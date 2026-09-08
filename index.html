@@ -295,7 +295,6 @@ function screenNouvelEnvoi() {
       '<div class="field" id="newclient" hidden><label>Nom du nouveau client final <i>*</i></label><input type="text" name="newclient" placeholder="Ex. Belona"></div>' +
       '<div class="field"><label>Deadline souhaitée</label><input type="date" name="deadline" value="' + def + '"><span class="hint">Par défaut, sous 3 jours ouvrés.</span></div>' +
     "</div>" +
-    '<div class="grid2"><div class="field"><label>Votre prénom</label><input type="text" name="by" placeholder="Pour savoir qui a déposé" value="' + esc(read("ds-by") || "") + '"></div></div>' +
     '<div class="field"><label>Liens vers les rushes <i>*</i></label><textarea name="links" required placeholder="Collez vos liens, un par ligne : Google Drive, WeTransfer ou Frame.io."></textarea><span class="hint">Multicaméra : toutes les caméras et les pistes audio séparées.</span></div>' +
     '<div><div class="eyebrow" style="margin-bottom:10px">Votre brief, en cinq points</div><div class="grid2">' +
       ta("format", "1 · Format et durée", "Ex. Reels 9:16 de 45 s max · Podcast 16:9 d\'environ 20 min, 3 caméras", true) +
@@ -312,11 +311,10 @@ function submitOrder(e) {
   e.preventDefault(); var f = new FormData(e.target); var client = f.get("client");
   if (client === "__new") client = String(f.get("newclient") || "").trim();
   if (!client) { toast(ERR.CLIENT_FINAL_REQUIS, true); return false; }
-  store("ds-by", f.get("by") || "");
   var btn = e.target.querySelector("button[type=submit]"); btn.disabled = true;
   act("space_submit_order", { p_token: token, p_end_client: client, p_links: String(f.get("links") || "").split("\n").map(function (l) { return l.trim(); }).filter(Boolean),
     p_brief: { format: f.get("format"), style: f.get("style"), text: f.get("text"), audio: f.get("audio"), keep: f.get("keep"), refs: f.get("refs") || "" },
-    p_deadline: f.get("deadline") || null, p_submitted_by: f.get("by") || null }, "Envoyé. L'équipe DS Editing est prévenue.")
+    p_deadline: f.get("deadline") || null }, "Envoyé. L'équipe DS Editing est prévenue.")
     .then(function (r) { location.hash = "#video/" + r.deliverable_id; }).catch(function () { btn.disabled = false; });
   return false;
 }
@@ -356,7 +354,7 @@ function screenMessages() {
     '<section class="panel"><div class="body"><div class="thread">' + msgs + "</div>" +
     '<form class="compose" onsubmit="return sendMsg(event)"><input type="text" name="t" required placeholder="Écrire à l\'équipe qualité"><button class="btn primary" type="submit">Envoyer</button></form></div></section>');
 }
-function sendMsg(e) { e.preventDefault(); var t = new FormData(e.target).get("t"); e.target.reset(); act("space_send_message", { p_token: token, p_body: t, p_author: read("ds-by") || null }, "Envoyé à l'équipe qualité."); return false; }
+function sendMsg(e) { e.preventDefault(); var t = new FormData(e.target).get("t"); e.target.reset(); act("space_send_message", { p_token: token, p_body: t }, "Envoyé à l'équipe qualité."); return false; }
 
 function screenFactures() {
   var LBL = { emise: ["À payer", "s4"], payee: ["Payée", "s3"], annulee: ["Annulée", "s0"] };
