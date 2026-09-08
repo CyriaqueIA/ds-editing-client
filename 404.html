@@ -1,0 +1,7 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>Espace client</title>
+<script>
+  // GitHub Pages : /e/<token> n'existe pas comme fichier → on renvoie vers /#/e/<token>
+  var m = location.pathname.match(/\/e\/([a-f0-9]{16,64})/i);
+  var base = location.pathname.replace(/\/e\/.*$/, "/");
+  location.replace(base + (m ? "#/e/" + m[1] : ""));
+</script></head><body></body></html>
