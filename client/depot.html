@@ -1,0 +1,746 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta name="theme-color" content="#0C0B10"/>
+  <meta name="robots" content="noindex"/>
+  <title>DS Editing — Nouveau projet</title>
+  <link rel="icon" type="image/png" href="../assets/logo.png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root{
+      --bg:#0C0B10; --surface:#16141A; --surface-2:#1D1A22; --line:rgba(237,232,220,.10); --line-strong:rgba(237,232,220,.22);
+      --cream:#EDE8DC; --taupe:#8A8378; --amber:#FF6A2B; --amber-soft:rgba(255,106,43,.14); --ok:#5FD39A; --err:#F08A82;
+      --radius:14px;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;background:var(--bg);color:var(--cream);font-family:"Archivo",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+    body{min-height:100vh;display:flex;flex-direction:column}
+    a{color:inherit}
+    .mono{font-family:"JetBrains Mono",ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;font-size:10px;color:var(--taupe)}
+    .display{font-family:"Anton",Impact,sans-serif;font-weight:400;letter-spacing:.01em;text-transform:uppercase;line-height:1}
+
+    header{position:sticky;top:0;z-index:20;background:rgba(12,11,16,.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+    .hd{max-width:960px;margin:0 auto;padding:14px 16px;display:flex;align-items:center;gap:14px}
+    .hd img{width:34px;height:34px;border-radius:8px;object-fit:cover}
+    .hd .brand{display:flex;flex-direction:column;gap:2px}
+    .hd .brand b{font-weight:600;letter-spacing:.02em}
+    .hd .client{margin-left:auto;display:flex;align-items:center;gap:8px;padding:6px 12px;border:1px solid var(--line-strong);border-radius:999px;font-size:13px}
+    .hd .client i{width:7px;height:7px;border-radius:50%;background:var(--amber);box-shadow:0 0 12px var(--amber)}
+    .lang{margin-left:10px;background:none;border:1px solid var(--line);color:var(--taupe);border-radius:999px;padding:6px 10px;cursor:pointer;font:inherit;font-size:12px}
+    .lang:hover{color:var(--cream);border-color:var(--line-strong)}
+
+    main{flex:1;width:100%;max-width:960px;margin:0 auto;padding:28px 16px 90px}
+    .intro h1{margin:18px 0 8px;font-size:clamp(34px,6vw,58px)}
+    .intro p{margin:0;color:var(--taupe);max-width:60ch;font-size:15px;line-height:1.55}
+
+    .steps{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin:26px 0 22px}
+    .step{padding:10px 10px 8px;border:1px solid var(--line);border-radius:10px;background:var(--surface);position:relative;overflow:hidden;cursor:pointer}
+    .step .n{font-family:"JetBrains Mono",monospace;font-size:10px;color:var(--taupe)}
+    .step .t{font-size:12px;margin-top:3px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .step::after{content:"";position:absolute;left:0;bottom:0;height:2px;width:0;background:var(--amber);transition:width .35s}
+    .step.active{border-color:var(--line-strong)}
+    .step.active::after,.step.done::after{width:100%}
+    .step.done .n{color:var(--ok)}
+    @media (max-width:640px){.steps{grid-template-columns:repeat(3,1fr)}}
+
+    .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:22px;margin-bottom:16px}
+    .card h2{margin:0 0 4px;font-size:22px}
+    .card .hint{margin:0 0 18px;color:var(--taupe);font-size:14px;line-height:1.5}
+    .panel{display:none}.panel.active{display:block;animation:fade .25s ease}
+    @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+    .block{margin-top:22px;padding-top:18px;border-top:1px solid var(--line)}
+    .block:first-of-type{margin-top:0;padding-top:0;border-top:0}
+    .block h3{margin:0 0 4px;font-size:16px}
+    .block .sub{margin:0 0 12px;color:var(--taupe);font-size:13px;line-height:1.5}
+
+    label.f{display:block;margin:14px 0 6px;font-size:14px;font-weight:500}
+    label.f small{color:var(--taupe);font-weight:400;margin-left:6px}
+    .in,textarea.in{width:100%;background:var(--bg);color:var(--cream);border:1px solid var(--line);border-radius:10px;padding:12px 14px;font:inherit;font-size:15px;outline:none;transition:border-color .15s,box-shadow .15s}
+    .in:focus{border-color:rgba(255,106,43,.6);box-shadow:0 0 0 3px rgba(255,106,43,.18)}
+    .in::placeholder{color:rgba(138,131,120,.6)}
+    textarea.in{min-height:150px;resize:vertical;line-height:1.5}
+    .in.bad{border-color:var(--err)}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    @media (max-width:640px){.row{grid-template-columns:1fr}}
+
+    /* cartes de choix */
+    .choices{display:grid;gap:10px;margin-top:8px}
+    .choices.two{grid-template-columns:1fr 1fr}
+    .choices.three{grid-template-columns:repeat(3,1fr)}
+    @media (max-width:720px){.choices.two,.choices.three{grid-template-columns:1fr}}
+    .c{border:1px solid var(--line);border-radius:12px;padding:16px;background:var(--bg);display:flex;flex-direction:column;gap:8px;cursor:pointer;transition:border-color .15s,background .15s;position:relative}
+    .c:hover{border-color:var(--line-strong)}
+    .c.on{border-color:rgba(255,106,43,.6);background:var(--amber-soft)}
+    .c .top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+    .c .name{font-weight:600;font-size:16px}
+    .c .price{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--taupe);border:1px solid var(--line);border-radius:999px;padding:4px 9px;white-space:nowrap}
+    .c.on .price{color:var(--amber);border-color:rgba(255,106,43,.5)}
+    .c .desc{font-size:13px;color:var(--taupe);line-height:1.45;flex:1}
+    .c .foot{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:4px}
+    .preview{background:none;border:none;color:var(--cream);font:inherit;font-size:13px;cursor:pointer;padding:0;display:inline-flex;align-items:center;gap:6px;opacity:.85}
+    .preview:hover{color:var(--amber);opacity:1}
+    .preview[disabled]{color:var(--taupe);cursor:default;opacity:.6}
+    .preview i{width:20px;height:20px;border-radius:50%;border:1px solid currentColor;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-style:normal}
+    .qty{display:flex;align-items:center;gap:6px}
+    .qty button{width:34px;height:34px;border-radius:9px;border:1px solid var(--line-strong);background:var(--surface);color:var(--cream);font-size:18px;cursor:pointer;line-height:1}
+    .qty button:hover{border-color:var(--amber);color:var(--amber)}
+    .qty input{width:52px;height:34px;text-align:center;background:var(--bg);border:1px solid var(--line);border-radius:9px;color:var(--cream);font:inherit;font-size:15px}
+    .qty input::-webkit-outer-spin-button,.qty input::-webkit-inner-spin-button{-webkit-appearance:none}
+    .qty .lab{font-size:13px;color:var(--taupe);margin-right:6px}
+    .thumbs{display:flex;gap:8px;margin:8px 0 4px}
+    .thumbs a,.thumbs span{width:96px;aspect-ratio:16/9;border-radius:8px;border:1px solid var(--line);background:linear-gradient(135deg,#1D1A22,#2A2530);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--taupe);text-decoration:none;overflow:hidden}
+    .thumbs a img{width:100%;height:100%;object-fit:cover}
+    .thumbs a:hover{border-color:var(--amber)}
+    .note{font-size:12px;color:var(--taupe);margin-top:8px;line-height:1.5}
+
+    .links{display:flex;flex-direction:column;gap:8px}
+    .links .l{display:flex;gap:8px}
+    .links .l .in{flex:1}
+    .links .l button{width:44px;border-radius:10px;border:1px solid var(--line);background:none;color:var(--taupe);cursor:pointer;font-size:18px}
+    .links .l button:hover{color:var(--err);border-color:var(--err)}
+    .add{margin-top:8px;background:none;border:1px dashed var(--line-strong);color:var(--taupe);border-radius:10px;padding:10px 14px;cursor:pointer;font:inherit;font-size:13px;width:100%}
+    .add:hover{color:var(--cream);border-color:var(--cream)}
+    .chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 4px}
+    .chip{border:1px solid var(--line-strong);background:none;color:var(--cream);border-radius:999px;padding:7px 12px;font:inherit;font-size:13px;cursor:pointer}
+    .chip:hover{border-color:var(--amber);color:var(--amber);background:var(--amber-soft)}
+    .swatches{display:flex;gap:6px;margin-top:8px;min-height:18px}
+    .swatches i{width:22px;height:22px;border-radius:6px;border:1px solid var(--line-strong)}
+    .brandkit{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:22px}
+    @media (max-width:640px){.brandkit{grid-template-columns:1fr}}
+    .kh{display:flex;align-items:center;gap:8px;font-family:"JetBrains Mono",monospace;font-size:11px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--cream)}
+    .kh svg{color:var(--amber);flex:none}
+    .ks{margin:6px 0 10px;font-size:12px;color:var(--taupe)}
+    .drop{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:82px;border:1px dashed var(--line-strong);border-radius:12px;cursor:pointer;color:var(--taupe);font-size:13px;text-align:center;padding:12px;transition:.15s}
+    .drop .up{color:var(--amber)}
+    .drop:hover,.drop.over{border-color:var(--amber);background:var(--amber-soft);color:var(--cream)}
+    .drop.has{border-style:solid;border-color:rgba(255,106,43,.5);color:var(--cream)}
+    .drop img{max-height:56px;max-width:80%;object-fit:contain;border-radius:6px}
+    .cta-block{margin:22px 0 4px;padding-top:18px;border-top:1px solid var(--line)}
+    .yn{display:flex;gap:10px}
+    .yn button{min-width:78px;border:1px solid var(--line-strong);border-radius:999px;background:none;color:var(--cream);font:inherit;font-size:14px;font-weight:600;padding:11px 20px;cursor:pointer;transition:.15s}
+    .yn button:hover{border-color:var(--amber)}
+    .yn button.on{background:var(--amber);border-color:var(--amber);color:#0C0B10}
+    .cta-ex{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:14px;font-size:13px;color:var(--taupe)}
+    .cta-ex #ctaChips{display:flex;gap:8px;flex-wrap:wrap}
+    .cx{position:relative;display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:999px;background:var(--surface-2);color:var(--cream);font:inherit;font-size:13px;padding:8px 12px;cursor:default}
+    .cx.live{cursor:pointer}.cx.live:hover{border-color:var(--amber)}
+    .cx i{width:14px;height:14px;border-radius:50%;border:1px solid var(--amber);color:var(--amber);font-size:9px;font-style:normal;display:inline-flex;align-items:center;justify-content:center}
+    .cx .pop{display:none;position:absolute;bottom:calc(100% + 10px);left:0;z-index:30;width:280px;background:var(--surface);border:1px solid var(--line-strong);border-radius:12px;padding:8px;box-shadow:0 20px 50px rgba(0,0,0,.5)}
+    .cx:hover .pop,.cx:focus .pop{display:block}
+    .cx .pop img,.cx .pop video{display:block;width:100%;border-radius:8px;background:#000}
+    .cx .pop span{display:block;padding:18px 8px;text-align:center;color:var(--taupe);font-size:12px}
+    .fontpick{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+    .fontpick button{border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--taupe);font:inherit;font-size:14px;text-align:left;padding:16px;cursor:pointer;transition:.15s}
+    .fontpick button:hover{border-color:var(--line-strong);color:var(--cream)}
+    .fontpick button.on{border-color:var(--amber);background:var(--amber-soft);color:var(--cream)}
+    .check{display:flex;align-items:center;gap:10px;margin-top:10px;font-size:14px;color:var(--taupe);cursor:pointer}
+    .check input{width:18px;height:18px;accent-color:var(--amber)}
+
+    .nav{position:sticky;bottom:0;background:rgba(12,11,16,.92);backdrop-filter:blur(10px);border-top:1px solid var(--line);margin:0 -16px;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+    .btn{border:none;border-radius:999px;padding:14px 22px;font:inherit;font-size:15px;font-weight:600;cursor:pointer;transition:transform .12s,opacity .15s;white-space:nowrap}
+    .btn:active{transform:scale(.98)}
+    .btn.primary{background:var(--amber);color:#0C0B10}
+    .btn.primary:hover{opacity:.92}
+    .btn.ghost{background:none;color:var(--taupe);border:1px solid var(--line)}
+    .btn.ghost:hover{color:var(--cream);border-color:var(--line-strong)}
+    .btn[disabled]{opacity:.5;cursor:not-allowed}
+    .summary{font-size:12px;color:var(--taupe);text-align:center;line-height:1.4;flex:1;min-width:0}
+    .summary b{color:var(--cream);font-weight:500}
+    .nav{flex-wrap:wrap}
+    .msg{flex-basis:100%;order:-1;font-size:14px;font-weight:600;color:var(--err);text-align:center}
+    .msg:empty{display:none}
+
+    .recap{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    @media (max-width:640px){.recap{grid-template-columns:1fr}}
+    .recap .k{font-size:11px;color:var(--taupe);text-transform:uppercase;letter-spacing:.12em;font-family:"JetBrains Mono",monospace;margin-bottom:4px}
+    .recap .v{font-size:14px;line-height:1.5;white-space:pre-wrap;word-break:break-word}
+    .recap .full{grid-column:1/-1}
+
+    .success{text-align:center;padding:40px 10px}
+    .success .ok{width:64px;height:64px;border-radius:50%;background:rgba(95,211,154,.15);border:1px solid rgba(95,211,154,.5);display:inline-flex;align-items:center;justify-content:center;color:var(--ok);font-size:28px;margin-bottom:16px}
+    .success h2{font-size:34px;margin:0 0 8px}
+    .success p{color:var(--taupe);max-width:52ch;margin:0 auto 22px;line-height:1.55}
+    .next{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;text-align:left;margin-top:8px}
+    @media (max-width:640px){.next{grid-template-columns:1fr}}
+    .next div{border:1px solid var(--line);border-radius:12px;padding:14px;background:var(--bg);font-size:14px;line-height:1.45}
+    .next b{display:block;margin-bottom:4px}
+    footer{padding:18px 16px;text-align:center}
+
+    /* aperçu vidéo */
+    .modal{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.78);display:none;align-items:center;justify-content:center;padding:16px}
+    .modal.open{display:flex}
+    .modal .box{width:min(960px,100%);background:var(--surface);border:1px solid var(--line-strong);border-radius:14px;overflow:hidden}
+    .modal .bar{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--line);font-size:13px}
+    .modal .bar button{background:none;border:none;color:var(--taupe);font-size:20px;cursor:pointer}
+    .modal iframe{display:block;width:100%;aspect-ratio:16/9;border:0;background:#000}
+    .modal video{display:block;width:100%;aspect-ratio:16/9;background:#000;max-height:72vh}
+    .plist{display:flex;gap:8px;padding:10px;overflow-x:auto;border-top:1px solid var(--line)}
+    .plist:empty{display:none}
+    .plist button{flex:none;width:150px;border:1px solid var(--line);border-radius:8px;background:#000;padding:0;cursor:pointer;overflow:hidden;color:var(--cream);text-align:left}
+    .plist button img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;opacity:.75}
+    .plist button span{display:block;padding:6px 8px;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .plist button.on{border-color:var(--amber)}.plist button.on img{opacity:1}
+    .terms{display:flex;gap:10px;align-items:flex-start;margin-top:16px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;font-size:13px;line-height:1.45;cursor:pointer}
+    .terms input{margin-top:3px;accent-color:var(--amber);width:16px;height:16px;flex:none}
+    .terms a{color:var(--amber)}
+  </style>
+</head>
+<body>
+<header>
+  <div class="hd">
+    <img src="../assets/logo.png" alt="DS Editing"/>
+    <div class="brand"><b>DS Editing</b><span class="mono" data-i="tagline"></span></div>
+    <div class="client"><i></i><span id="clientName">—</span></div>
+    <button class="lang" id="langBtn" type="button">EN</button>
+  </div>
+</header>
+
+<main>
+  <section class="intro">
+    <div class="mono" data-i="kicker"></div>
+    <h1 class="display" data-i="title"></h1>
+    <p data-i="intro"></p>
+  </section>
+
+  <div class="steps" id="steps"></div>
+
+  <form id="form" novalidate>
+    <!-- 1. Produit -->
+    <section class="card panel" data-step="0">
+      <h2 data-i="s1.title"></h2>
+      <p class="hint" data-i="s1.hint"></p>
+      <label class="f" for="projet" data-i="f.projet"></label>
+      <input class="in" id="projet" name="projet" data-ph="ph.projet" autocomplete="off"/>
+      <label class="f" data-i="f.produit"></label>
+      <div class="choices two" id="produit"></div>
+      <p class="note" data-i="note.episode"></p>
+    </section>
+
+    <!-- 2. Formule -->
+    <section class="card panel" data-step="1">
+      <h2 data-i="s2.title"></h2>
+      <p class="hint" data-i="s2.hint"></p>
+      <div class="choices two" id="formule"></div>
+    </section>
+
+    <!-- 3. Extras -->
+    <section class="card panel" data-step="2">
+      <h2 data-i="s3.title"></h2>
+      <p class="hint" data-i="s3.hint"></p>
+      <div class="block">
+        <h3 data-i="x.reels"></h3><p class="sub" data-i="x.reelsSub"></p>
+        <div class="choices two" id="reels"></div>
+      </div>
+      <div class="block">
+        <h3 data-i="x.miniature"></h3><p class="sub" data-i="x.miniatureSub"></p>
+        <div class="thumbs" id="thumbs"></div>
+        <div class="qty"><span class="lab" data-i="f.qty"></span><button type="button" data-dec="miniature">−</button><input type="number" min="0" max="99" data-q="miniature"/><button type="button" data-inc="miniature">+</button><span class="price" id="pMiniature" style="margin-left:10px"></span></div>
+      </div>
+      <div class="block">
+        <h3 data-i="x.trailer"></h3><p class="sub" data-i="x.trailerSub"></p>
+        <div class="qty"><span class="lab" data-i="f.qty"></span><button type="button" data-dec="trailer">−</button><input type="number" min="0" max="99" data-q="trailer"/><button type="button" data-inc="trailer">+</button><span class="price" id="pTrailer" style="margin-left:10px"></span><button type="button" class="preview" data-prev="trailer" style="margin-left:14px"><i>▶</i><span data-i="preview"></span></button></div>
+      </div>
+      <div class="block">
+        <label class="f" for="autre_demande" style="margin-top:0" data-i="f.autre_demande"></label>
+        <input class="in" id="autre_demande" name="autre_demande" data-ph="ph.autre_demande"/>
+      </div>
+    </section>
+
+    <!-- 4. Fichiers -->
+    <section class="card panel" data-step="3">
+      <h2 data-i="s4.title"></h2>
+      <p class="hint" data-i="s4.hint"></p>
+      <label class="f" data-i="f.rushes"></label>
+      <div class="links" id="rushes"></div>
+      <button type="button" class="add" data-add="rushes" data-i="add.link"></button>
+      <div class="brandkit">
+        <div>
+          <div class="kh"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/></svg><span data-i="bk.logo"></span></div>
+          <p class="ks" data-i="bk.logoSub"></p>
+          <label class="drop" id="dropLogo"><input type="file" accept=".png,.svg,.jpg,.jpeg,image/png,image/svg+xml,image/jpeg" hidden data-file="logo"/><span class="up"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 15V4M7 9l5-5 5 5M4 15v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4"/></svg></span><span class="dl" data-i="bk.logoDrop"></span></label>
+        </div>
+        <div>
+          <div class="kh"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 1.6-.9 1.2-1.8-.5-1-.2-2.2 1.1-2.2H17a4 4 0 0 0 4-4c0-5-4-10-9-10z"/><circle cx="7.5" cy="11" r="1"/><circle cx="10" cy="7" r="1"/><circle cx="14.5" cy="7" r="1"/></svg><span data-i="bk.palette"></span></div>
+          <p class="ks" data-i="bk.paletteSub"></p>
+          <label class="drop" id="dropPalette"><input type="file" accept="image/*" hidden data-file="palette"/><span class="up"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 15V4M7 9l5-5 5 5M4 15v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4"/></svg></span><span class="dl" data-i="bk.paletteDrop"></span></label>
+          <input class="in" id="palette" name="palette" data-ph="ph.palette" style="margin-top:10px"/>
+          <div class="swatches" id="swatches"></div>
+        </div>
+      </div>
+      <div class="kh" style="margin-top:22px"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 5h14M12 5v14M9 19h6"/></svg><span data-i="bk.font"></span></div>
+      <div class="fontpick" id="fontpick"><button type="button" data-font="own" data-i="bk.fontOwn"></button><button type="button" data-font="team" data-i="bk.fontTeam"></button></div>
+      <input class="in" id="fontName" data-ph="ph.font" style="margin-top:10px"/>
+      <label class="f" data-i="f.references"><small data-i="f.referencesSmall"></small></label>
+      <div class="links" id="references"></div>
+      <button type="button" class="add" data-add="references" data-i="add.link"></button>
+    </section>
+
+    <!-- 5. Brief -->
+    <section class="card panel" data-step="4">
+      <h2 data-i="s5.title"></h2>
+      <p class="hint" data-i="s5.hint"></p>
+      <label class="f" for="description" data-i="f.description"></label>
+      <div class="chips" id="chips"></div>
+      <textarea class="in" id="description" name="description" data-ph="ph.description"></textarea>
+      <div class="row">
+        <div>
+          <label class="f" for="deadline" data-i="f.deadline"><small data-i="f.deadlineSmall"></small></label>
+          <input class="in" id="deadline" name="deadline" type="date"/>
+        </div>
+      </div>
+      <div class="cta-block">
+        <div class="kh"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg><span data-i="cta.title"></span></div>
+        <p class="ks" data-i="cta.sub"></p>
+        <div class="yn" id="ctaYN"><button type="button" data-cta="yes" data-i="cta.yes"></button><button type="button" data-cta="no" data-i="cta.no"></button></div>
+        <input class="in" id="ctaNets" data-ph="ph.ctaNets" style="margin-top:10px;display:none"/>
+        <div class="cta-ex"><span data-i="cta.examples"></span><span id="ctaChips"></span></div>
+      </div>
+      <div class="row">
+        <div>
+          <label class="f" for="contactName" data-i="f.contactName"></label>
+          <input class="in" id="contactName" data-ph="ph.contactName" autocomplete="name"/>
+        </div>
+        <div>
+          <label class="f" for="contactHow" data-i="f.contactHow"></label>
+          <input class="in" id="contactHow" data-ph="ph.contactHow"/>
+        </div>
+      </div>
+      <label class="f" for="email" data-i="f.email"><small data-i="f.emailSmall"></small></label>
+      <input class="in" id="email" type="email" data-ph="ph.email" autocomplete="email"/>
+      <label class="f" for="autres" data-i="f.autres"></label>
+      <input class="in" id="autres" name="autres" data-ph="ph.autres"/>
+    </section>
+
+    <!-- 6. Récap -->
+    <section class="card panel" data-step="5">
+      <h2 data-i="s6.title"></h2>
+      <p class="hint" data-i="s6.hint"></p>
+      <div class="recap" id="recap"></div>
+      <label class="terms" for="terms"><input type="checkbox" id="terms"/><span><span data-i="s6.terms"></span> <a id="termsLink" href="../conditions.html" target="_blank" rel="noopener" data-i="s6.termsLink"></a></span></label>
+    </section>
+
+    <div class="nav">
+      <div class="msg" id="msg"></div>
+      <button type="button" class="btn ghost" id="prev" data-i="btn.prev"></button>
+      <div class="summary" id="summary"></div>
+      <button type="button" class="btn primary" id="next" data-i="btn.next"></button>
+    </div>
+  </form>
+
+  <section class="card success" id="success" style="display:none">
+    <div class="ok">✓</div>
+    <h2 class="display" data-i="ok.title"></h2>
+    <p data-i="ok.text"></p>
+    <div class="next">
+      <div><b data-i="ok.n1t"></b><span data-i="ok.n1"></span></div>
+      <div><b data-i="ok.n2t"></b><span data-i="ok.n2"></span></div>
+      <div><b data-i="ok.n3t"></b><span data-i="ok.n3"></span></div>
+    </div>
+    <p style="margin-top:22px"><a class="btn primary" id="spaceLink" href="#" style="display:none" data-i="ok.space"></a> <button class="btn ghost" id="again" type="button" data-i="ok.again"></button></p>
+  </section>
+</main>
+<footer class="mono">DS Editing · <span data-i="footer"></span></footer>
+
+<div class="modal" id="modal"><div class="box"><div class="bar"><span id="modalTitle"></span><button type="button" id="modalClose">×</button></div><iframe id="modalFrame" allow="autoplay; fullscreen" allowfullscreen></iframe><div class="plist" id="plist"></div></div></div>
+
+<script src="forms.js?v=4"></script>
+<script src="previews.js?v=4"></script>
+<script>
+/* =========================================================================
+   À REMPLIR PAR DS EDITING — liens d'aperçu et prix.
+   Un lien vide = bouton « Aperçu » grisé. Un prix vide = « Sur devis ».
+   Liens acceptés : YouTube, Vimeo (ouverts dans une fenêtre), tout autre lien (nouvel onglet).
+   ========================================================================= */
+const PREVIEWS = {
+  // Vidéos d'aperçu : générées depuis le Drive par sync_previews.mjs (client/previews.js)
+  ...(window.DS_PREVIEWS || {}),
+  trailer: "",
+  portfolio: "",                 // lien vers le portfolio miniatures
+  miniatures: ["", "", ""],      // 3 images d'exemple (URL d'image)
+};
+// Exemples de CTA à l'écran : nom + image ou vidéo courte (gif, png, mp4). Vide = « Aperçu bientôt ».
+// Source : dossier Drive « Videos Espaces Clients 05 Brief », via sync_previews.mjs (client/previews.js). Secours : pastilles vides.
+const CTA_EXAMPLES = (window.DS_PREVIEWS && window.DS_PREVIEWS.cta && window.DS_PREVIEWS.cta.length) ? window.DS_PREVIEWS.cta : [{ name: "Jordan Pierre", media: "" }, { name: "Courtney Kay", media: "" }];
+const PRICES = { podcast: "", vsl: "", standard: "", premium: "", reel_basique: "", reel_signature: "", miniature: "", trailer: "" };
+
+/* ---------------- textes ---------------- */
+const I18N = {
+  fr: {
+    tagline:"Espace client", kicker:"Nouveau projet", title:"Envoyez-nous<br/>votre prochaine vidéo",
+    intro:"Six étapes, cinq minutes. Choisissez, collez vos liens, dites-nous ce que vous voulez. Vous recevez un lien de relecture frame.io dès que le premier montage est prêt.",
+    steps:["Produit","Formule","Extras","Fichiers","Brief","Envoi"],
+    "s1.title":"Votre projet","s1.hint":"Un nom, un produit. Le reste vient après.",
+    "f.projet":"Nom du projet ou de l'épisode","ph.projet":"Ex. Épisode 12 — Dr Weber",
+    "f.produit":"Ce que vous nous confiez","f.episodes":"Nombre d'épisodes",
+    produit:{podcast:["Podcast / Interview","Épisode complet monté, 16:9, prêt à publier."],vsl:["VSL","Vidéo de vente, 16:9, rythme et sous-titres travaillés."]},
+    "note.episode":"Un épisode = une vidéo finie jusqu'à 60 minutes. Au-delà, un supplément par tranche de 30 minutes.",
+    "s2.title":"Votre formule","s2.hint":"Le niveau de finition de l'épisode uniquement. Les extras se choisissent à part.",
+    formule:{standard:["Standard","Montage propre et rythmé, habillage simple, son mixé. Pas d'intro dédiée."],premium:["Premium","Standard + une ouverture percutante de 20 à 30 secondes montée depuis vos meilleurs moments, titres animés, sound design."]},
+    "s3.title":"Les extras","s3.hint":"Facultatif. Ajoutez ce qui accompagne l'épisode.",
+    "x.reels":"Reels","x.reelsSub":"Extraits verticaux 9:16 de votre épisode, sous-titres animés.",
+    reels:{reel_basique:["Reel standard","Les meilleurs moments, sous-titres animés, sound design."],reel_signature:["Reel premium","Motion design, b-roll, sound design poussé, niveau publicitaire."]},
+    "x.miniature":"Miniature","x.miniatureSub":"Le visuel de couverture de l'épisode, une par vidéo.",
+    "x.trailer":"Trailer","x.trailerSub":"60 à 90 secondes pour vos réseaux : sound design, étalonnage cinéma, motion.",
+    "f.qty":"Quantité","preview":"Aperçu","previewSoon":"Aperçu bientôt","portfolio":"Voir le portfolio","exemple":"Exemple",
+    "f.autre_demande":"Autre demande","ph.autre_demande":"Ex. générique de fin, sous-titres anglais…",
+    "s4.title":"Vos fichiers","s4.hint":"Rien à téléverser ici : collez les liens de vos rushes, WeTransfer, Google Drive ou frame.io. Pensez à autoriser l'accès.",
+    "cta.title":"Veux-tu un CTA vers tes réseaux sociaux dans l'épisode ?","cta.sub":"Survole un exemple pour voir à quoi ressemble le CTA à l'écran.","cta.yes":"Oui","cta.no":"Non","cta.examples":"Voir des exemples","cta.soon":"Aperçu bientôt","ph.ctaNets":"Tes réseaux : @instagram, chaîne YouTube, TikTok…","cta.unit":"CTA réseaux sociaux",
+    "bk.logo":"Ton logo ici","bk.logoSub":"PNG, SVG ou JPG. Facultatif.","bk.logoDrop":"Glisse ton logo ici","bk.palette":"Ta palette graphique ici","bk.paletteSub":"Une capture de ta palette, ou tes codes couleur en dessous.","bk.paletteDrop":"Glisse ta palette ici","bk.font":"Une police d'écriture spécifique à utiliser ?","bk.fontOwn":"J'ai une police spécifique","bk.fontTeam":"Laisser l'équipe artistique décider","ph.font":"Nom de la police, ou un lien","bk.teamFont":"l'équipe artistique décide","bk.file":"fichier joint",
+    "f.rushes":"Liens des rushes","f.logos":"Logos et polices","f.logosSmall":"liens Drive ou WeTransfer","f.logosSent":"Vous les avez déjà, rien de nouveau",
+    "f.references":"Les vidéos dont on doit s'inspirer","f.referencesSmall":"colle les liens de vidéos que tu adores, on reprend leur style : rythme, sous-titres, habillage","add.link":"+ Ajouter un lien","ph.link":"https://…",
+    "s5.title":"Votre brief","s5.hint":"Plus c'est précis, plus le premier montage est juste. Cliquez sur une puce pour insérer une rubrique.",
+    "f.description":"Description et détails","ph.description":"Objectif, audience, ton, ce qu'il faut garder ou couper, durée visée…",
+    chips:["Objectif :","Ton :","À garder :","À couper :","Durée visée :"],
+    "f.palette":"Palette de couleurs","f.paletteSmall":"codes hex","ph.palette":"ex. #E02B20, #0A0A0B, #FFFFFF",
+    "f.deadline":"Deadline souhaitée","f.deadlineSmall":"on vous confirme la date à réception",
+    "f.email":"Ton e-mail","f.emailSmall":"confirmation de commande, suivi et facture","ph.email":"toi@studio.com",
+    "f.contactName":"Contact pour ce projet","ph.contactName":"Prénom et nom","f.contactHow":"WhatsApp","ph.contactHow":"+33 6…",
+    "f.autres":"Autre chose à nous dire ?","ph.autres":"Facultatif",
+    "s6.title":"Récapitulatif","s6.hint":"Vérifiez, puis envoyez. Vous pouvez revenir en arrière.",
+    recap:{projet:"Projet",commande:"Commande",autre_demande:"Autre demande",rushes:"Rushes",logos:"Logos et polices",references:"Vidéos d\'inspiration",description:"Brief",palette:"Palette",deadline:"Deadline souhaitée",contact:"Contact",email:"E-mail",autres:"Autres infos",prix:"Prix"},
+    quote:"Sur devis", quoteLong:"Sur devis, confirmé par notre équipe à réception.",
+    "btn.prev":"Retour","btn.next":"Continuer","btn.send":"Envoyer à DS Editing","btn.sending":"Envoi…",
+    saved:"Brouillon enregistré sur cet appareil", empty:"Votre commande apparaîtra ici",
+    units:{episode:["épisode","épisodes"],reel_basique:["reel standard","reels standard"],reel_signature:["reel premium","reels premium"],miniature:["miniature","miniatures"],trailer:["trailer","trailers"]},
+    err:{projet:"Donnez un nom au projet.",produit:"Choisissez Podcast / Interview ou VSL.",formule:"Choisissez une formule.",rushes:"Ajoutez au moins un lien de rushes.",description:"Décrivez ce que vous attendez, même en trois lignes.",contact:"Indiquez un contact et un moyen de le joindre.",email:"Indiquez un e-mail valide, c'est là qu'arrivent la confirmation et le suivi.",send:"L'envoi a échoué. Réessayez, ou écrivez-nous sur WhatsApp.",terms:"Cochez les conditions de collaboration pour envoyer la commande."},
+    "s6.terms":"J'accepte les conditions de collaboration DS Editing : facture hebdomadaire, paiement à réception, pénalité de 20 % par semaine de retard.","s6.termsLink":"Lire les conditions","ok.space":"Ouvrir mon espace (commandes, factures)",
+    "ok.title":"C'est parti","ok.text":"Votre projet est chez nous. Vous recevrez un lien de relecture frame.io dès que le premier montage sera prêt.",
+    "ok.n1t":"1. On lit votre brief","ok.n1":"Et on revient vers vous si un lien ne s'ouvre pas.","ok.n2t":"2. On monte","ok.n2":"Un monteur dédié, validé par notre head of editing avant envoi.","ok.n3t":"3. Vous relisez","ok.n3":"Commentaires à la seconde près sur frame.io, puis vous approuvez.",
+    "ok.again":"Déposer un autre projet", footer:"vos rushes sont pris en charge dès réception", none:"—", already:"déjà envoyés",
+  },
+  en: {
+    tagline:"Client space", kicker:"New project", title:"Send us<br/>your next video",
+    intro:"Six steps, five minutes. Choose, paste your links, tell us what you want. You get a frame.io review link as soon as the first cut is ready.",
+    steps:["Product","Package","Extras","Files","Brief","Send"],
+    "s1.title":"Your project","s1.hint":"A name, a product. The rest comes next.",
+    "f.projet":"Project or episode name","ph.projet":"e.g. Episode 12 — Dr Weber",
+    "f.produit":"What you're sending us","f.episodes":"Number of episodes",
+    produit:{podcast:["Podcast / Interview","Full edited episode, 16:9, ready to publish."],vsl:["VSL","Sales video, 16:9, pacing and captions crafted."]},
+    "note.episode":"One episode = one finished video up to 60 minutes. Beyond, a supplement per extra 30 minutes.",
+    "s2.title":"Your package","s2.hint":"The finish level of the episode only. Extras are chosen separately.",
+    formule:{standard:["Standard","Clean, paced edit, simple graphics, mixed sound. No dedicated intro."],premium:["Premium","Standard + a punchy 20–30 s cold open cut from your strongest moments, motion titles, sound design."]},
+    "s3.title":"Extras","s3.hint":"Optional. Add what goes with the episode.",
+    "x.reels":"Reels","x.reelsSub":"Vertical 9:16 clips from your episode, animated captions.",
+    reels:{reel_basique:["Standard reel","Best moments, animated captions, sound design."],reel_signature:["Premium reel","Motion design, b-roll, deep sound design, ad-grade."]},
+    "x.miniature":"Thumbnail","x.miniatureSub":"The cover visual of the episode, one per video.",
+    "x.trailer":"Trailer","x.trailerSub":"60–90 seconds for your socials: sound design, cinema grade, motion.",
+    "f.qty":"Quantity","preview":"Preview","previewSoon":"Preview soon","portfolio":"See the portfolio","exemple":"Example",
+    "f.autre_demande":"Other request","ph.autre_demande":"e.g. end credits, English subtitles…",
+    "s4.title":"Your files","s4.hint":"Nothing to upload here: paste your footage links, WeTransfer, Google Drive or frame.io. Make sure access is allowed.",
+    "cta.title":"Do you want a CTA to your socials in the episode?","cta.sub":"Hover an example to see what the CTA looks like on screen.","cta.yes":"Yes","cta.no":"No","cta.examples":"See examples","cta.soon":"Preview soon","ph.ctaNets":"Your socials: @instagram, YouTube channel, TikTok…","cta.unit":"Social media CTA",
+    "bk.logo":"Your logo here","bk.logoSub":"PNG, SVG or JPG. Optional.","bk.logoDrop":"Drop your logo here","bk.palette":"Your colour palette here","bk.paletteSub":"A screenshot of your palette, or your colour codes below.","bk.paletteDrop":"Drop your palette here","bk.font":"A specific font to use?","bk.fontOwn":"I have a specific font","bk.fontTeam":"Let the art team decide","ph.font":"Font name, or a link","bk.teamFont":"art team decides","bk.file":"file attached",
+    "f.rushes":"Raw footage links","f.logos":"Logos & fonts","f.logosSmall":"Drive or WeTransfer links","f.logosSent":"You already have them, nothing new",
+    "f.references":"The videos we should take after","f.referencesSmall":"paste links to videos you love, we'll match their style: pacing, captions, graphics","add.link":"+ Add a link","ph.link":"https://…",
+    "s5.title":"Your brief","s5.hint":"The more precise, the better the first cut. Click a chip to insert a section.",
+    "f.description":"Description & details","ph.description":"Goal, audience, tone, what to keep or cut, target length…",
+    chips:["Goal:","Tone:","Keep:","Cut:","Target length:"],
+    "f.palette":"Colour palette","f.paletteSmall":"hex codes","ph.palette":"e.g. #E02B20, #0A0A0B, #FFFFFF",
+    "f.deadline":"Desired deadline","f.deadlineSmall":"we confirm the date on receipt",
+    "f.email":"Your email","f.emailSmall":"order confirmation, tracking and invoice","ph.email":"you@studio.com",
+    "f.contactName":"Contact for this project","ph.contactName":"First and last name","f.contactHow":"WhatsApp","ph.contactHow":"+1…",
+    "f.autres":"Anything else?","ph.autres":"Optional",
+    "s6.title":"Summary","s6.hint":"Check, then send. You can go back.",
+    recap:{projet:"Project",commande:"Order",autre_demande:"Other request",rushes:"Footage",logos:"Logos & fonts",references:"Inspiration videos",description:"Brief",palette:"Palette",deadline:"Desired deadline",contact:"Contact",email:"Email",autres:"Other info",prix:"Price"},
+    quote:"On quote", quoteLong:"On quote, confirmed by our team on receipt.",
+    "btn.prev":"Back","btn.next":"Continue","btn.send":"Send to DS Editing","btn.sending":"Sending…",
+    saved:"Draft saved on this device", empty:"Your order will appear here",
+    units:{episode:["episode","episodes"],reel_basique:["standard reel","standard reels"],reel_signature:["premium reel","premium reels"],miniature:["thumbnail","thumbnails"],trailer:["trailer","trailers"]},
+    err:{projet:"Give the project a name.",produit:"Choose Podcast / Interview or VSL.",formule:"Choose a package.",rushes:"Add at least one footage link.",description:"Describe what you expect, even in three lines.",contact:"Give us a contact and a way to reach them.",email:"Enter a valid email, that's where the confirmation and tracking go.",send:"Sending failed. Try again, or message us on WhatsApp.",terms:"Tick the terms of collaboration to send the order."},
+    "s6.terms":"I accept the DS Editing terms of collaboration: weekly invoice, payment on receipt, 20% penalty per week late.","s6.termsLink":"Read the terms","ok.space":"Open my space (orders, invoices)",
+    "ok.title":"You're all set","ok.text":"Your project is with us. You'll get a frame.io review link as soon as the first cut is ready.",
+    "ok.n1t":"1. We read your brief","ok.n1":"And get back to you if a link doesn't open.","ok.n2t":"2. We edit","ok.n2":"One dedicated editor, checked by our head of editing before delivery.","ok.n3t":"3. You review","ok.n3":"Frame-accurate comments on frame.io, then you approve.",
+    "ok.again":"Submit another project", footer:"your footage is handled on receipt", none:"—", already:"already sent",
+  },
+};
+const FORMULES = ["standard", "premium"];
+const REELS = ["reel_basique", "reel_signature"];
+
+/* ---------------- client & langue ---------------- */
+const params = new URLSearchParams(location.search);
+const slug = (params.get("client") || "").toLowerCase();
+const FORMS = window.DS_FORMS || {};
+const client = FORMS[slug];
+let lang = params.get("lang") || (client ? client.lang : "fr");
+if (!I18N[lang]) lang = "fr";
+const $ = (s) => document.querySelector(s);
+const t = (k) => (I18N[lang][k] ?? k);
+const KEY = "ds-depot-" + (slug || "demo");
+let step = 0;
+const draft = Object.assign({ qty: {}, episodes: 1 }, load());
+if (draft.formule && !["standard", "premium"].includes(draft.formule)) delete draft.formule;
+if (draft.produit && !["podcast", "vsl"].includes(draft.produit)) delete draft.produit;
+const price = (k) => PRICES[k] ? PRICES[k] : t("quote");
+const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+
+function applyText() {
+  document.documentElement.lang = lang;
+  document.querySelectorAll("[data-i]").forEach((el) => { const v = t(el.dataset.i); if (typeof v === "string") el.innerHTML = v; });
+  document.querySelectorAll("[data-ph]").forEach((el) => { el.placeholder = t(el.dataset.ph); });
+  $("#langBtn").textContent = lang === "fr" ? "EN" : "FR";
+  $("#clientName").textContent = client ? client.client : (slug || "Demo");
+  document.title = "DS Editing — " + (lang === "fr" ? "Nouveau projet" : "New project");
+  $("#pMiniature").textContent = price("miniature"); $("#pTrailer").textContent = price("trailer");
+  renderSteps(); renderProduit(); renderFormule(); renderReels(); renderThumbs(); renderQty(); renderChips(); renderLinks("rushes"); renderLinks("references"); renderBrandkit(); renderCTA(); renderNav(); wirePreviews();
+}
+$("#langBtn").addEventListener("click", () => { lang = lang === "fr" ? "en" : "fr"; applyText(); });
+
+/* ---------------- rendus ---------------- */
+function renderSteps() {
+  $("#steps").innerHTML = t("steps").map((s, i) => `<div class="step ${i === step ? "active" : ""} ${i < step ? "done" : ""}" data-go="${i}"><div class="n">0${i + 1}</div><div class="t">${s}</div></div>`).join("");
+  document.querySelectorAll(".step[data-go]").forEach((el) => el.addEventListener("click", () => { const g = +el.dataset.go; if (g < step) go(g); }));
+  document.querySelectorAll(".panel").forEach((p) => p.classList.toggle("active", +p.dataset.step === step));
+}
+function choiceCard(key, name, desc, priceKey, previewKey, on, extraFoot = "") {
+  const hasPrev = !!PREVIEWS[previewKey];
+  return `<div class="c ${on ? "on" : ""}" data-choice="${key}">
+    <div class="top"><div class="name">${name}</div><div class="price">${price(priceKey)}</div></div>
+    <div class="desc">${desc}</div>
+    <div class="foot">${previewKey ? `<button type="button" class="preview" data-prev="${previewKey}" ${hasPrev ? "" : "disabled"}><i>▶</i><span>${hasPrev ? t("preview") : t("previewSoon")}</span></button>` : "<span></span>"}${extraFoot}</div>
+  </div>`;
+}
+function renderProduit() {
+  const p = t("produit");
+  $("#produit").innerHTML = ["podcast", "vsl"].map((k) => choiceCard(k, p[k][0], p[k][1], k, null, draft.produit === k)).join("");
+  $("#produit").querySelectorAll("[data-choice]").forEach((el) => el.addEventListener("click", () => { draft.produit = el.dataset.choice; save(); renderProduit(); renderNav(); wirePreviews(); }));
+}
+function renderFormule() {
+  const f = t("formule");
+  $("#formule").innerHTML = FORMULES.map((k) => choiceCard(k, f[k][0], f[k][1], k, k, draft.formule === k)).join("");
+  $("#formule").querySelectorAll("[data-choice]").forEach((el) => el.addEventListener("click", (e) => { if (e.target.closest(".preview")) return; draft.formule = el.dataset.choice; save(); renderFormule(); renderNav(); wirePreviews(); }));
+}
+function renderReels() {
+  const r = t("reels");
+  $("#reels").innerHTML = REELS.map((k) => {
+    const n = draft.qty[k] || 0;
+    const foot = `<div class="qty"><button type="button" data-dec="${k}">−</button><input type="number" min="0" max="99" value="${n}" data-q="${k}"/><button type="button" data-inc="${k}">+</button></div>`;
+    return choiceCard(k, r[k][0], r[k][1], k, k, n > 0, foot);
+  }).join("");
+  $("#reels").querySelectorAll("[data-choice]").forEach((el) => el.addEventListener("click", (e) => { if (e.target.closest(".qty") || e.target.closest(".preview")) return; const k = el.dataset.choice; if (!(draft.qty[k] > 0)) { draft.qty[k] = 1; save(); renderReels(); renderNav(); wirePreviews(); } }));
+  wireQty($("#reels"));
+}
+function renderThumbs() {
+  const imgs = PREVIEWS.miniatures.filter(Boolean);
+  const tiles = imgs.length ? imgs.map((u) => `<a href="${PREVIEWS.portfolio || u}" target="_blank" rel="noopener"><img src="${u}" alt=""/></a>`).join("") : [0, 1, 2].map(() => `<span>${t("exemple")}</span>`).join("");
+  const link = PREVIEWS.portfolio ? `<a class="preview" href="${PREVIEWS.portfolio}" target="_blank" rel="noopener" style="align-self:center;margin-left:6px"><i>↗</i><span>${t("portfolio")}</span></a>` : "";
+  $("#thumbs").innerHTML = tiles + link;
+}
+function renderQty() { document.querySelectorAll('[data-q="episodes"],[data-q="miniature"],[data-q="trailer"]').forEach((i) => { i.value = i.dataset.q === "episodes" ? (draft.episodes || 1) : (draft.qty[i.dataset.q] || 0); }); wireQty(document); }
+function wireQty(root) {
+  root.querySelectorAll("[data-inc],[data-dec],[data-q]").forEach((el) => {
+    if (el.dataset.wired) return; el.dataset.wired = "1";
+    const k = el.dataset.inc || el.dataset.dec || el.dataset.q;
+    el.addEventListener(el.dataset.q !== undefined ? "change" : "click", () => {
+      const input = document.querySelector(`[data-q="${k}"]`);
+      let v = +(input.value || 0);
+      if (el.dataset.inc !== undefined) v++; if (el.dataset.dec !== undefined) v--;
+      if (k === "episodes") { draft.episodes = Math.min(99, Math.max(1, v)); input.value = draft.episodes; }
+      else { draft.qty[k] = Math.min(99, Math.max(0, v)); input.value = draft.qty[k]; if (REELS.includes(k)) renderReels(); }
+      save(); renderNav(); wirePreviews();
+    });
+  });
+}
+function renderChips() {
+  $("#chips").innerHTML = t("chips").map((c) => `<button type="button" class="chip">${c}</button>`).join("");
+  $("#chips").querySelectorAll(".chip").forEach((b) => b.addEventListener("click", () => { const ta = $("#description"); const sep = ta.value && !ta.value.endsWith("\n") ? "\n" : ""; ta.value += sep + b.textContent + " "; ta.focus(); draft.description = ta.value; save(); }));
+}
+function renderLinks(key) {
+  const list = (draft[key] && draft[key].length ? draft[key] : [""]);
+  $("#" + key).innerHTML = list.map((v, i) => `<div class="l"><input class="in" type="url" value="${esc(v)}" placeholder="${t("ph.link")}"/><button type="button" data-rm="${key}" data-x="${i}">×</button></div>`).join("");
+  $("#" + key).querySelectorAll("input").forEach((inp) => inp.addEventListener("input", () => { draft[key] = collect(key); save(); }));
+  $("#" + key).querySelectorAll("[data-rm]").forEach((b) => b.addEventListener("click", () => { const arr = collect(key); arr.splice(+b.dataset.x, 1); draft[key] = arr.length ? arr : [""]; save(); renderLinks(key); }));
+}
+document.querySelectorAll("[data-add]").forEach((b) => b.addEventListener("click", () => { const k = b.dataset.add; draft[k] = [...collect(k), ""]; save(); renderLinks(k); const ins = $("#" + k).querySelectorAll("input"); ins[ins.length - 1]?.focus(); }));
+function collect(key) { return [...$("#" + key).querySelectorAll("input")].map((i) => i.value.trim()); }
+function commande() {
+  const u = t("units"); const out = [];
+  if (draft.produit) out.push(t("produit")[draft.produit][0]);
+  if (draft.formule) out.push(`${lang === "fr" ? "formule" : "package"} ${t("formule")[draft.formule][0]}`);
+  for (const k of [...REELS, "miniature", "trailer"]) { const n = draft.qty[k] || 0; if (n > 0) out.push(`${n} ${n > 1 ? u[k][1] : u[k][0]}`); }
+  if (draft.cta === "yes") out.push(t("cta.unit"));
+  return out.join(" · ");
+}
+function renderNav() {
+  $("#prev").style.visibility = step === 0 ? "hidden" : "visible";
+  $("#next").textContent = step === 5 ? t("btn.send") : t("btn.next");
+  const c = commande();
+  $("#summary").innerHTML = c ? `<b>${esc(c)}</b><br/>${t("quote")} · ${t("saved")}` : `${t("empty")}<br/>${t("saved")}`;
+}
+function renderRecap() {
+  const v = values(); const r = t("recap"); const none = t("none");
+  const rows = [["projet", v.projet], ["commande", v.commande], ["prix", t("quoteLong")], ["autre_demande", v.autre_demande], ["rushes", v.rushes], ["logos", v.logos], ["references", v.references], ["description", v.description], ["palette", v.palette], ["deadline", v.deadline], ["contact", v.contact], ["email", v.email], ["autres", v.autres]];
+  $("#recap").innerHTML = rows.map(([k, val]) => `<div class="${["description", "rushes", "commande"].includes(k) ? "full" : ""}"><div class="k">${r[k]}</div><div class="v">${esc(val || none)}</div></div>`).join("");
+}
+function esc(s) { return String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
+
+/* ---------------- aperçus ---------------- */
+function embedUrl(u) {
+  const yt = u.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|shorts\/|embed\/))([\w-]{6,})/); if (yt) return `https://www.youtube.com/embed/${yt[1]}?autoplay=1&rel=0`;
+  const vm = u.match(/vimeo\.com\/(?:video\/)?(\d+)/); if (vm) return `https://player.vimeo.com/video/${vm[1]}?autoplay=1`;
+  return null;
+}
+// Vidéos d'aperçu selon le produit choisi et la langue de l'espace → liste [{src, poster, title}]
+function prevList(key) {
+  let v = ["standard", "premium"].includes(key) ? (PREVIEWS[draft.produit || "podcast"] || {})[key] : PREVIEWS[key];
+  if (v && !Array.isArray(v) && typeof v === "object") v = v[lang];
+  if (!v) return [];
+  return (Array.isArray(v) ? v : [v]).filter(Boolean).map((x) => (typeof x === "string" ? { src: x, poster: "", title: "" } : x));
+}
+function playPreview(list, i) {
+  const box = $("#modalFrame").parentNode; box.querySelectorAll("video").forEach((v) => { v.pause(); v.remove(); });
+  const it = list[i];
+  if (/\.mp4(\?|$)/i.test(it.src)) {
+    const v = document.createElement("video");
+    v.src = it.src; v.poster = it.poster || ""; v.controls = true; v.playsInline = true; if (it.vertical) v.style.cssText = "display:block;margin:0 auto;height:72vh;width:auto;aspect-ratio:9/16;background:#000";
+    v.muted = false; v.volume = 1;
+    v.setAttribute("controlsList", "nodownload noplaybackrate noremoteplayback"); v.disableRemotePlayback = true; v.disablePictureInPicture = true;
+    v.addEventListener("contextmenu", (e) => e.preventDefault());
+    $("#modalFrame").style.display = "none"; box.insertBefore(v, $("#plist"));
+    const pr = v.play(); if (pr && pr.catch) pr.catch(() => {});
+  } else {
+    const em = embedUrl(it.src); if (!em) { window.open(it.src, "_blank", "noopener"); return; }
+    $("#modalFrame").style.display = "block"; $("#modalFrame").src = em;
+  }
+  $("#plist").querySelectorAll("button").forEach((b, j) => b.classList.toggle("on", j === i));
+}
+function wirePreviews() {
+  document.querySelectorAll("[data-prev]").forEach((b) => {
+    if (b.dataset.wired) return; b.dataset.wired = "1";
+    b.addEventListener("click", (e) => {
+      e.stopPropagation(); const list = prevList(b.dataset.prev); if (!list.length) return;
+      $("#modalTitle").textContent = b.closest(".c")?.querySelector(".name")?.textContent || t("preview");
+      $("#plist").innerHTML = list.length > 1 ? list.map((it, j) => `<button type="button" data-j="${j}"><img src="${it.poster}" alt=""/><span>${esc(it.title)}</span></button>`).join("") : "";
+      $("#plist").querySelectorAll("button").forEach((pb) => pb.addEventListener("click", () => playPreview(list, +pb.dataset.j)));
+      $("#modal").classList.add("open");
+      playPreview(list, 0);
+    });
+  });
+  document.querySelectorAll(".preview[data-prev]").forEach((b) => {
+    const n = prevList(b.dataset.prev).length; b.disabled = !n;
+    b.querySelector("span").textContent = n ? (n > 1 ? `${t("preview")} · ${n}` : t("preview")) : t("previewSoon");
+  });
+}
+const closeModal = () => { $("#modal").classList.remove("open"); $("#modalFrame").src = ""; $("#modalFrame").parentNode.querySelectorAll("video").forEach((v) => { v.pause(); v.remove(); }); $("#plist").innerHTML = ""; };
+$("#modalClose").addEventListener("click", closeModal);
+$("#modal").addEventListener("click", (e) => { if (e.target.id === "modal") closeModal(); });
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModal(); });
+
+/* ---------------- données ---------------- */
+["projet", "autre_demande", "description", "palette", "deadline", "contactName", "contactHow", "email", "autres"].forEach((id) => {
+  const el = $("#" + id); el.value = draft[id] || "";
+  el.addEventListener("input", () => { draft[id] = el.value; save(); if (id === "palette") swatches(); });
+});
+// Fichiers logo / palette : gardés en mémoire (pas dans le brouillon, trop lourds)
+const FILES = { logo: null, palette: null };
+function renderBrandkit() {
+  [["logo", "#dropLogo", "bk.logoDrop"], ["palette", "#dropPalette", "bk.paletteDrop"]].forEach(([k, sel, lab]) => {
+    const z = $(sel), f = FILES[k]; z.classList.toggle("has", !!f);
+    z.querySelector(".dl").textContent = f ? f.name : t(lab);
+    z.querySelectorAll("img").forEach((i) => i.remove());
+    if (f && f.url) { const i = document.createElement("img"); i.src = f.url; z.insertBefore(i, z.querySelector(".dl")); }
+    z.querySelector(".up").style.display = f && f.url ? "none" : "";
+  });
+  $("#fontpick").querySelectorAll("button").forEach((b) => b.classList.toggle("on", draft.font === b.dataset.font));
+  $("#fontName").style.display = draft.font === "team" ? "none" : "";
+}
+function takeFile(k, file) {
+  if (!file) return;
+  if (FILES[k] && FILES[k].url) URL.revokeObjectURL(FILES[k].url);
+  FILES[k] = { name: file.name, size: file.size, type: file.type, file, url: /^image\//.test(file.type) ? URL.createObjectURL(file) : "" };
+  renderBrandkit();
+}
+document.querySelectorAll("[data-file]").forEach((inp) => {
+  const k = inp.dataset.file, zone = inp.closest(".drop");
+  inp.addEventListener("change", () => takeFile(k, inp.files[0]));
+  ["dragenter", "dragover"].forEach((ev) => zone.addEventListener(ev, (e) => { e.preventDefault(); zone.classList.add("over"); }));
+  ["dragleave", "drop"].forEach((ev) => zone.addEventListener(ev, (e) => { e.preventDefault(); zone.classList.remove("over"); }));
+  zone.addEventListener("drop", (e) => takeFile(k, e.dataTransfer.files[0]));
+});
+$("#fontpick").querySelectorAll("button").forEach((b) => b.addEventListener("click", () => { draft.font = b.dataset.font; save(); renderBrandkit(); if (draft.font === "own") $("#fontName").focus(); }));
+function renderCTA() {
+  $("#ctaYN").querySelectorAll("button").forEach((b) => b.classList.toggle("on", draft.cta === b.dataset.cta));
+  $("#ctaNets").style.display = draft.cta === "yes" ? "" : "none";
+  $("#ctaChips").innerHTML = CTA_EXAMPLES.map((x, i) => {
+    const pop = x.media ? `<img src="${x.poster || ""}" alt=""/>` : `<span>${t("cta.soon")}</span>`;
+    return `<span class="cx${x.media ? " live" : ""}" tabindex="0" data-cta-i="${i}">${esc(x.name)} <i>▶</i><span class="pop">${pop}</span></span>`;
+  }).join("");
+  $("#ctaChips").querySelectorAll(".cx").forEach((chip) => {
+    const x = CTA_EXAMPLES[+chip.dataset.ctaI]; if (!x || !x.media) return;
+    const pop = chip.querySelector(".pop");
+    const start = () => {
+      if (pop.querySelector("video")) return;
+      const v = document.createElement("video"); v.src = x.media; v.muted = true; v.loop = true; v.playsInline = true; v.autoplay = true; v.preload = "auto";
+      v.setAttribute("controlsList", "nodownload"); v.disablePictureInPicture = true;
+      pop.innerHTML = ""; pop.appendChild(v); const pr = v.play(); if (pr && pr.catch) pr.catch(() => {});
+    };
+    const stop = () => { const v = pop.querySelector("video"); if (v) { v.pause(); v.remove(); pop.innerHTML = `<img src="${x.poster || ""}" alt=""/>`; } };
+    chip.addEventListener("mouseenter", start); chip.addEventListener("focus", start);
+    chip.addEventListener("mouseleave", stop); chip.addEventListener("blur", stop);
+    chip.addEventListener("click", () => { stop(); $("#modalTitle").textContent = x.name; $("#plist").innerHTML = ""; $("#modal").classList.add("open"); playPreview([{ src: x.media, poster: x.poster || "", title: x.name }], 0); });
+  });
+}
+$("#ctaYN").querySelectorAll("button").forEach((b) => b.addEventListener("click", () => { draft.cta = b.dataset.cta; save(); renderCTA(); renderNav(); if (draft.cta === "yes") $("#ctaNets").focus(); }));
+$("#ctaNets").value = draft.ctaNets || "";
+$("#ctaNets").addEventListener("input", () => { draft.ctaNets = $("#ctaNets").value; save(); });
+$("#fontName").value = draft.fontName || "";
+$("#fontName").addEventListener("input", () => { draft.fontName = $("#fontName").value; save(); });
+$("#deadline").min = new Date().toISOString().slice(0, 10);
+function swatches() { const hex = ($("#palette").value.match(/#[0-9a-fA-F]{3,8}\b/g) || []).slice(0, 8); $("#swatches").innerHTML = hex.map((h) => `<i style="background:${h}" title="${h}"></i>`).join(""); }
+swatches();
+function values() {
+  const links = (k) => (draft[k] || []).filter(Boolean).join("\n");
+  return {
+    projet: draft.projet || "", commande: commande(), autre_demande: draft.autre_demande || "",
+    rushes: links("rushes"), logos: [FILES.logo ? `Logo : ${FILES.logo.name} (${t("bk.file")})` : "", draft.font === "team" ? `Police : ${t("bk.teamFont")}` : (draft.fontName ? `Police : ${draft.fontName}` : "")].filter(Boolean).join("\n"), references: links("references"),
+    description: draft.description || "", palette: [draft.palette || "", FILES.palette ? `Capture : ${FILES.palette.name} (${t("bk.file")})` : ""].filter(Boolean).join("\n"), deadline: draft.deadline || "",
+    contact: [draft.contactName, draft.contactHow].filter(Boolean).join(" — "), email: draft.email || "", autres: draft.autres || "",
+  };
+}
+function save() { try { localStorage.setItem(KEY, JSON.stringify(draft)); } catch {} }
+function load() { try { return JSON.parse(localStorage.getItem(KEY) || "{}"); } catch { return {}; } }
+
+/* ---------------- navigation & validation ---------------- */
+function validate(s) {
+  const e = t("err"); const v = values(); document.querySelectorAll(".in.bad").forEach((x) => x.classList.remove("bad"));
+  if (s === 0) { if (!v.projet.trim()) { $("#projet").classList.add("bad"); return e.projet; } if (!draft.produit) return e.produit; }
+  if (s === 1) { if (!draft.formule) return e.formule; }
+  if (s === 3) { if (!v.rushes) { $("#rushes input").classList.add("bad"); return e.rushes; } }
+  if (s === 5) { if (!$("#terms").checked) { $("#terms").focus(); return e.terms; } }
+  if (s === 4) { if (v.description.trim().length < 10) { $("#description").classList.add("bad"); return e.description; } if (!draft.contactName || !draft.contactHow) { $("#contactName").classList.add("bad"); $("#contactHow").classList.add("bad"); return e.contact; } if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(draft.email || "")) { $("#email").classList.add("bad"); return e.email; } }
+  return "";
+}
+function go(s) { step = s; $("#msg").textContent = ""; if (step === 5) renderRecap(); renderSteps(); renderNav(); window.scrollTo({ top: 0, behavior: "smooth" }); }
+$("#prev").addEventListener("click", () => go(Math.max(0, step - 1)));
+$("#next").addEventListener("click", async () => { const err = validate(step); if (err) { $("#msg").textContent = err; const bad = document.querySelector(".in.bad"); if (bad) { if (bad.scrollIntoView) bad.scrollIntoView({ behavior: "smooth", block: "center" }); bad.focus(); } return; } if (step < 5) return go(step + 1); await submit(); });
+
+/* ---------------- envoi : même circuit que le formulaire Google, sans serveur ---------------- */
+async function submit() {
+  if (!client) { $("#msg").textContent = "Client inconnu dans l'adresse (?client=…)."; return; }
+  const btn = $("#next"); btn.disabled = true; btn.textContent = t("btn.sending");
+  const v = values(); const q = draft.qty; const fd = new FormData();
+  const put = (key, val) => { const id = client.entries[key]; if (id && val !== undefined && val !== "") fd.append("entry." + id, val); };
+  put("projet", v.projet);
+  put("podcast", draft.produit === "podcast" ? "1" : ""); put("vsl", draft.produit === "vsl" ? "1" : "");
+  put("formule", draft.formule ? cap(draft.formule) : "");
+  put("reels", q.reel_basique ? String(q.reel_basique) : ""); put("reels_signature", q.reel_signature ? String(q.reel_signature) : "");
+  put("miniature", q.miniature ? String(q.miniature) : ""); put("trailer", q.trailer ? String(q.trailer) : "");
+  put("autre_demande", [v.autre_demande, draft.cta === "yes" ? `${t("cta.unit")}${draft.ctaNets ? " : " + draft.ctaNets : ""}` : ""].filter(Boolean).join(" · ")); put("description", v.description); put("rushes", v.rushes); put("logos", v.logos); put("references", v.references); put("palette", v.palette); put("contact", v.contact); put("email", v.email); put("autres", v.autres);
+  if ($("#terms").checked && client.options && client.options.terms) put("terms", client.options.terms);
+  if (v.deadline && client.entries.deadline) { const [y, m, d] = v.deadline.split("-"); fd.append(`entry.${client.entries.deadline}_year`, y); fd.append(`entry.${client.entries.deadline}_month`, String(+m)); fd.append(`entry.${client.entries.deadline}_day`, String(+d)); }
+  try {
+    await fetch(client.action, { method: "POST", mode: "no-cors", body: fd });
+    try { localStorage.removeItem(KEY); } catch {}
+    $("#form").style.display = "none"; $("#steps").style.display = "none"; $("#success").style.display = "block"; window.scrollTo({ top: 0, behavior: "smooth" });
+  } catch (e) { $("#msg").textContent = t("err").send; btn.disabled = false; btn.textContent = t("btn.send"); }
+}
+$("#again").addEventListener("click", () => location.reload());
+const spaceKey = params.get("k"); if (spaceKey && slug) { const a = $("#spaceLink"); a.href = `espace.html?client=${encodeURIComponent(slug)}&k=${encodeURIComponent(spaceKey)}&lang=${lang}`; a.style.display = "inline-block"; }
+$("#termsLink").href = `../conditions.html?lang=${lang}`;
+
+applyText();
+</script>
+</body>
+</html>

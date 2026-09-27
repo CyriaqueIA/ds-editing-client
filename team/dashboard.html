@@ -113,6 +113,24 @@
     .empty{padding:60px 20px;text-align:center;color:var(--taupe)}
     @media (max-width:1180px){.job{grid-template-columns:1fr 1fr 1fr;row-gap:10px}.job .detail{grid-template-columns:1fr}}
 
+    /* onglets admin */
+    .tabs{display:flex;gap:4px;margin-left:18px}
+    .tab{background:none;border:1px solid transparent;color:var(--taupe);border-radius:999px;padding:8px 14px;font-size:13px;cursor:pointer}
+    .tab.on{color:var(--amber);border-color:var(--amber);background:var(--amber-soft)}
+    .admin{display:grid;gap:14px}
+    .panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+    .panel h3{margin:0 0 10px;font-size:16px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
+    .grid label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--taupe)}
+    .grid input{width:100%}
+    table.adm{width:100%;border-collapse:collapse;font-size:13px}
+    table.adm th{text-align:left;font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--taupe);padding:8px 8px;border-bottom:1px solid var(--line)}
+    table.adm td{padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
+    .row-form{display:grid;grid-template-columns:1.2fr 2fr 80px 110px auto auto;gap:8px;align-items:end}
+    .row-form label{display:flex;flex-direction:column;gap:4px;font-size:11px;color:var(--taupe)}
+    .amount{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px}
+    .amount .big{font-family:"Anton",Impact,sans-serif;font-size:20px}
+    .amount .miss{color:var(--err);font-size:12px}
     /* mode télé */
     body.tv{--av:56px}
     body.tv main{padding:14px 18px}
@@ -136,6 +154,7 @@
   <img src="../assets/logo.png" alt=""/>
   <div class="brand"><b>DS Editing</b><span class="mono" data-t="sub"></span></div>
   <span class="live" id="live" hidden><i></i><span data-t="live"></span></span>
+  <div class="tabs" id="tabs" hidden></div>
   <div class="right">
     <span class="clock" id="clock"></span>
     <span class="who" id="who"></span>
@@ -160,6 +179,7 @@
     <div class="stats" id="stats"></div>
     <div class="toolbar" id="toolbar"></div>
     <div class="board" id="board"></div>
+    <div class="admin" id="admin" hidden></div>
   </div>
 </main>
 
@@ -176,12 +196,20 @@ const T = {
     all: "Tous", tasks: (n) => `${n} tâche${n > 1 ? "s" : ""}`, stats: ["Reçues aujourd'hui", "En cours", "En retard", "À contrôler", "Livrées cette semaine"],
     filters: { all: "Tout", late: "En retard", qc: "À contrôler", done: "Livrées" }, search: "Rechercher…",
     steps: { dl: "Fichiers", start: "Commencé", half: "50 %", done: "Livré" }, qc: { pending: "Qualité : en attente", ok: "Qualité : OK", revisions: "Qualité : à revoir" },
-    wanted: "Date souhaitée", noDate: "sans date", late: "EN RETARD", team: "équipe", delivered: "livré", unassigned: "À attribuer", noEditor: "Aucun monteur", brief: "Brief", files: "Fichiers", frame: "frame.io", empty: "Aucune commande dans cette vue.", received: "Reçu", frameioPh: "Lien frame.io de livraison", noteQc: "Note qualité", notes: "Notes internes", deliveryDate: "Livraison fixée par l'équipe", rushes: "Rushes", email: "E-mail client", contact: "Contact" },
+    wanted: "Date souhaitée", noDate: "sans date", late: "EN RETARD", team: "équipe", delivered: "livré", unassigned: "À attribuer", noEditor: "Aucun monteur", brief: "Brief", files: "Fichiers", frame: "frame.io", empty: "Aucune commande dans cette vue.", received: "Reçu", frameioPh: "Lien frame.io de livraison", noteQc: "Note qualité", notes: "Notes internes", deliveryDate: "Livraison fixée par l'équipe", rushes: "Rushes", email: "E-mail client", contact: "Contact",
+    tabs: { prod: "Production", tarifs: "Tarifs", factures: "Factures" }, amountL: "Montant", amountMiss: "Prix manquant dans la grille :", override: "Montant forcé", recalc: "Recalculer", invoiced: "Facturé", sunday: "facturé dimanche",
+    keys: { podcast_standard: "Épisode podcast · Standard", podcast_premium: "Épisode podcast · Premium", vsl_standard: "VSL · Standard", vsl_premium: "VSL · Premium", reel_standard: "Reel standard", reel_premium: "Reel premium", intro: "Intro", miniature: "Miniature", trailer: "Trailer", cta: "CTA réseaux sociaux", extra_30min: "Supplément 30 min" },
+    tarifsHint: "Prix unitaires par client, dans sa devise. Vide = pas encore fixé : la commande validée attend un prix avant d'être facturée.", clientSel: "Client", saved: "enregistré", recalcAll: "Recalculer les commandes validées", space: "Espace client", billing: "Facturation", billingName: "Raison sociale", billingAddress: "Adresse (une ligne par ligne)", billingEmail: "E-mail de facturation", attention: "À l'attention de", currency: "Devise", tvaL: "TVA",
+    factHint: "Une facture par client et par semaine, générée le dimanche à 23 h 50 (Bali). Relance automatique 2 jours après l'envoi.", cols: ["N°", "Client", "Semaine", "Total", "Statut", "Envoyée", ""], markPaid: "Marquer payée", paid: "Payée", issued: "Émise", cancel: "Annuler", extrasTitle: "Lignes manuelles (facturées avec la prochaine facture)", label: "Libellé", qty: "Qté", unit: "Prix unitaire", offered: "Offert", add: "Ajouter", pending: "En attente de facturation", none: "Aucune", del: "Supprimer" },
   en: { sub: "Production", live: "Live", tv: "TV mode", logout: "Log out", login: "Team space", loginSub: "Sign in with your DS Editing email.", loginBtn: "Enter",
     all: "All", tasks: (n) => `${n} task${n > 1 ? "s" : ""}`, stats: ["Received today", "In progress", "Late", "To review", "Delivered this week"],
     filters: { all: "All", late: "Late", qc: "To review", done: "Delivered" }, search: "Search…",
     steps: { dl: "Files", start: "Started", half: "50%", done: "Delivered" }, qc: { pending: "QC: pending", ok: "QC: OK", revisions: "QC: revisions" },
-    wanted: "Requested date", noDate: "no date", late: "LATE", team: "team", delivered: "delivered", unassigned: "Unassigned", noEditor: "No editor", brief: "Brief", files: "Files", frame: "frame.io", empty: "No order in this view.", received: "Received", frameioPh: "frame.io delivery link", noteQc: "QC note", notes: "Internal notes", deliveryDate: "Delivery set by the team", rushes: "Footage", email: "Client email", contact: "Contact" },
+    wanted: "Requested date", noDate: "no date", late: "LATE", team: "team", delivered: "delivered", unassigned: "Unassigned", noEditor: "No editor", brief: "Brief", files: "Files", frame: "frame.io", empty: "No order in this view.", received: "Received", frameioPh: "frame.io delivery link", noteQc: "QC note", notes: "Internal notes", deliveryDate: "Delivery set by the team", rushes: "Footage", email: "Client email", contact: "Contact",
+    tabs: { prod: "Production", tarifs: "Pricing", factures: "Invoices" }, amountL: "Amount", amountMiss: "Missing price in the grid:", override: "Forced amount", recalc: "Recalculate", invoiced: "Invoiced", sunday: "invoiced Sunday",
+    keys: { podcast_standard: "Podcast episode · Standard", podcast_premium: "Podcast episode · Premium", vsl_standard: "VSL · Standard", vsl_premium: "VSL · Premium", reel_standard: "Standard reel", reel_premium: "Premium reel", intro: "Intro", miniature: "Thumbnail", trailer: "Trailer", cta: "Social CTA", extra_30min: "Extra 30 min" },
+    tarifsHint: "Unit prices per client, in their currency. Empty = not set yet: the approved order waits for a price before being invoiced.", clientSel: "Client", saved: "saved", recalcAll: "Recalculate approved orders", space: "Client space", billing: "Billing", billingName: "Legal name", billingAddress: "Address (one line per line)", billingEmail: "Billing email", attention: "Attention", currency: "Currency", tvaL: "VAT",
+    factHint: "One invoice per client per week, generated Sunday 11:50 pm (Bali). Automatic reminder 2 days after sending.", cols: ["No.", "Client", "Week", "Total", "Status", "Sent", ""], markPaid: "Mark paid", paid: "Paid", issued: "Issued", cancel: "Cancel", extrasTitle: "Manual lines (billed with the next invoice)", label: "Label", qty: "Qty", unit: "Unit price", offered: "Complimentary", add: "Add", pending: "Waiting for invoicing", none: "None", del: "Delete" },
 };
 const $ = (s) => document.querySelector(s);
 const params = new URLSearchParams(location.search);
@@ -189,6 +217,8 @@ let lang = params.get("lang") || (() => { try { return localStorage.getItem("ds_
 const t = (k) => T[lang][k];
 let tv = params.get("tv") === "1"; document.body.classList.toggle("tv", tv);
 let me = null, profile = null, myEditor = null, jobs = [], editors = [], filter = params.get("f") || "all", edFilter = params.get("editor") || "", q = "", known = new Set(), sb = null;
+let tab = params.get("tab") || "prod", studios = [], grids = [], invoicesAll = [], extras = [], tarifStudio = "";
+const money = (x, cur) => x == null ? "—" : (cur === "USD" ? "$" + Number(x).toLocaleString("en-US", { minimumFractionDigits: 2 }) : Number(x).toLocaleString("fr-FR", { minimumFractionDigits: 2 }) + " €");
 
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const loc = () => (lang === "fr" ? "fr-FR" : "en-GB");
@@ -292,14 +322,27 @@ function renderBoard() {
           <b>${t("frame")}</b><input class="in" data-field="frameio_url" data-id="${j.id}" value="${esc(j.frameio_url || "")}" placeholder="${t("frameioPh")}" ${ed ? "" : "disabled"}/>
           ${isAdmin() ? `<b style="margin-top:8px">${t("deliveryDate")}</b><input class="in" type="date" data-field="delivery_date" data-id="${j.id}" value="${j.delivery_date || ""}"/><b style="margin-top:8px">${t("noteQc")}</b><input class="in" data-field="qc_note" data-id="${j.id}" value="${esc(j.qc_note || "")}"/>` : (j.qc_note ? `<b style="margin-top:8px">${t("noteQc")}</b>${esc(j.qc_note)}` : "")}
           <b style="margin-top:8px">${t("notes")}</b><input class="in" data-field="notes" data-id="${j.id}" value="${esc(j.notes || "")}" ${ed ? "" : "disabled"}/>
+          ${isAdmin() ? amountBlock(j) : ""}
         </div>
       </div>
     </div>`;
   }).join("");
   wireBoard();
 }
+function amountBlock(j) {
+  const s = studios.find((x) => x.id === j.studio_id); const cur = s ? s.currency : "EUR";
+  const inv = invoicesAll.find((i) => i.id === j.invoice_id);
+  return `<b style="margin-top:8px">${t("amountL")}</b><div class="amount">
+    <span class="big">${money(j.amount, cur)}</span>
+    ${(j.pricing_missing || []).length && j.amount == null ? `<span class="miss">${t("amountMiss")} ${j.pricing_missing.map((k) => t("keys")[k] || k).join(", ")}</span>` : ""}
+    ${inv ? `<span class="badge ok">${t("invoiced")} ${esc(inv.number)}</span>` : (j.qc_status === "ok" && j.amount != null ? `<span class="badge">${t("sunday")}</span>` : "")}
+    <input class="in" style="width:120px" type="number" step="0.01" placeholder="${t("override")}" data-field="amount_override" data-id="${j.id}" value="${j.amount_override ?? ""}" ${inv ? "disabled" : ""}/>
+    ${inv ? "" : `<button type="button" class="btn ghost" data-recalc="${j.id}">${t("recalc")}</button>`}
+  </div>${(j.lines || []).length ? `<div style="font-size:12px;color:var(--taupe);margin-top:4px">${j.lines.map((l) => `${esc(l.label)} × ${l.qty} → ${money(l.amount, cur)}`).join(" · ")}</div>` : ""}`;
+}
 function wireBoard() {
   const B = $("#board");
+  B.querySelectorAll("[data-recalc]").forEach((b) => b.addEventListener("click", async () => { const { error } = await sb.rpc("price_job", { p_job: b.dataset.recalc }); if (error) alert(error.message); await load(false); }));
   B.querySelectorAll("[data-more]").forEach((b) => b.addEventListener("click", () => b.closest(".job").classList.toggle("open")));
   B.querySelectorAll("[data-step]").forEach((el) => el.addEventListener("click", async () => {
     if (el.getAttribute("aria-disabled") === "true") return;
@@ -334,11 +377,73 @@ async function update(id, patch, keepPop) {
 // chrono : mise à jour chaque seconde, sans re-rendu
 setInterval(() => { document.querySelectorAll("[data-cd]").forEach((el) => { const j = jobs.find((x) => x.id === el.dataset.cd); if (j) el.textContent = countdown(remaining(j), isDone(j)); }); }, 1000);
 
+/* ===== onglets admin : Tarifs, Factures ===== */
+function renderTabs() {
+  if (!isAdmin()) return; $("#tabs").hidden = false;
+  $("#tabs").innerHTML = ["prod", "tarifs", "factures"].map((k) => `<button type="button" class="tab ${tab === k ? "on" : ""}" data-tab="${k}">${t("tabs")[k]}</button>`).join("");
+  $("#tabs").querySelectorAll("[data-tab]").forEach((b) => b.addEventListener("click", () => { tab = b.dataset.tab; const u = new URL(location.href); tab === "prod" ? u.searchParams.delete("tab") : u.searchParams.set("tab", tab); history.replaceState(null, "", u); renderTabs(); renderAdmin(); }));
+  renderAdmin();
+}
+function renderAdmin() {
+  const prod = tab === "prod"; ["#edbar", "#stats", "#toolbar", "#board"].forEach((s) => { $(s).style.display = prod ? "" : "none"; }); $("#admin").hidden = prod;
+  if (tab === "tarifs") renderTarifs(); else if (tab === "factures") renderFactures();
+}
+function renderTarifs() {
+  if (!tarifStudio && studios.length) tarifStudio = studios[0].id;
+  const s = studios.find((x) => x.id === tarifStudio); if (!s) { $("#admin").innerHTML = ""; return; }
+  const g = Object.fromEntries(grids.filter((x) => x.studio_id === s.id).map((x) => [x.item_key, x.unit_price]));
+  const spaceUrl = `${location.origin}${location.pathname.replace(/team\/dashboard\.html$/, "")}client/espace.html?client=${s.slug}&k=${s.access_token}`;
+  $("#admin").innerHTML = `<div class="panel">
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><label style="font-size:12px;color:var(--taupe)">${t("clientSel")}</label><select class="in" id="tarifStudio" style="width:auto">${studios.map((x) => `<option value="${x.id}" ${x.id === s.id ? "selected" : ""}>${esc(x.name)}</option>`).join("")}</select>
+        <span class="badge">${s.currency} · ${s.lang}</span><a class="btn ghost" href="${spaceUrl}" target="_blank" rel="noopener">${t("space")} ↗</a><button type="button" class="btn ghost" id="recalcAll">${t("recalcAll")}</button><span id="tarifMsg" style="font-size:12px;color:var(--ok)"></span></div>
+      <p style="font-size:12px;color:var(--taupe);margin:10px 0 12px">${t("tarifsHint")}</p>
+      <div class="grid">${Object.keys(t("keys")).map((k) => `<label>${t("keys")[k]}<input class="in" type="number" step="0.01" min="0" data-key="${k}" value="${g[k] ?? ""}" placeholder="—"/></label>`).join("")}</div>
+    </div>
+    <div class="panel"><h3>${t("billing")}</h3><div class="grid">
+      <label>${t("billingName")}<input class="in" data-studio="billing_name" value="${esc(s.billing_name || "")}"/></label>
+      <label>${t("attention")}<input class="in" data-studio="attention" value="${esc(s.attention || "")}"/></label>
+      <label>${t("billingEmail")}<input class="in" data-studio="billing_email" value="${esc(s.billing_email || "")}"/></label>
+      <label>${t("currency")}<select class="in" data-studio="currency"><option ${s.currency === "EUR" ? "selected" : ""}>EUR</option><option ${s.currency === "USD" ? "selected" : ""}>USD</option></select></label>
+      <label>${t("tvaL")}<select class="in" data-studio="tva">${["ue", "hors_ue", "us", "none"].map((v) => `<option value="${v}" ${s.tva === v ? "selected" : ""}>${v}</option>`).join("")}</select></label>
+      <label style="grid-column:1/-1">${t("billingAddress")}<textarea class="in" rows="3" data-studio="billing_address">${esc(s.billing_address || "")}</textarea></label>
+    </div></div>`;
+  $("#tarifStudio").addEventListener("change", (e) => { tarifStudio = e.target.value; renderTarifs(); });
+  $("#admin").querySelectorAll("[data-key]").forEach((i) => i.addEventListener("change", async () => {
+    const v = i.value === "" ? null : Number(i.value);
+    const { error } = await sb.from("price_grids").upsert({ studio_id: s.id, item_key: i.dataset.key, unit_price: v }, { onConflict: "studio_id,item_key" });
+    if (error) { alert(error.message); return; } $("#tarifMsg").textContent = "✓ " + t("saved"); setTimeout(() => { $("#tarifMsg").textContent = ""; }, 1500); await loadAdmin();
+  }));
+  $("#admin").querySelectorAll("[data-studio]").forEach((i) => i.addEventListener("change", async () => { const { error } = await sb.from("studios").update({ [i.dataset.studio]: i.value || null }).eq("id", s.id); if (error) alert(error.message); else { $("#tarifMsg").textContent = "✓ " + t("saved"); await loadAdmin(); } }));
+  $("#recalcAll").addEventListener("click", async () => { const list = jobs.filter((j) => j.studio_id === s.id && j.qc_status === "ok" && !j.invoice_id); for (const j of list) await sb.rpc("price_job", { p_job: j.id }); await load(false); $("#tarifMsg").textContent = `✓ ${list.length}`; });
+}
+function renderFactures() {
+  const stName = (id) => studios.find((x) => x.id === id)?.name || "—";
+  const rows = invoicesAll.map((i) => `<tr><td class="mono" style="color:var(--amber);font-size:12px;letter-spacing:0">${esc(i.number)}</td><td>${esc(stName(i.studio_id))}</td><td>${fmtD(i.period_start + "T12:00:00")} → ${fmtD(i.period_end + "T12:00:00")}</td><td><b>${money(i.total, i.currency)}</b></td>
+    <td><span class="badge ${i.status === "payee" ? "ok" : i.status === "annulee" ? "err" : ""}">${i.status === "payee" ? t("paid") : i.status === "annulee" ? t("cancel") : t("issued")}${i.paid_at ? " · " + fmtD(i.paid_at) : ""}</span></td><td>${i.sent_at ? "✓ " + fmtDT(i.sent_at) : "—"}${i.reminder_count ? ` · 🔔 ${i.reminder_count}` : ""}</td>
+    <td style="white-space:nowrap">${i.pdf_url ? `<a class="btn ghost" href="${esc(i.pdf_url)}" target="_blank" rel="noopener">PDF</a> ` : ""}${i.status === "emise" ? `<button type="button" class="btn" data-paid="${i.id}">${t("markPaid")}</button> <button type="button" class="btn ghost" data-cancel="${i.id}">${t("cancel")}</button>` : ""}</td></tr>`).join("");
+  const pend = extras.filter((e) => !e.invoice_id);
+  $("#admin").innerHTML = `<div class="panel"><p style="font-size:12px;color:var(--taupe);margin:0 0 12px">${t("factHint")}</p>
+      <table class="adm"><thead><tr>${t("cols").map((c) => `<th>${c}</th>`).join("")}</tr></thead><tbody>${rows || `<tr><td colspan="7" style="color:var(--taupe)">${t("none")}</td></tr>`}</tbody></table></div>
+    <div class="panel"><h3>${t("extrasTitle")}</h3>
+      <div class="row-form"><label>${t("clientSel")}<select class="in" id="xStudio">${studios.map((x) => `<option value="${x.id}">${esc(x.name)}</option>`).join("")}</select></label><label>${t("label")}<input class="in" id="xLabel"/></label><label>${t("qty")}<input class="in" id="xQty" type="number" value="1" min="0.5" step="0.5"/></label><label>${t("unit")}<input class="in" id="xPrice" type="number" step="0.01"/></label><label style="flex-direction:row;align-items:center;gap:6px"><input type="checkbox" id="xOff"/> ${t("offered")}</label><button type="button" class="btn" id="xAdd">${t("add")}</button></div>
+      <table class="adm" style="margin-top:12px"><thead><tr><th>${t("clientSel")}</th><th>${t("label")}</th><th>${t("qty")}</th><th>${t("unit")}</th><th>${t("pending")}</th><th></th></tr></thead><tbody>${pend.map((e) => `<tr><td>${esc(stName(e.studio_id))}</td><td>${esc(e.label)}${e.offered ? ` <span class="badge ok">${t("offered")}</span>` : ""}</td><td>${e.qty}</td><td>${money(e.unit_price, studios.find((x) => x.id === e.studio_id)?.currency)}</td><td>${fmtDT(e.created_at)}</td><td><button type="button" class="btn ghost" data-del="${e.id}">${t("del")}</button></td></tr>`).join("") || `<tr><td colspan="6" style="color:var(--taupe)">${t("none")}</td></tr>`}</tbody></table></div>`;
+  $("#admin").querySelectorAll("[data-paid]").forEach((b) => b.addEventListener("click", async () => { const { error } = await sb.from("invoices").update({ status: "payee", paid_at: new Date().toISOString() }).eq("id", b.dataset.paid); if (error) alert(error.message); await loadAdmin(); renderFactures(); }));
+  $("#admin").querySelectorAll("[data-cancel]").forEach((b) => b.addEventListener("click", async () => { if (!confirm(t("cancel") + " ?")) return; const { error } = await sb.from("invoices").update({ status: "annulee" }).eq("id", b.dataset.cancel); if (error) alert(error.message); await loadAdmin(); renderFactures(); }));
+  $("#admin").querySelectorAll("[data-del]").forEach((b) => b.addEventListener("click", async () => { await sb.from("extra_lines").delete().eq("id", b.dataset.del); await loadAdmin(); renderFactures(); }));
+  $("#xAdd").addEventListener("click", async () => { const label = $("#xLabel").value.trim(), price = Number($("#xPrice").value); if (!label || !(price >= 0)) return; const { error } = await sb.from("extra_lines").insert({ studio_id: $("#xStudio").value, label, qty: Number($("#xQty").value) || 1, unit_price: price, offered: $("#xOff").checked, created_by: profile.display_name }); if (error) alert(error.message); await loadAdmin(); renderFactures(); });
+}
+async function loadAdmin() {
+  if (!isAdmin()) return;
+  const [a, b, c, d] = await Promise.all([sb.from("studios").select("*").order("name"), sb.from("price_grids").select("*"), sb.from("invoices").select("*").order("period_end", { ascending: false }).limit(300), sb.from("extra_lines").select("*").order("created_at", { ascending: false }).limit(200)]);
+  studios = a.data || []; grids = b.data || []; invoicesAll = c.data || []; extras = d.data || [];
+}
+
 /* ===== données ===== */
 async function load(first, keepPop) {
   const [{ data: rows, error }, { data: eds }] = await Promise.all([
     sb.from("jobs").select("*").order("created_at", { ascending: false }).limit(400),
     sb.from("editors").select("id,name,avatar_url,profile_id,active,sort").order("sort"),
+    loadAdmin(),
   ]);
   if (error) { console.error(error); return; }
   if (!first) { const fresh = (rows || []).filter((j) => !known.has(j.id)); if (fresh.length) beep(fresh.length); }
@@ -362,7 +467,7 @@ async function boot() {
   profile = p || { role: "editor", display_name: me.email };
   $("#who").innerHTML = `<b>${esc(profile.display_name)}</b> · ${esc(profile.role)}`;
   $("#logout").hidden = false; $("#gate").hidden = true; $("#app").hidden = false; $("#live").hidden = false;
-  renderToolbar(); await load(true);
+  renderToolbar(); await load(true); renderTabs();
   sb.channel("jobs-live").on("postgres_changes", { event: "*", schema: "public", table: "jobs" }, () => load(false)).subscribe();
   setInterval(() => load(false), 60000);
 }

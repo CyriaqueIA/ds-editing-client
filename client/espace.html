@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta name="robots" content="noindex,nofollow"/>
+  <meta name="theme-color" content="#0C0B10"/>
+  <title>DS Editing — Espace client</title>
+  <link rel="icon" type="image/png" href="../assets/logo.png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--bg:#0C0B10;--surface:#16141A;--surface-2:#1D1A22;--line:rgba(237,232,220,.10);--line-strong:rgba(237,232,220,.22);--cream:#EDE8DC;--taupe:#8A8378;--amber:#FF6A2B;--amber-soft:rgba(255,106,43,.14);--ok:#5FD39A;--warn:#F5C400;--err:#F08A82;--blue:#7FB0E0}
+    *{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--cream);font-family:"Archivo",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+    a{color:inherit}
+    .mono{font-family:"JetBrains Mono",ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;font-size:10px;color:var(--taupe)}
+    .display{font-family:"Anton",Impact,sans-serif;font-weight:400;letter-spacing:.01em;text-transform:uppercase;line-height:1}
+    header{position:sticky;top:0;z-index:10;background:rgba(12,11,16,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+    .hd{max-width:1040px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:12px}
+    .hd img{width:34px;height:34px;border-radius:50%;object-fit:cover}.hd .brand{display:flex;flex-direction:column;line-height:1.1}.hd b{font-weight:600}
+    .hd .right{margin-left:auto;display:flex;gap:8px;align-items:center}
+    .btn{border:none;border-radius:999px;padding:10px 16px;font:inherit;font-size:13px;font-weight:600;cursor:pointer;background:var(--amber);color:#0C0B10;text-decoration:none;display:inline-block}
+    .btn.ghost{background:none;color:var(--taupe);border:1px solid var(--line)}.btn.ghost:hover{color:var(--cream);border-color:var(--line-strong)}
+    main{max-width:1040px;margin:0 auto;padding:30px 16px 80px}
+    h1{font-size:clamp(34px,6vw,54px);margin:8px 0 4px}
+    .lead{color:var(--taupe);margin:0 0 24px}
+    .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:26px}@media (max-width:760px){.cards{grid-template-columns:1fr}}
+    .card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+    .card .v{font-family:"Anton",Impact,sans-serif;font-size:34px;line-height:1;margin-top:6px}.card.err .v{color:var(--err)}.card.ok .v{color:var(--ok)}.card.amber .v{color:var(--amber)}
+    .card .s{font-size:12px;color:var(--taupe);margin-top:6px}
+    section{margin-bottom:34px}
+    h2{font-size:22px;margin:0 0 12px}
+    .month{margin:18px 0 8px;font-size:13px;color:var(--taupe);letter-spacing:.06em;text-transform:uppercase;font-family:"JetBrains Mono",monospace}
+    .inv{display:grid;grid-template-columns:130px 1fr 130px 130px 110px;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--line-strong);border-radius:12px;padding:12px 14px;font-size:13px;margin-bottom:8px}
+    .inv.due{border-left-color:var(--warn)}.inv.late{border-left-color:var(--err)}.inv.paid{border-left-color:var(--ok);opacity:.8}
+    .inv .n{font-family:"JetBrains Mono",monospace;font-size:13px;color:var(--amber)}.inv .n small{display:block;color:var(--taupe);font-size:10px;margin-top:3px}
+    .inv .p b{display:block;font-weight:600}.inv .p span{color:var(--taupe);font-size:12px}
+    .inv .amt{font-family:"Anton",Impact,sans-serif;font-size:22px}
+    .badge{display:inline-block;font-size:10px;letter-spacing:.08em;text-transform:uppercase;border-radius:6px;padding:4px 8px;border:1px solid var(--line);color:var(--taupe)}
+    .badge.due{color:var(--warn);border-color:rgba(245,196,0,.45)}.badge.late{color:var(--err);border-color:rgba(240,138,130,.5)}.badge.paid{color:var(--ok);border-color:rgba(95,211,154,.4)}
+    .inv .lines{grid-column:1/-1;display:none;border-top:1px solid var(--line);margin-top:6px;padding-top:8px;color:var(--taupe);font-size:12px}
+    .inv.open .lines{display:block}.inv .lines div{display:flex;justify-content:space-between;padding:3px 0}
+    .inv .lines .strike{text-decoration:line-through}
+    .toggle{background:none;border:1px solid var(--line);color:var(--taupe);border-radius:8px;padding:6px 9px;cursor:pointer;font:inherit;font-size:12px}
+    table{width:100%;border-collapse:collapse;font-size:13px}th{text-align:left;font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--taupe);padding:8px 10px;border-bottom:1px solid var(--line)}
+    td{padding:11px 10px;border-bottom:1px solid var(--line);vertical-align:top}td .tk{font-family:"JetBrains Mono",monospace;color:var(--amber)}td small{color:var(--taupe);display:block;margin-top:2px}
+    .st{font-size:11px;padding:3px 8px;border-radius:6px;border:1px solid var(--line);color:var(--taupe);white-space:nowrap}.st.ok{color:var(--ok);border-color:rgba(95,211,154,.4)}.st.qc{color:var(--warn);border-color:rgba(245,196,0,.45)}.st.run{color:var(--blue);border-color:rgba(127,176,224,.45)}
+    .week{background:var(--surface);border:1px solid rgba(255,106,43,.35);border-radius:14px;padding:16px 18px}
+    .week .row{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px}.week .row:last-child{border-bottom:none}
+    .week .tot{display:flex;justify-content:space-between;margin-top:8px;font-weight:600}
+    .empty{color:var(--taupe);font-size:13px;padding:14px 0}
+    .gate{max-width:420px;margin:90px auto;text-align:center;color:var(--taupe)}
+    @media (max-width:760px){.inv{grid-template-columns:1fr 1fr}.inv>*{grid-column:auto}}
+  </style>
+</head>
+<body>
+<header><div class="hd"><img src="../assets/logo.png" alt=""/><div class="brand"><b>DS Editing</b><span class="mono" data-t="sub"></span></div><div class="right"><a class="btn ghost" id="trackBtn" href="../suivi.html" data-t="track"></a><a class="btn" id="newBtn" href="#" data-t="new"></a><button class="btn ghost" id="langBtn" type="button">EN</button></div></div></header>
+<main>
+  <div class="gate" id="gate" hidden data-t="gate"></div>
+  <div id="app" hidden>
+    <div class="mono" data-t="kicker"></div>
+    <h1 class="display" id="title"></h1>
+    <p class="lead" data-t="lead"></p>
+    <div class="cards" id="cards"></div>
+    <section><h2 data-t="weekTitle"></h2><div class="week" id="week"></div></section>
+    <section><h2 data-t="invTitle"></h2><div id="invoices"></div></section>
+    <section><h2 data-t="ordersTitle"></h2><div id="orders"></div></section>
+    <p class="empty"><a href="../conditions.html" id="cgv" target="_blank" data-t="cgv"></a></p>
+  </div>
+</main>
+<script type="module">
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+const SUPABASE_URL = "https://xkanmjlpysxpohsuqvwg.supabase.co"; const SUPABASE_ANON = "sb_publishable_lIZtV_WtN5NcGSb0dnfaiQ_AgKYBIVa";
+const T = {
+  fr: { sub: "Espace client", track: "Suivre une commande", new: "Nouvelle commande", gate: "Ce lien n'est pas valide. Utilisez le lien reçu par e-mail ou écrivez à contact@ds-editing.com.", kicker: "Votre espace", lead: "Vos commandes, vos livraisons validées et vos factures, semaine par semaine.",
+    cards: ["À payer", "Cette semaine", "Livrées validées"], weekTitle: "Cette semaine", invTitle: "Factures", ordersTitle: "Toutes les commandes", cgv: "Conditions de collaboration",
+    weekNote: "Facture émise dimanche à 23 h 50 (heure de Bali), envoyée par e-mail et ajoutée ici.", weekEmpty: "Aucune livraison validée cette semaine pour l'instant.", invEmpty: "Aucune facture pour l'instant.", ordersEmpty: "Aucune commande. Déposez votre première vidéo.",
+    st: { run: "En cours", qc: "Contrôle qualité", ok: "Livré", new: "Reçu" }, badge: { due: "À payer", late: "En retard", paid: "Payée", draft: "En préparation" }, pdf: "PDF", detail: "Détail", cols: ["Commande", "Projet", "Livrables", "Statut", "Montant", "Facture"], review: "Voir la vidéo", week: "Semaine du", to: "au", noPrice: "sur devis", total: "Total de la semaine", invoiced: "Facturé le", issued: "émise le", paidOn: "payée le" },
+  en: { sub: "Client space", track: "Track an order", new: "New order", gate: "This link is not valid. Use the link you received by email or write to contact@ds-editing.com.", kicker: "Your space", lead: "Your orders, approved deliveries and invoices, week by week.",
+    cards: ["To pay", "This week", "Approved deliveries"], weekTitle: "This week", invTitle: "Invoices", ordersTitle: "All orders", cgv: "Terms of collaboration",
+    weekNote: "Invoice issued Sunday at 11:50 pm (Bali time), emailed and added here.", weekEmpty: "No approved delivery this week yet.", invEmpty: "No invoice yet.", ordersEmpty: "No order yet. Submit your first video.",
+    st: { run: "In progress", qc: "Quality check", ok: "Delivered", new: "Received" }, badge: { due: "To pay", late: "Late", paid: "Paid", draft: "In preparation" }, pdf: "PDF", detail: "Details", cols: ["Order", "Project", "Deliverables", "Status", "Amount", "Invoice"], review: "Watch", week: "Week of", to: "to", noPrice: "on quote", total: "Week total", invoiced: "Invoiced on", issued: "issued", paidOn: "paid on" },
+};
+const $ = (s) => document.querySelector(s); const params = new URLSearchParams(location.search);
+const slug = params.get("client") || "", key = params.get("k") || "";
+let lang = params.get("lang") || "fr", data = null; if (!T[lang]) lang = "fr";
+const t = (k) => T[lang][k]; const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const loc = () => (lang === "fr" ? "fr-FR" : "en-GB");
+const money = (x, cur) => x == null ? t("noPrice") : (cur === "USD" ? "$" + Number(x).toLocaleString("en-US", { minimumFractionDigits: 2 }) : Number(x).toLocaleString("fr-FR", { minimumFractionDigits: 2 }) + " €");
+const fmtD = (d) => d ? new Date(d).toLocaleDateString(loc(), { day: "2-digit", month: "short" }) : "—";
+const fmtDL = (d) => d ? new Date(d + (d.length === 10 ? "T12:00:00" : "")).toLocaleDateString(loc(), { day: "2-digit", month: "short", year: "numeric" }) : "—";
+const monthKey = (d) => new Date(d + "T12:00:00").toLocaleDateString(loc(), { month: "long", year: "numeric" });
+function weekOf(dt) { const d = new Date(dt); const dow = (d.getDay() + 6) % 7; const mon = new Date(d); mon.setDate(d.getDate() - dow); mon.setHours(0, 0, 0, 0); const sun = new Date(mon); sun.setDate(mon.getDate() + 6); sun.setHours(23, 59, 59, 0); return { mon, sun }; }
+const invState = (i) => i.status === "payee" || i.paid_at ? "paid" : (Date.now() - new Date(i.issued_at).getTime() > 2 * 86400e3 ? "late" : "due");
+function applyText() { document.documentElement.lang = lang; document.querySelectorAll("[data-t]").forEach((el) => { const v = t(el.dataset.t); if (typeof v === "string") el.textContent = v; }); $("#langBtn").textContent = lang === "fr" ? "EN" : "FR"; $("#cgv").href = `../conditions.html?lang=${lang}`; $("#trackBtn").href = `../suivi.html?lang=${lang}`; }
+function render() {
+  const s = data.studio, cur = s.currency; $("#title").textContent = s.name;
+  $("#newBtn").href = `depot.html?client=${encodeURIComponent(slug)}&k=${encodeURIComponent(key)}&lang=${lang}`;
+  const invoices = data.invoices || [], jobs = data.jobs || [];
+  const due = invoices.filter((i) => invState(i) !== "paid").reduce((a, i) => a + Number(i.total || 0), 0);
+  const { mon, sun } = weekOf(new Date());
+  const thisWeek = jobs.filter((j) => j.qc_ok && !j.invoice_id); const extras = data.extra_lines || [];
+  const weekTotal = thisWeek.reduce((a, j) => a + Number(j.amount || 0), 0) + extras.reduce((a, e) => a + (e.offered ? 0 : Number(e.qty) * Number(e.unit_price)), 0);
+  const okCount = jobs.filter((j) => j.qc_ok).length;
+  $("#cards").innerHTML = [["err", money(due, cur), invoices.filter((i) => invState(i) !== "paid").length + (lang === "fr" ? " facture(s)" : " invoice(s)")], ["amber", money(weekTotal, cur), `${t("week")} ${fmtD(mon)} ${t("to")} ${fmtD(sun)}`], ["ok", okCount, ""]].map(([c, v, sub], i) => `<div class="card ${c}"><div class="mono">${t("cards")[i]}</div><div class="v">${v}</div><div class="s">${sub}</div></div>`).join("");
+  // semaine en cours
+  $("#week").innerHTML = (thisWeek.length || extras.length)
+    ? thisWeek.map((j) => `<div class="row"><span><b>${esc(j.project)}</b> · <span style="color:var(--taupe)">${esc(j.work_to_do || "")}</span></span><span>${money(j.amount, cur)}</span></div>`).join("") + extras.map((e) => `<div class="row"><span>${esc(e.label)}${e.offered ? " · " + t("badge").paid.toLowerCase() : ""}</span><span class="${e.offered ? "strike" : ""}">${money(Number(e.qty) * Number(e.unit_price), cur)}</span></div>`).join("") + `<div class="tot"><span>${t("total")}</span><span>${money(weekTotal, cur)}</span></div><div class="empty">${t("weekNote")}</div>`
+    : `<div class="empty">${t("weekEmpty")}<br/>${t("weekNote")}</div>`;
+  // factures par mois
+  if (!invoices.length) $("#invoices").innerHTML = `<div class="empty">${t("invEmpty")}</div>`;
+  else { const groups = {}; for (const i of invoices) (groups[monthKey(i.period_end)] = groups[monthKey(i.period_end)] || []).push(i);
+    $("#invoices").innerHTML = Object.entries(groups).map(([m, list]) => `<div class="month">${m}</div>` + list.map((i) => { const st = invState(i); return `<div class="inv ${st}" data-inv="${i.id}">
+      <div class="n">${esc(i.number)}<small>${t("issued")} ${fmtDL(i.issued_at?.slice(0, 10))}</small></div>
+      <div class="p"><b>${t("week")} ${fmtD(i.period_start + "T12:00:00")} ${t("to")} ${fmtD(i.period_end + "T12:00:00")}</b><span>${(i.lines || []).length} ${lang === "fr" ? "ligne(s)" : "line(s)"}${i.paid_at ? " · " + t("paidOn") + " " + fmtDL(i.paid_at.slice(0, 10)) : ""}</span></div>
+      <div class="amt">${money(i.total, i.currency)}</div>
+      <div><span class="badge ${st}">${t("badge")[st]}</span></div>
+      <div style="display:flex;gap:6px;justify-content:flex-end">${i.pdf_url ? `<a class="btn ghost" href="${esc(i.pdf_url)}" target="_blank" rel="noopener">${t("pdf")}</a>` : ""}<button type="button" class="toggle" data-tg="${i.id}">${t("detail")}</button></div>
+      <div class="lines">${(i.lines || []).map((l) => `<div><span class="${l.offert ? "strike" : ""}">${esc(l.titre)} × ${l.qte}</span><span>${money(l.qte * l.tarif, i.currency)}</span></div>`).join("")}</div></div>`; }).join("")).join("");
+    $("#invoices").querySelectorAll("[data-tg]").forEach((b) => b.addEventListener("click", () => b.closest(".inv").classList.toggle("open"))); }
+  // commandes
+  if (!jobs.length) $("#orders").innerHTML = `<div class="empty">${t("ordersEmpty")}</div>`;
+  else { const invByJob = {}; for (const i of invoices) invByJob[i.id] = i.number;
+    $("#orders").innerHTML = `<table><thead><tr>${t("cols").map((c) => `<th>${c}</th>`).join("")}</tr></thead><tbody>${jobs.map((j) => { const st = j.qc_ok ? "ok" : j.delivered ? "qc" : j.started ? "run" : "new"; return `<tr><td><span class="tk">${esc(j.token)}</span><small>${fmtDL(j.created_at.slice(0, 10))}</small></td><td><b>${esc(j.project)}</b><small><a href="../suivi.html?token=${j.token}&lang=${lang}" target="_blank" rel="noopener">${lang === "fr" ? "suivi" : "tracking"}</a>${j.frameio_url ? ` · <a href="${esc(j.frameio_url)}" target="_blank" rel="noopener">${t("review")}</a>` : ""}</small></td><td>${esc(j.work_to_do || "")}</td><td><span class="st ${st}">${t("st")[st]}</span></td><td>${j.qc_ok ? money(j.amount, cur) : "—"}</td><td>${j.invoice_id ? esc(invByJob[j.invoice_id] || "") : (j.qc_ok ? `<span style="color:var(--taupe)">${lang === "fr" ? "dimanche" : "Sunday"}</span>` : "")}</td></tr>`; }).join("")}</tbody></table>`; }
+}
+async function boot() {
+  applyText();
+  if (!slug || !key) { $("#gate").hidden = false; return; }
+  const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
+  const { data: d, error } = await sb.rpc("client_space", { p_slug: slug, p_key: key });
+  if (error || !d) { $("#gate").hidden = false; return; }
+  data = d; if (!params.get("lang") && T[d.studio.lang]) { lang = d.studio.lang; applyText(); }
+  $("#app").hidden = false; render();
+  setInterval(async () => { const { data: d2 } = await sb.rpc("client_space", { p_slug: slug, p_key: key }); if (d2) { data = d2; render(); } }, 600000);
+}
+$("#langBtn").addEventListener("click", () => { lang = lang === "fr" ? "en" : "fr"; applyText(); if (data) render(); });
+boot();
+</script>
+</body>
+</html>

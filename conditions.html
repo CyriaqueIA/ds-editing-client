@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta name="theme-color" content="#0C0B10"/>
+  <title>DS Editing — Conditions de collaboration</title>
+  <link rel="icon" type="image/png" href="assets/logo.png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--bg:#0C0B10;--surface:#16141A;--line:rgba(237,232,220,.10);--cream:#EDE8DC;--taupe:#8A8378;--amber:#FF6A2B}
+    *{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--cream);font-family:"Archivo",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+    .mono{font-family:"JetBrains Mono",monospace;letter-spacing:.14em;text-transform:uppercase;font-size:10px;color:var(--taupe)}
+    header{border-bottom:1px solid var(--line)}.hd{max-width:760px;margin:0 auto;padding:14px 16px;display:flex;align-items:center;gap:12px}.hd img{width:34px;height:34px;border-radius:50%}
+    .hd b{font-weight:600}.lang{margin-left:auto;background:none;border:1px solid var(--line);color:var(--taupe);border-radius:999px;padding:6px 10px;cursor:pointer;font:inherit;font-size:12px}
+    main{max-width:760px;margin:0 auto;padding:36px 16px 80px;line-height:1.6}
+    h1{font-family:"Anton",Impact,sans-serif;font-weight:400;text-transform:uppercase;font-size:clamp(32px,6vw,50px);line-height:1;margin:12px 0 6px}
+    h2{font-size:15px;margin:28px 0 6px;color:var(--amber);letter-spacing:.02em}
+    p{margin:0 0 8px;color:var(--cream)}.sub{color:var(--taupe)}
+    a{color:var(--amber)}
+  </style>
+</head>
+<body>
+<header><div class="hd"><img src="assets/logo.png" alt=""/><b>DS Editing</b><button class="lang" id="langBtn" type="button">EN</button></div></header>
+<main id="main"></main>
+<script>
+const T = {
+  fr: { kicker: "Conditions de collaboration", title: "Comment on travaille ensemble", sub: "Version du 27 septembre 2026. Ces conditions s'appliquent à chaque commande passée via l'espace client DS Editing.",
+    sections: [
+      ["1. Le prestataire", "DS Editing est le nom commercial de Silver Ledger HK LLC, société établie à Cheyenne, Wyoming (États-Unis), Filing ID 2026-001894957. Contact : contact@ds-editing.com."],
+      ["2. La commande", "Chaque envoi du formulaire de dépôt constitue une commande. Le client reçoit un numéro de suivi à 7 chiffres et un lien de suivi. Le client fournit des liens de rushes accessibles ; les fichiers restent hébergés chez lui, DS Editing ne stocke que les liens, le brief et les éléments de marque."],
+      ["3. Délais", "La date souhaitée indiquée dans la commande est un objectif partagé. Le délai standard est de 5 jours ouvrés après réception des fichiers ; il peut être ajusté selon la charge et le volume. Tout retard est visible en temps réel sur la page de suivi."],
+      ["4. Livraison et validation", "Chaque montage passe par le contrôle qualité DS Editing avant d'être envoyé. Le client relit et commente sur frame.io. Les ajustements raisonnables demandés dans les 5 jours suivant la livraison sont inclus ; au-delà, ou pour une nouvelle direction créative, une nouvelle commande est nécessaire."],
+      ["5. Facturation hebdomadaire", "Une facture par semaine (lundi au dimanche) regroupe toutes les livraisons validées par le contrôle qualité dans la semaine. Elle est émise le dimanche à 23 h 50 (heure de Bali), envoyée par e-mail avec le PDF et disponible dans l'espace client. Pas de livraison dans la semaine, pas de facture."],
+      ["6. Paiement", "Paiement à réception, par virement bancaire (coordonnées sur la facture), en indiquant le numéro de facture en référence. Un rappel automatique est envoyé 2 jours après l'envoi si la facture reste impayée."],
+      ["7. Retard de paiement", "Tout retard de paiement entraîne une pénalité de 20 % par semaine de retard sur le solde dû, à compter du 3e jour suivant l'envoi de la facture. DS Editing peut suspendre les livraisons en cours tant qu'un solde reste impayé."],
+      ["8. Taxes", "TVA non applicable : prestataire établi hors Union européenne. Pour un client professionnel européen, autoliquidation par le preneur (art. 283-2 du CGI). Les prix sont exprimés dans la devise du client (EUR ou USD)."],
+      ["9. Propriété et usage", "Les montages livrés appartiennent au client dès le paiement complet de la facture correspondante. DS Editing peut présenter des extraits dans son portfolio, sauf demande contraire écrite du client."],
+      ["10. Confidentialité", "Les rushes, briefs et informations transmis restent confidentiels et ne sont utilisés que pour réaliser la commande. Les accès sont limités à l'équipe affectée au projet."],
+      ["11. Acceptation", "L'envoi d'une commande depuis l'espace client vaut acceptation de ces conditions. Elles peuvent évoluer ; la version en vigueur est celle publiée sur cette page à la date de la commande."],
+    ] },
+  en: { kicker: "Terms of collaboration", title: "How we work together", sub: "Version dated September 27, 2026. These terms apply to every order placed through the DS Editing client space.",
+    sections: [
+      ["1. The provider", "DS Editing is the trade name of Silver Ledger HK LLC, a company established in Cheyenne, Wyoming (USA), Filing ID 2026-001894957. Contact: contact@ds-editing.com."],
+      ["2. The order", "Each submission of the deposit form is an order. The client receives a 7-digit tracking number and a tracking link. The client provides accessible footage links; files stay hosted on the client's side, DS Editing only stores links, the brief and brand assets."],
+      ["3. Timing", "The requested date given in the order is a shared target. The standard turnaround is 5 business days after the files are received; it may be adjusted depending on workload and volume. Any delay is visible in real time on the tracking page."],
+      ["4. Delivery and approval", "Every edit goes through DS Editing quality control before being sent. The client reviews and comments on frame.io. Reasonable adjustments requested within 5 days of delivery are included; beyond that, or for a new creative direction, a new order is required."],
+      ["5. Weekly invoicing", "One invoice per week (Monday to Sunday) covers all deliveries approved by quality control during the week. It is issued on Sunday at 11:50 pm (Bali time), emailed with the PDF and available in the client space. No delivery during the week, no invoice."],
+      ["6. Payment", "Payment is due on receipt, by bank wire (details on the invoice), referencing the invoice number. An automatic reminder is sent 2 days after the invoice is emailed if it remains unpaid."],
+      ["7. Late payment", "Late payments accrue a 20% penalty per week on the outstanding balance, starting on the 3rd day after the invoice is sent. DS Editing may pause ongoing deliveries while a balance remains unpaid."],
+      ["8. Taxes", "No VAT applicable: provider established outside the European Union. For EU business clients, reverse charge by the customer (art. 283-2 CGI). Prices are in the client's currency (EUR or USD)."],
+      ["9. Ownership and usage", "Delivered edits belong to the client once the corresponding invoice is paid in full. DS Editing may show excerpts in its portfolio unless the client objects in writing."],
+      ["10. Confidentiality", "Footage, briefs and information shared remain confidential and are used only to fulfil the order. Access is limited to the team assigned to the project."],
+      ["11. Acceptance", "Submitting an order from the client space constitutes acceptance of these terms. They may evolve; the version in force is the one published on this page on the order date."],
+    ] },
+};
+const params = new URLSearchParams(location.search); let lang = params.get("lang") || ((navigator.language || "en").slice(0, 2) === "fr" ? "fr" : "en"); if (!T[lang]) lang = "en";
+function render() { const t = T[lang]; document.documentElement.lang = lang; document.title = "DS Editing — " + t.kicker; document.getElementById("langBtn").textContent = lang === "fr" ? "EN" : "FR";
+  document.getElementById("main").innerHTML = `<div class="mono">${t.kicker}</div><h1>${t.title}</h1><p class="sub">${t.sub}</p>` + t.sections.map(([h, p]) => `<h2>${h}</h2><p>${p}</p>`).join(""); }
+document.getElementById("langBtn").addEventListener("click", () => { lang = lang === "fr" ? "en" : "fr"; render(); }); render();
+</script>
+</body>
+</html>
