@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta name="robots" content="noindex,nofollow"/>
+  <meta name="theme-color" content="#0C0B10"/>
+  <title>DS Editing — Production</title>
+  <link rel="icon" type="image/png" href="../assets/logo.png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--bg:#0C0B10;--surface:#16141A;--surface-2:#1D1A22;--line:rgba(237,232,220,.10);--line-strong:rgba(237,232,220,.22);--cream:#EDE8DC;--taupe:#8A8378;--amber:#FF6A2B;--amber-soft:rgba(255,106,43,.14);--ok:#5FD39A;--warn:#F5C400;--err:#F08A82;--blue:#7FB0E0}
+    *{box-sizing:border-box}
+    html,body{margin:0;background:var(--bg);color:var(--cream);font-family:"Archivo",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+    a{color:inherit}
+    .mono{font-family:"JetBrains Mono",ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;font-size:10px;color:var(--taupe)}
+    .display{font-family:"Anton",Impact,sans-serif;font-weight:400;letter-spacing:.01em;text-transform:uppercase;line-height:1}
+    button,input,select{font:inherit}
+    .btn{border:none;border-radius:999px;padding:10px 16px;font-size:13px;font-weight:600;cursor:pointer;background:var(--amber);color:#0C0B10}
+    .btn.ghost{background:none;color:var(--taupe);border:1px solid var(--line)}
+    .btn.ghost:hover{color:var(--cream);border-color:var(--line-strong)}
+    .in,select.in{background:var(--bg);color:var(--cream);border:1px solid var(--line);border-radius:9px;padding:9px 11px;font-size:13px;outline:none;width:100%}
+    .in:focus{border-color:rgba(255,106,43,.6)}
+
+    header{position:sticky;top:0;z-index:20;background:rgba(12,11,16,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+    .hd{display:flex;align-items:center;gap:14px;padding:12px 20px}
+    .hd img{width:34px;height:34px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 1px rgba(255,106,43,.4)}
+    .hd .brand{display:flex;flex-direction:column;line-height:1.1}
+    .hd .brand b{font-weight:600}
+    .hd .right{margin-left:auto;display:flex;align-items:center;gap:10px}
+    .clock{font-family:"JetBrains Mono",monospace;font-size:13px;color:var(--taupe)}
+    .who{font-size:13px;color:var(--taupe)}
+    .who b{color:var(--cream);font-weight:500}
+    .live{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--taupe)}
+    .live i{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 10px var(--ok)}
+
+    main{padding:18px 20px 60px}
+    .stats{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:16px}
+    @media (max-width:900px){.stats{grid-template-columns:repeat(2,1fr)}}
+    .stat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+    .stat .v{font-family:"Anton",Impact,sans-serif;font-size:34px;line-height:1;margin-top:6px}
+    .stat.warn .v{color:var(--warn)}.stat.err .v{color:var(--err)}.stat.ok .v{color:var(--ok)}.stat.amber .v{color:var(--amber)}
+    .toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+    .chip{border:1px solid var(--line-strong);background:none;color:var(--cream);border-radius:999px;padding:8px 13px;font-size:13px;cursor:pointer}
+    .chip.on,.chip:hover{border-color:var(--amber);color:var(--amber);background:var(--amber-soft)}
+    .toolbar .search{margin-left:auto;width:240px}
+
+    .board{display:flex;flex-direction:column;gap:8px}
+    .job{display:grid;grid-template-columns:96px 1.2fr 1.4fr 110px 96px 150px 1fr 1fr 150px 40px;gap:10px;align-items:center;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--line-strong);border-radius:12px;padding:10px 14px;font-size:13px}
+    .job.g{border-left-color:var(--ok)}.job.o{border-left-color:var(--warn)}.job.r{border-left-color:var(--err)}.job.done{border-left-color:var(--blue);opacity:.75}
+    .job .tok{font-family:"JetBrains Mono",monospace;font-size:13px;color:var(--amber)}
+    .job .c b{display:block;font-weight:600}
+    .job .c span,.job .p span{display:block;font-size:11px;color:var(--taupe);margin-top:2px}
+    .job .p b{display:block;font-weight:500}
+    .job .d{font-family:"JetBrains Mono",monospace;font-size:12px}
+    .job .d small{display:block;color:var(--taupe);font-size:10px}
+    .left{font-family:"JetBrains Mono",monospace;font-size:12px;font-weight:500;border-radius:999px;padding:5px 9px;text-align:center;border:1px solid var(--line)}
+    .left.g{color:var(--ok);border-color:rgba(95,211,154,.4)}.left.o{color:var(--warn);border-color:rgba(245,196,0,.4)}.left.r{color:var(--err);border-color:rgba(240,138,130,.5);background:rgba(240,138,130,.1)}
+    .links a{display:inline-block;font-size:12px;color:var(--cream);border:1px solid var(--line);border-radius:7px;padding:4px 8px;margin:2px 4px 2px 0;text-decoration:none}
+    .links a:hover{border-color:var(--amber);color:var(--amber)}
+    .badge{display:inline-block;font-size:10px;letter-spacing:.08em;text-transform:uppercase;border-radius:6px;padding:3px 7px;color:var(--taupe);border:1px solid var(--line)}
+    .badge.ok{color:var(--ok);border-color:rgba(95,211,154,.4)}.badge.err{color:var(--err);border-color:rgba(240,138,130,.5)}
+    .steps{display:flex;gap:6px;flex-wrap:wrap}
+    .st{display:inline-flex;align-items:center;gap:5px;font-size:11px;border:1px solid var(--line);border-radius:7px;padding:5px 8px;cursor:pointer;color:var(--taupe);user-select:none}
+    .st.on{color:var(--ok);border-color:rgba(95,211,154,.4);background:rgba(95,211,154,.08)}
+    .st.auto{cursor:default}
+    .st[aria-disabled="true"]{cursor:not-allowed;opacity:.6}
+    .qc{display:flex;flex-direction:column;gap:5px}
+    .qc select{padding:6px 8px;font-size:12px}
+    .qc.ok select{color:var(--ok)}.qc.revisions select{color:var(--err)}
+    .more{background:none;border:1px solid var(--line);color:var(--taupe);border-radius:8px;width:32px;height:32px;cursor:pointer}
+    .more:hover{color:var(--cream);border-color:var(--line-strong)}
+    .detail{grid-column:1/-1;display:none;gap:14px;padding:10px 4px 4px;border-top:1px solid var(--line);margin-top:6px;font-size:13px;color:var(--taupe);grid-template-columns:1fr 1fr 1fr}
+    .job.open .detail{display:grid}
+    .detail b{display:block;color:var(--cream);font-weight:500;margin-bottom:4px}
+    .detail .lk{white-space:pre-wrap;word-break:break-all;font-size:12px}
+    .empty{padding:60px 20px;text-align:center;color:var(--taupe)}
+    @media (max-width:1100px){.job{grid-template-columns:1fr 1fr;row-gap:8px}.job>*{grid-column:auto}.job .detail{grid-template-columns:1fr}}
+
+    /* mode télé */
+    body.tv main{padding:14px 18px}
+    body.tv .toolbar,body.tv .more,body.tv .detail{display:none}
+    body.tv .job{font-size:15px;padding:14px 16px}
+    body.tv .stat .v{font-size:44px}
+    body.tv .hd .right .btn{display:none}
+
+    /* connexion */
+    .gate{max-width:380px;margin:90px auto;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:26px}
+    .gate h1{font-size:28px;margin:0 0 6px}
+    .gate p{color:var(--taupe);font-size:14px;margin:0 0 16px}
+    .gate .in{margin-bottom:10px}
+    .gate .msg{font-size:13px;color:var(--err);min-height:18px;margin-top:8px}
+    .setup{max-width:560px;margin:80px auto;color:var(--taupe);font-size:14px;line-height:1.6}
+    .setup code{color:var(--cream)}
+  </style>
+</head>
+<body>
+<header><div class="hd">
+  <img src="../assets/logo.png" alt=""/>
+  <div class="brand"><b>DS Editing</b><span class="mono" data-t="sub"></span></div>
+  <span class="live" id="live" hidden><i></i><span data-t="live"></span></span>
+  <div class="right">
+    <span class="clock" id="clock"></span>
+    <span class="who" id="who"></span>
+    <button class="btn ghost" id="langBtn" type="button">EN</button>
+    <button class="btn ghost" id="tvBtn" type="button" data-t="tv"></button>
+    <button class="btn ghost" id="logout" type="button" data-t="logout" hidden></button>
+  </div>
+</div></header>
+
+<main>
+  <div class="setup" id="setup" hidden></div>
+  <div class="gate" id="gate" hidden>
+    <h1 class="display" data-t="login"></h1>
+    <p data-t="loginSub"></p>
+    <input class="in" id="email" type="email" placeholder="email" autocomplete="username"/>
+    <input class="in" id="password" type="password" placeholder="mot de passe" autocomplete="current-password"/>
+    <button class="btn" id="loginBtn" type="button" data-t="loginBtn"></button>
+    <div class="msg" id="loginMsg"></div>
+  </div>
+
+  <div id="app" hidden>
+    <div class="stats" id="stats"></div>
+    <div class="toolbar" id="toolbar"></div>
+    <div class="board" id="board"></div>
+  </div>
+</main>
+
+<script type="module">
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+/* ===== Configuration ===== */
+const SUPABASE_URL = "https://xkanmjlpysxpohsuqvwg.supabase.co";
+const SUPABASE_ANON = "sb_publishable_lIZtV_WtN5NcGSb0dnfaiQ_AgKYBIVa";   // clé « anon / publishable » du projet Supabase (Settings → API)
+const BUSINESS_DAYS_DEFAULT = 5;
+
+const T = {
+  fr: { sub: "Production", live: "En direct", tv: "Mode télé", logout: "Déconnexion", login: "Espace équipe", loginSub: "Connecte-toi avec ton e-mail DS Editing.", loginBtn: "Entrer",
+    stats: ["Reçues aujourd'hui", "En cours", "En retard", "À contrôler", "Livrées cette semaine"],
+    filters: { all: "Tout", mine: "Mes tâches", late: "En retard", qc: "À contrôler", done: "Livrées" }, search: "Rechercher…",
+    steps: { dl: "Fichiers", start: "Commencé", half: "50 %", done: "Livré" }, qc: { pending: "Qualité : en attente", ok: "Qualité : OK", revisions: "Qualité : à revoir" },
+    days: (n) => n < 0 ? `${-n} j de retard` : n === 0 ? "aujourd'hui" : `${n} j`, unassigned: "— à attribuer —", brief: "Brief", files: "Fichiers", frame: "frame.io", empty: "Aucune commande dans cette vue.", received: "Reçu", due: "Livraison", requested: "souhaité", frameioPh: "Lien frame.io de livraison", noteQc: "Note qualité", notes: "Notes internes", deliveryDate: "Date de livraison", rushes: "Rushes", email: "E-mail client", contact: "Contact", newJob: "Nouvelle commande reçue" },
+  en: { sub: "Production", live: "Live", tv: "TV mode", logout: "Log out", login: "Team space", loginSub: "Sign in with your DS Editing email.", loginBtn: "Enter",
+    stats: ["Received today", "In progress", "Late", "To review", "Delivered this week"],
+    filters: { all: "All", mine: "My tasks", late: "Late", qc: "To review", done: "Delivered" }, search: "Search…",
+    steps: { dl: "Files", start: "Started", half: "50%", done: "Delivered" }, qc: { pending: "QC: pending", ok: "QC: OK", revisions: "QC: revisions" },
+    days: (n) => n < 0 ? `${-n} d late` : n === 0 ? "today" : `${n} d`, unassigned: "— unassigned —", brief: "Brief", files: "Files", frame: "frame.io", empty: "No order in this view.", received: "Received", due: "Delivery", requested: "requested", frameioPh: "frame.io delivery link", noteQc: "QC note", notes: "Internal notes", deliveryDate: "Delivery date", rushes: "Footage", email: "Client email", contact: "Contact", newJob: "New order received" },
+};
+const $ = (s) => document.querySelector(s);
+const params = new URLSearchParams(location.search);
+let lang = params.get("lang") || (() => { try { return localStorage.getItem("ds_lang"); } catch { return null; } })() || "fr"; if (!T[lang]) lang = "fr";
+const t = (k) => T[lang][k];
+let tv = params.get("tv") === "1"; document.body.classList.toggle("tv", tv);
+let me = null, profile = null, jobs = [], editors = [], filter = params.get("f") || "all", q = "", known = new Set(), sb = null;
+
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const fmtD = (d) => d ? new Date(d).toLocaleDateString(lang === "fr" ? "fr-FR" : "en-GB", { day: "2-digit", month: "short" }) : "—";
+const fmtDT = (d) => d ? new Date(d).toLocaleString(lang === "fr" ? "fr-FR" : "en-GB", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" }) : "—";
+function addBusinessDays(date, n) { const d = new Date(date); let k = 0; while (k < n) { d.setDate(d.getDate() + 1); if (d.getDay() !== 0 && d.getDay() !== 6) k++; } return d; }
+function dueDate(j) { if (j.delivery_date) return new Date(j.delivery_date); const auto = addBusinessDays(j.created_at, BUSINESS_DAYS_DEFAULT); if (j.requested_deadline) { const r = new Date(j.requested_deadline); return r < auto ? r : auto; } return auto; }
+function daysLeft(j) { const d = dueDate(j); const today = new Date(); today.setHours(0, 0, 0, 0); d.setHours(0, 0, 0, 0); return Math.round((d - today) / 86400000); }
+const isDone = (j) => j.qc_status === "ok";
+const isLate = (j) => !isDone(j) && daysLeft(j) < 0;
+const canEdit = (j) => profile && (["admin", "dispatcher", "qc"].includes(profile.role) || (profile.role === "editor" && j.editor_id === me.id));
+const isAdmin = () => profile && ["admin", "dispatcher", "qc"].includes(profile.role);
+
+function applyText() {
+  document.documentElement.lang = lang;
+  document.querySelectorAll("[data-t]").forEach((el) => { const v = t(el.dataset.t); if (typeof v === "string") el.textContent = v; });
+  $("#langBtn").textContent = lang === "fr" ? "EN" : "FR";
+  $("#password").placeholder = lang === "fr" ? "mot de passe" : "password";
+}
+function tick() { $("#clock").textContent = new Date().toLocaleTimeString(lang === "fr" ? "fr-FR" : "en-GB", { hour: "2-digit", minute: "2-digit" }); }
+setInterval(tick, 10000); tick();
+
+/* ===== rendu ===== */
+function renderStats() {
+  const today = new Date().toDateString(); const weekAgo = Date.now() - 7 * 86400000;
+  const s = [
+    ["", jobs.filter((j) => new Date(j.created_at).toDateString() === today).length],
+    ["amber", jobs.filter((j) => j.started_at && !j.delivered_at).length],
+    ["err", jobs.filter(isLate).length],
+    ["warn", jobs.filter((j) => j.delivered_at && j.qc_status === "pending").length],
+    ["ok", jobs.filter((j) => isDone(j) && new Date(j.qc_at || j.delivered_at).getTime() > weekAgo).length],
+  ];
+  $("#stats").innerHTML = s.map(([cls, v], i) => `<div class="stat ${cls}"><div class="mono">${t("stats")[i]}</div><div class="v">${v}</div></div>`).join("");
+}
+function renderToolbar() {
+  const f = t("filters");
+  $("#toolbar").innerHTML = Object.keys(f).filter((k) => k !== "mine" || profile?.role === "editor" || true).map((k) => `<button type="button" class="chip ${filter === k ? "on" : ""}" data-f="${k}">${f[k]}</button>`).join("") + `<input class="in search" id="search" placeholder="${t("search")}" value="${esc(q)}"/>`;
+  $("#toolbar").querySelectorAll("[data-f]").forEach((b) => b.addEventListener("click", () => { filter = b.dataset.f; renderToolbar(); renderBoard(); }));
+  $("#search").addEventListener("input", (e) => { q = e.target.value.toLowerCase(); renderBoard(); });
+}
+function visible() {
+  return jobs.filter((j) => {
+    if (filter === "mine" && j.editor_id !== me?.id) return false;
+    if (filter === "late" && !isLate(j)) return false;
+    if (filter === "qc" && !(j.delivered_at && j.qc_status === "pending")) return false;
+    if (filter === "done" && !isDone(j)) return false;
+    if (filter === "all" && isDone(j) && Date.now() - new Date(j.qc_at || j.delivered_at).getTime() > 7 * 86400000) return false;
+    if (q && !`${j.token} ${j.client_name} ${j.project} ${j.editor_name || ""} ${j.work_to_do || ""}`.toLowerCase().includes(q)) return false;
+    return true;
+  }).sort((a, b) => (isDone(a) - isDone(b)) || (daysLeft(a) - daysLeft(b)));
+}
+function renderBoard() {
+  const list = visible(); const st = t("steps"); const qc = t("qc");
+  if (!list.length) { $("#board").innerHTML = `<div class="empty">${t("empty")}</div>`; return; }
+  $("#board").innerHTML = list.map((j) => {
+    const n = daysLeft(j); const cls = isDone(j) ? "done" : n < 0 ? "r" : n <= 2 ? "o" : "g";
+    const ed = canEdit(j); const dis = ed ? "" : 'aria-disabled="true"';
+    const editorSel = isAdmin()
+      ? `<select class="in" data-act="editor" data-id="${j.id}"><option value="">${t("unassigned")}</option>${editors.map((e) => `<option value="${e.id}" ${e.id === j.editor_id ? "selected" : ""}>${esc(e.display_name)}</option>`).join("")}</select>`
+      : `<span>${esc(j.editor_name || t("unassigned"))}</span>`;
+    return `<div class="job ${cls}" data-id="${j.id}">
+      <div class="tok">${esc(j.token)}</div>
+      <div class="c"><b>${esc(j.client_name)}</b><span>${t("received")} ${fmtDT(j.created_at)}</span></div>
+      <div class="p"><b>${esc(j.project)}</b><span>${esc(j.work_to_do || "")}</span></div>
+      <div class="d">${fmtD(dueDate(j))}<small>${j.requested_deadline ? `${t("requested")} ${fmtD(j.requested_deadline)}` : "&nbsp;"}</small></div>
+      <div><span class="left ${cls === "done" ? "" : cls}">${isDone(j) ? "✓" : t("days")(n)}</span></div>
+      <div>${editorSel}</div>
+      <div class="links">${j.brief_url ? `<a href="${j.brief_url}" target="_blank" rel="noopener">${t("brief")}</a>` : ""}${j.folder_url ? `<a href="${j.folder_url}" target="_blank" rel="noopener">${t("files")}</a>` : ""}${j.frameio_url ? `<a href="${j.frameio_url}" target="_blank" rel="noopener">${t("frame")}</a>` : ""}</div>
+      <div class="steps">
+        <span class="st auto ${j.files_downloaded_at ? "on" : ""}" title="${j.download_error ? esc(j.download_error) : ""}">${j.files_downloaded_at ? "✓" : j.download_error ? "!" : "…"} ${st.dl}</span>
+        <span class="st ${j.started_at ? "on" : ""}" data-step="started_at" data-id="${j.id}" ${dis}>${j.started_at ? "✓" : "○"} ${st.start}</span>
+        <span class="st ${j.half_at ? "on" : ""}" data-step="half_at" data-id="${j.id}" ${dis}>${j.half_at ? "✓" : "○"} ${st.half}</span>
+        <span class="st ${j.delivered_at ? "on" : ""}" data-step="delivered_at" data-id="${j.id}" ${dis}>${j.delivered_at ? "✓" : "○"} ${st.done}</span>
+      </div>
+      <div class="qc ${j.qc_status}">${isAdmin() ? `<select class="in" data-act="qc" data-id="${j.id}">${["pending", "ok", "revisions"].map((k) => `<option value="${k}" ${k === j.qc_status ? "selected" : ""}>${qc[k]}</option>`).join("")}</select>` : `<span class="badge ${j.qc_status === "ok" ? "ok" : j.qc_status === "revisions" ? "err" : ""}">${qc[j.qc_status]}</span>`}</div>
+      <button type="button" class="more" data-more="${j.id}">⋯</button>
+      <div class="detail">
+        <div><b>${t("rushes")}</b><div class="lk">${(j.rushes_links || []).map((u) => `<a href="${esc(u)}" target="_blank" rel="noopener">${esc(u)}</a>`).join("\n") || "—"}</div></div>
+        <div><b>${t("contact")}</b>${esc(j.contact || "—")}<br/><b style="margin-top:8px">${t("email")}</b>${esc(j.email || "—")}${j.description ? `<br/><b style="margin-top:8px">Brief</b><span style="white-space:pre-wrap">${esc(j.description)}</span>` : ""}</div>
+        <div>
+          <b>${t("frame")}</b><input class="in" data-field="frameio_url" data-id="${j.id}" value="${esc(j.frameio_url || "")}" placeholder="${t("frameioPh")}" ${ed ? "" : "disabled"}/>
+          ${isAdmin() ? `<b style="margin-top:8px">${t("deliveryDate")}</b><input class="in" type="date" data-field="delivery_date" data-id="${j.id}" value="${j.delivery_date || ""}"/><b style="margin-top:8px">${t("noteQc")}</b><input class="in" data-field="qc_note" data-id="${j.id}" value="${esc(j.qc_note || "")}"/>` : (j.qc_note ? `<b style="margin-top:8px">${t("noteQc")}</b>${esc(j.qc_note)}` : "")}
+          <b style="margin-top:8px">${t("notes")}</b><input class="in" data-field="notes" data-id="${j.id}" value="${esc(j.notes || "")}" ${ed ? "" : "disabled"}/>
+        </div>
+      </div>
+    </div>`;
+  }).join("");
+  wireBoard();
+}
+function wireBoard() {
+  const B = $("#board");
+  B.querySelectorAll("[data-more]").forEach((b) => b.addEventListener("click", () => b.closest(".job").classList.toggle("open")));
+  B.querySelectorAll("[data-step]").forEach((el) => el.addEventListener("click", async () => {
+    if (el.getAttribute("aria-disabled") === "true") return;
+    const j = jobs.find((x) => x.id === el.dataset.id); const k = el.dataset.step; const val = j[k] ? null : new Date().toISOString();
+    const patch = { [k]: val };
+    if (k === "delivered_at" && val && !j.started_at) patch.started_at = val;
+    if (k === "delivered_at" && !val) patch.qc_status = "pending";
+    await update(j.id, patch);
+  }));
+  B.querySelectorAll("[data-act='editor']").forEach((s) => s.addEventListener("change", async () => { const e = editors.find((x) => x.id === s.value); await update(s.dataset.id, { editor_id: e ? e.id : null, editor_name: e ? e.display_name : null }); }));
+  B.querySelectorAll("[data-act='qc']").forEach((s) => s.addEventListener("change", async () => { await update(s.dataset.id, { qc_status: s.value, qc_at: s.value === "pending" ? null : new Date().toISOString(), qc_owner: s.value === "pending" ? null : profile.display_name }); }));
+  B.querySelectorAll("[data-field]").forEach((i) => i.addEventListener("change", async () => { await update(i.dataset.id, { [i.dataset.field]: i.value || null }); }));
+}
+async function update(id, patch) {
+  const { error } = await sb.from("jobs").update(patch).eq("id", id);
+  if (error) { alert((lang === "fr" ? "Modification refusée : " : "Update refused: ") + error.message); return; }
+  await load(false);
+}
+
+/* ===== données ===== */
+async function load(first) {
+  const [{ data: rows, error }, { data: eds }] = await Promise.all([
+    sb.from("jobs").select("*").order("created_at", { ascending: false }).limit(400),
+    sb.from("profiles").select("id,display_name,role").eq("role", "editor").order("display_name"),
+  ]);
+  if (error) { console.error(error); return; }
+  if (!first) { const fresh = (rows || []).filter((j) => !known.has(j.id)); if (fresh.length) beep(fresh.length); }
+  jobs = rows || []; editors = eds || []; jobs.forEach((j) => known.add(j.id));
+  renderStats(); renderBoard();
+}
+function beep(n) {
+  try { const ctx = new (window.AudioContext || window.webkitAudioContext)(); for (let i = 0; i < Math.min(n, 3); i++) { const o = ctx.createOscillator(), g = ctx.createGain(); o.connect(g); g.connect(ctx.destination); o.frequency.value = 880; g.gain.value = .08; o.start(ctx.currentTime + i * .25); o.stop(ctx.currentTime + i * .25 + .15); } } catch {}
+}
+async function boot() {
+  applyText();
+  if (!SUPABASE_ANON) { $("#setup").hidden = false; $("#setup").innerHTML = lang === "fr" ? "Il manque la clé publique Supabase : ouvrir <code>team/dashboard.html</code> et remplir <code>SUPABASE_ANON</code> (Supabase → Settings → API → anon / publishable)." : "Missing the Supabase public key: open <code>team/dashboard.html</code> and set <code>SUPABASE_ANON</code>."; return; }
+  sb = createClient(SUPABASE_URL, SUPABASE_ANON);
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { $("#gate").hidden = false; return; }
+  me = session.user;
+  const { data: p } = await sb.from("profiles").select("*").eq("id", me.id).single();
+  profile = p || { role: "editor", display_name: me.email };
+  $("#who").innerHTML = `<b>${esc(profile.display_name)}</b> · ${esc(profile.role)}`;
+  $("#logout").hidden = false; $("#gate").hidden = true; $("#app").hidden = false; $("#live").hidden = false;
+  renderToolbar(); await load(true);
+  sb.channel("jobs-live").on("postgres_changes", { event: "*", schema: "public", table: "jobs" }, () => load(false)).subscribe();
+  setInterval(() => load(false), 60000);
+}
+$("#loginBtn").addEventListener("click", async () => {
+  $("#loginMsg").textContent = "";
+  const { error } = await sb.auth.signInWithPassword({ email: $("#email").value.trim(), password: $("#password").value });
+  if (error) { $("#loginMsg").textContent = error.message; return; }
+  location.reload();
+});
+$("#password").addEventListener("keydown", (e) => { if (e.key === "Enter") $("#loginBtn").click(); });
+$("#logout").addEventListener("click", async () => { await sb.auth.signOut(); location.reload(); });
+$("#langBtn").addEventListener("click", () => { lang = lang === "fr" ? "en" : "fr"; try { localStorage.setItem("ds_lang", lang); } catch {} applyText(); if (profile) { renderToolbar(); renderStats(); renderBoard(); } });
+$("#tvBtn").addEventListener("click", () => { tv = !tv; document.body.classList.toggle("tv", tv); const u = new URL(location.href); tv ? u.searchParams.set("tv", "1") : u.searchParams.delete("tv"); history.replaceState(null, "", u); });
+boot();
+</script>
+</body>
+</html>

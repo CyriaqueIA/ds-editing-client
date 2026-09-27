@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta name="robots" content="noindex,nofollow"/>
+  <meta name="theme-color" content="#0C0B10"/>
+  <title>DS Editing — Suivi de commande</title>
+  <link rel="icon" type="image/png" href="assets/logo.png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--bg:#0C0B10;--surface:#16141A;--line:rgba(237,232,220,.10);--line-strong:rgba(237,232,220,.22);--cream:#EDE8DC;--taupe:#8A8378;--amber:#FF6A2B;--amber-soft:rgba(255,106,43,.14);--ok:#5FD39A;--err:#F08A82}
+    *{box-sizing:border-box}
+    html,body{margin:0;background:var(--bg);color:var(--cream);font-family:"Archivo",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+    body{min-height:100vh;display:flex;flex-direction:column}
+    a{color:inherit}
+    .mono{font-family:"JetBrains Mono",ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;font-size:10px;color:var(--taupe)}
+    .display{font-family:"Anton",Impact,sans-serif;font-weight:400;letter-spacing:.01em;text-transform:uppercase;line-height:1}
+    header{border-bottom:1px solid var(--line)}
+    .hd{max-width:760px;margin:0 auto;padding:14px 16px;display:flex;align-items:center;gap:12px}
+    .hd img{width:34px;height:34px;border-radius:50%;object-fit:cover}
+    .hd .brand{display:flex;flex-direction:column;line-height:1.1}.hd b{font-weight:600}
+    .lang{margin-left:auto;background:none;border:1px solid var(--line);color:var(--taupe);border-radius:999px;padding:6px 10px;cursor:pointer;font:inherit;font-size:12px}
+    main{flex:1;width:100%;max-width:760px;margin:0 auto;padding:36px 16px 80px}
+    h1{font-size:clamp(34px,6vw,54px);margin:14px 0 8px}
+    .lead{margin:0 0 22px;color:var(--taupe);line-height:1.55}
+    .tokform{display:flex;gap:10px}
+    .in{flex:1;background:var(--surface);color:var(--cream);border:1px solid var(--line);border-radius:12px;padding:14px 16px;font:inherit;font-size:18px;letter-spacing:.2em;font-family:"JetBrains Mono",monospace;outline:none}
+    .in:focus{border-color:rgba(255,106,43,.6)}
+    .btn{border:none;border-radius:999px;padding:14px 22px;font:inherit;font-size:15px;font-weight:600;cursor:pointer;background:var(--amber);color:#0C0B10}
+    .msg{margin-top:12px;color:var(--err);font-size:13px;min-height:18px}
+    .card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px;margin-top:22px}
+    .card .k{font-size:11px;color:var(--taupe);letter-spacing:.12em;text-transform:uppercase;font-family:"JetBrains Mono",monospace}
+    .card .v{font-size:16px;margin:4px 0 14px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 18px}
+    @media (max-width:560px){.grid{grid-template-columns:1fr}}
+    .timeline{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:0}
+    .timeline li{display:grid;grid-template-columns:28px 1fr auto;gap:12px;align-items:center;padding:12px 0;border-top:1px solid var(--line)}
+    .timeline li i{width:22px;height:22px;border-radius:50%;border:2px solid var(--line-strong);display:flex;align-items:center;justify-content:center;font-style:normal;font-size:11px;color:var(--taupe)}
+    .timeline li.done i{border-color:var(--ok);background:rgba(95,211,154,.15);color:var(--ok)}
+    .timeline li.now i{border-color:var(--amber);color:var(--amber);box-shadow:0 0 12px rgba(255,106,43,.5)}
+    .timeline li b{font-weight:500}.timeline li.done b{color:var(--cream)}.timeline li:not(.done) b{color:var(--taupe)}
+    .timeline li small{color:var(--taupe);font-family:"JetBrains Mono",monospace;font-size:11px}
+    .deliv{margin-top:18px;padding:16px;border:1px solid rgba(95,211,154,.4);border-radius:12px;background:rgba(95,211,154,.08)}
+    .deliv a{display:inline-block;margin-top:8px;color:var(--ok);font-weight:600}
+    footer{padding:18px;text-align:center}
+  </style>
+</head>
+<body>
+<header><div class="hd"><img src="assets/logo.png" alt=""/><div class="brand"><b>DS Editing</b><span class="mono" data-t="sub"></span></div><button class="lang" id="langBtn" type="button">EN</button></div></header>
+<main>
+  <div class="mono" data-t="kicker"></div>
+  <h1 class="display" data-t="title"></h1>
+  <p class="lead" data-t="lead"></p>
+  <form class="tokform" id="f"><input class="in" id="token" inputmode="numeric" pattern="[0-9]*" maxlength="7" placeholder="0000000" autocomplete="off"/><button class="btn" type="submit" data-t="go"></button></form>
+  <div class="msg" id="msg"></div>
+  <div id="result"></div>
+</main>
+<footer class="mono">DS Editing · <span data-t="footer"></span></footer>
+
+<script type="module">
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+const SUPABASE_URL = "https://xkanmjlpysxpohsuqvwg.supabase.co";
+const SUPABASE_ANON = "sb_publishable_lIZtV_WtN5NcGSb0dnfaiQ_AgKYBIVa";   // même clé publique que team/dashboard.html
+const T = {
+  fr: { sub: "Suivi de commande", kicker: "Où en est ma vidéo ?", title: "Suivi de<br/>votre commande", lead: "Entrez le numéro à 7 chiffres reçu par e-mail à la commande.", go: "Voir", footer: "mise à jour en continu",
+    notfound: "Aucune commande avec ce numéro. Vérifiez les 7 chiffres.", setup: "Page en cours d'installation.", project: "Projet", client: "Client", work: "Commande", received: "Reçue le", due: "Livraison prévue", requested: "souhaitée", steps: ["Commande reçue", "Fichiers récupérés", "Montage commencé", "Montage à 50 %", "Montage terminé", "Contrôle qualité validé"], review: "Votre vidéo est prête. Relisez-la et commentez directement sur frame.io.", open: "Ouvrir la vidéo", revisions: "Notre contrôle qualité a demandé des ajustements au monteur. Vous recevrez le lien dès validation." },
+  en: { sub: "Order tracking", kicker: "Where is my video?", title: "Track<br/>your order", lead: "Enter the 7-digit number you received by email when ordering.", go: "View", footer: "updated continuously",
+    notfound: "No order with this number. Check the 7 digits.", setup: "Page being set up.", project: "Project", client: "Client", work: "Order", received: "Received on", due: "Planned delivery", requested: "requested", steps: ["Order received", "Files retrieved", "Editing started", "Editing at 50%", "Editing finished", "Quality check passed"], review: "Your video is ready. Review and comment directly on frame.io.", open: "Open the video", revisions: "Our quality team asked the editor for adjustments. You'll get the link once validated." },
+};
+const $ = (s) => document.querySelector(s);
+const params = new URLSearchParams(location.search);
+let lang = params.get("lang") || ((navigator.language || "en").slice(0, 2) === "fr" ? "fr" : "en"); if (!T[lang]) lang = "en";
+let last = null;
+const t = (k) => T[lang][k];
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const fmt = (d) => d ? new Date(d).toLocaleDateString(lang === "fr" ? "fr-FR" : "en-GB", { day: "2-digit", month: "long" }) : "—";
+function applyText() { document.documentElement.lang = lang; document.querySelectorAll("[data-t]").forEach((el) => { const v = t(el.dataset.t); if (typeof v === "string") el.innerHTML = v; }); $("#langBtn").textContent = lang === "fr" ? "EN" : "FR"; if (last) render(last); }
+function addBusinessDays(date, n) { const d = new Date(date); let k = 0; while (k < n) { d.setDate(d.getDate() + 1); if (d.getDay() !== 0 && d.getDay() !== 6) k++; } return d; }
+function render(j) {
+  last = j; const s = j.steps; const order = [s.received, s.downloaded, s.started, s.half, s.delivered, s.qc];
+  let nowIdx = order.findIndex((x) => !x); if (nowIdx < 0) nowIdx = 99;
+  const due = j.delivery_date ? new Date(j.delivery_date) : (j.requested_deadline && new Date(j.requested_deadline) < addBusinessDays(j.created_at, 5) ? new Date(j.requested_deadline) : addBusinessDays(j.created_at, 5));
+  $("#result").innerHTML = `<div class="card">
+    <div class="grid">
+      <div><div class="k">${t("client")}</div><div class="v">${esc(j.client)}</div></div>
+      <div><div class="k">${t("project")}</div><div class="v">${esc(j.project)}</div></div>
+      <div><div class="k">${t("work")}</div><div class="v">${esc(j.work_to_do || "—")}</div></div>
+      <div><div class="k">${t("received")}</div><div class="v">${fmt(j.created_at)}</div></div>
+      <div><div class="k">${t("due")}</div><div class="v">${fmt(due)}${j.requested_deadline ? ` <span style="color:var(--taupe);font-size:12px">· ${t("requested")} ${fmt(j.requested_deadline)}</span>` : ""}</div></div>
+    </div>
+    <ul class="timeline">${t("steps").map((label, i) => `<li class="${order[i] ? "done" : ""} ${i === nowIdx ? "now" : ""}"><i>${order[i] ? "✓" : i + 1}</i><b>${label}</b><small>${order[i] ? new Date(order[i]).toLocaleDateString(lang === "fr" ? "fr-FR" : "en-GB", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" }) : ""}</small></li>`).join("")}</ul>
+    ${j.frameio_url ? `<div class="deliv">${t("review")}<br/><a href="${esc(j.frameio_url)}" target="_blank" rel="noopener">${t("open")} →</a></div>` : (j.qc_status === "revisions" ? `<div class="deliv" style="border-color:rgba(255,106,43,.4);background:var(--amber-soft)">${t("revisions")}</div>` : "")}
+  </div>`;
+}
+async function lookup(token) {
+  $("#msg").textContent = ""; $("#result").innerHTML = "";
+  if (!SUPABASE_ANON) { $("#msg").textContent = t("setup"); return; }
+  const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
+  const { data, error } = await sb.rpc("job_status", { p_token: token });
+  if (error || !data) { $("#msg").textContent = t("notfound"); return; }
+  if (data.lang && T[data.lang] && !params.get("lang")) { lang = data.lang; applyText(); }
+  render(data); const u = new URL(location.href); u.searchParams.set("token", token); history.replaceState(null, "", u);
+}
+$("#f").addEventListener("submit", (e) => { e.preventDefault(); const tk = $("#token").value.replace(/\D/g, ""); if (tk.length === 7) lookup(tk); else $("#msg").textContent = t("notfound"); });
+$("#langBtn").addEventListener("click", () => { lang = lang === "fr" ? "en" : "fr"; applyText(); });
+applyText();
+const tk = (params.get("token") || "").replace(/\D/g, ""); if (tk.length === 7) { $("#token").value = tk; lookup(tk); }
+setInterval(() => { const v = $("#token").value.replace(/\D/g, ""); if (v.length === 7 && last) lookup(v); }, 600000);
+</script>
+</body>
+</html>
