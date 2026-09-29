@@ -1,442 +1,432 @@
-<!doctype html>
-<html lang="fr">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<meta charset="utf-8">
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="robots" content="noindex">
-<title>Espace client · DS Editing</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
-<style>
-  :root {
-    --bg: #F4F5F8; --panel: #FFFFFF; --fg: #171A21; --muted: #667085; --line: #E2E5EB; --soft: #EEF1F6;
-    --brand: #2F5D8A; --brand-ink: #FFFFFF; --brand-soft: #E4EDF6;
-    --ok: #1E7F4F; --ok-soft: #E3F3EA; --warn: #A8690F; --warn-soft: #FBEFD9; --crit: #B3261E; --crit-soft: #FBE4E2;
-    --shadow: 0 1px 2px rgba(23,26,33,.05), 0 8px 24px rgba(23,26,33,.06);
-    color-scheme: light;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --bg: #0F1217; --panel: #171B22; --fg: #E8EBF0; --muted: #98A2B3; --line: #262C36; --soft: #1F242D;
-      --brand: #7FB0E0; --brand-ink: #0B1520; --brand-soft: #1B2A3A;
-      --ok: #5CC48A; --ok-soft: #14301F; --warn: #E2B25A; --warn-soft: #3A2A0E; --crit: #F08A82; --crit-soft: #3B1714;
-      --shadow: 0 1px 2px rgba(0,0,0,.5), 0 8px 24px rgba(0,0,0,.4);
-      color-scheme: dark;
-    }
-  }
-  * { box-sizing: border-box; }
-  body { margin: 0; background: var(--bg); color: var(--fg); font-family: "Instrument Sans", "Helvetica Neue", Arial, sans-serif; font-size: 15px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
-  a { color: var(--brand); }
-  button, input, select, textarea { font: inherit; color: inherit; }
-  .mono { font-family: "IBM Plex Mono", Menlo, monospace; font-variant-numeric: tabular-nums; }
-  h1 { font-size: 1.45rem; margin: 0; font-weight: 600; letter-spacing: -.01em; text-wrap: balance; }
-  h2 { font-size: 1.05rem; margin: 0; font-weight: 600; }
-  .muted { color: var(--muted); }
-  .eyebrow { font-size: .72rem; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); font-weight: 600; }
-
-  .app { display: grid; grid-template-columns: 232px 1fr; min-height: 100vh; }
-  .side { background: var(--panel); border-right: 1px solid var(--line); padding: 20px 14px; display: flex; flex-direction: column; gap: 6px; position: sticky; top: 0; height: 100vh; }
-  .studio { display: flex; align-items: center; gap: 10px; padding: 6px 8px 16px; }
-  .studio .logo { width: 36px; height: 36px; border-radius: 8px; background: var(--brand); color: var(--brand-ink); display: grid; place-items: center; font-weight: 700; letter-spacing: .04em; font-size: .85rem; overflow: hidden; }
-  .studio .logo img { width: 100%; height: 100%; object-fit: cover; }
-  .studio b { display: block; line-height: 1.15; }
-  .studio small { color: var(--muted); font-size: .78rem; }
-  .nav a { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 8px; color: var(--fg); text-decoration: none; font-weight: 500; }
-  .nav a:hover { background: var(--soft); }
-  .nav a[aria-current="page"] { background: var(--brand-soft); color: var(--brand); }
-  .nav a .badge { margin-left: auto; background: var(--crit); color: #fff; font-size: .7rem; padding: 1px 7px; border-radius: 999px; font-weight: 600; }
-  .nav svg { width: 18px; height: 18px; flex: none; }
-  .side .foot { margin-top: auto; font-size: .78rem; color: var(--muted); padding: 8px 10px; }
-  .side .foot a { color: var(--muted); }
-  .main { padding: 24px 28px 96px; max-width: 1080px; width: 100%; }
-  .topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; flex-wrap: wrap; }
-  .topbar .actions { display: flex; gap: 8px; align-items: center; }
-
-  .btn { border: 1px solid var(--line); background: var(--panel); border-radius: 8px; padding: 8px 14px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; white-space: nowrap; }
-  .btn:hover { background: var(--soft); }
-  .btn.primary { background: var(--brand); color: var(--brand-ink); border-color: var(--brand); }
-  .btn.primary:hover { filter: brightness(1.08); }
-  .btn.ok { background: var(--ok); color: #fff; border-color: var(--ok); }
-  .btn.sm { padding: 5px 10px; font-size: .86rem; }
-  .btn:disabled { opacity: .5; cursor: default; }
-  .btn:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
-  @property --cta-angle { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
-  .cta { position: relative; isolation: isolate; border: 0; border-radius: 12px; padding: 12px 20px 12px 16px; background: linear-gradient(135deg, var(--brand), color-mix(in srgb, var(--brand) 55%, #7FE3FF)); color: var(--brand-ink); font-weight: 700; letter-spacing: .01em; overflow: hidden; box-shadow: 0 6px 20px color-mix(in srgb, var(--brand) 35%, transparent), inset 0 1px 0 rgba(255,255,255,.25); transition: transform .18s cubic-bezier(.2,.8,.2,1), box-shadow .18s ease; }
-  .btn.cta, .btn.cta:hover { background: linear-gradient(135deg, var(--brand), color-mix(in srgb, var(--brand) 55%, #7FE3FF)); border: 0; }
-  .cta::before { content: ""; position: absolute; inset: -2px; z-index: -2; border-radius: 14px; background: conic-gradient(from var(--cta-angle), transparent 0 60%, rgba(255,255,255,.85) 75%, transparent 90%); animation: cta-spin 3.2s linear infinite; }
-  .cta::after { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: 12px; background: linear-gradient(135deg, var(--brand), color-mix(in srgb, var(--brand) 55%, #7FE3FF)); }
-  .cta .shine { position: absolute; inset: 0; z-index: 0; background: linear-gradient(115deg, transparent 30%, rgba(255,255,255,.35) 50%, transparent 70%); transform: translateX(-120%); }
-  .cta:hover { transform: translateY(-2px); box-shadow: 0 12px 30px color-mix(in srgb, var(--brand) 45%, transparent), inset 0 1px 0 rgba(255,255,255,.3); }
-  .cta:hover .shine { animation: cta-shine .9s ease forwards; }
-  .cta:active { transform: translateY(0) scale(.98); }
-  .cta svg { position: relative; z-index: 1; width: 22px; height: 22px; animation: cta-pulse 2.4s ease-in-out infinite; }
-  .cta span { position: relative; z-index: 1; }
-  @keyframes cta-spin { to { --cta-angle: 360deg; } }
-  @keyframes cta-shine { to { transform: translateX(120%); } }
-  @keyframes cta-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.12); } }
-  @media (prefers-reduced-motion: reduce) { .cta::before, .cta svg, .cta .shine { animation: none !important; } }
-
-  .field { display: flex; flex-direction: column; gap: 5px; }
-  .field label { font-size: .86rem; font-weight: 600; }
-  .field label i { color: var(--crit); font-style: normal; }
-  .field .hint { font-size: .8rem; color: var(--muted); }
-  input[type=text], input[type=url], input[type=date], input[type=number], input[type=password], input[type=email], select, textarea { width: 100%; border: 1px solid var(--line); background: var(--panel); border-radius: 8px; padding: 9px 11px; }
-  textarea { min-height: 96px; resize: vertical; }
-  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
-  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; }
-  .panel .head { padding: 14px 18px; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-  .panel .body { padding: 18px; }
-  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 18px; }
-  .stat { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px 16px; }
-  .stat b { display: block; font-size: 1.5rem; font-weight: 600; letter-spacing: -.02em; }
-  .stat span { font-size: .82rem; color: var(--muted); }
-  .stat.alert { border-color: var(--crit); }
-  .stat.alert b { color: var(--crit); }
-  .vlist { display: flex; flex-direction: column; }
-  .vrow { display: grid; grid-template-columns: 1.6fr 1fr 1.4fr auto; gap: 14px; align-items: center; padding: 14px 18px; border-top: 1px solid var(--line); text-decoration: none; color: inherit; }
-  .vrow:first-child { border-top: none; }
-  .vrow:hover { background: var(--soft); }
-  .vrow .t b { display: block; font-weight: 600; }
-  .vrow .t small { color: var(--muted); }
-  .chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px; border-radius: 999px; font-size: .78rem; font-weight: 600; white-space: nowrap; }
-  .chip::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
-  .chip.s0 { background: var(--soft); color: var(--muted); }
-  .chip.s1 { background: var(--brand-soft); color: var(--brand); }
-  .chip.s2 { background: var(--warn-soft); color: var(--warn); }
-  .chip.s3 { background: var(--ok-soft); color: var(--ok); }
-  .chip.s4 { background: var(--crit-soft); color: var(--crit); }
-  .chip.s5 { background: var(--ok); color: #fff; }
-  .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
-  .steps i { display: block; height: 6px; border-radius: 3px; background: var(--line); }
-  .steps i.on { background: var(--brand); }
-  .steps i.done { background: var(--ok); }
-  .stepl { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; font-size: .72rem; color: var(--muted); margin-top: 4px; }
-  .kv { display: grid; grid-template-columns: 160px 1fr; gap: 6px 14px; font-size: .92rem; }
-  .kv dt { color: var(--muted); }
-  .kv dd { margin: 0; word-break: break-word; }
-  .brief h4 { margin: 12px 0 2px; font-size: .74rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 600; }
-  .brief p { margin: 0; white-space: pre-line; }
-  .deliver { background: var(--ok-soft); border: 1px solid var(--ok); border-radius: 12px; padding: 16px 18px; display: flex; gap: 14px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
-  .deliver b { display: block; }
-  .comment { display: grid; grid-template-columns: 74px 1fr; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); font-size: .92rem; }
-  .comment:first-child { border-top: none; }
-  .comment .tc { color: var(--brand); font-weight: 500; }
-  .comment small { color: var(--muted); display: block; }
-  .thread { display: flex; flex-direction: column; gap: 12px; }
-  .msg { max-width: 72%; padding: 10px 14px; border-radius: 12px; background: var(--soft); white-space: pre-line; }
-  .msg.me { align-self: flex-end; background: var(--brand-soft); }
-  .msg small { display: block; color: var(--muted); font-size: .76rem; margin-bottom: 2px; white-space: normal; }
-  .via { display: inline-flex; align-items: center; gap: 3px; margin-left: 6px; padding: 0 6px; border-radius: 999px; background: var(--panel); border: 1px solid var(--line); font-size: .68rem; color: var(--muted); vertical-align: middle; }
-  .compose { display: grid; grid-template-columns: 1fr auto; gap: 8px; margin-top: 14px; }
-  table.inv { width: 100%; border-collapse: collapse; }
-  table.inv th { text-align: left; font-size: .76rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); padding: 10px 18px; border-bottom: 1px solid var(--line); }
-  table.inv td { padding: 12px 18px; border-bottom: 1px solid var(--line); vertical-align: middle; }
-  table.inv tr:last-child td { border-bottom: none; }
-  .num { text-align: right; white-space: nowrap; }
-  .accesslink { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: center; }
-  .accesslink code { display: block; background: var(--soft); border: 1px solid var(--line); border-radius: 8px; padding: 9px 11px; font-family: "IBM Plex Mono", Menlo, monospace; font-size: .84rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .gate { min-height: 100vh; display: grid; place-items: center; padding: 24px; }
-  .gate .card { width: 100%; max-width: 420px; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 28px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 14px; }
-  .gate .card .studio { padding: 0 0 6px; }
-  .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: var(--fg); color: var(--bg); padding: 10px 16px; border-radius: 10px; font-weight: 500; box-shadow: var(--shadow); max-width: 92vw; z-index: 20; }
-  .toast.err { background: var(--crit); color: #fff; }
-  .tabbar { display: none; }
-  .loading { padding: 40px; text-align: center; color: var(--muted); }
-  @media (max-width: 820px) {
-    .app { grid-template-columns: 1fr; }
-    .side { display: none; }
-    .main { padding: 16px 14px 92px; }
-    .tabbar { display: grid; grid-template-columns: repeat(5, 1fr); position: fixed; left: 0; right: 0; bottom: 0; background: var(--panel); border-top: 1px solid var(--line); z-index: 10; }
-    .tabbar a { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 4px 10px; font-size: .68rem; color: var(--muted); text-decoration: none; font-weight: 600; }
-    .tabbar a[aria-current="page"] { color: var(--brand); }
-    .tabbar svg { width: 20px; height: 20px; }
-    .stats { grid-template-columns: repeat(2, 1fr); }
-    .vrow { grid-template-columns: 1fr; gap: 8px; }
-    .grid2, .grid3 { grid-template-columns: 1fr; }
-    .kv { grid-template-columns: 1fr; }
-    .msg { max-width: 92%; }
-    table.inv th:nth-child(3), table.inv td:nth-child(3) { display: none; }
-  }
-</style>
+<meta name="theme-color" content="#050607">
+<title>DS Editing · White-label video editing studio · Bali</title>
+<meta name="description" content="DS Editing is the white-label editing studio behind podcast studios, video studios and agencies. Dedicated senior editors, 7 days a week. Your first edit is free.">
+<meta name="author" content="DS Editing">
+<link rel="icon" href="ds-media/logo.png">
+<link rel="apple-touch-icon" href="ds-media/logo.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="DS Editing · White-label video editing studio">
+<meta property="og:description" content="Dedicated senior editors for podcast studios, video studios and agencies. Express turnaround, one revision round included, first edit free.">
+<meta property="og:image" content="ds-media/pod-daniel.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<!-- Charte du designer (septembre 2026) : base + styles + mouvement. Réglages retenus dans __DS_TWEAKS__ ci-dessous. -->
+<link rel="stylesheet" href="css/ds-site.css">
+<link rel="stylesheet" href="css/ds-atv.css">
+<link rel="stylesheet" href="css/ds-themes.css">
+<link rel="stylesheet" href="css/ds-motion.css">
+<link rel="stylesheet" href="css/ds-chrome.css">
+<!-- Ajouts DS : formulaire de contact, notifications, réglages transverses · fenêtres sur place (services, studios, vidéos) · calendrier de réservation -->
+<link rel="stylesheet" href="css/ds-extras.css">
+<link rel="stylesheet" href="css/ds-panels.css">
+<link rel="stylesheet" href="css/ds-booking.css">
+<script>window.__DS_TWEAKS__=/*EDITMODE-BEGIN*/{
+  "accent": "white",
+  "style": "atv",
+  "motion": true,
+  "logo": "rec"
+}/*EDITMODE-END*/;
+/* Secours des boutons « Réserver un appel » si le calendrier (js/ds-booking.js) ne charge pas : ancre vers le formulaire. */
+window.DS_CALENDLY="#contact";</script>
 </head>
 <body>
-<div id="root"><div class="loading">Ouverture de votre espace…</div></div>
+<header class="nav" id="nav">
+<div class="wrap nav-in">
+<a class="logo" href="#top" aria-label="DS Editing"><span class="lv lv-img"><img class="logo-img" src="ds-media/logo.png" alt="DS Editing"></span><span class="lv lv-cut">DS<i></i><em>Editing</em></span><span class="lv lv-slate"><b>DS</b><em>Editing</em></span><span class="lv lv-rec"><i></i>DS<em>Editing</em></span><span class="lv lv-frame"><b>DS</b><em>Editing</em></span><span class="lv lv-play"><svg viewBox="0 0 24 24"><path d="M7 4l13 8-13 8z"></path></svg>DS<em>Editing</em></span></a>
+<nav class="nav-links">
+<a href="#services">Services</a>
+<a href="#work" data-fr="Réalisations">Work</a>
+<a href="#process" data-fr="Process">Process</a>
+<a href="#packages" data-fr="Packs">Packages</a>
+<a href="#team" data-fr="L’équipe">Team</a>
+<a href="#studio">Studio</a>
+<a href="#faq">FAQ</a>
+<a href="#contact">Contact</a>
+</nav>
+<div class="nav-r">
+<a class="nav-client" href="client/" data-fr="Espace client">Client space</a>
+<div class="lang"><button data-l="en" class="on">EN</button><button data-l="fr">FR</button></div>
+<a class="btn btn-ac btn-sm js-book navbook" href="#contact"><span class="avs"><img src="ds-media/team2/candice-c.jpg" alt=""><img src="ds-media/team2/conseillere-1.jpg" alt=""><img src="ds-media/team2/conseillere-2.jpg" alt=""></span><span data-fr="Réserver un appel">Book a call</span></a>
+<button class="burger" id="burger" aria-label="Menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"></path></svg></button>
+</div>
+</div>
+</header>
+<div class="mm" id="mm">
+<button class="x" aria-label="Close">×</button>
+<span class="mm-kick">Menu</span>
+<a class="ml" href="#services">Services</a>
+<a class="ml" href="#work" data-fr="Réalisations">Work</a>
+<a class="ml" href="#process" data-fr="Process">Process</a>
+<a class="ml" href="#packages" data-fr="Packs">Packages</a>
+<a class="ml" href="#team" data-fr="L’équipe">Team</a>
+<a class="ml" href="#studio">Studio</a>
+<a class="ml" href="#faq">FAQ</a>
+<a class="ml" href="#contact">Contact</a>
+<a class="ml ml-sm" href="client/" data-fr="Espace client →">Client space →</a>
+<a class="btn btn-ac js-book" href="#contact" data-fr="Réserver un appel">Book a call</a>
+</div>
+
+<section class="hero" id="top" data-screen-label="Hero">
+<div class="hero-media crop"><video src="ds-media/pod-daniel.mp4" poster="ds-media/pod-daniel.jpg" data-start="8" data-end="24" autoplay muted loop playsinline></video></div>
+<div class="wrap" style="width:100%">
+<div class="hero-in">
+<div class="series rv-in"><b>DS</b><span data-fr="Studio de montage en marque blanche">White-label editing studio</span></div>
+<h1 class="disp rv-in" data-fr="Vos montages. Notre équipe. <em>Votre marge.</em>">Your edits. Our team. <em>Your margin.</em></h1>
+<div class="meta rv-in">
+<a class="match hstars" href="https://www.trustpilot.com/review/ds-editing.com" target="_blank" rel="noopener"><span class="stars sm"><i></i><i></i><i></i><i></i><i></i></span><span data-fr="5.0 sur Trustpilot">5.0 on Trustpilot</span></a>
+<span data-fr="Délai express">Express turnaround</span>
+<span class="box">7/7</span>
+</div>
+<p class="lead rv-in" data-fr="Le studio de montage en marque blanche des studios podcast, studios vidéo et agences. Des monteurs seniors dédiés, 7j/7, sous votre marque. Sans embauche, sans coûts fixes.">The white-label editing studio behind podcast studios, video studios and agencies. Dedicated senior editors, 7 days a week, under your brand. No hiring, no overhead.</p>
+<div class="hero-cta rv-in">
+<a class="btn btn-play js-book" href="#contact"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 4l15 8-15 8z"></path></svg><span data-fr="Mon 1er montage offert">Get my first edit free</span></a>
+<a class="btn btn-gray" href="#work"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"></circle><path d="M10 9l5 3-5 3z"></path></svg><span data-fr="Voir nos montages">Watch our work</span></a>
+</div>
+<div class="top10 rv-in"><i style="white-space:nowrap;width:auto;padding:0 8px">500+</i><span data-fr="Montages livrés pour 80+ studios et agences">Edits delivered for 80+ studios &amp; agencies</span></div>
+</div>
+</div>
+<div class="hero-age">Bali · Miami · Paris</div>
+</section>
+
+<!-- @work : vidéos « Nos montages ». Lecture sur place (js/ds-panels.js), jamais de sortie du site. -->
+<section class="row" id="work" style="padding-top:clamp(16px,2vw,32px)">
+<div class="wrap">
+<div class="row-h"><h3 data-fr="Nos montages · survolez pour lire">Real edits by DS · hover to play</h3><span class="mono" data-fr="Podcast · Interview · YouTube">Podcast · Interview · YouTube</span></div>
+</div>
+<div class="rail"><div class="rail-track" data-loop>
+<div class="ep" data-video="ds-media/pod-pau.mp4"><img src="ds-media/pod-pau.jpg" alt=""><span class="tag">Premium</span><span class="play"><svg viewBox="0 0 24 24"><path d="M6 4l15 8-15 8z"></path></svg></span><div class="cap"><div class="t" data-fr="Intro podcast">Podcast intro</div><div class="s"><span>EN · COLD OPEN</span><span>16:9</span></div></div></div>
+<div class="ep" data-video="ds-media/pod-daniel.mp4"><img src="ds-media/pod-daniel.jpg" alt=""><span class="tag">Premium</span><span class="play"><svg viewBox="0 0 24 24"><path d="M6 4l15 8-15 8z"></path></svg></span><div class="cap"><div class="t" data-fr="Intro podcast">Podcast intro</div><div class="s"><span>EN · MIAMI</span><span>16:9</span></div></div></div>
+<div class="ep" data-video="ds-media/pod-fr-creative.mp4"><img src="ds-media/pod-fr-creative.jpg" alt=""><span class="tag">Premium</span><span class="play"><svg viewBox="0 0 24 24"><path d="M6 4l15 8-15 8z"></path></svg></span><div class="cap"><div class="t" data-fr="Intro créative">Creative intro</div><div class="s"><span data-fr="FR · SOUS-TITRES ANIMÉS">FR · ANIMATED CAPTIONS</span><span>16:9</span></div></div></div>
+<div class="ep" data-video="ds-media/pod-fr-basic.mp4"><img src="ds-media/pod-fr-basic.jpg" alt=""><span class="tag" style="background:#fff;color:#000">Standard</span><span class="play"><svg viewBox="0 0 24 24"><path d="M6 4l15 8-15 8z"></path></svg></span><div class="cap"><div class="t" data-fr="Épisode podcast">Podcast episode</div><div class="s"><span>FR · MULTICAM</span><span>16:9</span></div></div></div>
+<a class="ep" href="https://youtu.be/t7sjem3iHbQ" target="_blank" rel="noopener"><img src="https://img.youtube.com/vi/t7sjem3iHbQ/maxresdefault.jpg" alt=""><span class="play"><svg viewBox="0 0 24 24"><path d="M6 4l15 8-15 8z"></path></svg></span><div class="cap"><div class="t" data-fr="YouTube long format">YouTube long-form</div><div class="s"><span>YOUTUBE</span><span></span></div></div></a>
+<a class="ep" href="https://youtu.be/a2HvHIyw_nI" target="_blank" rel="noopener"><img src="https://img.youtube.com/vi/a2HvHIyw_nI/maxresdefault.jpg" alt=""><span class="play"><svg viewBox="0 0 24 24"><path d="M6 4l15 8-15 8z"></path></svg></span><div class="cap"><div class="t" data-fr="YouTube long format">YouTube long-form</div><div class="s"><span>YOUTUBE</span><span></span></div></div></a>
+<a class="ep" href="https://youtu.be/0eb0kdoaIjE" target="_blank" rel="noopener"><img src="https://img.youtube.com/vi/0eb0kdoaIjE/maxresdefault.jpg" alt=""><span class="play"><svg viewBox="0 0 24 24"><path d="M6 4l15 8-15 8z"></path></svg></span><div class="cap"><div class="t" data-fr="YouTube long format">YouTube long-form</div><div class="s"><span>YOUTUBE</span><span></span></div></div></a>
+<a class="ep" href="https://youtu.be/Oe7OVicUC8A" target="_blank" rel="noopener"><img src="https://img.youtube.com/vi/Oe7OVicUC8A/maxresdefault.jpg" alt=""><span class="play"><svg viewBox="0 0 24 24"><path d="M6 4l15 8-15 8z"></path></svg></span><div class="cap"><div class="t" data-fr="YouTube long format">YouTube long-form</div><div class="s"><span>YOUTUBE</span><span></span></div></div></a>
+</div></div>
+</section>
+
+<!-- Chaînes : preuve visuelle, volontairement sans lien (on ne quitte pas le site) -->
+<section class="row" style="padding-bottom:clamp(80px,9vw,130px)">
+<div class="wrap">
+<div class="row-h"><h3 data-fr="Les chaînes qu’on monte chaque semaine">Channels we edit every week</h3><span class="mono">YouTube</span></div>
+<div class="chn-grid"><div class="chn"><span class="chl"><img src="https://unavatar.io/youtube/GSTPodcast" alt="" onerror="this.remove()"><i>GST</i></span><div><b>GST Podcast</b><span>@GSTPodcast</span><p data-fr="Podcast long format, multicam, sound design.">Long-form podcast, multicam, sound design.</p></div></div><div class="chn"><span class="chl"><img src="ds-media/clients/a-life-elsewhere.png" alt="" onerror="this.remove()"><i>ALE</i></span><div><b>A Life Elsewhere</b><span>@ALifeElsewhere</span><p data-fr="Voyage et lifestyle, rythme et étalonnage cinéma.">Travel &amp; lifestyle, cinematic pacing and grading.</p></div></div><div class="chn"><span class="chl"><img src="https://unavatar.io/youtube/ggbenitezinternational" alt="" onerror="this.remove()"><i>GG</i></span><div><b>GG Benitez International</b><span>@ggbenitezinternational</span><p data-fr="Contenu de marque et fondateur, forte rétention.">Brand &amp; founder content, high retention.</p></div></div></div>
+</div>
+</section>
+
+<section class="offer" data-screen-label="Offer">
+<div class="wrap offer-in">
+<div class="disp rv-in" data-fr="1er montage. <br>Offert.">First edit.<br>On us.</div>
+<div class="rv-in">
+<p data-fr="Testez sans risque. Envoyez-nous vos rushes : on monte votre premier épisode gratuitement, au niveau de nos meilleurs clients. Vous jugez sur pièce.">Test us risk-free. Send your footage and we edit your first episode for free, to the same standard as our best clients. Judge the work, not the pitch.</p>
+<ul>
+<li><span class="oi">🎁</span><span data-fr="1er montage offert, sans engagement">First edit free, no commitment</span></li>
+<li><span class="oi">⚡</span><span data-fr="Délai express, disponibles 7j/7">Express turnaround, 7 days a week</span></li>
+<li><span class="oi">🔁</span><span data-fr="Un aller-retour de retours inclus">One round of revisions included</span></li>
+</ul>
+<a class="btn js-book" href="#contact" data-fr="J’en profite">Claim my free edit</a>
+</div>
+</div>
+<div class="offer-strip"><div class="rail-track" data-loop><span data-fr="1er montage offert">First edit free</span><span>·</span><span data-fr="Délai express">Express turnaround</span><span>·</span><span data-fr="1 aller-retour inclus">1 revision round included</span><span>·</span><span data-fr="Dispo 7j/7">Available 7/7</span><span>·</span><span>YouTube long-form</span><span>·</span><span>Reels &amp; Shorts</span><span>·</span><span>Podcast</span><span>·</span><span>Motion design</span><span>·</span><span data-fr="Étalonnage">Color grading</span><span>·</span></div></div>
+</section>
+
+<section class="section" id="numbers">
+<div class="wrap">
+<div class="stats">
+<div class="stat rv-in"><div class="num" data-count="500">500<sup>+</sup></div><div class="l" data-fr="Montages livrés">Edits delivered</div></div>
+<div class="stat rv-in"><div class="num" data-count="80">80<sup>+</sup></div><div class="l" data-fr="Studios et agences">Studios &amp; agencies</div></div>
+<div class="stat rv-in"><div class="num" data-count="25">25<sup>M+</sup></div><div class="l" data-fr="Vues générées">Views delivered</div></div>
+<div class="stat rv-in"><div class="num" data-count="98">98<sup>%</sup></div><div class="l" data-fr="Clients qui reviennent">Client return rate</div></div>
+</div>
+</div>
+</section>
+
+<!-- @services : chaque bloc ouvre une fenêtre sur place (js/ds-panels.js) avec les exemples de sa catégorie (data-cat = slug de client/portfolio.js). Le href reste un secours sans JS. -->
+<section class="section" id="services" style="padding-top:0">
+<div class="wrap">
+<div class="shead">
+<div><span class="kick">Services</span><h2 class="disp h2" data-fr="Post-production, avec la précision <span class='ac'>d’un monteur cinéma.</span>">Post-production, with the precision <span class="ac">of a film editor.</span></h2></div>
+<p class="lead" data-fr="Du premier rough cut à la livraison finale, chaque image a un seul objectif : garder votre audience jusqu’à la dernière seconde.">From the first rough cut to final delivery, every frame has one job: keep your audience watching to the last second.</p>
+</div>
+<div class="svc-grid">
+<a class="svc rv-in js-svc" data-cat="youtube-docu" href="services/youtube-docu.html"><div class="vid"><img src="ds-media/svc/svc1.jpg" alt=""></div><span class="mono">01 · Long form</span><h4 data-fr="YouTube & Docu">YouTube &amp; Docu</h4><p data-fr="Des montages long format qui retiennent : rythme, b-roll, motion design, chapitres.">Long-form edits that hold attention: pacing, b-roll, motion design, chapters.</p><div class="tags"><span>YouTube</span><span>B-roll</span><span data-fr="Chapitres">Chapters</span></div></a>
+<a class="svc rv-in js-svc" data-cat="podcast-interview" href="services/podcast-interview.html"><div class="vid"><img src="ds-media/svc/svc2.jpg" alt=""></div><span class="mono">02 · Talk</span><h4>Podcast &amp; Interview</h4><p data-fr="Multicam synchronisé, silences coupés, audio nettoyé. Vous recevez un épisode prêt à publier.">Synced multicam, silences cut, clean audio. You get an episode ready to upload.</p><div class="tags"><span>Multicam</span><span>Cold open</span><span>Audio</span></div></a>
+<a class="svc rv-in js-svc" data-cat="reels-shorts" href="services/reels-shorts.html"><div class="vid"><img src="ds-media/svc/svc3.jpg" alt=""></div><span class="mono">03 · Short form</span><h4>Reels &amp; Shorts</h4><p data-fr="Extraits choisis pour accrocher dès la première seconde, sous-titres animés, sound design, formats natifs.">Clips picked to hook from the first second, animated captions, sound design, native formats.</p><div class="tags"><span>Instagram</span><span>TikTok</span><span>Shorts</span></div></a>
+<a class="svc rv-in js-svc" data-cat="vsl" href="services/vsl.html"><div class="vid"><img src="ds-media/svc/svc4.jpg" alt=""></div><span class="mono">04 · Convert</span><h4 data-fr="VSL & tunnels de vente">VSL &amp; sales funnels</h4><p data-fr="Rythme serré, preuves à l’écran, appel à l’action clair. Regardée jusqu’au bouton.">Tight pacing, on-screen proof, a clear call to action. Watched until the button.</p></a>
+<a class="svc rv-in js-svc" data-cat="ads" href="services/ads.html"><div class="vid"><img src="ds-media/svc/svc5.jpg" alt=""></div><span class="mono">05 · Paid</span><h4>Ads</h4><p data-fr="Hook, preuve, offre, action. Déclinées en plusieurs accroches pour tester vite.">Hook, proof, offer, action. Cut in several hooks so you can test fast.</p><div class="tags"><span>Meta</span><span>TikTok</span><span>YouTube</span></div></a>
+<a class="svc rv-in js-svc" data-cat="trailers" href="services/autres.html"><div class="vid"><img src="ds-media/svc/svc6.jpg" alt=""></div><span class="mono">06 · Finish</span><h4 data-fr="Motion & étalonnage">Motion &amp; color</h4><p data-fr="Typographie animée, lower thirds, apparitions de logo sous After Effects. Étalonnage cinéma et masters HDR-ready.">Kinetic type, lower thirds and logo reveals in After Effects. Cinematic color grading and HDR-ready masters.</p><div class="tags"><span>After Effects</span><span>DaVinci</span></div></a>
+</div>
+</div>
+</section>
+
+<section class="section reels" id="reels" data-screen-label="Reels">
+<div class="wrap reels-in">
+<div class="reels-copy">
+<span class="kick">Short form</span>
+<h2 class="disp h2" data-fr="Vos meilleurs moments, <span class='ac'>en vertical.</span>">Your best moments, <span class="ac">vertical.</span></h2>
+<p class="lead" data-fr="Chaque épisode devient une semaine de contenu. Une équipe de 6 monteurs short-form découpe, sous-titre et rythme. Vous n’avez plus qu’à programmer.">Every episode becomes a week of content. A team of 6 short-form editors cuts, captions and paces it. You just schedule.</p>
+<div class="pts">
+<div class="pt"><span class="mono">0–2s</span><div><b data-fr="Le hook">The hook</b><span data-fr="La phrase la plus forte de l’épisode, en ouverture.">The strongest line of the episode, up front.</span></div></div>
+<div class="pt"><span class="mono">2–25s</span><div><b data-fr="Le rythme">The pacing</b><span data-fr="Jump cuts, zooms, b-roll et sous-titres animés.">Jump cuts, punch-ins, b-roll and animated captions.</span></div></div>
+<div class="pt"><span class="mono">25–30s</span><div><b data-fr="La finition">The finish</b><span data-fr="Sound design et formats natifs Instagram, TikTok et Shorts.">Sound design and native formats for Instagram, TikTok and Shorts.</span></div></div>
+</div>
+<div class="tools"><span>Premiere Pro</span><span>After Effects</span><span>CapCut</span><span>Submagic</span></div>
+</div>
+<div class="stage">
+<div class="bgcols" aria-hidden="true">
+<div class="bgcol" data-loop><div class="rt"><image-slot id="bc1" src="ds-img/reel3.jpg" fit="cover"></image-slot></div><div class="rt"><image-slot id="bc2" src="ds-img/reel5.jpg" fit="cover"></image-slot></div><div class="rt"><image-slot id="bc3" src="ds-img/reel1.jpg" fit="cover"></image-slot></div></div>
+<div class="bgcol dn" data-loop><div class="rt"><image-slot id="bc4" src="ds-img/reel4.jpg" fit="cover"></image-slot></div><div class="rt"><image-slot id="bc5" src="ds-img/reel2.jpg" fit="cover"></image-slot></div><div class="rt"><image-slot id="bc6" src="ds-img/reel5.jpg" fit="cover"></image-slot></div></div>
+<div class="bgcol" data-loop style="animation-duration:50s"><div class="rt"><image-slot id="bc7" src="ds-img/reel2.jpg" fit="cover"></image-slot></div><div class="rt"><image-slot id="bc8" src="ds-img/reel1.jpg" fit="cover"></image-slot></div><div class="rt"><image-slot id="bc9" src="ds-img/reel4.jpg" fit="cover"></image-slot></div></div>
+<div class="bgcol dn" data-loop style="animation-duration:45s"><div class="rt"><image-slot id="bc10" src="ds-img/reel5.jpg" fit="cover"></image-slot></div><div class="rt"><image-slot id="bc11" src="ds-img/reel3.jpg" fit="cover"></image-slot></div><div class="rt"><image-slot id="bc12" src="ds-img/reel2.jpg" fit="cover"></image-slot></div></div>
+</div>
+<div class="float-stat a"><b>6</b><span data-fr="monteurs short-form dédiés">dedicated short-form editors</span></div>
+<div class="float-stat b"><b class="up">7/7</b><span data-fr="livraison express par lot">express batch delivery</span></div>
+<div class="phone">
+<div class="screen">
+<div class="notch"></div>
+<div class="feed">
+<div class="rv"><video src="ds-media/reel1.mp4" autoplay muted loop playsinline></video></div>
+<div class="rv"><video src="ds-media/youtube.mp4" autoplay muted loop playsinline></video></div>
+<div class="rv"><video src="ds-media/reel3.mp4" autoplay muted loop playsinline></video></div>
+<div class="rv"><video src="ds-media/reel2.mp4" autoplay muted loop playsinline></video></div>
+<div class="rv"><video src="ds-media/reel1.mp4" autoplay muted loop playsinline></video></div>
+</div>
+<div class="ui"><div class="side"><div><svg viewBox="0 0 24 24"><path d="M12 21s-8-5.3-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.7-8 11-8 11z"></path></svg></div><div><svg viewBox="0 0 24 24"><path d="M4 4h16v12H8l-4 4z"></path></svg></div><div><svg viewBox="0 0 24 24"><path d="M3 11l18-8-8 18-2-8z"></path></svg></div></div><div class="who"><b>@ds.videoediting</b>Edited by DS</div><div class="bar"></div></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- @clients : un clic ouvre une fenêtre sur place (js/ds-panels.js) avec les vidéos montées pour ce studio (client/portfolio.js + previews.js) -->
+<section class="section pods clients" id="clients">
+<div class="wrap"><div class="row-h"><h3 data-fr="Ils nous confient leurs montages · cliquez pour voir">Studios that trust us · click to see the work</h3><span class="mono">Miami · Paris · Bali</span></div></div>
+<div class="rail"><div class="rail-track" data-loop>
+<button type="button" class="cl js-client" data-studio="The Move Miami"><img src="ds-media/clients/the-move-miami.png" alt=""><div><b>The Move Miami</b><span>Creative content studio</span></div></button>
+<button type="button" class="cl js-client" data-studio="Mediacast"><img src="ds-media/clients/mediacast.png" alt=""><div><b>Mediacast</b><span>Podcast studio</span></div></button>
+<button type="button" class="cl js-client" data-studio="A Life Elsewhere"><img src="ds-media/clients/a-life-elsewhere.png" alt=""><div><b>A Life Elsewhere</b><span>Content creator</span></div></button>
+<button type="button" class="cl js-client" data-studio="My Studio"><img src="ds-media/clients/my-studio.png" alt=""><div><b>My Studio</b><span>Studio</span></div></button>
+<button type="button" class="cl js-client" data-studio="Prémices Studio"><img src="ds-media/clients/premices-studio.png" alt=""><div><b>Prémices Studio</b><span>Studio</span></div></button>
+<button type="button" class="cl js-client" data-studio="Recordia"><img src="ds-media/clients/recordia.png" alt=""><div><b>Recordia</b><span>Studio</span></div></button>
+<button type="button" class="cl js-client" data-studio="DotCom"><img src="ds-media/clients/dotcom.png" alt=""><div><b>DotCom</b><span>Studio</span></div></button>
+<button type="button" class="cl js-client" data-studio="Sept-Up"><img src="ds-media/clients/sept-up.png" alt=""><div><b>Sept-Up</b><span>Agency</span></div></button>
+<button type="button" class="cl js-client" data-studio="Prime Studio"><img src="ds-media/clients/prime-studio.png" alt=""><div><b>Prime Studio</b><span>Studio</span></div></button>
+</div></div>
+</section>
+
+<section class="section proc" id="process" data-screen-label="Process">
+<div class="wrap">
+<div class="shead">
+<div><span class="kick" data-fr="Le process">The process</span><h2 class="disp h2" data-fr="Des rushes <span class='ac'>à la mise en ligne.</span>">From raw footage <span class="ac">to published.</span></h2></div>
+<p class="lead" data-fr="Quatre étapes, délai express. Une équipe de monteurs rien que pour vous, pas de rotation, pas de sous-traitance opaque.">Four steps, express turnaround. A team of editors just for you, no rotation, no opaque outsourcing.</p>
+</div>
+<div class="tl rv-in">
+<div class="ruler"><span>00:00:00</span><span>DAY 01</span><span>DAY 02</span><span>DAY 03</span><span>DELIVERED</span></div>
+<div class="tracks">
+<div class="clip"><span class="step">01</span><span class="mono">Upload</span><div class="mo mo-up" aria-hidden="true"><div class="tray"></div><div class="grab"><div class="file"></div><svg class="cur" viewBox="0 0 24 24"><path d="M4 2l14 10-6 1 3 7-3 1-3-7-5 4z"></path></svg></div><div class="bar"><i></i></div></div><h4 data-fr="Déposez vos rushes">Drop your footage</h4><p data-fr="Drive, WeTransfer, Frame.io ou votre espace de dépôt DS. Tous formats, toutes tailles, toutes caméras.">Drive, WeTransfer, Frame.io or your DS upload space. Any format, any size, any number of cameras.</p><span class="when" data-fr="Jour 0 · 5 min">Day 0 · 5 min</span></div>
+<div class="clip"><span class="step">02</span><span class="mono">Brief</span><div class="mo mo-br" aria-hidden="true"><div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div></div><h4 data-fr="Donnez le brief">Give us the brief</h4><p data-fr="Ton, références, moments clés, logo. Un formulaire en 6 étapes ou un appel découverte de 20 minutes.">Tone, references, key moments, logo. A 6-step form or a 20-minute discovery call.</p><span class="when" data-fr="Jour 0 · 10 min">Day 0 · 10 min</span></div>
+<div class="clip"><span class="step">03</span><span class="mono">Edit</span><div class="mo mo-ed" aria-hidden="true"><div class="tr"><i class="c" style="left:4%;width:38%"></i><i class="c" style="left:46%;width:48%;animation-delay:.25s"></i></div><div class="tr"><i class="c" style="left:14%;width:30%;animation-delay:.4s"></i><i class="c" style="left:58%;width:26%;animation-delay:.6s"></i></div><div class="tr"><i class="c" style="left:4%;width:90%;animation-delay:.15s"></i></div><span class="ph"></span></div><h4 data-fr="On monte">We cut it</h4><p data-fr="Montage, sous-titres, étalonnage, mix audio et clips, sous votre marque. Pendant que vous dormez à Miami ou à Paris.">Edit, captions, color, audio mix and clips, under your brand. While you sleep in Miami or Paris.</p><span class="when" data-fr="Délai express">Express turnaround</span></div>
+<div class="clip"><span class="step">04</span><span class="mono">Review</span><div class="mo mo-rv" aria-hidden="true"><span class="bub" data-fr="Resserre l’intro">Tighten the intro</span><span class="ok"><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"></path></svg></span><div class="line"></div><span class="pin p1"></span><span class="pin p2"></span></div><h4 data-fr="Vos retours">Your notes</h4><p data-fr="Commentez sur le timecode dans Frame.io. Un aller-retour de retours est inclus ; au-delà, on vous fait un devis.">Comment on the timecode in Frame.io. One round of revisions is included; beyond that, we quote it.</p><span class="when" data-fr="1 aller-retour inclus">1 revision round included</span></div>
+</div>
+<div class="wave"></div>
+<div class="playhead"></div>
+</div>
+<div class="proc-foot"><span><b data-fr="Une équipe de monteurs rien que pour vous">A team of editors just for you</b></span><span><b>Frame.io</b> <span data-fr="pour les retours">for reviews</span></span><span><b>Premiere Pro · DaVinci · After Effects</b></span></div>
+</div>
+</section>
+
+<!-- Packs : mêmes noms que l'espace de dépôt et le portfolio (Standard / Premium / Signature) -->
+<section class="section" id="packages" data-screen-label="Packages">
+<div class="wrap">
+<div class="shead">
+<div><span class="kick" data-fr="Les packs">Packages</span><h2 class="disp h2" data-fr="Trois packs signature. <span class='ac'>Pensés pour la rétention.</span>">Three signature packs. <span class="ac">Built for retention.</span></h2></div>
+<p class="lead" data-fr="Chaque projet est unique, le tarif est adapté à votre brief. On le détaille pendant l’appel et vous recevez un devis personnalisé sous 24h.">Every project is unique, so pricing is tailored to your brief. We walk you through it on a call and send a personalised quote within 24h.</p>
+</div>
+<div class="pk-grid">
+<div class="pk rv-in"><h4>Standard</h4><p class="for" data-fr="La base essentielle pour un rendu pro.">The essential foundation for a professional look.</p><div class="pscreen t1" aria-hidden="true"><video data-src="ds-media/pod-fr-basic.mp4" poster="ds-media/pod-fr-basic.jpg" data-start="12" data-end="26" muted loop playsinline></video><div class="raw"><span>RAW</span></div><span class="gr">GRADED</span><span class="lvl"><i class="on"></i><i class=""></i><i class=""></i><em>Level 1</em></span><div class="eq"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div><div class="price"><b data-fr="Tarif sur appel">Pricing on call</b><span data-fr="Essentiel">Essential</span></div>
+<ul><li><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"></path></svg><span data-fr="Nettoyage audio pro (débruitage & EQ)">Pro sound cleaning (noise reduction &amp; EQ)</span></li><li><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"></path></svg><span data-fr="Étalonnage pro">Pro color grading</span></li><li><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"></path></svg><span data-fr="Cut narratif sans coutures">Seamless narrative cut</span></li><li><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"></path></svg><span data-fr="Adaptations format (9:16, 16:9, 4:5)">Format editing (9:16, 16:9, 4:5)</span></li><li><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"></path></svg><span data-fr="Intégration logo">Logo integration</span></li></ul>
+<a class="btn btn-line js-book" href="#contact" data-fr="Démarrer avec ce pack">Start with this pack</a></div>
+<div class="pk hot rv-in"><span class="badge" data-fr="Le plus populaire">Most popular</span><h4>Premium</h4><p class="for" data-fr="Boostez votre engagement sans lever le petit doigt.">Level up your engagement without lifting a finger.</p><div class="pscreen t2" aria-hidden="true"><video data-src="ds-media/pod-pau.mp4" poster="ds-media/pod-pau.jpg" data-start="6" data-end="20" muted loop playsinline></video><div class="whip"></div><span class="lvl"><i class="on"></i><i class="on"></i><i class=""></i><em>Level 2</em></span><div class="l3"><b>Pau</b><span>Host · Podcast</span></div><span class="sfx">SFX</span></div><div class="price"><b data-fr="Tarif sur appel">Pricing on call</b><span data-fr="Engagement">Engagement</span></div>
+<ul><li><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"></path></svg><span data-fr="Tout le pack Standard, plus :">Everything in Standard, plus:</span></li><li><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"></path></svg><span data-fr="Lower thirds sur mesure">Custom lower thirds</span></li><li><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"></path></svg><span data-fr="Transitions dynamiques">Dynamic transitions</span></li><li><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"></path></svg><span data-fr="SFX et effets visuels avancés">Advanced SFX &amp; visual effects</span></li><li><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"></path></svg><span data-fr="Montage rythmé haute rétention">Fast-paced engagement editing</span></li></ul>
+<a class="btn btn-ac js-book" href="#contact" data-fr="Choisir Premium">Choose Premium</a></div>
+<div class="pk rv-in"><h4>Signature</h4><p class="for" data-fr="La production ultime haute rétention pour créateurs premium.">The ultimate high-retention production for top-tier creators.</p><div class="pscreen t3" aria-hidden="true"><div class="zoom"><video data-src="ds-media/pod-daniel.mp4" poster="ds-media/pod-daniel.jpg" data-start="8" data-end="24" muted loop playsinline></video></div><span class="lvl"><i class="on"></i><i class="on"></i><i class="on"></i><em>Level 3</em></span><span class="prio">PRIORITY</span><div class="pip"><img src="ds-media/pod-fr-creative.jpg" alt=""><span>B-ROLL</span></div><span class="hook">HOOK</span></div><div class="price"><b data-fr="Tarif sur appel">Pricing on call</b><span data-fr="Prioritaire">Priority</span></div>
+<ul><li><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"></path></svg><span data-fr="Tout le pack Premium, plus :">Everything in Premium, plus:</span></li><li><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"></path></svg><span data-fr="Intro style « Diary of a CEO » (hook fort)">“Diary of a CEO”-style intro (strong hook)</span></li><li><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"></path></svg><span data-fr="B-roll premium et stock footage">Premium b-roll &amp; stock footage</span></li><li><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"></path></svg><span data-fr="Boost de définition visuelle">Visual definition enhancement</span></li><li><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"></path></svg><span data-fr="Support et livraison prioritaires">Priority support &amp; delivery</span></li></ul>
+<a class="btn btn-line js-book" href="#contact" data-fr="Demander un devis">Request a quote</a></div>
+</div>
+<p class="pk-note" data-fr="Série long format ou volume mensuel ? On construit une offre sur mesure. Tous les packs commencent par un 1er montage offert.">Long-form series or monthly volume? We build a custom retainer. Every pack starts with a free first edit.</p>
+<!-- @portfolio : demande du portfolio privé (fenêtre sur place, js/ds-panels.js) -->
+<div class="pk-cta rv-in"><span class="mono" data-fr="Envie de voir plus ?">Want to see more?</span><button type="button" class="btn btn-line js-portfolio" data-fr="Demander le portfolio privé">Request the private portfolio</button></div>
+</div>
+</section>
+
+<section class="section" id="reviews" style="padding-top:0" data-screen-label="Reviews">
+<div class="wrap">
+<div class="shead">
+<div><span class="kick" data-fr="Avis clients">Reviews</span><h2 class="disp h2" data-fr="Cinq étoiles. <span class='ac'>À chaque avis.</span>">Five stars. <span class="ac">Every review.</span></h2></div>
+<a class="tp" href="https://www.trustpilot.com/review/ds-editing.com" target="_blank" rel="noopener"><span class="score">Excellent</span><div class="stars"><i></i><i></i><i></i><i></i><i></i></div><span class="tpl">Trustpilot</span><span class="mono" style="color:var(--mu)" data-fr="5.0/5 · tous nos avis sont 5 étoiles">5.0/5 · every review 5 stars</span></a>
+</div>
+</div>
+<div class="rail rv-rail"><div class="rail-track" data-loop>
+<div class="rc"><div class="top"><div class="stars sm"><i></i><i></i><i></i><i></i><i></i></div><span class="mono">Miami, US</span></div><h5>They edit like part of our team</h5><p>We record Tuesday, the episode and the clips are in Frame.io by Thursday. Our clients think we have an in-house editing team.</p><div class="by"><span class="av">MR</span><div>Marco R.<br><span>Podcast studio owner</span></div></div></div>
+<div class="rc"><div class="top"><div class="stars sm"><i></i><i></i><i></i><i></i><i></i></div><span class="mono">Paris, FR</span></div><h5>Enfin une équipe fiable</h5><p>Quatre caméras, deux invités, un rendu digne d’une émission télé. Le premier montage était offert, on a signé dans la foulée.</p><div class="by"><span class="av">CL</span><div>Camille L.<br><span>Productrice podcast</span></div></div></div>
+<div class="rc"><div class="top"><div class="stars sm"><i></i><i></i><i></i><i></i><i></i></div><span class="mono">New York, US</span></div><h5>White-label that actually works</h5><p>We resell their edits under our brand. No hiring, no overhead, and our margins went up. The time difference means we wake up to finished cuts.</p><div class="by"><span class="av">JK</span><div>Jordan K.<br><span>Agency founder</span></div></div></div>
+<div class="rc"><div class="top"><div class="stars sm"><i></i><i></i><i></i><i></i><i></i></div><span class="mono">Lyon, FR</span></div><h5>Des reels qui marchent</h5><p>Ils comprennent le rythme, les hooks et les sous-titres mieux que nous. Et les retours sont traités en quelques heures.</p><div class="by"><span class="av">TB</span><div>Thomas B.<br><span>Coach &amp; créateur</span></div></div></div>
+</div></div>
+<div class="rail rv-rail rev"><div class="rail-track" data-loop>
+<div class="rc"><div class="top"><div class="stars sm"><i></i><i></i><i></i><i></i><i></i></div><span class="mono">Los Angeles, US</span></div><h5>Fast, clean, no hand-holding</h5><p>I send a Loom with notes, they nail it on the first try almost every time. One round of notes is all it ever takes.</p><div class="by"><span class="av">DW</span><div>Dre W.<br><span>YouTube creator</span></div></div></div>
+<div class="rc"><div class="top"><div class="stars sm"><i></i><i></i><i></i><i></i><i></i></div><span class="mono">Bordeaux, FR</span></div><h5>Un vrai partenaire</h5><p>Un interlocuteur qui répond en français, des délais tenus, disponibles même le week-end. Je recommande à tous les studios.</p><div class="by"><span class="av">AM</span><div>Amandine M.<br><span>Studio vidéo</span></div></div></div>
+<div class="rc"><div class="top"><div class="stars sm"><i></i><i></i><i></i><i></i><i></i></div><span class="mono">Miami, US</span></div><h5>The free edit sold us</h5><p>We tried them with one episode, zero risk. Months later they edit our podcast and all our reels every week.</p><div class="by"><span class="av">LG</span><div>Luis G.<br><span>Content studio</span></div></div></div>
+</div></div>
+<div class="wrap" style="text-align:center;margin-top:36px"><a class="btn btn-line" href="https://www.trustpilot.com/review/ds-editing.com" target="_blank" rel="noopener" data-fr="Lire nos avis sur Trustpilot">Read our reviews on Trustpilot</a></div>
+</section>
+
+<section class="section" id="team" style="padding-top:clamp(40px,5vw,80px)" data-screen-label="Team">
+<div class="wrap">
+<div class="shead">
+<div><span class="kick" data-fr="L’équipe">The cast</span><h2 class="disp h2" data-fr="Pas de crew anonyme. <span class='ac'>Une équipe dédiée.</span>">No anonymous crew. <span class="ac">A dedicated team.</span></h2></div>
+<p class="lead" data-fr="Pas de rotation de monteurs, pas de sous-traitance opaque. Vous connaissez chaque personne qui touche à vos vidéos. Des monteurs seniors, bilingues FR/EN.">No editor rotation, no opaque outsourcing. You know every person who touches your videos: senior editors, fully bilingual FR/EN.</p>
+</div>
+<div class="team-grid team-6">
+<div class="tm rv-in"><image-slot id="tm2" src="ds-media/team2/cyriaque2.jpg" fit="cover" placeholder="Cyriaque"></image-slot><div class="info"><div class="role" data-fr="Business Dev · Marché FR">Business Dev · FR market</div><div class="nm">Cyriaque Gely</div></div></div>
+<div class="tm rv-in"><image-slot id="tm3" src="ds-media/team2/candice-c.jpg" fit="cover" placeholder="Candice"></image-slot><div class="info"><div class="role" data-fr="Business Dev · Marché US">Business Dev · US market</div><div class="nm">Candice Caban</div></div></div>
+<div class="tm rv-in"><image-slot id="tm4" src="ds-media/team2/putu.jpg" fit="cover" placeholder="Putu"></image-slot><div class="info"><div class="role">Head of Video Editing</div><div class="nm">Putu</div></div></div>
+<div class="tm rv-in"><image-slot id="tm5" src="ds-media/team2/dimas.jpg" fit="cover" placeholder="Dimas"></image-slot><div class="info"><div class="role">Team Lead · Podcast</div><div class="nm">Dimas</div></div></div>
+<div class="tm rv-in"><image-slot id="tm6" src="ds-media/team2/ariel.jpg" fit="cover" placeholder="Ariel"></image-slot><div class="info"><div class="role">Team Lead · Vertical</div><div class="nm">Ariel</div></div></div>
+<div class="tm crew rv-in"><image-slot id="tm7" src="ds-media/crew2.jpg" fit="cover" placeholder="Crew"></image-slot><div class="info"><b>+20</b><p data-fr="monteurs podcast et short-form au studio de Bali.">podcast and short-form editors at the Bali studio.</p></div></div>
+</div>
+</div>
+</section>
+
+<section class="section proc" id="studio" data-screen-label="Studio">
+<div class="wrap world">
+<div>
+<span class="kick" data-fr="Bali → le monde">Bali → worldwide</span>
+<h2 class="disp h2" data-fr="Un vrai studio. <span class='ac'>Pas juste une boîte mail.</span>">A real studio. <span class="ac">Not just an inbox.</span></h2>
+<p class="lead" data-fr="L’équipe travaille sur place, au CoNest à Canggu. Bali a 12h d’avance sur Miami et 6h sur Paris : vous déposez le soir, le montage avance pendant votre nuit.">The team works on-site at CoNest in Canggu. Bali is 12 hours ahead of Miami and 6 ahead of Paris: upload in the evening, the edit moves while you sleep.</p>
+<div class="clocks">
+<div class="clk hq" data-tz="Asia/Makassar"><span class="mono">Bali · HQ</span><div class="tm2">--:--</div><div class="st" data-fr="On monte">We’re editing</div></div>
+<div class="clk" data-tz="America/New_York"><span class="mono">Miami</span><div class="tm2">--:--</div><div class="st"></div></div>
+<div class="clk" data-tz="Europe/Paris"><span class="mono">Paris</span><div class="tm2">--:--</div><div class="st"></div></div>
+</div>
+<div class="addr"><div><b>Studio</b>CoNest · Gang Moonkey<br>Jl. Raya Padonan, Tibubeneng<br>Kuta Utara, Badung, Bali 80361</div><div><b>Contact</b><a href="mailto:contact@ds-editing.com">contact@ds-editing.com</a></div></div>
+</div>
+<div class="suite rv-in"><image-slot id="suite" src="ds-media/space/hero.jpg" fit="cover" placeholder="Studio"></image-slot><span class="rec">LIVE · CONEST, CANGGU</span></div>
+</div>
+</section>
+
+<section class="section" id="faq" data-screen-label="FAQ">
+<div class="wrap faq-grid">
+<div><span class="kick">FAQ</span><h2 class="disp h2" data-fr="Vos <span class='ac'>questions.</span>">Your <span class="ac">questions.</span></h2><p class="lead" data-fr="Une autre question ? On y répond pendant l’appel.">Something else? We’ll answer it on the call.</p></div>
+<div>
+<div class="fq"><button type="button"><span data-fr="Le premier montage est vraiment offert ?">Is the first edit really free?</span><span class="pl"></span></button><div class="a"><p data-fr="Oui. Envoyez vos rushes, on monte un premier épisode gratuitement, sans engagement. Vous jugez sur pièce.">Yes. Send your footage and we edit a first episode for free, with no commitment. You judge the work.</p></div></div>
+<div class="fq"><button type="button"><span data-fr="Vous travaillez en marque blanche ?">Do you work white-label?</span><span class="pl"></span></button><div class="a"><p data-fr="Oui, c’est notre cœur de métier. Nos montages sont livrés sous votre marque, pour vos propres clients. Vous gardez la relation et la marge.">Yes, that’s our core business. Edits are delivered under your brand, for your own clients. You keep the relationship and the margin.</p></div></div>
+<div class="fq"><button type="button"><span data-fr="Pourquoi les prix ne sont pas sur le site ?">Why aren’t prices on the site?</span><span class="pl"></span></button><div class="a"><p data-fr="Chaque projet est différent : format, durée, volume, niveau de finition. On vous fait un devis personnalisé sous 24h après l’appel.">Every project is different: format, length, volume, level of finish. We send a personalised quote within 24h of the call.</p></div></div>
+<div class="fq"><button type="button"><span data-fr="En combien de temps je reçois mon montage ?">How fast do I get my edit?</span><span class="pl"></span></button><div class="a"><p data-fr="Délai express : on s’engage sur une date de livraison à la commande et l’équipe travaille 7j/7. Livraison prioritaire avec le pack Signature.">Express turnaround: we commit to a delivery date when you order, and the team works 7 days a week. Priority delivery with the Signature pack.</p></div></div>
+<div class="fq"><button type="button"><span data-fr="Combien de retours puis-je demander ?">How many revisions do I get?</span><span class="pl"></span></button><div class="a"><p data-fr="Un aller-retour de retours est inclus dans chaque livraison : vous commentez directement sur le timecode dans Frame.io. Au-delà, on vous fait un devis.">One round of revisions is included with every delivery: you comment right on the timecode in Frame.io. Beyond that, we quote it.</p></div></div>
+<div class="fq"><button type="button"><span data-fr="Vous parlez français et anglais ?">Do you work in French and English?</span><span class="pl"></span></button><div class="a"><p data-fr="Oui. L’équipe est bilingue FR/EN, avec un interlocuteur dédié au marché français et un au marché américain.">Yes. The team is bilingual FR/EN, with a dedicated contact for the French market and one for the US market.</p></div></div>
+</div>
+</div>
+</section>
+
+<section class="final" id="book" data-screen-label="Final CTA">
+<div class="wrap">
+<span class="kick" data-fr="Sans engagement">No commitment</span>
+<div class="disp rv-in" style="margin-top:18px" data-fr="Votre premier montage <em>est offert.</em>">Your first edit <em>is on us.</em></div>
+<p class="lead" data-fr="Réservez un appel découverte de 20 minutes avec votre conseiller dédié. On découvre votre projet, on vous présente les packs et on monte votre premier épisode gratuitement.">Book a 20-minute discovery call with your dedicated advisor. We learn about your project, walk you through the packs and edit your first episode for free.</p>
+<div class="hero-cta"><a class="btn btn-play js-book" href="#contact"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 4l15 8-15 8z"></path></svg><span data-fr="Réserver mon appel">Book my call</span></a><a class="btn btn-gray" href="mailto:contact@ds-editing.com">contact@ds-editing.com</a></div>
+<div class="contacts">
+<a class="ct" href="tel:+33777390343"><img src="ds-media/team2/cyriaque2.jpg" alt=""><div><b>Cyriaque · FR</b><span>+33 7 77 39 03 43</span></div></a>
+<a class="ct" href="tel:+33614064369"><img src="ds-media/team2/candice-c.jpg" alt=""><div><b>Candice · US</b><span>+33 6 14 06 43 69</span></div></a>
+</div>
+<a class="tp" href="https://www.trustpilot.com/review/ds-editing.com" target="_blank" rel="noopener"><div class="stars sm"><i></i><i></i><i></i><i></i><i></i></div><span class="tpl">Trustpilot</span><span class="mono" style="color:var(--mu)">5.0/5</span></a>
+</div>
+</section>
+
+<!-- Formulaire de contact : même envoi que l'ancien site (FormSubmit → contact@ds-editing.com), sans budget -->
+<section class="section contact" id="contact" data-screen-label="Contact">
+<div class="wrap contact-grid">
+<div class="rv-in">
+<span class="kick" data-fr="Parlons-en">Let’s talk</span>
+<h2 class="disp h2" data-fr="Parlez-nous de <span class='ac'>votre projet.</span>">Tell us about <span class="ac">your project.</span></h2>
+<p class="lead" data-fr="Partagez quelques détails et nous revenons sous 24h avec une proposition et un planning personnalisés.">Share a few details and we’ll come back within 24 hours with a personalised proposal and timeline.</p>
+<div class="contact-meta">
+<div><span class="mono">Email</span><a href="mailto:contact@ds-editing.com">contact@ds-editing.com</a></div>
+<div><span class="mono">Studio</span><span>CoNest · Gang Moonkey, Jl. Raya Padonan, Tibubeneng · Kuta Utara, Badung, Bali 80361</span></div>
+<div><span class="mono" data-fr="Réponse">Response</span><span data-fr="Sous 24h — lundi à vendredi">Within 24 hours — Mon to Fri</span></div>
+<div><span class="mono" data-fr="Déjà client ?">Already a client?</span><span><a href="client/" data-fr="Espace client →">Client space →</a> &nbsp;·&nbsp; <a href="suivi.html" data-fr="Suivre ma commande →">Track my order →</a></span></div>
+</div>
+</div>
+<form id="contact-form" class="cform rv-in" novalidate>
+<input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off">
+<div class="cf-row">
+<label><span class="mono" data-fr="Nom">Name</span><input id="cf-name" name="name" class="cf-in" placeholder="Jane Doe" data-ph-en="Jane Doe" data-ph-fr="Jean Dupont" required></label>
+<label><span class="mono">Email</span><input id="cf-email" name="email" type="email" class="cf-in" placeholder="you@email.com" data-ph-en="you@email.com" data-ph-fr="vous@email.com" required></label>
+</div>
+<div class="cf-row">
+<label><span class="mono" data-fr="Studio / société">Studio / company</span><input id="cf-studio" name="studio" class="cf-in" placeholder="Your studio" data-ph-en="Your studio" data-ph-fr="Votre studio"></label>
+<label><span class="mono" data-fr="Type de projet">Project type</span><span class="cf-sel"><select id="cf-type" name="project_type" class="cf-in">
+<option value="Podcast / Interview" selected>Podcast / Interview</option>
+<option value="YouTube Long-form" data-fr="YouTube Long Format">YouTube Long-form</option>
+<option value="Short-form / Reels / TikTok" data-fr="Court format / Reels / TikTok">Short-form / Reels / TikTok</option>
+<option value="VSL / Sales funnel" data-fr="VSL / Tunnel de vente">VSL / Sales funnel</option>
+<option value="Ads" data-fr="Publicités">Ads</option>
+<option value="Brand Film / Campaign" data-fr="Film de marque / Campagne">Brand Film / Campaign</option>
+<option value="Motion Graphics Only" data-fr="Motion Design uniquement">Motion Graphics Only</option>
+<option value="Career — Video Editor (Bali)" data-fr="Carrière — Monteur vidéo (Bali)">Career — Video Editor (Bali)</option>
+<option value="Other" data-fr="Autre">Other</option>
+</select></span></label>
+</div>
+<label><span class="mono" data-fr="Dites-nous plus">Tell us more</span><textarea id="cf-message" name="message" rows="6" class="cf-in" placeholder="What are you looking to create? Any references, deadlines, platforms?" data-ph-en="What are you looking to create? Any references, deadlines, platforms?" data-ph-fr="Que voulez-vous créer ? Références, deadlines, plateformes ?" required></textarea></label>
+<button type="submit" class="btn btn-ac cf-submit"><span class="js-submit-label" data-fr="Envoyer le brief">Send project brief</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></button>
+<p class="cf-note" data-fr="On répond à chaque demande sérieuse sous 24h.">We reply to every serious inquiry within 24h.</p>
+</form>
+</div>
+</section>
+
+<footer class="foot">
+<div class="wrap">
+<div class="foot-grid">
+<div><a class="logo big" href="#top" aria-label="DS Editing"><span class="lv lv-img"><img class="logo-img" src="ds-media/logo.png" alt="DS Editing" style="height:64px"></span><span class="lv lv-cut">DS<i></i><em>Editing</em></span><span class="lv lv-slate"><b>DS</b><em>Editing</em></span><span class="lv lv-rec"><i></i>DS<em>Editing</em></span><span class="lv lv-frame"><b>DS</b><em>Editing</em></span><span class="lv lv-play"><svg viewBox="0 0 24 24"><path d="M7 4l13 8-13 8z"></path></svg>DS<em>Editing</em></span></a><p style="margin-top:16px;max-width:320px" data-fr="Un studio boutique de montage en marque blanche qui aide studios, agences et créateurs à livrer de la vidéo premium, plus vite.">A boutique white-label editing studio helping studios, agencies and creators ship premium video, faster.</p></div>
+<div class="foot-col"><h6>Services</h6><a href="#services">YouTube &amp; Docu</a><a href="#services">Podcast &amp; Interview</a><a href="#services">Reels &amp; Shorts</a><a href="#services">VSL</a><a href="#services">Ads</a><a href="#services" data-fr="Motion & étalonnage">Motion &amp; color</a></div>
+<div class="foot-col"><h6>Studio</h6><a href="#process" data-fr="Process">Process</a><a href="#packages" data-fr="Packs">Packages</a><a href="#team" data-fr="L’équipe">Team</a><a href="#studio" data-fr="Nos locaux">Our space</a><a href="client/" data-fr="Espace client">Client space</a><a href="suivi.html" data-fr="Suivre ma commande">Track my order</a><a href="conditions.html" data-fr="Conditions de collaboration">Terms of collaboration</a></div>
+<div class="foot-col"><h6>Contact</h6><a href="mailto:contact@ds-editing.com">contact@ds-editing.com</a><a href="https://www.instagram.com/ds.videoediting/" target="_blank" rel="noopener">Instagram</a><a href="https://www.youtube.com/watch?v=fMyb3M30DGI" target="_blank" rel="noopener">YouTube</a><a href="https://www.trustpilot.com/review/ds-editing.com" target="_blank" rel="noopener">Trustpilot</a></div>
+</div>
+<div class="foot-bot"><span data-fr="© 2026 DS Editing · Canggu, Bali · Tous droits réservés">© 2026 DS Editing · Canggu, Bali · All rights reserved</span><span data-fr="Réservations ouvertes">Bookings open</span></div>
+</div>
+</footer>
+
+<div class="sticky" id="sticky"><span class="l" data-fr="<b>1er montage offert</b> · délai express"><b>First edit free</b> · express turnaround</span><a class="btn btn-ac btn-sm js-book" href="#contact" data-fr="Réserver un appel">Book a call</a></div>
+
+<!-- @panels : fenêtres sur place (services, studios, vidéos, portfolio privé) — markup injecté par js/ds-panels.js -->
+<!-- @booking : calendrier de réservation de l'appel — markup injecté par js/ds-booking.js -->
+
+<!-- Panneau Tweaks du designer : Maj+T ou ?tweaks dans l'adresse. Les réglages retenus sont dans __DS_TWEAKS__ (head). -->
+<aside id="tweaks">
+<div class="h"><span>Tweaks</span><button id="twx" aria-label="Close">×</button></div>
+<div class="lab">Style</div>
+<div class="sw"><button data-style="netflix" style="background:#141414;color:#fff;border-color:#E3122B">Streaming</button><button data-style="atv" style="background:linear-gradient(180deg,#fff,#9BA4AE);color:#000">Apple TV</button></div>
+<div class="sw" style="margin-top:8px"><button data-style="atvl" style="background:#F5F5F7;color:#1D1D1F">Apple TV light</button><button data-style="hbo" style="background:#000;color:#fff;font-family:Georgia,serif;border-color:#fff">HBO</button></div>
+<div class="sw" style="margin-top:8px"><button data-style="chrome" style="background:linear-gradient(180deg,#fff 0%,#8793A0 48%,#1B2027 50%,#C9D3DE 80%);color:#05070A;font-weight:800;letter-spacing:.12em">CHROME</button></div>
+<div class="lab">Logo</div>
+<div class="sw lsw"><button data-logo="cut">DS/</button><button data-logo="slate">Slate</button><button data-logo="rec">● Rec</button><button data-logo="frame">Frame</button><button data-logo="play">▶ Play</button><button data-logo="img">Actuel</button></div>
+<div class="lab">Motion</div>
+<div class="sw"><button data-motion="off" style="background:#222;color:#fff">Off</button><button data-motion="on" style="background:#222;color:#fff">On</button></div>
+<div class="lab">Accent</div>
+<div class="sw"><button data-accent="red" style="background:#E3122B;color:#fff">Red</button><button data-accent="white" style="background:#F5F5F1;color:#000">White</button><button data-accent="violet" style="background:#7B3CFF;color:#fff">Violet</button></div>
+</aside>
+
 <div id="toast-root"></div>
 
-<script>
-/* ============ Configuration ============ */
-var SUPABASE_URL = "https://xkanmjlpysxpohsuqvwg.supabase.co";
-var SUPABASE_KEY = "sb_publishable_lIZtV_WtN5NcGSb0dnfaiQ_AgKYBIVa"; // clé publique (sb_publishable_…), sans danger dans un navigateur
-var STAGES = ["Reçu", "En montage", "Contrôle qualité", "Livré"];
-var STATUS = { recu: ["Reçu", "s0", 0], attribue: ["Reçu", "s0", 0], montage: ["En montage", "s1", 1], bloque: ["En attente d'éléments", "s2", 1],
-  qc: ["Contrôle qualité", "s2", 2], livre: ["À approuver", "s4", 3], retours: ["Retours en cours", "s2", 1], approuve: ["Approuvée", "s5", 3], facture: ["Facturée", "s5", 3] };
-var ERR = { LIEN_INVALIDE: "Ce lien d'accès n'est pas valide. Écrivez à contact@ds-editing.com.", BRIEF_INCOMPLET: "Les cinq points du brief sont obligatoires.",
-  LIENS_REQUIS: "Ajoutez au moins un lien vers vos rushes.", CLIENT_FINAL_REQUIS: "Choisissez un client final.", NON_APPROUVABLE: "Cette vidéo n'est pas en attente d'approbation.",
-  PAS_EN_ATTENTE_DE_RETOURS: "Cette vidéo n'est pas en attente de retours.", NOTE_REQUISE: "Décrivez les modifications souhaitées.", MESSAGE_VIDE: "Le message est vide.",
-  PIN_4_A_6_CHIFFRES: "Le code doit faire 4 à 6 chiffres.", NOM_REQUIS: "Le nom est obligatoire." };
-var ICON = {
-  home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>',
-  plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>',
-  chat: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h16v11H8l-4 4z"/></svg>',
-  inv: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/></svg>',
-  users: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><circle cx="17" cy="9" r="2.5"/><path d="M15.5 14.5a5 5 0 0 1 6 5"/></svg>',
-  gear: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>',
-  wa: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="11" height="11"><path d="M4 20l1.3-3.8A8 8 0 1 1 8.2 19z"/></svg>'
-};
-
-/* ============ État, accès, API ============ */
-var token = null, pin = null, data = null, busy = false;
-function store(k, v) { try { v === null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch (e) {} }
-function read(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
-function tokenFromUrl() {
-  var m = (location.hash + location.search).match(/(?:#\/e\/|[?&]e=)([a-f0-9]{16,64})/i);
-  return m ? m[1] : null;
-}
-function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
-function fr(d) { if (!d) return ""; var s = String(d).slice(0, 10).split("-"); return s.length === 3 ? s[2] + "/" + s[1] + "/" + s[0] : d; }
-function frdt(d) { if (!d) return ""; var x = new Date(d); return isNaN(x) ? d : x.toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit" }) + " " + x.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" }); }
-function money(n, cur) { return (Number(n) || 0).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " " + (cur === "USD" ? "$" : "€"); }
-function toast(t, err) {
-  var r = document.getElementById("toast-root"); r.innerHTML = '<div class="toast' + (err ? " err" : "") + '" role="status">' + esc(t) + "</div>";
-  clearTimeout(toast._t); toast._t = setTimeout(function () { r.innerHTML = ""; }, err ? 5000 : 3200);
-}
-function friendly(e) { var m = String(e && e.message || e || ""); for (var k in ERR) if (m.indexOf(k) >= 0) return ERR[k]; return "Une erreur est survenue. Réessayez, ou écrivez à contact@ds-editing.com."; }
-function rpc(fn, params) {
-  return fetch(SUPABASE_URL + "/rest/v1/rpc/" + fn, { method: "POST", headers: { "Content-Type": "application/json", "apikey": SUPABASE_KEY, "Authorization": "Bearer " + SUPABASE_KEY }, body: JSON.stringify(params || {}) })
-    .then(function (r) { return r.json().then(function (j) { if (!r.ok) throw new Error(j.message || j.hint || r.status); return j; }); });
-}
-function reload() {
-  return rpc("space_open", { p_token: token, p_pin: pin }).then(function (d) {
-    if (d.pin_required) { data = null; renderGate("pin", d.studio.name); return null; }
-    data = d; applyBrand(); render(); return d;
-  }).catch(function (e) { data = null; renderGate(String(e.message).indexOf("LIEN_INVALIDE") >= 0 ? "invalid" : "error"); });
-}
-function applyBrand() {
-  var c = data && data.studio.brand_color; var root = document.documentElement;
-  if (c && /^#[0-9a-f]{6}$/i.test(c)) { root.style.setProperty("--brand", c); root.style.setProperty("--brand-soft", "color-mix(in srgb, " + c + " 14%, var(--panel))"); }
-}
-function act(fn, params, okMsg) {
-  if (busy) return Promise.resolve(); busy = true;
-  return rpc(fn, params).then(function (r) { busy = false; if (okMsg) toast(okMsg); return reload().then(function () { return r; }); })
-    .catch(function (e) { busy = false; toast(friendly(e), true); throw e; });
-}
-
-/* ============ Portes d'entrée ============ */
-function renderGate(kind, name) {
-  var h;
-  if (kind === "pin") {
-    h = '<form class="card" onsubmit="return enterPin(event)"><div class="studio"><div class="logo">' + initials(name) + "</div><div><b>" + esc(name) + '</b><small>Espace client</small></div></div>' +
-      '<p style="margin:0">Ce studio a activé un code d\'accès.</p><div class="field"><label>Code</label><input type="text" name="pin" inputmode="numeric" autocomplete="one-time-code" autofocus required></div>' +
-      '<button class="btn primary" type="submit">Ouvrir mon espace</button></form>';
-  } else if (kind === "invalid") {
-    h = '<div class="card"><h1>Lien d\'accès invalide</h1><p class="muted" style="margin:0">Ce lien n\'ouvre aucun espace. Il a peut-être été régénéré par votre studio. Écrivez à <a href="mailto:contact@ds-editing.com">contact@ds-editing.com</a> pour en recevoir un nouveau.</p></div>';
-  } else if (kind === "nolink") {
-    h = '<div class="card"><h1>Espace client DS Editing</h1><p class="muted" style="margin:0">Ouvrez le lien d\'accès que DS Editing vous a envoyé. Vous ne l\'avez plus ? Écrivez à <a href="mailto:contact@ds-editing.com">contact@ds-editing.com</a>.</p></div>';
-  } else {
-    h = '<div class="card"><h1>Espace momentanément indisponible</h1><p class="muted" style="margin:0">Réessayez dans quelques minutes. Si ça persiste, écrivez à <a href="mailto:contact@ds-editing.com">contact@ds-editing.com</a>.</p><button class="btn primary" onclick="reload()">Réessayer</button></div>';
-  }
-  document.getElementById("root").innerHTML = '<div class="gate">' + h + '<p class="muted" style="font-size:.8rem;position:fixed;bottom:14px">Propulsé par DS Editing</p></div>';
-}
-function enterPin(e) { e.preventDefault(); pin = new FormData(e.target).get("pin"); try { sessionStorage.setItem("ds-pin", pin); } catch (x) {} reload(); return false; }
-function initials(n) { return String(n || "").split(/\s+/).map(function (w) { return w[0] || ""; }).join("").slice(0, 2).toUpperCase(); }
-
-/* ============ Coquille ============ */
-var NAV = [["#tableau", "Mes vidéos", "home"], ["#nouvel-envoi", "Nouvel envoi", "plus"], ["#messages", "Messages", "chat"], ["#factures", "Factures", "inv"], ["#clients-finaux", "Clients finaux", "users"], ["#parametres", "Paramètres", "gear"]];
-function shell(route, content) {
-  var s = data.studio; var toApprove = data.videos.filter(function (v) { return v.stage === "livre"; }).length;
-  var nav = NAV.map(function (n) { var badge = (n[0] === "#tableau" && toApprove) ? '<span class="badge">' + toApprove + "</span>" : "";
-    return '<a href="' + n[0] + '"' + (route === n[0].slice(1) ? ' aria-current="page"' : "") + ">" + ICON[n[2]] + n[1] + badge + "</a>"; }).join("");
-  var tabs = NAV.slice(0, 5).map(function (n) { return '<a href="' + n[0] + '"' + (route === n[0].slice(1) ? ' aria-current="page"' : "") + ">" + ICON[n[2]] + n[1] + "</a>"; }).join("");
-  var logo = s.logo_url ? '<img src="' + esc(s.logo_url) + '" alt="">' : initials(s.name);
-  return '<div class="app"><aside class="side"><div class="studio"><div class="logo">' + logo + "</div><div><b>" + esc(s.name) + "</b><small>Espace client</small></div></div>" +
-    '<nav class="nav">' + nav + '</nav><div class="foot">Accès par lien · <a href="#parametres">gérer</a><br><br>Propulsé par DS Editing</div></aside>' +
-    '<main class="main">' + content + '</main></div><nav class="tabbar">' + tabs + "</nav>";
-}
-function stepper(v) { var st = STATUS[v.stage] || STATUS.recu; var reached = st[2]; var done = v.stage === "approuve" || v.stage === "facture";
-  return '<div><div class="steps">' + STAGES.map(function (s, i) { return "<i class=\"" + (i < reached || done ? "done" : (i === reached ? "on" : "")) + "\"></i>"; }).join("") + '</div><div class="stepl">' + STAGES.map(function (s) { return "<span>" + s + "</span>"; }).join("") + "</div></div>"; }
-function chip(v) { var st = STATUS[v.stage] || STATUS.recu; return '<span class="chip ' + st[1] + '">' + st[0] + "</span>"; }
-function vtitle(v) { return v.title + (v.qty > 1 ? " · " + v.idx + "/" + v.qty : ""); }
-
-/* ============ Écrans ============ */
-function screenTableau(q) {
-  var filter = (q && q.client) || ""; var s = data.studio;
-  var vids = data.videos.filter(function (v) { return !filter || v.end_client === filter; });
-  var enCours = data.videos.filter(function (v) { return ["recu", "attribue", "montage", "bloque", "qc", "retours"].indexOf(v.stage) >= 0; }).length;
-  var aApprouver = data.videos.filter(function (v) { return v.stage === "livre"; }).length;
-  var approuvees = data.videos.filter(function (v) { return v.stage === "approuve"; }).length;
-  var options = data.end_clients.map(function (c) { return '<option value="' + esc(c.name) + '"' + (c.name === filter ? " selected" : "") + ">" + esc(c.name) + "</option>"; }).join("");
-  var rows = vids.map(function (v) {
-    return '<a class="vrow" href="#video/' + v.id + '"><div class="t"><b>' + esc(vtitle(v)) + "</b><small>" + esc(v.end_client) + " · " + (v.service ? esc(v.service) : "à qualifier par l'équipe") + "</small></div>" +
-      "<div>" + chip(v) + "</div>" + stepper(v) + '<div class="muted mono" style="font-size:.82rem">' + (v.requested_deadline ? fr(v.requested_deadline) : "") + "</div></a>";
-  }).join("") || '<div class="body muted">' + (data.videos.length ? "Aucune vidéo pour ce client final." : "Aucune vidéo pour l'instant. Déposez votre premier envoi.") + "</div>";
-  return shell("tableau",
-    '<div class="topbar"><div><h1>Bonjour ' + esc(s.contact_name || s.name) + '</h1><div class="muted">Voici où en sont vos vidéos.</div></div>' +
-    '<div class="actions"><a class="btn cta" href="#nouvel-envoi"><i class="shine"></i>' + ICON.plus + "<span>Nouvel envoi</span></a></div></div>" +
-    '<div class="stats"><div class="stat"><b>' + enCours + '</b><span>en cours chez DS Editing</span></div>' +
-    '<div class="stat' + (aApprouver ? " alert" : "") + '"><b>' + aApprouver + '</b><span>livrée' + (aApprouver > 1 ? "s" : "") + " à approuver</span></div>" +
-    '<div class="stat"><b>' + approuvees + '</b><span>approuvée' + (approuvees > 1 ? "s" : "") + ", sur la prochaine facture</span></div>" +
-    '<div class="stat"><b>' + data.end_clients.length + "</b><span>clients finaux</span></div></div>" +
-    '<section class="panel"><div class="head"><h2>Vidéos</h2><div class="actions"><label class="muted" style="font-size:.86rem">Client final</label>' +
-    '<select onchange="location.hash=\'#tableau\'+(this.value?\'?client=\'+encodeURIComponent(this.value):\'\')"><option value="">Tous</option>' + options + "</select></div></div>" +
-    '<div class="vlist">' + rows + "</div></section>");
-}
-
-function screenNouvelEnvoi() {
-  var clients = data.end_clients.map(function (c) { return "<option>" + esc(c.name) + "</option>"; }).join("");
-  var d = new Date(); d.setDate(d.getDate() + 4); var def = d.toISOString().slice(0, 10);
-  function ta(name, label, ph, req) { return '<div class="field"><label>' + label + (req ? " <i>*</i>" : "") + '</label><textarea name="' + name + '"' + (req ? " required" : "") + ' style="min-height:78px" placeholder="' + ph + '"></textarea></div>'; }
-  return shell("nouvel-envoi",
-    '<div class="topbar"><div><h1>Nouvel envoi</h1><div class="muted">Le client final, vos liens, puis un brief guidé en cinq points pour que rien ne soit oublié. Une fois envoyé, votre projet entre en montage.</div></div></div>' +
-    '<form class="panel" onsubmit="return submitOrder(event)"><div class="body" style="display:flex;flex-direction:column;gap:18px">' +
-    '<div class="grid3">' +
-      '<div class="field"><label>Pour quel client final ? <i>*</i></label><select name="client" required onchange="document.getElementById(\'newclient\').hidden = this.value !== \'__new\'"><option value="">Choisir</option>' + clients + '<option value="__new">+ Nouveau client final</option></select></div>' +
-      '<div class="field" id="newclient" hidden><label>Nom du nouveau client final <i>*</i></label><input type="text" name="newclient" placeholder="Ex. Belona"></div>' +
-      '<div class="field"><label>Deadline souhaitée</label><input type="date" name="deadline" value="' + def + '"><span class="hint">Par défaut, sous 3 jours ouvrés.</span></div>' +
-    "</div>" +
-    '<div class="field"><label>Liens vers les rushes <i>*</i></label><textarea name="links" required placeholder="Collez vos liens, un par ligne : Google Drive, WeTransfer ou Frame.io."></textarea><span class="hint">Multicaméra : toutes les caméras et les pistes audio séparées.</span></div>' +
-    '<div><div class="eyebrow" style="margin-bottom:10px">Votre brief, en cinq points</div><div class="grid2">' +
-      ta("format", "1 · Format et durée", "Ex. Reels 9:16 de 45 s max · Podcast 16:9 d\'environ 20 min, 3 caméras", true) +
-      ta("style", "2 · Style et rythme", "Ex. dynamique, coupes rapides, zooms sur les punchlines · ou posé, cinématique, étalonnage chaud", true) +
-      ta("text", "3 · Sous-titres et textes", "Ex. sous-titres en français, Montserrat Bold, blanc avec contour noir, en bas au centre · titres animés en intro", true) +
-      ta("audio", "4 · Musique et son", "Ex. musique fournie dans le dossier · ou choisissez une musique libre de droits énergique · nettoyer le bruit de fond", true) +
-      ta("keep", "5 · À garder, à couper", "Ex. garder l\'anecdote à 12 min · couper les silences et les hésitations · ne jamais couper le logo de fin", true) +
-      ta("refs", "Exemples que vous aimez", "Liens YouTube, Instagram ou TikTok, un par ligne. Le meilleur moyen de tomber juste du premier coup.", false) +
-    "</div></div>" +
-    '<div style="display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;align-items:center"><a class="btn" href="#tableau">Annuler</a><button class="btn cta" type="submit"><i class="shine"></i>' + ICON.plus + "<span>Envoyer en montage</span></button></div>" +
-    "</div></form>");
-}
-function submitOrder(e) {
-  e.preventDefault(); var f = new FormData(e.target); var client = f.get("client");
-  if (client === "__new") client = String(f.get("newclient") || "").trim();
-  if (!client) { toast(ERR.CLIENT_FINAL_REQUIS, true); return false; }
-  var btn = e.target.querySelector("button[type=submit]"); btn.disabled = true;
-  act("space_submit_order", { p_token: token, p_end_client: client, p_links: String(f.get("links") || "").split("\n").map(function (l) { return l.trim(); }).filter(Boolean),
-    p_brief: { format: f.get("format"), style: f.get("style"), text: f.get("text"), audio: f.get("audio"), keep: f.get("keep"), refs: f.get("refs") || "" },
-    p_deadline: f.get("deadline") || null }, "Envoyé. L'équipe DS Editing est prévenue.")
-    .then(function (r) { location.hash = "#video/" + r.deliverable_id; }).catch(function () { btn.disabled = false; });
-  return false;
-}
-
-function screenVideo(id) {
-  var v = data.videos.filter(function (x) { return x.id === id; })[0];
-  if (!v) return shell("tableau", "<p>Vidéo introuvable. <a href='#tableau'>Retour</a></p>");
-  var deliver = "";
-  if (v.stage === "livre" || v.stage === "approuve" || v.stage === "facture" || v.stage === "retours") {
-    var head = v.stage === "livre" ? "Livrée le " + frdt(v.delivered_at) : v.stage === "retours" ? "Retours transmis à l'équipe" : "Approuvée le " + frdt(v.approved_at);
-    deliver = '<div class="deliver"><div><b>' + head + '</b><span class="muted">' + (v.frameio_link ? "Le lien Frame.io reste disponible 30 jours. Vos commentaires Frame.io remontent ici." : "Le lien de la vidéo arrive avec la livraison.") + "</span></div>" +
-      '<div style="display:flex;gap:8px;flex-wrap:wrap">' + (v.frameio_link ? '<a class="btn" href="' + esc(v.frameio_link) + '" target="_blank" rel="noopener">Ouvrir dans Frame.io</a>' : "") +
-      (v.stage === "livre" ? '<button class="btn" onclick="document.getElementById(\'chg\').hidden=false">Demander des retours</button><button class="btn ok" onclick="approve(\'' + v.id + '\')">Approuver</button>' : "") + "</div>" +
-      (v.stage === "livre" ? '<form id="chg" hidden style="width:100%" onsubmit="return requestChanges(event, \'' + v.id + '\')"><div class="field"><label>Modifications souhaitées</label><textarea name="note" required placeholder="Ex. Le sous-titre déborde sur le logo à 0:04, laisser respirer la coupe à 0:31."></textarea></div><div style="margin-top:8px;display:flex;gap:8px"><button class="btn primary" type="submit">Envoyer les retours</button></div></form>' : "") + "</div>";
-  }
-  var comments = (v.comments || []).map(function (c) { return '<div class="comment"><span class="mono tc">' + esc(c.tc || "") + "</span><div>" + esc(c.body) + "<small>" + esc(c.author || "") + " · " + frdt(c.at) + " · via Frame.io</small></div></div>"; }).join("") || '<div class="muted">Aucun commentaire Frame.io pour l\'instant.</div>';
-  var b = v.brief || {}; var parts = [["Format et durée", b.format], ["Style et rythme", b.style], ["Sous-titres et textes", b.text], ["Musique et son", b.audio], ["À garder, à couper", b.keep], ["Exemples", b.refs]];
-  var brief = '<div class="brief">' + parts.filter(function (p) { return p[1]; }).map(function (p) { return "<h4>" + p[0] + "</h4><p>" + esc(p[1]) + "</p>"; }).join("") + "</div>";
-  var links = (v.rush_links || []).map(function (l) { return '<a href="' + esc(l) + '" target="_blank" rel="noopener">' + esc(l) + "</a>"; }).join("<br>");
-  return shell("tableau",
-    '<div class="topbar"><div><a href="#tableau" class="muted" style="font-size:.86rem;text-decoration:none">← Mes vidéos</a><h1>' + esc(vtitle(v)) + "</h1></div><div>" + chip(v) + "</div></div>" +
-    '<section class="panel" style="margin-bottom:14px"><div class="body">' + stepper(v) + "</div></section>" + deliver +
-    '<div class="grid2" style="margin-top:14px"><section class="panel"><div class="head"><h2>Votre brief</h2></div><div class="body"><dl class="kv">' +
-      "<dt>Client final</dt><dd>" + esc(v.end_client) + "</dd><dt>Prestation</dt><dd>" + (v.service ? esc(v.service) + (v.qty > 1 ? " · " + v.qty + " livrables" : "") : "À qualifier par l'équipe DS Editing") + "</dd>" +
-      "<dt>Déposé le</dt><dd>" + frdt(v.created_at) + (v.submitted_by ? " par " + esc(v.submitted_by) : "") + "</dd>" + (v.requested_deadline ? "<dt>Deadline souhaitée</dt><dd>" + fr(v.requested_deadline) + "</dd>" : "") +
-      (v.offered ? "<dt>Tarif</dt><dd>Test offert</dd>" : "") + (links ? "<dt>Rushes</dt><dd>" + links + "</dd>" : "") + "</dl>" + brief + "</div></section>" +
-    '<section class="panel"><div class="head"><h2>Retours Frame.io</h2><span class="muted" style="font-size:.82rem">synchronisés</span></div><div class="body">' + comments + "</div></section></div>");
-}
-function approve(id) { if (!confirm("Approuver cette vidéo ? Elle sera ajoutée à votre prochaine facture hebdomadaire.")) return; act("space_approve", { p_token: token, p_deliverable: id }, "Approuvée. Elle sera sur la facture de la semaine."); }
-function requestChanges(e, id) { e.preventDefault(); act("space_request_changes", { p_token: token, p_deliverable: id, p_note: new FormData(e.target).get("note") }, "Retours transmis à l'équipe."); return false; }
-
-function screenMessages() {
-  var msgs = data.messages.map(function (m) { var via = m.channel === "whatsapp" ? '<span class="via">' + ICON.wa + "WhatsApp</span>" : '<span class="via">Espace</span>';
-    return '<div class="msg' + (m.from_client ? " me" : "") + '"><small>' + esc(m.author) + " · " + frdt(m.at) + via + "</small>" + esc(m.body) + "</div>"; }).join("") || '<div class="muted">Aucun message pour l\'instant. L\'équipe qualité vous répond ici.</div>';
-  return shell("messages",
-    '<div class="topbar"><div><h1>Messages</h1><div class="muted">Votre fil avec l\'équipe qualité DS Editing. Réponse dans la journée, 7 jours sur 7.</div></div></div>' +
-    '<section class="panel"><div class="body"><div class="thread">' + msgs + "</div>" +
-    '<form class="compose" onsubmit="return sendMsg(event)"><input type="text" name="t" required placeholder="Écrire à l\'équipe qualité"><button class="btn primary" type="submit">Envoyer</button></form></div></section>');
-}
-function sendMsg(e) { e.preventDefault(); var t = new FormData(e.target).get("t"); e.target.reset(); act("space_send_message", { p_token: token, p_body: t }, "Envoyé à l'équipe qualité."); return false; }
-
-function screenFactures() {
-  var LBL = { emise: ["À payer", "s4"], payee: ["Payée", "s3"], annulee: ["Annulée", "s0"] };
-  var rows = data.invoices.map(function (i) { var l = LBL[i.status] || ["", "s0"];
-    return "<tr><td class=\"mono\">" + esc(i.number || "") + "</td><td>" + fr(i.period_start) + " au " + fr(i.period_end) + "</td><td class=\"mono\">" + fr(i.issued_at) + "</td><td class=\"num mono\">" + money(i.total, i.currency) + "</td><td><span class=\"chip " + l[1] + "\">" + l[0] + "</span></td>" +
-      '<td class="num">' + (i.pdf_path ? '<a class="btn sm" href="' + esc(i.pdf_path) + '" target="_blank" rel="noopener">PDF</a>' : "") + "</td></tr>"; }).join("") ||
-    '<tr><td colspan="6" class="muted">Aucune facture pour l\'instant. La première arrivera le lundi suivant votre première vidéo approuvée.</td></tr>';
-  return shell("factures",
-    '<div class="topbar"><div><h1>Factures</h1><div class="muted">Une facture par semaine, envoyée le lundi, qui regroupe les vidéos approuvées. Paiement à réception.</div></div></div>' +
-    '<section class="panel" style="overflow-x:auto"><table class="inv"><thead><tr><th>Numéro</th><th>Période</th><th>Émise le</th><th class="num">Montant</th><th>Statut</th><th></th></tr></thead><tbody>' + rows + "</tbody></table></section>" +
-    '<p class="muted" style="font-size:.84rem;margin-top:10px">Retard de paiement : pénalité de 20 % du montant dû par semaine de retard entamée. Virement ou paiement en ligne.</p>');
-}
-
-function screenClients() {
-  var rows = data.end_clients.map(function (c) { var n = data.videos.filter(function (v) { return v.end_client === c.name; }).length;
-    return '<a class="vrow" href="#tableau?client=' + encodeURIComponent(c.name) + '" style="grid-template-columns:1fr auto"><div class="t"><b>' + esc(c.name) + "</b><small>" + n + (n > 1 ? " vidéos" : " vidéo") + "</small></div><span class=\"muted\">Voir →</span></a>"; }).join("") || '<div class="body muted">Aucun client final. Ajoutez-en un, ou créez-le directement lors d\'un envoi.</div>';
-  return shell("clients-finaux",
-    '<div class="topbar"><div><h1>Clients finaux</h1><div class="muted">Vos propres clients. Chaque vidéo leur est rattachée, la facture hebdo est regroupée par client final.</div></div>' +
-    '<div class="actions"><button class="btn primary" onclick="addClient()">' + ICON.plus + "Ajouter</button></div></div><section class=\"panel\"><div class=\"vlist\">" + rows + "</div></section>");
-}
-function addClient() { var n = prompt("Nom du client final"); if (!n) return; act("space_add_end_client", { p_token: token, p_name: n }, "Client final ajouté."); }
-
-function screenParametres() {
-  var s = data.studio; var link = location.origin + location.pathname.replace(/index\.html$/, "") + "#/e/" + token;
-  return shell("parametres",
-    '<div class="topbar"><div><h1>Paramètres</h1></div></div><div class="grid2">' +
-      '<section class="panel"><div class="head"><h2>Votre lien d\'accès</h2></div><div class="body" style="display:flex;flex-direction:column;gap:12px">' +
-        '<p class="muted" style="margin:0;font-size:.9rem">Ce lien ouvre votre espace, sans mot de passe. Partagez-le aux personnes de votre équipe qui déposent des vidéos.</p>' +
-        '<div class="accesslink"><code id="lnk">' + esc(link) + '</code><button class="btn" type="button" onclick="copyLink()">Copier</button></div>' +
-        '<div><button class="btn sm" type="button" onclick="regen()">Générer un nouveau lien</button> <span class="hint muted">L\'ancien cessera de fonctionner.</span></div>' +
-        '<form onsubmit="return setPin(event)" class="field"><label>Code à l\'ouverture du lien <span class="muted" style="font-weight:400">(facultatif, 4 à 6 chiffres)</span></label>' +
-        '<div style="display:flex;gap:8px"><input type="text" name="pin" inputmode="numeric" placeholder="' + (s.pin_enabled ? "Code activé" : "Aucun code") + '" style="max-width:180px"><button class="btn" type="submit">' + (s.pin_enabled ? "Changer" : "Activer") + "</button>" + (s.pin_enabled ? '<button class="btn" type="button" onclick="clearPin()">Retirer</button>' : "") + "</div></form>" +
-      "</div></section>" +
-      '<section class="panel"><div class="head"><h2>Votre studio</h2></div><div class="body"><form onsubmit="return saveSettings(event)" style="display:flex;flex-direction:column;gap:12px">' +
-        '<div class="field"><label>Nom</label><input type="text" value="' + esc(s.name) + '" disabled></div>' +
-        (s.billing_name ? '<div class="field"><label>Entité facturée</label><input type="text" value="' + esc(s.billing_name) + '" disabled></div>' : "") +
-        '<div class="field"><label>Email de facturation</label><input type="email" name="email" value="' + esc(s.billing_email || "") + '"></div>' +
-        '<div class="field"><label>Langue</label><select name="lang"><option value="fr"' + (s.lang === "fr" ? " selected" : "") + '>Français</option><option value="en"' + (s.lang === "en" ? " selected" : "") + '>English (bientôt)</option></select></div>' +
-        '<div><button class="btn primary" type="submit">Enregistrer</button></div></form></div></section></div>');
-}
-function copyLink() { var t = document.getElementById("lnk").textContent; (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(function () { toast("Lien copié."); }, function () { prompt("Copiez ce lien :", t); }); }
-function regen() { if (!confirm("Générer un nouveau lien ? L'ancien ne fonctionnera plus, pensez à renvoyer le nouveau à votre équipe.")) return;
-  act("space_regenerate_token", { p_token: token }).then(function (r) { token = r.token; store("ds-token", token); location.hash = "#/e/" + token; setTimeout(function () { location.hash = "#parametres"; toast("Nouveau lien généré."); }, 50); }); }
-function setPin(e) { e.preventDefault(); var p = new FormData(e.target).get("pin"); act("space_set_pin", { p_token: token, p_pin: p }, "Code enregistré.").then(function () { pin = p; try { sessionStorage.setItem("ds-pin", p); } catch (x) {} }); return false; }
-function clearPin() { act("space_set_pin", { p_token: token, p_pin: "" }, "Code retiré.").then(function () { pin = null; }); }
-function saveSettings(e) { e.preventDefault(); var f = new FormData(e.target); act("space_update_settings", { p_token: token, p_billing_email: f.get("email"), p_lang: f.get("lang") }, "Enregistré."); return false; }
-
-/* ============ Routeur ============ */
-function render() {
-  if (!data) return;
-  var h = location.hash || "#tableau"; var path = h.slice(1); var q = {};
-  if (path.indexOf("/e/") === 0) path = "tableau";
-  var qi = path.indexOf("?"); if (qi >= 0) { path.slice(qi + 1).split("&").forEach(function (p) { var kv = p.split("="); q[kv[0]] = decodeURIComponent(kv[1] || ""); }); path = path.slice(0, qi); }
-  var out;
-  if (path === "nouvel-envoi") out = screenNouvelEnvoi();
-  else if (path.indexOf("video/") === 0) out = screenVideo(path.slice(6));
-  else if (path === "messages") out = screenMessages();
-  else if (path === "factures") out = screenFactures();
-  else if (path === "clients-finaux") out = screenClients();
-  else if (path === "parametres") out = screenParametres();
-  else out = screenTableau(q);
-  document.getElementById("root").innerHTML = out; window.scrollTo(0, 0);
-}
-window.addEventListener("hashchange", function () {
-  var t = tokenFromUrl(); if (t && t !== token) { token = t; store("ds-token", t); reload(); return; }
-  if (location.hash.indexOf("#/e/") === 0) { location.hash = "#tableau"; return; }
-  render();
-});
-(function boot() {
-  if (SUPABASE_KEY.indexOf("REMPLACER") === 0) { document.getElementById("root").innerHTML = '<div class="gate"><div class="card"><h1>Configuration incomplète</h1><p class="muted" style="margin:0">La clé publique Supabase n\'est pas renseignée dans ce fichier.</p></div></div>'; return; }
-  token = tokenFromUrl() || read("ds-token");
-  try { pin = sessionStorage.getItem("ds-pin"); } catch (e) {}
-  if (!token) { renderGate("nolink"); return; }
-  store("ds-token", token);
-  reload().then(function (d) { if (d && location.hash.indexOf("#/e/") === 0) location.hash = "#tableau"; });
-  // Rafraîchissement discret toutes les 60 s, jamais pendant une saisie ni sur le formulaire d'envoi
-  setInterval(function () {
-    var typing = document.activeElement && /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName);
-    if (!data || busy || typing || document.visibilityState !== "visible" || location.hash.indexOf("#nouvel-envoi") === 0) return;
-    rpc("space_open", { p_token: token, p_pin: pin }).then(function (d) { if (!d.pin_required) { data = d; render(); } }).catch(function () {});
-  }, 60000);
-})();
-</script>
+<script src="js/image-slot.js"></script>
+<script src="client/portfolio.js"></script>
+<script src="client/previews.js"></script>
+<script src="services/services.js"></script>
+<script src="js/ds-app.js"></script>
+<script src="js/ds-extras.js"></script>
+<script src="js/ds-panels.js"></script>
+<script src="js/ds-booking.js"></script>
 </body>
 </html>

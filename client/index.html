@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta name="theme-color" content="#050607"/>
+  <meta name="robots" content="noindex,nofollow"/>
+  <title>DS Editing — Espace client</title>
+  <link rel="icon" type="image/png" href="../assets/logo.png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--bg:#050607;--surface:#0F1114;--surface-2:#161A1F;--line:rgba(255,255,255,.09);--line-strong:rgba(255,255,255,.22);--cream:#F5F5F1;--taupe:#9AA3AD;--amber:#DCE3EA;--amber-soft:rgba(220,227,234,.12);--ok:#46D369;--err:#F08A82;--chrome:linear-gradient(180deg,#FFFFFF 0%,#E3E7EC 38%,#9BA4AE 72%,#D6DBE0 100%);--chrome2:linear-gradient(95deg,#B9C9DA 0%,#7FA3CF 45%,#E6ECF2 100%)}
+    *{box-sizing:border-box}
+    html,body{margin:0;color:var(--cream);font-family:'Geist',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+    body{min-height:100vh;display:flex;flex-direction:column;background:radial-gradient(1200px 700px at 85% -5%,rgba(125,155,195,.16),transparent 60%),radial-gradient(900px 600px at -10% 40%,rgba(160,170,185,.08),transparent 60%),#050607;background-attachment:fixed}
+    a{color:inherit}
+    .mono{font-weight:600;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--taupe);font-variant-numeric:tabular-nums}
+    .display{font-weight:600;letter-spacing:-.035em;line-height:.98;background:var(--chrome);-webkit-background-clip:text;background-clip:text;color:transparent}
+    header{position:sticky;top:0;z-index:20;background:rgba(8,9,11,.62);backdrop-filter:blur(22px) saturate(1.4);border-bottom:1px solid var(--line)}
+    .hd{max-width:960px;margin:0 auto;padding:14px 16px;display:flex;align-items:center;gap:14px}
+    .brand{display:flex;align-items:center;gap:12px;text-decoration:none}
+    .lv-rec{display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:22px;letter-spacing:-.04em;line-height:1;color:var(--cream);white-space:nowrap}
+    .lv-rec i{width:9px;height:9px;border-radius:50%;background:var(--amber);box-shadow:0 0 12px var(--amber);animation:blink 1.6s infinite;margin-right:2px}
+    .lv-rec em{font-style:normal;font-size:11px;font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:var(--taupe);margin-left:2px}
+    @keyframes blink{50%{opacity:.2}}
+    .brand .mono{padding-left:12px;border-left:1px solid var(--line)}
+    .lang{margin-left:auto;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.16);color:var(--cream);border-radius:999px;padding:8px 14px;cursor:pointer;font:inherit;font-size:12px;font-weight:600}
+    main{flex:1;width:100%;max-width:520px;margin:0 auto;padding:60px 16px 90px}
+    h1{margin:14px 0 10px;font-size:clamp(36px,6vw,54px)}
+    p.lead{margin:0 0 28px;color:var(--taupe);font-size:15px;line-height:1.55}
+    .card{background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.09);border-radius:22px;backdrop-filter:blur(20px);box-shadow:inset 0 1px 0 rgba(255,255,255,.08);padding:24px}
+    label{display:block;margin:0 0 8px;font-size:14px;font-weight:500}
+    .in{width:100%;height:54px;padding:0 16px;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:12px;color:var(--cream);font:inherit;font-size:20px;letter-spacing:.12em;font-variant-numeric:tabular-nums;outline:none;transition:border-color .15s,box-shadow .15s}
+    .in::placeholder{color:rgba(154,163,173,.6);letter-spacing:.12em}
+    .in:focus{border-color:rgba(220,227,234,.6);box-shadow:0 0 0 3px rgba(220,227,234,.14)}
+    .in.bad{border-color:var(--err)}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;width:100%;height:54px;margin-top:12px;padding:0 24px;border:0;border-radius:999px;font:inherit;font-weight:600;font-size:16px;cursor:pointer;background:linear-gradient(180deg,#FFFFFF,#C9D0D7);color:#0A0B0D;box-shadow:inset 0 1px 0 #fff,0 8px 30px rgba(180,200,225,.18);transition:.15s}
+    .btn:hover{background:linear-gradient(180deg,#fff,#E4E8EC)}
+    .btn[disabled]{opacity:.45;cursor:default}
+    .msg{min-height:22px;margin-top:12px;font-size:14px;color:var(--taupe)}
+    .msg.err{color:var(--err)}
+    .alt{margin-top:22px;padding-top:18px;border-top:1px solid var(--line);display:grid;gap:10px;font-size:14px;color:var(--taupe)}
+    .alt a{color:var(--cream);text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1px}
+    footer{padding:24px 16px;text-align:center}
+    @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+  </style>
+</head>
+<body>
+<header><div class="hd">
+  <a class="brand" href="../index.html"><span class="lv-rec"><i></i>DS<em>Editing</em></span><span class="mono" data-t="sub"></span></a>
+  <button class="lang" id="langBtn" type="button">EN</button>
+</div></header>
+
+<main>
+  <div class="mono" data-t="kicker"></div>
+  <h1 class="display" data-t="title"></h1>
+  <p class="lead" data-t="lead"></p>
+  <form class="card" id="f" novalidate>
+    <label for="key" data-t="label"></label>
+    <input class="in" id="key" name="key" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="••••••••••" inputmode="text"/>
+    <button class="btn" id="go" type="submit" data-t="go"></button>
+    <div class="msg" id="msg"></div>
+    <div class="alt">
+      <span><span data-t="track"></span> <a href="../suivi.html" data-t="trackLink"></a></span>
+      <span><span data-t="noKey"></span> <a href="mailto:contact@ds-editing.com">contact@ds-editing.com</a></span>
+    </div>
+  </form>
+</main>
+<footer class="mono" data-t="footer"></footer>
+
+<script type="module">
+  const SB_URL = "https://xkanmjlpysxpohsuqvwg.supabase.co";
+  const SB_KEY = "sb_publishable_lIZtV_WtN5NcGSb0dnfaiQ_AgKYBIVa";
+  const $ = (s) => document.querySelector(s);
+  const T = {
+    fr: { sub: "Espace client", kicker: "Vos commandes, vos livraisons, vos factures", title: "Votre espace", lead: "Entrez le code d'accès reçu par e-mail. Il ouvre votre espace : commandes en cours, livraisons validées et factures de la semaine.", label: "Code d'accès", go: "Ouvrir mon espace", track: "Vous suivez une commande précise ?", trackLink: "Suivre avec son numéro →", noKey: "Pas encore de code ? Écrivez à", footer: "DS Editing · Espace client", checking: "Vérification…", bad: "Ce code n'est pas reconnu. Vérifiez l'e-mail reçu ou écrivez-nous.", fail: "Impossible de vérifier le code pour l'instant. Réessayez dans un instant.", empty: "Entrez votre code d'accès." },
+    en: { sub: "Client space", kicker: "Your orders, deliveries and invoices", title: "Your space", lead: "Enter the access code you received by email. It opens your space: orders in progress, approved deliveries and this week's invoices.", label: "Access code", go: "Open my space", track: "Tracking a specific order?", trackLink: "Track it with its number →", noKey: "No code yet? Write to", footer: "DS Editing · Client space", checking: "Checking…", bad: "This code isn't recognised. Check the email you received or write to us.", fail: "We can't check the code right now. Please try again in a moment.", empty: "Enter your access code." },
+  };
+  const params = new URLSearchParams(location.search);
+  let lang = params.get("lang") || (() => { try { return localStorage.getItem("ds_lang"); } catch { return null; } })() || ((navigator.language || "en").slice(0, 2) === "fr" ? "fr" : "en");
+  if (!["fr", "en"].includes(lang)) lang = "en";
+  function render() { document.documentElement.lang = lang; document.querySelectorAll("[data-t]").forEach((el) => { el.textContent = T[lang][el.dataset.t] || ""; }); $("#langBtn").textContent = lang === "fr" ? "EN" : "FR"; }
+  $("#langBtn").addEventListener("click", () => { lang = lang === "fr" ? "en" : "fr"; try { localStorage.setItem("ds_lang", lang); } catch {} render(); });
+  render();
+
+  let sb = null;
+  async function client() { if (!sb) { const { createClient } = await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm"); sb = createClient(SB_URL, SB_KEY); } return sb; }
+  async function open(key) {
+    const t = T[lang], msg = $("#msg"), btn = $("#go"), inp = $("#key");
+    key = (key || "").trim(); inp.classList.remove("bad"); msg.className = "msg";
+    if (!key) { msg.textContent = t.empty; inp.classList.add("bad"); inp.focus(); return; }
+    btn.disabled = true; msg.textContent = t.checking;
+    try {
+      const { data, error } = await (await client()).rpc("client_slug", { p_key: key });
+      if (error) throw error;
+      if (!data || !data.slug) { msg.textContent = t.bad; msg.className = "msg err"; inp.classList.add("bad"); btn.disabled = false; return; }
+      try { localStorage.setItem("ds_client_key", key); } catch {}
+      location.href = `espace.html?client=${encodeURIComponent(data.slug)}&k=${encodeURIComponent(key)}&lang=${lang}`;
+    } catch (e) { msg.textContent = t.fail; msg.className = "msg err"; btn.disabled = false; }
+  }
+  $("#f").addEventListener("submit", (e) => { e.preventDefault(); open($("#key").value); });
+  // Code dans l'adresse (?k=…) ou mémorisé sur cet appareil : ouverture directe
+  const remembered = params.get("k") || (() => { try { return localStorage.getItem("ds_client_key"); } catch { return null; } })();
+  if (remembered) { $("#key").value = remembered; open(remembered); }
+</script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+/* Motion tweak */
+.mo{display:none}
+body.motion .mo{display:block;position:relative;height:96px;margin:6px 0 4px;border-radius:10px;background:rgba(255,255,255,.035);border:1px solid var(--line);overflow:hidden}
+/* 01 upload: cursor drags a file into the tray */
+.mo-up .tray{position:absolute;left:50%;bottom:16px;width:96px;height:26px;margin-left:-48px;border:2px solid var(--mu);border-top:0;border-radius:0 0 8px 8px}
+.mo-up .grab{position:absolute;left:10%;top:6px;animation:drag 3.6s cubic-bezier(.6,0,.3,1) infinite}
+.mo-up .file{width:30px;height:38px;border-radius:4px;background:var(--tx);position:relative;opacity:.9}
+.mo-up .file::before{content:"MP4";position:absolute;left:0;right:0;bottom:6px;text-align:center;font-size:8px;font-weight:800;color:var(--bg)}
+.mo-up .file::after{content:"";position:absolute;right:0;top:0;border-left:9px solid var(--bg3);border-bottom:9px solid transparent;border-top:0}
+.mo-up .cur{position:absolute;left:18px;top:18px;width:18px;height:18px}
+.mo-up .cur path{fill:#fff;stroke:#000;stroke-width:1.2}
+.mo-up .bar{position:absolute;left:14px;right:14px;bottom:6px;height:3px;border-radius:2px;background:var(--line)}
+.mo-up .bar i{position:absolute;inset:0 auto 0 0;background:var(--accent);border-radius:2px;animation:upbar 3.6s linear infinite}
+@keyframes drag{0%{transform:translate(0,-10px);opacity:0}12%{opacity:1;transform:translate(0,0)}55%{transform:translate(calc(var(--w,180px)*.42),30px)}70%,85%{transform:translate(calc(var(--w,180px)*.42),42px) scale(.8);opacity:1}100%{transform:translate(calc(var(--w,180px)*.42),48px) scale(.6);opacity:0}}
+@keyframes upbar{0%,60%{width:0}95%,100%{width:100%}}
+/* 02 brief: note typing */
+.mo-br{padding:14px 16px}
+.mo-br .ln{height:7px;border-radius:4px;background:var(--mu);opacity:.55;margin-bottom:9px;width:0;animation:type 4s steps(18) infinite}
+.mo-br .ln:nth-child(1){--to:78%;background:var(--tx);opacity:.9}
+.mo-br .ln:nth-child(2){--to:92%;animation-delay:.6s}
+.mo-br .ln:nth-child(3){--to:64%;animation-delay:1.2s}
+.mo-br .ln:nth-child(4){--to:40%;animation-delay:1.8s;background:var(--accent);opacity:1}
+@keyframes type{0%{width:0}25%,85%{width:var(--to)}100%{width:var(--to);opacity:0}}
+/* 03 edit: clips land on tracks */
+.mo-ed{padding:12px 12px}
+.mo-ed .tr{position:relative;height:18px;margin-bottom:6px;border-radius:3px;background:rgba(255,255,255,.04)}
+.mo-ed .c{position:absolute;top:0;bottom:0;border-radius:3px;animation:land 4s cubic-bezier(.2,.9,.2,1) infinite;opacity:0}
+.mo-ed .tr:nth-child(1) .c{background:var(--accent)}
+.mo-ed .tr:nth-child(2) .c{background:#8A8A8A}
+.mo-ed .tr:nth-child(3) .c{background:repeating-linear-gradient(90deg,var(--mu) 0 2px,transparent 2px 4px)}
+@keyframes land{0%{transform:translateX(160%);opacity:0}25%,85%{transform:none;opacity:1}100%{opacity:0}}
+.mo-ed .ph{position:absolute;top:6px;bottom:6px;width:2px;background:#fff;left:8%;animation:edph 4s linear infinite;box-shadow:0 0 8px rgba(255,255,255,.7)}
+@keyframes edph{0%,30%{left:6%}90%{left:94%}100%{left:94%}}
+/* 04 review: comment pops, then approved */
+.mo-rv .line{position:absolute;left:14px;right:14px;top:62px;height:4px;border-radius:2px;background:var(--line)}
+.mo-rv .pin{position:absolute;top:57px;width:14px;height:14px;border-radius:50%;background:var(--accent);transform:scale(0);animation:pin 4.4s infinite}
+.mo-rv .pin.p1{left:26%}.mo-rv .pin.p2{left:62%;animation-delay:.9s}
+.mo-rv .bub{position:absolute;left:14px;top:12px;font-size:12px;font-weight:600;background:var(--tx);color:var(--bg);padding:5px 10px;border-radius:10px 10px 10px 2px;opacity:0;animation:bub 4.4s infinite}
+.mo-rv .ok{position:absolute;right:14px;top:10px;width:30px;height:30px;border-radius:50%;background:#46D369;display:grid;place-items:center;transform:scale(0);animation:ok 4.4s infinite}
+.mo-rv .ok svg{width:16px;height:16px;fill:none;stroke:#000;stroke-width:3}
+@keyframes pin{0%,10%{transform:scale(0)}18%,80%{transform:scale(1)}90%,100%{transform:scale(0)}}
+@keyframes bub{0%,20%{opacity:0;transform:translateY(6px)}30%,55%{opacity:1;transform:none}62%,100%{opacity:0}}
+@keyframes ok{0%,60%{transform:scale(0)}68%,88%{transform:scale(1)}100%{transform:scale(0)}}
+/* packages */
+body.motion .pk li svg path{stroke-dasharray:24;stroke-dashoffset:24}
+body.motion .pk.in li svg path{animation:draw .5s ease forwards}
+body.motion .pk.in li:nth-child(1) svg path{animation-delay:.4s}body.motion .pk.in li:nth-child(2) svg path{animation-delay:.6s}body.motion .pk.in li:nth-child(3) svg path{animation-delay:.8s}body.motion .pk.in li:nth-child(4) svg path{animation-delay:1s}body.motion .pk.in li:nth-child(5) svg path{animation-delay:1.2s}
+@keyframes draw{to{stroke-dashoffset:0}}
+body.motion .pk.hot{animation:glow 3s ease-in-out infinite}
+@keyframes glow{0%,100%{box-shadow:0 0 0 0 color-mix(in oklab,var(--accent) 0%,transparent)}50%{box-shadow:0 0 50px 0 color-mix(in oklab,var(--accent) 35%,transparent)}}
+body.motion .pk{transition:transform .4s cubic-bezier(.2,.8,.2,1)}
+body.motion .pk:hover{transform:translateY(-8px)}
+/* headings reveal */
+body.motion .h2{clip-path:inset(0 0 100% 0);transform:translateY(30px);transition:clip-path 1s cubic-bezier(.7,0,.2,1),transform 1s cubic-bezier(.7,0,.2,1)}
+body.motion .h2.in{clip-path:inset(0 0 -10% 0);transform:none}
+/* small life */
+body.motion .offer .oi{animation:bob 2.4s ease-in-out infinite}
+body.motion .offer li:nth-child(2) .oi{animation-delay:.3s}body.motion .offer li:nth-child(3) .oi{animation-delay:.6s}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-5px) rotate(-6deg)}}
+body.motion .svc{transition:transform .35s cubic-bezier(.2,.8,.2,1),border-color .25s}
+body.motion .svc:hover{transform:translateY(-6px)}
+body.motion .step{display:inline-block;animation:stepin 1s cubic-bezier(.2,.8,.2,1) both}
+body.motion .clip:nth-child(2) .step{animation-delay:.15s}body.motion .clip:nth-child(3) .step{animation-delay:.3s}body.motion .clip:nth-child(4) .step{animation-delay:.45s}
+@keyframes stepin{from{opacity:0;transform:translateY(20px) scale(.9)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){body.motion *{animation:none!important;transition:none!important}}

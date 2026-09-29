@@ -3,27 +3,37 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <meta name="theme-color" content="#0C0B10"/>
+  <meta name="theme-color" content="#050607"/>
   <title>DS Editing — Conditions de collaboration</title>
   <link rel="icon" type="image/png" href="assets/logo.png"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&display=swap" rel="stylesheet"/>
   <style>
-    :root{--bg:#0C0B10;--surface:#16141A;--line:rgba(237,232,220,.10);--cream:#EDE8DC;--taupe:#8A8378;--amber:#FF6A2B}
-    *{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--cream);font-family:"Archivo",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
-    .mono{font-family:"JetBrains Mono",monospace;letter-spacing:.14em;text-transform:uppercase;font-size:10px;color:var(--taupe)}
-    header{border-bottom:1px solid var(--line)}.hd{max-width:760px;margin:0 auto;padding:14px 16px;display:flex;align-items:center;gap:12px}.hd img{width:34px;height:34px;border-radius:50%}
-    .hd b{font-weight:600}.lang{margin-left:auto;background:none;border:1px solid var(--line);color:var(--taupe);border-radius:999px;padding:6px 10px;cursor:pointer;font:inherit;font-size:12px}
+    :root{--bg:#050607;--surface:#0F1114;--surface-2:#161A1F;--line:rgba(255,255,255,.09);--line-strong:rgba(255,255,255,.22);--cream:#F5F5F1;--taupe:#9AA3AD;--amber:#DCE3EA;--amber-soft:rgba(220,227,234,.12);--ok:#46D369;--err:#F08A82;--warn:#F5C400;--blue:#7FB0E0;--accent2:#B9C9DA;--chrome:linear-gradient(180deg,#FFFFFF 0%,#E3E7EC 38%,#9BA4AE 72%,#D6DBE0 100%);--chrome2:linear-gradient(95deg,#B9C9DA 0%,#7FA3CF 45%,#E6ECF2 100%);--glass:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02))}
+    *{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--cream);font-family:'Geist',system-ui,sans-serif;font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+    body{background:radial-gradient(1200px 700px at 85% -5%,rgba(125,155,195,.16),transparent 60%),radial-gradient(900px 600px at -10% 40%,rgba(160,170,185,.08),transparent 60%),#050607;background-attachment:fixed}
+    .mono{font-family:'Geist',system-ui,sans-serif;font-weight:600;font-size:11px;letter-spacing:.06em;text-transform:uppercase;font-variant-numeric:tabular-nums;color:var(--taupe)}
+    .display{font-family:'Geist',system-ui,sans-serif;font-weight:600;letter-spacing:-.035em;text-transform:none;line-height:.98;background:var(--chrome);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .lv-rec{display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:22px;letter-spacing:-.04em;line-height:1;color:var(--cream);white-space:nowrap}
+    .lv-rec i{width:9px;height:9px;border-radius:50%;background:var(--amber);box-shadow:0 0 12px var(--amber);animation:blink 1.6s infinite;margin-right:2px}
+    .lv-rec em{font-style:normal;font-size:11px;font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:var(--taupe);margin-left:2px}
+    @keyframes blink{50%{opacity:.2}}
+    header{position:sticky;top:0;z-index:10;background:rgba(8,9,11,.62);-webkit-backdrop-filter:blur(22px) saturate(1.4);backdrop-filter:blur(22px) saturate(1.4);border-bottom:1px solid var(--line)}.hd{max-width:760px;margin:0 auto;padding:14px 16px;display:flex;align-items:center;gap:12px}
+    .hd b{font-weight:600;display:none} /* le nom est déjà porté par le logo « ● Rec » */
+    .lang{margin-left:auto;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.16);color:#fff;border-radius:999px;height:36px;padding:0 14px;cursor:pointer;font:inherit;font-size:12px;font-weight:600;letter-spacing:-.01em;-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);transition:border-color .2s,background .2s}.lang:hover{border-color:rgba(220,230,240,.35);background:rgba(255,255,255,.08)}
     main{max-width:760px;margin:0 auto;padding:36px 16px 80px;line-height:1.6}
-    h1{font-family:"Anton",Impact,sans-serif;font-weight:400;text-transform:uppercase;font-size:clamp(32px,6vw,50px);line-height:1;margin:12px 0 6px}
-    h2{font-size:15px;margin:28px 0 6px;color:var(--amber);letter-spacing:.02em}
-    p{margin:0 0 8px;color:var(--cream)}.sub{color:var(--taupe)}
-    a{color:var(--amber)}
+    h1{font-family:'Geist',system-ui,sans-serif;font-weight:600;letter-spacing:-.035em;text-transform:none;font-size:clamp(32px,6vw,50px);line-height:.98;margin:12px 0 10px;background:var(--chrome);-webkit-background-clip:text;background-clip:text;color:transparent}
+    p{margin:0 0 8px;color:var(--cream)}.sub{color:var(--taupe);margin:0 0 26px}
+    /* chaque condition = h2 + p, rendus en une seule carte verre 22px (le h2 porte le haut, le p le bas) */
+    h2{font-family:'Geist',system-ui,sans-serif;font-weight:600;font-size:16px;letter-spacing:-.015em;line-height:1.25;margin:12px 0 0;padding:18px 22px 6px;background:rgba(255,255,255,.04);border:1px solid var(--line);border-bottom:0;border-radius:22px 22px 0 0;box-shadow:inset 0 1px 0 rgba(255,255,255,.08);color:var(--cream)}
+    h2+p{margin:0 0 12px;padding:0 22px 18px;background:rgba(255,255,255,.04);border:1px solid var(--line);border-top:0;border-radius:0 0 22px 22px;color:var(--cream)}
+    a{color:var(--amber);text-decoration-color:rgba(220,227,234,.4);text-underline-offset:3px;transition:text-decoration-color .2s}a:hover{text-decoration-color:var(--amber)}
+    @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
   </style>
 </head>
 <body>
-<header><div class="hd"><img src="assets/logo.png" alt=""/><b>DS Editing</b><button class="lang" id="langBtn" type="button">EN</button></div></header>
+<header><div class="hd"><span class="lv-rec"><i></i>DS<em>Editing</em></span><b>DS Editing</b><button class="lang" id="langBtn" type="button">EN</button></div></header>
 <main id="main"></main>
 <script>
 const T = {

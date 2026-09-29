@@ -4,68 +4,89 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <meta name="robots" content="noindex,nofollow"/>
-  <meta name="theme-color" content="#0C0B10"/>
+  <meta name="theme-color" content="#050607"/>
   <title>DS Editing — Production</title>
   <link rel="icon" type="image/png" href="../assets/logo.png"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&display=swap" rel="stylesheet"/>
   <style>
-    :root{--bg:#0C0B10;--surface:#16141A;--surface-2:#1D1A22;--line:rgba(237,232,220,.10);--line-strong:rgba(237,232,220,.22);--cream:#EDE8DC;--taupe:#8A8378;--amber:#FF6A2B;--amber-soft:rgba(255,106,43,.14);--ok:#5FD39A;--warn:#F5C400;--err:#F08A82;--blue:#7FB0E0;--av:44px}
+    :root{--bg:#050607;--surface:#0F1114;--surface-2:#161A1F;--line:rgba(255,255,255,.09);--line-strong:rgba(255,255,255,.22);--cream:#F5F5F1;--taupe:#9AA3AD;--amber:#DCE3EA;--amber-soft:rgba(220,227,234,.12);--ok:#46D369;--warn:#F5C400;--err:#F08A82;--blue:#7FB0E0;--accent2:#B9C9DA;--chrome:linear-gradient(180deg,#FFFFFF 0%,#E3E7EC 38%,#9BA4AE 72%,#D6DBE0 100%);--chrome2:linear-gradient(95deg,#B9C9DA 0%,#7FA3CF 45%,#E6ECF2 100%);--glass:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));--av:44px;color-scheme:dark}
     *{box-sizing:border-box}
-    html,body{margin:0;background:var(--bg);color:var(--cream);font-family:"Archivo",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+    [hidden]{display:none!important}
+    html,body{margin:0;background:var(--bg);color:var(--cream);font-family:'Geist',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+    body{background:radial-gradient(1200px 700px at 85% -5%,rgba(125,155,195,.16),transparent 60%),radial-gradient(900px 600px at -10% 40%,rgba(160,170,185,.08),transparent 60%),#050607;background-attachment:fixed;line-height:1.45}
     a{color:inherit}
-    .mono{font-family:"JetBrains Mono",ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;font-size:10px;color:var(--taupe)}
-    .display{font-family:"Anton",Impact,sans-serif;font-weight:400;letter-spacing:.01em;text-transform:uppercase;line-height:1}
-    button,input,select{font:inherit}
-    .btn{border:none;border-radius:999px;padding:10px 16px;font-size:13px;font-weight:600;cursor:pointer;background:var(--amber);color:#0C0B10}
-    .btn.ghost{background:none;color:var(--taupe);border:1px solid var(--line)}
-    .btn.ghost:hover{color:var(--cream);border-color:var(--line-strong)}
-    .in,select.in{background:var(--bg);color:var(--cream);border:1px solid var(--line);border-radius:9px;padding:9px 11px;font-size:13px;outline:none;width:100%}
-    .in:focus{border-color:rgba(255,106,43,.6)}
+    .mono{font-family:'Geist',system-ui,sans-serif;font-weight:600;font-size:11px;letter-spacing:.06em;text-transform:uppercase;font-variant-numeric:tabular-nums;color:var(--taupe)}
+    .display{font-family:'Geist',system-ui,sans-serif;font-weight:600;letter-spacing:-.035em;text-transform:none;line-height:1.06;padding:.02em 0 .08em;background:var(--chrome);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .display em,.display .ac{font-style:normal;background:var(--chrome2);-webkit-background-clip:text;background-clip:text;color:transparent}
+    button,input,select,textarea{font:inherit}
+    /* boutons : fantôme par défaut, primaire chromé pour #loginBtn, #recalcAll, #xAdd */
+    .btn{display:inline-flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.16);border-radius:999px;height:38px;padding:0 16px;font-size:13px;font-weight:600;letter-spacing:-.01em;line-height:1;cursor:pointer;background:rgba(255,255,255,.06);color:#fff;text-decoration:none;white-space:nowrap;-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);transition:background .2s,border-color .2s,color .2s,box-shadow .2s}
+    .btn:hover{border-color:rgba(220,230,240,.35);background:rgba(255,255,255,.08)}
+    .btn.ghost{background:rgba(255,255,255,.06);color:#fff;border:1px solid rgba(255,255,255,.16)}
+    .btn.ghost:hover{color:#fff;border-color:rgba(220,230,240,.35);background:rgba(255,255,255,.08)}
+    #loginBtn,#recalcAll,#xAdd,#rdvSave{border-color:transparent;background:linear-gradient(180deg,#FFFFFF,#C9D0D7);color:#0A0B0D;box-shadow:inset 0 1px 0 #fff,0 8px 30px rgba(180,200,225,.18);-webkit-backdrop-filter:none;backdrop-filter:none}
+    #loginBtn:hover,#recalcAll:hover,#xAdd:hover,#rdvSave:hover{background:linear-gradient(180deg,#fff,#E4E8EC);border-color:transparent}
+    .btn:disabled,.btn[disabled]{opacity:.45;cursor:default}
+    .btn:focus-visible,.chip:focus-visible,.tab:focus-visible,.ed:focus-visible,.st:focus-visible,.more:focus-visible{outline:2px solid rgba(220,227,234,.6);outline-offset:2px}
+    .in,select.in{background:rgba(255,255,255,.04);color:var(--cream);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:13px;outline:none;width:100%;transition:border-color .2s,box-shadow .2s}
+    .in::placeholder{color:rgba(154,163,173,.6)}
+    .in:focus{border-color:rgba(220,227,234,.6);box-shadow:0 0 0 3px rgba(220,227,234,.14)}
+    .in.bad{border-color:var(--err)}
+    .in:disabled{opacity:.45;cursor:not-allowed}
+    select.in option{background:var(--surface);color:var(--cream)}
+    input[type="checkbox"]{accent-color:var(--amber)}
 
-    header{position:sticky;top:0;z-index:20;background:rgba(12,11,16,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+    header{position:sticky;top:0;z-index:20;background:rgba(8,9,11,.62);-webkit-backdrop-filter:blur(22px) saturate(1.4);backdrop-filter:blur(22px) saturate(1.4);border-bottom:1px solid var(--line)}
     .hd{display:flex;align-items:center;gap:14px;padding:12px 20px}
-    .hd img{width:34px;height:34px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 1px rgba(255,106,43,.4)}
-    .hd .brand{display:flex;flex-direction:column;line-height:1.1}
-    .hd .brand b{font-weight:600}
+    .hd .brand{display:flex;flex-direction:column;justify-content:center;line-height:1.1;min-height:22px;padding-left:12px;border-left:1px solid var(--line)}
+    .hd .brand b{display:none} /* le nom est déjà porté par le logo « ● Rec » */
     .hd .right{margin-left:auto;display:flex;align-items:center;gap:10px}
-    .clock{font-family:"JetBrains Mono",monospace;font-size:13px;color:var(--taupe)}
+    .lv-rec{display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:22px;letter-spacing:-.04em;line-height:1;color:var(--cream);white-space:nowrap}
+    .lv-rec i{width:9px;height:9px;border-radius:50%;background:var(--amber);box-shadow:0 0 12px var(--amber);animation:blink 1.6s infinite;margin-right:2px}
+    .lv-rec em{font-style:normal;font-size:11px;font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:var(--taupe);margin-left:2px}
+    @keyframes blink{50%{opacity:.2}}
+    .clock{font-family:'Geist',system-ui,sans-serif;font-size:13px;color:var(--taupe);font-variant-numeric:tabular-nums}
     .who{font-size:13px;color:var(--taupe)}
     .who b{color:var(--cream);font-weight:500}
-    .live{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--taupe)}
+    .live{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--taupe)}
     .live i{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 10px var(--ok)}
 
     main{padding:18px 20px 60px}
     /* ---- barre des monteurs ---- */
     .edbar{display:flex;gap:10px;flex-wrap:wrap;align-items:stretch;margin-bottom:16px}
-    .ed{display:flex;align-items:center;gap:10px;padding:8px 16px 8px 8px;border:1px solid var(--line-strong);border-radius:999px;background:var(--surface);cursor:pointer;user-select:none;transition:border-color .15s,background .15s}
-    .ed:hover{border-color:var(--amber)}
-    .ed.on{border-color:var(--amber);background:var(--amber-soft);box-shadow:0 0 0 1px var(--amber) inset}
+    .ed{display:flex;align-items:center;gap:10px;padding:8px 16px 8px 8px;border:1px solid var(--line);border-radius:999px;background:var(--surface);cursor:pointer;user-select:none;transition:border-color .2s,background .2s}
+    .ed:hover{border-color:var(--line-strong)}
+    .ed.on{border-color:rgba(220,230,240,.5);background:var(--amber-soft);box-shadow:0 0 0 1px rgba(220,230,240,.2) inset}
     .ed .nm{font-size:16px;font-weight:600;line-height:1}
-    .ed .ct{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--taupe);margin-top:3px}
-    .ed.on .ct{color:var(--amber)}
+    .ed .ct{font-family:'Geist',system-ui,sans-serif;font-size:11px;color:var(--taupe);margin-top:3px;font-variant-numeric:tabular-nums}
+    .ed.on .ct{color:var(--accent2)}
     .ed.all .av{background:var(--surface-2);color:var(--cream)}
-    .av{width:var(--av);height:var(--av);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:calc(var(--av) * .38);color:#0C0B10;flex:none;overflow:hidden;letter-spacing:.02em}
+    .av{width:var(--av);height:var(--av);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:calc(var(--av) * .38);color:#0A0B0D;flex:none;overflow:hidden;letter-spacing:.02em}
     .av img{width:100%;height:100%;object-fit:cover}
     .av.sm{--av:30px}
 
     .stats{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:16px}
     @media (max-width:900px){.stats{grid-template-columns:repeat(2,1fr)}}
-    .stat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 16px}
-    .stat .v{font-family:"Anton",Impact,sans-serif;font-size:32px;line-height:1;margin-top:6px}
+    .stat{background:var(--glass);border:1px solid var(--line);border-radius:22px;padding:14px 18px;-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+    .stat .v{font-family:'Geist',system-ui,sans-serif;font-weight:600;font-size:32px;line-height:1;letter-spacing:-.035em;font-variant-numeric:tabular-nums;margin-top:6px}
     .stat.warn .v{color:var(--warn)}.stat.err .v{color:var(--err)}.stat.ok .v{color:var(--ok)}.stat.amber .v{color:var(--amber)}
     .toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
-    .chip{border:1px solid var(--line-strong);background:none;color:var(--cream);border-radius:999px;padding:8px 13px;font-size:13px;cursor:pointer}
-    .chip.on,.chip:hover{border-color:var(--amber);color:var(--amber);background:var(--amber-soft)}
+    .chip{border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.04);color:var(--cream);border-radius:999px;padding:8px 13px;font-size:13px;font-weight:500;cursor:pointer;transition:border-color .2s,background .2s,color .2s}
+    .chip:hover{border-color:rgba(220,230,240,.35)}
+    .chip.on{border-color:rgba(220,230,240,.5);background:var(--amber-soft);color:#fff}
     .toolbar .search{margin-left:auto;width:240px}
 
     /* ---- lignes ---- */
     .board{display:flex;flex-direction:column;gap:8px}
-    .job{display:grid;grid-template-columns:92px 1.3fr 210px 200px 1.1fr 160px 150px 40px;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--line-strong);border-radius:12px;padding:10px 14px;font-size:13px;position:relative}
-    .job.g{border-left-color:var(--ok)}.job.o{border-left-color:var(--warn)}.job.r{border-left-color:var(--err)}.job.done{border-left-color:var(--blue);opacity:.7}
-    .job .tok{font-family:"JetBrains Mono",monospace;font-size:14px;color:var(--amber);font-weight:500}
-    .job .tok small{display:block;color:var(--taupe);font-size:10px;font-weight:400;margin-top:3px;letter-spacing:.05em}
+    .job{display:grid;grid-template-columns:92px 1.3fr 210px 200px 1.1fr 160px 150px 40px;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--line-strong);border-radius:14px;padding:10px 14px;font-size:13px;position:relative}
+    .job.g{border-left-color:var(--ok);background:linear-gradient(90deg,rgba(70,211,105,.12),rgba(70,211,105,0) 32%),var(--surface)}
+    .job.o{border-left-color:var(--warn);background:linear-gradient(90deg,rgba(245,196,0,.12),rgba(245,196,0,0) 32%),var(--surface)}
+    .job.r{border-left-color:var(--err);background:linear-gradient(90deg,rgba(240,138,130,.12),rgba(240,138,130,0) 32%),var(--surface)}
+    .job.done{border-left-color:var(--blue);background:var(--surface);opacity:.6}
+    .job .tok{font-family:'Geist',system-ui,sans-serif;font-size:14px;color:var(--accent2);font-weight:600;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+    .job .tok small{display:block;color:var(--taupe);font-size:10px;font-weight:500;margin-top:3px;letter-spacing:.04em;font-variant-numeric:tabular-nums}
     .job .c b{display:block;font-weight:600;font-size:14px}
     .job .c em{display:block;font-style:normal;margin-top:2px}
     .job .c span{display:block;font-size:11px;color:var(--taupe);margin-top:3px}
@@ -75,63 +96,172 @@
     .eds .row{display:flex;align-items:center}
     .eds .row .av{margin-right:-8px;box-shadow:0 0 0 2px var(--surface)}
     .eds .names{font-size:12px;line-height:1.3}
-    .eds .none{color:var(--taupe);font-size:12px;border:1px dashed var(--line-strong);border-radius:8px;padding:6px 10px;text-align:center}
+    .eds .none{color:var(--taupe);font-size:12px;border:1px dashed var(--line-strong);border-radius:999px;padding:6px 10px;text-align:center;transition:border-color .2s,color .2s}
     .eds.can .none:hover{border-color:var(--amber);color:var(--amber)}
-    .pop{position:absolute;z-index:30;top:calc(100% + 6px);left:0;min-width:230px;background:var(--surface-2);border:1px solid var(--line-strong);border-radius:12px;padding:8px;box-shadow:0 14px 40px rgba(0,0,0,.5);display:grid;grid-template-columns:1fr 1fr;gap:2px}
-    .pop label{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:8px;cursor:pointer;font-size:13px}
+    .pop{position:absolute;z-index:30;top:calc(100% + 6px);left:0;min-width:230px;background:var(--surface-2);border:1px solid var(--line-strong);border-radius:16px;padding:8px;box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 14px 40px rgba(0,0,0,.55);display:grid;grid-template-columns:1fr 1fr;gap:2px}
+    .pop label{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:10px;cursor:pointer;font-size:13px;transition:background .15s}
     .pop label:hover{background:var(--amber-soft)}
     .pop input{accent-color:var(--amber)}
     .edcell{position:relative}
     /* date souhaitée + chrono */
-    .due{display:flex;flex-direction:column;gap:2px;padding:6px 10px;border-radius:10px;border:1px solid var(--line)}
-    .due .k{font-family:"JetBrains Mono",monospace;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--taupe)}
-    .due .dt{font-family:"Anton",Impact,sans-serif;font-size:22px;line-height:1.05;letter-spacing:.01em}
-    .due .cd{font-family:"JetBrains Mono",monospace;font-size:15px;font-weight:700;letter-spacing:.02em}
+    .due{display:flex;flex-direction:column;gap:2px;padding:8px 12px;border-radius:14px;border:1px solid var(--line);border-left:3px solid var(--line-strong);background:rgba(255,255,255,.03)}
+    .due .k{font-family:'Geist',system-ui,sans-serif;font-weight:600;font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--taupe)}
+    .due .dt{font-family:'Geist',system-ui,sans-serif;font-weight:600;font-size:22px;line-height:1.05;letter-spacing:-.03em}
+    .due .cd{font-family:'Geist',system-ui,sans-serif;font-size:15px;font-weight:700;letter-spacing:0;font-variant-numeric:tabular-nums}
     .due .team{font-size:11px;color:var(--taupe)}
-    .due.g{border-color:rgba(95,211,154,.35)}.due.g .cd{color:var(--ok)}
-    .due.o{border-color:rgba(245,196,0,.45);background:rgba(245,196,0,.06)}.due.o .cd{color:var(--warn)}
-    .due.r{border-color:rgba(240,138,130,.6);background:rgba(240,138,130,.10)}.due.r .cd,.due.r .dt{color:var(--err)}
-    .due.done{opacity:.7}.due.done .cd{color:var(--blue)}
-    .links a{display:inline-block;font-size:12px;color:var(--cream);border:1px solid var(--line);border-radius:7px;padding:4px 8px;margin:2px 4px 2px 0;text-decoration:none}
-    .links a:hover{border-color:var(--amber);color:var(--amber)}
-    .badge{display:inline-block;font-size:10px;letter-spacing:.08em;text-transform:uppercase;border-radius:6px;padding:3px 7px;color:var(--taupe);border:1px solid var(--line)}
-    .badge.ok{color:var(--ok);border-color:rgba(95,211,154,.4)}.badge.err{color:var(--err);border-color:rgba(240,138,130,.5)}
+    .due.g{border-color:rgba(70,211,105,.3);border-left-color:var(--ok);background:rgba(70,211,105,.12)}.due.g .cd{color:var(--ok)}
+    .due.o{border-color:rgba(245,196,0,.35);border-left-color:var(--warn);background:rgba(245,196,0,.12)}.due.o .cd{color:var(--warn)}
+    .due.r{border-color:rgba(240,138,130,.45);border-left-color:var(--err);background:rgba(240,138,130,.12)}.due.r .cd,.due.r .dt{color:var(--err)}
+    .due.done{opacity:.7;border-left-color:var(--blue)}.due.done .cd{color:var(--blue)}
+    .links a{display:inline-block;font-size:12px;color:var(--cream);border:1px solid var(--line);background:rgba(255,255,255,.04);border-radius:999px;padding:4px 10px;margin:2px 4px 2px 0;text-decoration:none;transition:border-color .2s,color .2s}
+    .links a:hover{border-color:rgba(220,230,240,.35);color:#fff}
+    .badge{display:inline-block;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;border-radius:999px;padding:3px 9px;color:var(--taupe);border:1px solid var(--line)}
+    .badge.ok{color:var(--ok);border-color:rgba(70,211,105,.4);background:rgba(70,211,105,.12)}.badge.err{color:var(--err);border-color:rgba(240,138,130,.5);background:rgba(240,138,130,.12)}
     .steps{display:flex;gap:6px;flex-wrap:wrap}
-    .st{display:inline-flex;align-items:center;gap:5px;font-size:11px;border:1px solid var(--line);border-radius:7px;padding:5px 8px;cursor:pointer;color:var(--taupe);user-select:none}
-    .st.on{color:var(--ok);border-color:rgba(95,211,154,.4);background:rgba(95,211,154,.08)}
-    .st.auto{cursor:default}
+    .st{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:500;border:1px solid var(--line);border-radius:999px;padding:5px 10px;cursor:pointer;color:var(--taupe);user-select:none;transition:border-color .2s,background .2s,color .2s}
+    .st:not(.on):not(.auto):not([aria-disabled="true"]):hover{border-color:var(--line-strong);color:var(--cream)}
+    .st.on{color:#0A0B0D;border-color:rgba(255,255,255,.85);background:rgba(255,255,255,.85)}
+    .st.auto{cursor:default;border-color:rgba(70,211,105,.5)}
+    .st.auto.on{border-color:var(--ok)}
     .st[aria-disabled="true"]{cursor:not-allowed;opacity:.6}
     .qc{display:flex;flex-direction:column;gap:5px}
     .qc select{padding:6px 8px;font-size:12px}
-    .qc.ok select{color:var(--ok)}.qc.revisions select{color:var(--err)}
-    .more{background:none;border:1px solid var(--line);color:var(--taupe);border-radius:8px;width:32px;height:32px;cursor:pointer}
-    .more:hover{color:var(--cream);border-color:var(--line-strong)}
-    .detail{grid-column:1/-1;display:none;gap:14px;padding:10px 4px 4px;border-top:1px solid var(--line);margin-top:6px;font-size:13px;color:var(--taupe);grid-template-columns:1fr 1fr 1fr}
+    .qc.pending select{color:var(--warn);border-color:rgba(245,196,0,.35)}
+    .qc.ok select{color:var(--ok);border-color:rgba(70,211,105,.4);background:rgba(70,211,105,.12)}.qc.revisions select{color:var(--err);border-color:rgba(240,138,130,.5);background:rgba(240,138,130,.12)}
+    .more{background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--taupe);border-radius:50%;width:32px;height:32px;cursor:pointer;transition:border-color .2s,color .2s,background .2s}
+    .more:hover{color:var(--cream);border-color:var(--line-strong);background:rgba(255,255,255,.08)}
+    .detail{grid-column:1/-1;display:none;gap:14px;padding:12px 4px 4px;border-top:1px solid var(--line);margin-top:6px;font-size:13px;color:var(--taupe);grid-template-columns:1fr 1fr 1fr}
     .job.open .detail{display:grid}
     .detail b{display:block;color:var(--cream);font-weight:500;margin-bottom:4px}
     .detail .lk{white-space:pre-wrap;word-break:break-all;font-size:12px}
+    .detail a{color:var(--accent2)}
     .empty{padding:60px 20px;text-align:center;color:var(--taupe)}
     @media (max-width:1180px){.job{grid-template-columns:1fr 1fr 1fr;row-gap:10px}.job .detail{grid-template-columns:1fr}}
+    @media (max-width:700px){.hd{flex-wrap:wrap;gap:8px 10px}.hd .right{flex-wrap:wrap;justify-content:flex-end}.tabs{margin-left:0}.due .dt{font-size:18px}}
 
     /* onglets admin */
     .tabs{display:flex;gap:4px;margin-left:18px}
-    .tab{background:none;border:1px solid transparent;color:var(--taupe);border-radius:999px;padding:8px 14px;font-size:13px;cursor:pointer}
-    .tab.on{color:var(--amber);border-color:var(--amber);background:var(--amber-soft)}
+    .tab{background:none;border:1px solid transparent;color:var(--taupe);border-radius:999px;padding:8px 14px;font-size:13px;font-weight:500;cursor:pointer;transition:border-color .2s,background .2s,color .2s}
+    .tab:hover{color:var(--cream)}
+    .tab.on{color:#fff;border-color:rgba(220,230,240,.5);background:var(--amber-soft)}
     .admin{display:grid;gap:14px}
-    .panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
-    .panel h3{margin:0 0 10px;font-size:16px}
+    .panel{background:var(--glass);border:1px solid var(--line);border-radius:22px;padding:18px 20px;-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+    .panel h3{margin:0 0 10px;font-size:16px;font-weight:600;letter-spacing:-.02em}
     .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
     .grid label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--taupe)}
     .grid input{width:100%}
     table.adm{width:100%;border-collapse:collapse;font-size:13px}
-    table.adm th{text-align:left;font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--taupe);padding:8px 8px;border-bottom:1px solid var(--line)}
-    table.adm td{padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
+    table.adm th{text-align:left;font-family:'Geist',system-ui,sans-serif;font-weight:600;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--taupe);padding:8px 8px;border-bottom:1px solid var(--line)}
+    table.adm td{padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:middle;font-variant-numeric:tabular-nums}
     .row-form{display:grid;grid-template-columns:1.2fr 2fr 80px 110px auto auto;gap:8px;align-items:end}
     .row-form label{display:flex;flex-direction:column;gap:4px;font-size:11px;color:var(--taupe)}
     .amount{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px}
-    .amount .big{font-family:"Anton",Impact,sans-serif;font-size:20px}
+    .amount .big{font-family:'Geist',system-ui,sans-serif;font-weight:600;font-size:20px;letter-spacing:-.02em;color:var(--cream);font-variant-numeric:tabular-nums}
     .amount .miss{color:var(--err);font-size:12px}
+    /* onglet Rendez-vous : plages par jour, liste des appels */
+    .wk{display:grid;grid-template-columns:110px repeat(2,minmax(0,1fr));gap:8px 14px;align-items:center;padding:7px 0;border-bottom:1px solid var(--line);font-size:13px}
+    .wk:last-child{border-bottom:0}
+    .wk b{font-weight:500}
+    .wk .rg{display:flex;align-items:center;gap:6px;color:var(--taupe)}
+    .wk input[type="time"]{width:auto;padding:7px 10px;font-variant-numeric:tabular-nums}
+    .wk.off b{color:var(--taupe)}
+    .rdv-when{font-variant-numeric:tabular-nums;white-space:nowrap}
+    .rdv-when small{display:block;color:var(--taupe);font-size:11px}
+    .rdv-notes{max-width:260px;font-size:12px;color:var(--taupe);white-space:pre-wrap}
+    .rdv-past td{opacity:.6}
+    table.adm .st-sel{width:auto;padding:6px 8px;font-size:12px}
+    table.adm .st-sel.confirmed{color:var(--ok);border-color:rgba(70,211,105,.4);background:rgba(70,211,105,.12)}
+    table.adm .st-sel.cancelled,table.adm .st-sel.no_show{color:var(--err);border-color:rgba(240,138,130,.5);background:rgba(240,138,130,.12)}
+    table.adm .st-sel.done{color:var(--blue);border-color:rgba(127,176,224,.4);background:rgba(127,176,224,.12)}
+    @media (max-width:700px){.wk{grid-template-columns:1fr}}
+    /* ---- PC du bureau : état du téléchargement sur la ligne ---- */
+    .dl{flex-basis:100%;min-width:0;display:flex;align-items:center;gap:4px 8px;flex-wrap:wrap;font-size:11px;line-height:1.35;color:var(--taupe);font-variant-numeric:tabular-nums}
+    .dl .dlp{display:inline-flex;align-items:center;gap:6px;max-width:100%;border:1px solid var(--line);border-radius:999px;padding:3px 9px;font-weight:600;color:var(--taupe)}
+    .dl .dlp i{width:6px;height:6px;border-radius:50%;background:currentColor;flex:none}
+    .dl .dlm{color:var(--cream);opacity:.86}
+    .dl.ready .dlp{color:var(--ok);border-color:rgba(70,211,105,.4);background:rgba(70,211,105,.12)}
+    .dl.running .dlp{color:var(--blue);border-color:rgba(127,176,224,.4);background:rgba(127,176,224,.12)}
+    .dl.running.now .dlp i{animation:blink 1.6s infinite}
+    .dl.access .dlp{color:var(--warn);border-color:rgba(245,196,0,.35);background:rgba(245,196,0,.12)}
+    .dl.error .dlp,.dl.abandon .dlp{color:var(--err);border-color:rgba(240,138,130,.5);background:rgba(240,138,130,.12)}
+    .dl.purged .dlp{border-style:dashed}
+    .chip .n{display:inline-block;min-width:20px;margin-left:6px;padding:1px 6px;border-radius:999px;background:rgba(255,255,255,.1);font-size:11px;font-weight:600;text-align:center;font-variant-numeric:tabular-nums}
+    .chip.has .n{background:rgba(70,211,105,.18);color:var(--ok)}
+    .badge.warn{color:var(--warn);border-color:rgba(245,196,0,.35);background:rgba(245,196,0,.12)}
+    /* bloc « Fichiers sur le PC du bureau » du panneau de détail */
+    .fx{grid-column:1/-1;display:grid;gap:10px;background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+    .fx .fxh{display:flex;align-items:center;gap:8px 12px;flex-wrap:wrap}
+    .fx .fxh b{margin:0}
+    .fx .fxp{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+    .fx .fxpath{flex:1 1 320px;min-width:0;font-size:13px;color:var(--cream);background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:12px;padding:8px 12px;word-break:break-all;user-select:all;font-variant-numeric:tabular-nums}
+    .fx .fxpath.gone{color:var(--taupe);text-decoration:line-through}
+    .fx .btn{height:34px;padding:0 14px;font-size:12px}
+    .fx .btn.okd{color:var(--ok);border-color:rgba(70,211,105,.4);background:rgba(70,211,105,.12)}
+    .fx .fxkv{display:flex;gap:8px 24px;flex-wrap:wrap}
+    .fx .fxkv span{display:flex;flex-direction:column;gap:2px}
+    .fx .fxkv em{font-style:normal;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--taupe)}
+    .fx .fxkv strong{font-weight:600;font-size:13px;color:var(--cream);font-variant-numeric:tabular-nums}
+    .fx .fxerr{margin:0;padding:0;list-style:none;display:grid;gap:6px;font-size:12px}
+    .fx .fxerr li{display:flex;gap:2px 8px;flex-wrap:wrap;align-items:baseline;border-left:2px solid var(--err);padding:2px 0 2px 10px}
+    .fx .fxerr .u{word-break:break-all;color:var(--accent2)}
+    .fx .fxerr .why{color:var(--err)}
+    .fx .fxa{display:flex;align-items:center;gap:8px 12px;flex-wrap:wrap}
+    .fx .fxmsg{font-size:12px;color:var(--ok)}
+    /* pastille du PC dans l'en-tête + infobulle */
+    .pcw{position:relative;display:inline-flex}
+    .pc{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:5px 11px;background:none;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;line-height:1.2;color:var(--taupe);cursor:pointer;white-space:nowrap;font-variant-numeric:tabular-nums;transition:border-color .2s,background .2s,color .2s}
+    .pc:hover{border-color:var(--line-strong)}
+    .pc:focus-visible{outline:2px solid rgba(220,227,234,.6);outline-offset:2px}
+    .pc i{width:8px;height:8px;border-radius:50%;background:var(--taupe);flex:none}
+    .pc.ok i{background:var(--ok);box-shadow:0 0 10px var(--ok)}
+    .pc.warn{color:var(--warn);border-color:rgba(245,196,0,.35);background:rgba(245,196,0,.12)}
+    .pc.warn i{background:var(--warn)}
+    .pc.err{color:var(--err);border-color:rgba(240,138,130,.5);background:rgba(240,138,130,.12)}
+    .pc.err i{background:var(--err)}
+    .pcpop{display:none;gap:9px;position:absolute;z-index:40;top:100%;left:0;margin-top:10px;width:340px;background:var(--surface-2);border:1px solid var(--line-strong);border-radius:16px;padding:14px 16px;box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 14px 40px rgba(0,0,0,.55);font-size:13px;color:var(--cream)}
+    .pcpop::before{content:"";position:absolute;left:0;right:0;top:-12px;height:12px}
+    .pcw.open .pcpop{display:grid}
+    @media (hover:hover){.pcw:hover .pcpop{display:grid}}
+    .pcw.shut .pcpop{display:none}
+    .pcpop .ph{display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .pcpop .ph b{font-weight:600;font-size:14px}
+    .pcpop .pr{display:grid;grid-template-columns:120px minmax(0,1fr);gap:10px;align-items:baseline}
+    .pcpop .pr em{font-style:normal;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--taupe)}
+    .pcpop .pr span{min-width:0;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+    .pcpop .pr strong{font-weight:600}
+    .pcpop p{margin:0;color:var(--taupe)}
+    .pcpop .btn{height:32px;padding:0 14px;font-size:12px;justify-self:start}
+    .bar{position:relative;display:block;height:8px;border-radius:999px;background:rgba(255,255,255,.1);overflow:hidden;margin:4px 0 5px}
+    .bar i{display:block;height:100%;border-radius:999px;background:var(--ok)}
+    .bar.warn i{background:var(--warn)}
+    .bar.err i{background:var(--err)}
+    .bar u{position:absolute;top:0;bottom:0;width:2px;background:rgba(255,255,255,.7)}
+    .pcpop .dk{display:block;font-size:12px;color:var(--taupe)}
+    .pcpop .dk strong{color:var(--cream)}
+    /* bandeau d'alerte au-dessus du tableau */
+    .alerts{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+    .alerts:empty{display:none}
+    .alert{display:flex;align-items:center;gap:12px;border:1px solid rgba(240,138,130,.5);border-left:4px solid var(--err);border-radius:14px;padding:11px 16px;background:rgba(240,138,130,.12);font-size:14px;line-height:1.4}
+    .alert.warn{border-color:rgba(245,196,0,.35);border-left-color:var(--warn);background:rgba(245,196,0,.12)}
+    .alert .ic{flex:none;width:24px;height:24px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:#0A0B0D;background:var(--err)}
+    .alert.warn .ic{background:var(--warn)}
+    .alert b{display:block;font-weight:600;color:var(--err)}
+    .alert.warn b{color:var(--warn)}
+    .alert span.tx{color:var(--cream);opacity:.86;font-size:13px;font-variant-numeric:tabular-nums}
+    /* fichiers prêts : la ligne clignote doucement trois fois */
+    @keyframes filesReady{0%,100%{box-shadow:0 0 0 0 rgba(70,211,105,0)}50%{box-shadow:0 0 0 2px rgba(70,211,105,.6),0 0 30px rgba(70,211,105,.28)}}
+    .job.flash{animation:filesReady 1.2s ease-in-out 3}
+    @media (prefers-reduced-motion:reduce){.job.flash{box-shadow:0 0 0 2px rgba(70,211,105,.6)}}
+    .in[readonly]{color:var(--taupe);cursor:default}
+    .hint{font-size:12px;color:var(--taupe);margin:0 0 12px}
+    @media (max-width:700px){.pcw{position:static}.pcpop{left:12px;right:12px;width:auto;margin-top:6px}.dl .dlp{border-radius:12px}}
     /* mode télé */
+    body.tv .dl{font-size:13px}
+    body.tv .dl .dlp{padding:4px 11px}
+    body.tv .pc{font-size:12px;pointer-events:none}
+    body.tv .pcpop{display:none!important}
+    body.tv .alert{font-size:17px;padding:14px 18px}
+    body.tv .alert span.tx{font-size:15px}
     body.tv{--av:56px}
     body.tv main{padding:14px 18px}
     body.tv .toolbar,body.tv .more,body.tv .detail{display:none}
@@ -142,18 +272,21 @@
     body.tv .hd .right .btn{display:none}
 
     /* connexion */
-    .gate{max-width:380px;margin:90px auto;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:26px}
+    .gate{max-width:380px;margin:90px auto;background:var(--glass);border:1px solid var(--line);border-radius:22px;padding:28px;-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 30px 80px rgba(0,0,0,.4)}
     .gate h1{font-size:28px;margin:0 0 6px}
     .gate p{color:var(--taupe);font-size:14px;margin:0 0 16px}
-    .gate .in{margin-bottom:10px}
+    .gate .in{margin-bottom:10px;padding:12px 14px}
+    .gate .btn{width:100%;height:46px;margin-top:4px;font-size:14px}
     .gate .msg{font-size:13px;color:var(--err);min-height:18px;margin-top:8px}
+    @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
   </style>
 </head>
 <body>
 <header><div class="hd">
-  <img src="../assets/logo.png" alt=""/>
+  <span class="lv-rec"><i></i>DS<em>Editing</em></span>
   <div class="brand"><b>DS Editing</b><span class="mono" data-t="sub"></span></div>
   <span class="live" id="live" hidden><i></i><span data-t="live"></span></span>
+  <span class="pcw" id="pcw" hidden><button type="button" class="pc" id="pc" aria-expanded="false" aria-controls="pcPop"><i></i><span id="pcTxt"></span></button><div class="pcpop" id="pcPop" role="group"></div></span>
   <div class="tabs" id="tabs" hidden></div>
   <div class="right">
     <span class="clock" id="clock"></span>
@@ -178,6 +311,7 @@
     <div class="edbar" id="edbar"></div>
     <div class="stats" id="stats"></div>
     <div class="toolbar" id="toolbar"></div>
+    <div class="alerts" id="alerts" aria-live="polite"></div>
     <div class="board" id="board"></div>
     <div class="admin" id="admin" hidden></div>
   </div>
@@ -194,22 +328,56 @@ const BUSINESS_DAYS_DEFAULT = 5;   // délai par défaut quand le client n'a pas
 const T = {
   fr: { sub: "Production", live: "En direct", tv: "Mode télé", logout: "Déconnexion", login: "Espace équipe", loginSub: "Connecte-toi avec ton e-mail DS Editing.", loginBtn: "Entrer",
     all: "Tous", tasks: (n) => `${n} tâche${n > 1 ? "s" : ""}`, stats: ["Reçues aujourd'hui", "En cours", "En retard", "À contrôler", "Livrées cette semaine"],
-    filters: { all: "Tout", late: "En retard", qc: "À contrôler", done: "Livrées" }, search: "Rechercher…",
+    filters: { all: "Tout", ready: "Fichiers prêts, à démarrer", late: "En retard", qc: "À contrôler", done: "Livrées" }, search: "Rechercher…",
+    dl: { waiting: "En attente", running: "Téléchargement en cours", ready: "Fichiers prêts", error: "Erreur", abandon: "Abandonné", access: "Accès demandé au client", purged: "Nettoyé",
+      tips: { waiting: "Le PC du bureau n'a pas encore commencé le téléchargement.", running: "Le PC du bureau télécharge les rushes.", ready: "Les rushes sont sur le PC du bureau.", access: "Le lien est privé : un e-mail a demandé au client d'ouvrir l'accès.", purged: "Le dossier a été supprimé du PC du bureau après la livraison." },
+      nTry: (n, m) => `essai ${n}/${m}`, nFiles: (n) => `${n} fichier${n > 1 ? "s" : ""}`, nFailed: (n) => `${n} lien${n > 1 ? "s" : ""} en échec`, since: (d) => `depuis ${d}`, pcOn: (k) => `PC Bali occupé sur ${k}`, pcOff: "PC hors ligne", manual: "à télécharger à la main",
+      title: "Fichiers sur le PC du bureau", noPath: "Pas encore de dossier : les rushes ne sont pas téléchargés.", copy: "Copier le chemin", copied: "Chemin copié", copyFail: "Copie impossible", size: "Poids", count: "Fichiers", doneAt: "Téléchargement terminé", startedAt: "Téléchargement démarré", accessAt: "Accès demandé", purgedAt: "Dossier nettoyé", tries: "Essais",
+      failed: "Liens en échec", relaunch: "Relancer le téléchargement", relaunched: "Relancé : le PC du bureau réessaie à son prochain passage." },
+    pc: { name: "PC Bali", title: "PC du bureau", online: "en ligne", late: (d) => `sans signal depuis ${d}`, off: (d) => `hors ligne depuis ${d}`, never: "jamais vu", neverHint: "L'agent de téléchargement n'a encore jamais donné de signal.", lessMin: "moins d'une minute", dayU: "j",
+      machine: "Machine", version: "Version", disk: "Disque", used: "occupé", free: "libres", current: "Commande en cours", idle: "Aucune", lastMsg: "Dernier message", lastSeen: "Dernier signal", ago: (d) => `il y a ${d}`, settings: "Réglages",
+      alertDisk: (p) => `Disque du PC Bali occupé à ${p} %`, alertDiskSub: (f, tot, lim) => `${f} libres sur ${tot}, seuil d'alerte à ${lim} %. Faire de la place avant les prochains téléchargements.`,
+      alertOff: (d) => d ? `PC Bali hors ligne depuis ${d}` : "PC Bali jamais vu en ligne", alertOffSub: (n) => `${n} commande${n > 1 ? "s attendent leurs" : " attend ses"} fichiers. Vérifier que le PC du bureau est allumé et connecté à Internet.`,
+      setTitle: "PC du bureau", setHint: "Réglages de l'agent qui télécharge les rushes sur le PC de Bali. Pris en compte à son prochain passage.", cleanup: "Nettoyage après Qualité OK (jours)", alertPct: "Alerte disque à partir de (%)", pct: (n) => `${n} %`, destRoot: "Dossier racine des rushes (lecture seule)",
+      destHint: "Non modifiable ici : changer de dossier ne déplace pas les rushes déjà téléchargés et fausserait leurs chemins. À faire avec l'équipe technique, sur le PC du bureau.", saved: "enregistré", bad: (a, b) => `Valeur attendue : entre ${a} et ${b}`, missing: "Réglages introuvables : l'agent du PC du bureau n'est pas encore configuré." },
     steps: { dl: "Fichiers", start: "Commencé", half: "50 %", done: "Livré" }, qc: { pending: "Qualité : en attente", ok: "Qualité : OK", revisions: "Qualité : à revoir" },
     wanted: "Date souhaitée", noDate: "sans date", late: "EN RETARD", team: "équipe", delivered: "livré", unassigned: "À attribuer", noEditor: "Aucun monteur", brief: "Brief", files: "Fichiers", frame: "frame.io", empty: "Aucune commande dans cette vue.", received: "Reçu", frameioPh: "Lien frame.io de livraison", noteQc: "Note qualité", notes: "Notes internes", deliveryDate: "Livraison fixée par l'équipe", rushes: "Rushes", email: "E-mail client", contact: "Contact",
-    tabs: { prod: "Production", tarifs: "Tarifs", factures: "Factures" }, amountL: "Montant", amountMiss: "Prix manquant dans la grille :", override: "Montant forcé", recalc: "Recalculer", invoiced: "Facturé", sunday: "facturé dimanche",
+    tabs: { prod: "Production", tarifs: "Tarifs", factures: "Factures", rdv: "Rendez-vous" }, amountL: "Montant", amountMiss: "Prix manquant dans la grille :", override: "Montant forcé", recalc: "Recalculer", invoiced: "Facturé", sunday: "facturé dimanche",
     keys: { podcast_standard: "Épisode podcast · Standard", podcast_premium: "Épisode podcast · Premium", vsl_standard: "VSL · Standard", vsl_premium: "VSL · Premium", reel_standard: "Reel standard", reel_premium: "Reel premium", intro: "Intro", miniature: "Miniature", trailer: "Trailer", cta: "CTA réseaux sociaux", extra_30min: "Supplément 30 min" },
     tarifsHint: "Prix unitaires par client, dans sa devise. Vide = pas encore fixé : la commande validée attend un prix avant d'être facturée.", clientSel: "Client", saved: "enregistré", recalcAll: "Recalculer les commandes validées", space: "Espace client", billing: "Facturation", billingName: "Raison sociale", billingAddress: "Adresse (une ligne par ligne)", billingEmail: "E-mail de facturation", attention: "À l'attention de", currency: "Devise", tvaL: "TVA",
-    factHint: "Une facture par client et par semaine, générée le dimanche à 23 h 50 (Bali). Relance automatique 2 jours après l'envoi.", cols: ["N°", "Client", "Semaine", "Total", "Statut", "Envoyée", ""], markPaid: "Marquer payée", paid: "Payée", issued: "Émise", cancel: "Annuler", extrasTitle: "Lignes manuelles (facturées avec la prochaine facture)", label: "Libellé", qty: "Qté", unit: "Prix unitaire", offered: "Offert", add: "Ajouter", pending: "En attente de facturation", none: "Aucune", del: "Supprimer" },
+    factHint: "Une facture par client et par semaine, générée le dimanche à 23 h 50 (Bali). Relance automatique 2 jours après l'envoi.", cols: ["N°", "Client", "Semaine", "Total", "Statut", "Envoyée", ""], markPaid: "Marquer payée", paid: "Payée", issued: "Émise", cancel: "Annuler", extrasTitle: "Lignes manuelles (facturées avec la prochaine facture)", label: "Libellé", qty: "Qté", unit: "Prix unitaire", offered: "Offert", add: "Ajouter", pending: "En attente de facturation", none: "Aucune", del: "Supprimer",
+    rdv: { settingsTitle: "Disponibilités", hint: "Créneaux proposés sur le site (boutons « Réserver un appel »), en heure de Paris. Deux plages max par jour ; jour vide = fermé. Le prospect voit les horaires dans son propre fuseau.",
+      days: { mon: "Lundi", tue: "Mardi", wed: "Mercredi", thu: "Jeudi", fri: "Vendredi", sat: "Samedi", sun: "Dimanche" }, range: (n) => `Plage ${n}`,
+      slot: "Durée d'un créneau (min)", lead: "Délai minimal avant un créneau (h)", horizon: "Réservable jusqu'à (jours)", tz: "Fuseau des plages", meet: "Lien Google Meet permanent", meetHint: "vide : « le lien vous sera envoyé avant l'appel »", host: "Qui appelle", notify: "E-mails à prévenir (séparés par une virgule)",
+      blocked: "Dates bloquées (une par ligne)", blockedHint: "2026-10-03 · 2026-12-24/2027-01-02 · 2026-10-06T14:00/2026-10-06T16:00 (heure de Paris)", save: "Enregistrer", saved: "enregistré", badRange: "Plage invalide : le début doit précéder la fin",
+      listTitle: "Rendez-vous", upcoming: "À venir", past: "Passés", cols: ["Date (Paris)", "Nom", "Studio", "E-mail", "Téléphone", "Notes", "Statut", "E-mails"],
+      status: { confirmed: "Confirmé", done: "Fait", cancelled: "Annulé", no_show: "Absent" }, none: "Aucun rendez-vous", confirm: "confirmation", reminder: "rappel", local: "chez vous", missing: "Réglages introuvables : appliquer supabase/bookings_v1.sql." } },
   en: { sub: "Production", live: "Live", tv: "TV mode", logout: "Log out", login: "Team space", loginSub: "Sign in with your DS Editing email.", loginBtn: "Enter",
     all: "All", tasks: (n) => `${n} task${n > 1 ? "s" : ""}`, stats: ["Received today", "In progress", "Late", "To review", "Delivered this week"],
-    filters: { all: "All", late: "Late", qc: "To review", done: "Delivered" }, search: "Search…",
+    filters: { all: "All", ready: "Files ready, to start", late: "Late", qc: "To review", done: "Delivered" }, search: "Search…",
+    dl: { waiting: "Waiting", running: "Downloading", ready: "Files ready", error: "Error", abandon: "Gave up", access: "Access requested from client", purged: "Cleaned up",
+      tips: { waiting: "The office PC has not started the download yet.", running: "The office PC is downloading the footage.", ready: "The footage is on the office PC.", access: "The link is private: an email asked the client to open access.", purged: "The folder was removed from the office PC after delivery." },
+      nTry: (n, m) => `attempt ${n}/${m}`, nFiles: (n) => `${n} file${n > 1 ? "s" : ""}`, nFailed: (n) => `${n} failed link${n > 1 ? "s" : ""}`, since: (d) => `since ${d}`, pcOn: (k) => `Bali PC busy on ${k}`, pcOff: "PC offline", manual: "download by hand",
+      title: "Files on the office PC", noPath: "No folder yet: the footage is not downloaded.", copy: "Copy path", copied: "Path copied", copyFail: "Copy failed", size: "Size", count: "Files", doneAt: "Download finished", startedAt: "Download started", accessAt: "Access requested", purgedAt: "Folder cleaned up", tries: "Attempts",
+      failed: "Failed links", relaunch: "Restart download", relaunched: "Restarted: the office PC retries on its next pass." },
+    pc: { name: "Bali PC", title: "Office PC", online: "online", late: (d) => `no signal for ${d}`, off: (d) => `offline for ${d}`, never: "never seen", neverHint: "The download agent has never sent a signal yet.", lessMin: "less than a minute", dayU: "d",
+      machine: "Machine", version: "Version", disk: "Disk", used: "used", free: "free", current: "Current order", idle: "None", lastMsg: "Last message", lastSeen: "Last signal", ago: (d) => `${d} ago`, settings: "Settings",
+      alertDisk: (p) => `Bali PC disk ${p}% full`, alertDiskSub: (f, tot, lim) => `${f} free of ${tot}, alert threshold ${lim}%. Free up space before the next downloads.`,
+      alertOff: (d) => d ? `Bali PC offline for ${d}` : "Bali PC never seen online", alertOffSub: (n) => `${n} order${n > 1 ? "s are waiting for their" : " is waiting for its"} files. Check that the office PC is on and connected to the Internet.`,
+      setTitle: "Office PC", setHint: "Settings of the agent that downloads the footage on the Bali PC. Applied on its next pass.", cleanup: "Clean-up after QC OK (days)", alertPct: "Disk alert from (%)", pct: (n) => `${n}%`, destRoot: "Footage root folder (read-only)",
+      destHint: "Not editable here: changing the folder does not move footage already downloaded and would break its paths. To be done with the tech team, on the office PC.", saved: "saved", bad: (a, b) => `Expected value: between ${a} and ${b}`, missing: "Settings not found: the office PC agent is not configured yet." },
     steps: { dl: "Files", start: "Started", half: "50%", done: "Delivered" }, qc: { pending: "QC: pending", ok: "QC: OK", revisions: "QC: revisions" },
     wanted: "Requested date", noDate: "no date", late: "LATE", team: "team", delivered: "delivered", unassigned: "Unassigned", noEditor: "No editor", brief: "Brief", files: "Files", frame: "frame.io", empty: "No order in this view.", received: "Received", frameioPh: "frame.io delivery link", noteQc: "QC note", notes: "Internal notes", deliveryDate: "Delivery set by the team", rushes: "Footage", email: "Client email", contact: "Contact",
-    tabs: { prod: "Production", tarifs: "Pricing", factures: "Invoices" }, amountL: "Amount", amountMiss: "Missing price in the grid:", override: "Forced amount", recalc: "Recalculate", invoiced: "Invoiced", sunday: "invoiced Sunday",
+    tabs: { prod: "Production", tarifs: "Pricing", factures: "Invoices", rdv: "Appointments" }, amountL: "Amount", amountMiss: "Missing price in the grid:", override: "Forced amount", recalc: "Recalculate", invoiced: "Invoiced", sunday: "invoiced Sunday",
     keys: { podcast_standard: "Podcast episode · Standard", podcast_premium: "Podcast episode · Premium", vsl_standard: "VSL · Standard", vsl_premium: "VSL · Premium", reel_standard: "Standard reel", reel_premium: "Premium reel", intro: "Intro", miniature: "Thumbnail", trailer: "Trailer", cta: "Social CTA", extra_30min: "Extra 30 min" },
     tarifsHint: "Unit prices per client, in their currency. Empty = not set yet: the approved order waits for a price before being invoiced.", clientSel: "Client", saved: "saved", recalcAll: "Recalculate approved orders", space: "Client space", billing: "Billing", billingName: "Legal name", billingAddress: "Address (one line per line)", billingEmail: "Billing email", attention: "Attention", currency: "Currency", tvaL: "VAT",
-    factHint: "One invoice per client per week, generated Sunday 11:50 pm (Bali). Automatic reminder 2 days after sending.", cols: ["No.", "Client", "Week", "Total", "Status", "Sent", ""], markPaid: "Mark paid", paid: "Paid", issued: "Issued", cancel: "Cancel", extrasTitle: "Manual lines (billed with the next invoice)", label: "Label", qty: "Qty", unit: "Unit price", offered: "Complimentary", add: "Add", pending: "Waiting for invoicing", none: "None", del: "Delete" },
+    factHint: "One invoice per client per week, generated Sunday 11:50 pm (Bali). Automatic reminder 2 days after sending.", cols: ["No.", "Client", "Week", "Total", "Status", "Sent", ""], markPaid: "Mark paid", paid: "Paid", issued: "Issued", cancel: "Cancel", extrasTitle: "Manual lines (billed with the next invoice)", label: "Label", qty: "Qty", unit: "Unit price", offered: "Complimentary", add: "Add", pending: "Waiting for invoicing", none: "None", del: "Delete",
+    rdv: { settingsTitle: "Availability", hint: "Slots offered on the website (“Book a call” buttons), Paris time. Up to two ranges per day; empty day = closed. Prospects see the times in their own time zone.",
+      days: { mon: "Monday", tue: "Tuesday", wed: "Wednesday", thu: "Thursday", fri: "Friday", sat: "Saturday", sun: "Sunday" }, range: (n) => `Range ${n}`,
+      slot: "Slot length (min)", lead: "Minimum notice before a slot (h)", horizon: "Bookable up to (days)", tz: "Time zone of the ranges", meet: "Permanent Google Meet link", meetHint: "empty: “the link will be sent before the call”", host: "Who calls", notify: "Emails to notify (comma separated)",
+      blocked: "Blocked dates (one per line)", blockedHint: "2026-10-03 · 2026-12-24/2027-01-02 · 2026-10-06T14:00/2026-10-06T16:00 (Paris time)", save: "Save", saved: "saved", badRange: "Invalid range: start must be before end",
+      listTitle: "Appointments", upcoming: "Upcoming", past: "Past", cols: ["Date (Paris)", "Name", "Studio", "Email", "Phone", "Notes", "Status", "Emails"],
+      status: { confirmed: "Confirmed", done: "Done", cancelled: "Cancelled", no_show: "No-show" }, none: "No appointment", confirm: "confirmation", reminder: "reminder", local: "your time", missing: "Settings not found: apply supabase/bookings_v1.sql." } },
 };
 const $ = (s) => document.querySelector(s);
 const params = new URLSearchParams(location.search);
@@ -217,7 +385,7 @@ let lang = params.get("lang") || (() => { try { return localStorage.getItem("ds_
 const t = (k) => T[lang][k];
 let tv = params.get("tv") === "1"; document.body.classList.toggle("tv", tv);
 let me = null, profile = null, myEditor = null, jobs = [], editors = [], filter = params.get("f") || "all", edFilter = params.get("editor") || "", q = "", known = new Set(), sb = null;
-let tab = params.get("tab") || "prod", studios = [], grids = [], invoicesAll = [], extras = [], tarifStudio = "";
+let tab = params.get("tab") || "prod", studios = [], grids = [], invoicesAll = [], extras = [], tarifStudio = "", bookingSettings = null, bookingsAll = [];
 const money = (x, cur) => x == null ? "—" : (cur === "USD" ? "$" + Number(x).toLocaleString("en-US", { minimumFractionDigits: 2 }) : Number(x).toLocaleString("fr-FR", { minimumFractionDigits: 2 }) + " €");
 
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -244,6 +412,161 @@ function countdown(ms, done) {
 const COLORS = ["#FF6A2B", "#5FD39A", "#7FB0E0", "#F5C400", "#E38BFF", "#F08A82", "#7CE0D6", "#FFB86B", "#B6E36B", "#FF8FC7", "#9BA8FF", "#EDE8DC"];
 const color = (name) => COLORS[[...name].reduce((a, c) => a + c.charCodeAt(0), 0) % COLORS.length];
 const avatar = (e, sm) => `<span class="av ${sm ? "sm" : ""}" style="background:${color(e.name)}" title="${esc(e.name)}">${e.avatar_url ? `<img src="${esc(e.avatar_url)}" alt=""/>` : esc(e.name.slice(0, 2).toUpperCase())}</span>`;
+
+/* ===== PC du bureau : agent qui télécharge les rushes (tables agent_status / agent_settings, colonnes files_* et download_* de jobs) ===== */
+const DL_MAX = 6, PC_LATE_MIN = 12, PC_OFF_MIN = 30, DISK_ALERT_DEFAULT = 85, FLASH_MS = 3800;
+let agent = null, agentSettings = null, agentOk = false, alertsHtml = null;
+const openIds = new Set(), hadFiles = new Map(), flashUntil = new Map(), notes = new Map();
+function fmtBytes(n) {
+  if (n == null || n === "" || !isFinite(Number(n))) return "—";
+  const u = lang === "fr" ? ["o", "Ko", "Mo", "Go", "To"] : ["B", "KB", "MB", "GB", "TB"];
+  let v = Math.max(0, Number(n)), i = 0;
+  while (v >= 1024 && i < u.length - 1) { v /= 1024; i++; }
+  if (Math.round(v) >= 1024 && i < u.length - 1) { v /= 1024; i++; }
+  return v.toLocaleString(loc(), { maximumFractionDigits: i > 0 && v < 10 ? 1 : 0 }) + " " + u[i];
+}
+function fmtAgo(ms) {
+  const m = Math.floor(ms / 60000); if (m < 1) return t("pc").lessMin; if (m < 60) return `${m} min`;
+  const h = Math.floor(m / 60); if (h < 48) return `${h} h${h < 6 && m % 60 ? " " + String(m % 60).padStart(2, "0") : ""}`;
+  return `${Math.floor(h / 24)} ${t("pc").dayU}`;
+}
+const pcAge = () => agent && agent.last_seen_at ? Math.max(0, Date.now() - new Date(agent.last_seen_at).getTime()) : Infinity;
+const pcState = () => { const a = pcAge() / 60000; return a < PC_LATE_MIN ? "ok" : a <= PC_OFF_MIN ? "warn" : "err"; };
+const diskPct = () => agent && Number(agent.disk_total) > 0 && agent.disk_free != null ? Math.min(100, Math.max(0, (1 - Number(agent.disk_free) / Number(agent.disk_total)) * 100)) : null;
+const diskLimit = () => { const v = Number(agentSettings && agentSettings.disk_alert_pct); return v > 0 && v <= 100 ? v : DISK_ALERT_DEFAULT; };
+const isReadyToStart = (j) => !!j.files_downloaded_at && !j.files_purged_at && !j.started_at && !j.delivered_at && !isDone(j);
+// état du téléchargement d'une commande : purged · ready · running · abandon · access · error · waiting
+// « en cours » = téléchargement démarré, fichiers pas encore là ; si le PC est en ligne et occupé sur une AUTRE commande, celle-ci est en file d'attente
+function dlInfo(j) {
+  const err = String(j.download_error || "").trim(); const abandon = /^\[abandon\]/i.test(err);
+  const m = /essai\s+(\d+)/i.exec(err); const tries = Math.max(Number(j.download_attempts) || 0, m ? +m[1] : 0);
+  const busy = agent && agent.current_token && pcState() !== "err" ? String(agent.current_token) : "";
+  const current = !!busy && busy === String(j.token) && !j.files_downloaded_at && !j.files_purged_at;
+  const fresh = !!j.download_started_at && Date.now() - new Date(j.download_started_at).getTime() < 120000;   // le signal du PC peut arriver juste après le début
+  const queued = !!busy && !current && !fresh;
+  const s = j.files_purged_at ? "purged" : j.files_downloaded_at ? "ready" : current ? "running" : abandon ? "abandon" : j.access_request_sent_at ? "access" : err ? "error" : j.download_started_at && !queued ? "running" : "waiting";
+  return { s, tries, current, err, busy: s === "waiting" ? busy : "" };
+}
+// download_error = « [abandon] essai 3 — lien → raison | lien → raison »
+function dlErrors(j) {
+  const s = String(j.download_error || "").trim().replace(/^\[abandon\]\s*/i, "").replace(/^essai\s+\d+(\s*\/\s*\d+)?\s*[—–:-]\s*/i, "");
+  return s.split(" | ").map((x) => x.trim()).filter(Boolean).map((x) => { const k = x.indexOf(" → "); return k < 0 ? { link: "", why: x } : { link: x.slice(0, k).trim(), why: x.slice(k + 3).trim() }; });
+}
+function dlLine(j) {
+  const D = t("dl"), i = dlInfo(j), meta = []; let label = D[i.s];
+  if (i.s === "ready") { if (j.files_bytes != null) meta.push(fmtBytes(j.files_bytes)); if (j.files_count != null) meta.push(D.nFiles(j.files_count)); }
+  else if (i.s === "purged") meta.push(fmtD(j.files_purged_at));
+  else if (i.s === "running") meta.push(i.current ? `${t("pc").name} · ${esc(agent.current_token)}` : D.since(fmtDT(j.download_started_at)));
+  else if (i.s === "error") { label += " · " + D.nTry(Math.min(Math.max(i.tries, 1), DL_MAX), DL_MAX); const n = dlErrors(j).filter((e) => e.link).length; if (n) meta.push(D.nFailed(n)); }
+  else if (i.s === "abandon") { label += ` · ${DL_MAX}/${DL_MAX}`; meta.push(D.manual); }
+  else if (i.s === "access") { meta.push(fmtDT(j.access_request_sent_at)); if (i.tries) meta.push(D.nTry(Math.min(i.tries, DL_MAX), DL_MAX)); }
+  else if (i.busy) meta.push(D.pcOn(esc(i.busy)));
+  else if (agentOk && pcState() === "err") meta.push(D.pcOff);
+  const tip = i.err || D.tips[i.s] || "";
+  return `<div class="dl ${i.s}${i.current ? " now" : ""}" data-dl="${j.id}" data-dl-state="${i.s}" title="${esc(tip)}"><span class="dlp"><i></i>${label}</span>${meta.length ? ` <span class="dlm">${meta.join(" · ")}</span>` : ""}</div>`;
+}
+function filesBlock(j) {
+  const D = t("dl"), i = dlInfo(j), gone = !!j.files_purged_at, errs = j.files_downloaded_at || gone ? [] : dlErrors(j);
+  const kv = (k, v) => `<span><em>${k}</em><strong>${v}</strong></span>`, kvs = [];
+  if (j.files_bytes != null) kvs.push(kv(D.size, fmtBytes(j.files_bytes)));
+  if (j.files_count != null) kvs.push(kv(D.count, Number(j.files_count).toLocaleString(loc())));
+  if (j.files_downloaded_at) kvs.push(kv(D.doneAt, fmtDT(j.files_downloaded_at))); else if (j.download_started_at) kvs.push(kv(D.startedAt, fmtDT(j.download_started_at)));
+  if (j.access_request_sent_at && !j.files_downloaded_at) kvs.push(kv(D.accessAt, fmtDT(j.access_request_sent_at)));
+  if (gone) kvs.push(kv(D.purgedAt, fmtDT(j.files_purged_at)));
+  if (!j.files_downloaded_at && !gone && i.tries) kvs.push(kv(D.tries, `${Math.min(i.tries, DL_MAX)}/${DL_MAX}`));
+  const relaunch = isAdmin() && !j.files_downloaded_at && !gone && (i.err || j.access_request_sent_at || i.tries > 0);
+  const note = (notes.get(j.id) || 0) > Date.now() ? "✓ " + D.relaunched : "";
+  const link = (u) => /^https?:\/\//i.test(u) ? `<a class="u" href="${esc(u)}" target="_blank" rel="noopener">${esc(u)}</a>` : `<span class="u">${esc(u)}</span>`;
+  return `<div class="fx" data-fx="${j.id}">
+      <div class="fxh"><b>${D.title}</b>${dlLine(j)}</div>
+      ${j.files_path ? `<div class="fxp"><span class="fxpath ${gone ? "gone" : ""}" data-path="${j.id}">${esc(j.files_path)}</span>${gone ? "" : `<button type="button" class="btn ghost" data-copy="${j.id}">${D.copy}</button>`}</div>` : `<div>${D.noPath}</div>`}
+      ${kvs.length ? `<div class="fxkv">${kvs.join("")}</div>` : ""}
+      ${errs.length ? `<div><b>${D.failed}</b><ul class="fxerr">${errs.map((e) => `<li>${e.link ? link(e.link) + `<span class="why">→ ${esc(e.why)}</span>` : `<span class="why">${esc(e.why)}</span>`}</li>`).join("")}</ul></div>` : ""}
+      ${relaunch || note ? `<div class="fxa">${relaunch ? `<button type="button" class="btn ghost" data-relaunch="${j.id}">${D.relaunch}</button>` : ""}<span class="fxmsg" data-fxmsg="${j.id}" role="status">${note}</span></div>` : ""}
+    </div>`;
+}
+async function copyText(s) {
+  try { if (navigator.clipboard && window.isSecureContext) { await navigator.clipboard.writeText(s); return true; } } catch {}
+  try { const ta = document.createElement("textarea"); ta.value = s; ta.setAttribute("readonly", ""); ta.style.cssText = "position:fixed;top:0;left:0;opacity:0"; document.body.appendChild(ta); ta.select(); const ok = document.execCommand("copy"); ta.remove(); return ok; } catch { return false; }
+}
+// la ligne « téléchargement » dépend aussi de l'état du PC : on la repeint sans toucher au reste (champs en cours de saisie)
+function paintDl() { document.querySelectorAll("#board [data-dl]").forEach((el) => { const j = jobs.find((x) => x.id === el.dataset.dl); if (j) el.outerHTML = dlLine(j); }); }
+function paintReady() { const el = $("#readyN"); if (!el) return; const n = byEditor(jobs).filter(isReadyToStart).length; el.textContent = n; el.closest(".chip").classList.toggle("has", n > 0); }
+function renderPc() {
+  const w = $("#pcw"); w.hidden = !profile || !agentOk; if (w.hidden) return;
+  const P = t("pc"), st = pcState(), age = pcAge(), seen = isFinite(age);
+  const txt = st === "ok" ? P.online : st === "warn" ? P.late(fmtAgo(age)) : seen ? P.off(fmtAgo(age)) : P.never;
+  $("#pc").className = "pc " + st; $("#pc").dataset.state = st; $("#pcTxt").textContent = `${P.name} · ${txt}`;
+  const pct = diskPct(), lim = diskLimit(), dc = pct == null ? "" : pct >= lim ? "err" : pct >= lim - 10 ? "warn" : "ok";
+  const cur = agent && agent.current_token ? jobs.find((j) => String(j.token) === String(agent.current_token)) : null;
+  const row = (k, v) => `<div class="pr"><em>${k}</em><span>${v}</span></div>`;
+  $("#pcPop").setAttribute("aria-label", P.title);
+  $("#pcPop").innerHTML = `<div class="ph"><b>${P.title}</b><span class="badge ${st}">${txt}</span></div>` + (agent
+    ? row(P.machine, esc([agent.hostname, agent.platform].filter(Boolean).join(" · ") || "—")) + row(P.version, esc(agent.version || "—"))
+      + row(P.disk, pct == null ? "—" : `<span class="bar ${dc}" data-disk="${Math.round(pct)}"><i style="width:${pct.toFixed(1)}%"></i><u style="left:${lim}%"></u></span><span class="dk"><strong>${P.pct(Math.round(pct))}</strong> ${P.used} · ${fmtBytes(agent.disk_free)} ${P.free} / ${fmtBytes(agent.disk_total)}</span>`)
+      + row(P.current, agent.current_token ? `<strong>${esc(agent.current_token)}</strong>${cur ? ` · ${esc(cur.client_name)}, ${esc(cur.project)}` : ""}` : P.idle)
+      + row(P.lastMsg, esc(agent.message || "—")) + row(P.lastSeen, seen ? `${fmtDT(agent.last_seen_at)} · ${P.ago(fmtAgo(age))}` : P.never)
+    : `<p>${P.neverHint}</p>`) + (profile.role === "admin" ? `<button type="button" class="btn ghost" id="pcGo">${P.settings}</button>` : "");
+}
+function renderAlerts() {
+  const P = t("pc"), out = [];
+  if (profile && agentOk) {
+    const pct = diskPct(), lim = diskLimit(), age = pcAge();
+    if (pct != null && pct >= lim) out.push(`<div class="alert ${pct >= 95 ? "err" : "warn"}" data-alert="disk" role="alert"><span class="ic">!</span><div><b>${P.alertDisk(Math.round(pct))}</b><span class="tx">${P.alertDiskSub(fmtBytes(agent.disk_free), fmtBytes(agent.disk_total), lim)}</span></div></div>`);
+    const n = jobs.filter((j) => !isDone(j) && ["waiting", "running", "access", "error"].includes(dlInfo(j).s)).length;
+    if (pcState() === "err" && n) out.push(`<div class="alert err" data-alert="offline" role="alert"><span class="ic">!</span><div><b>${P.alertOff(isFinite(age) ? fmtAgo(age) : "")}</b><span class="tx">${P.alertOffSub(n)}</span></div></div>`);
+  }
+  const html = out.join(""); if (html !== alertsHtml) { alertsHtml = html; $("#alerts").innerHTML = html; }
+}
+// « shut » : refermée à la main alors que la souris est encore dessus ; levé quand la souris sort
+function closePc(shut) { const w = $("#pcw"); w.classList.remove("open"); w.classList.toggle("shut", !!shut); $("#pc").setAttribute("aria-expanded", "false"); }
+$("#pc").addEventListener("click", () => { if (tv) return; const w = $("#pcw"); if (w.classList.contains("open")) { closePc(true); return; } w.classList.remove("shut"); w.classList.add("open"); $("#pc").setAttribute("aria-expanded", "true"); });
+$("#pcw").addEventListener("mouseleave", () => $("#pcw").classList.remove("shut"));
+$("#pcPop").addEventListener("click", (ev) => {
+  if (!ev.target.closest("#pcGo")) return;
+  closePc(true); tab = "tarifs"; const u = new URL(location.href); u.searchParams.set("tab", tab); history.replaceState(null, "", u); renderTabs();
+  const p = $("#pcSettings"); if (p) p.scrollIntoView({ block: "start" });
+});
+document.addEventListener("click", (ev) => { if (!ev.target.closest("#pcw")) closePc(); });
+document.addEventListener("keydown", (ev) => { if (ev.key === "Escape") closePc($("#pcw").matches(":hover")); });
+// réglages admin de l'agent : en bas de l'onglet Tarifs
+function agentPanel() {
+  if (!profile || profile.role !== "admin" || !agentOk) return "";
+  const P = t("pc"), s = agentSettings;
+  if (!s) return `<div class="panel" id="pcSettings"><h3>${P.setTitle}</h3><p class="hint" style="margin:0">${P.missing}</p></div>`;
+  return `<div class="panel" id="pcSettings"><h3>${P.setTitle}</h3><p class="hint">${P.setHint}</p><div class="grid" style="align-items:end">
+      <label>${P.cleanup}<input class="in" type="number" min="1" max="365" step="1" id="pcCleanup" data-agent="cleanup_days" value="${esc(s.cleanup_days ?? 30)}"/></label>
+      <label>${P.alertPct}<input class="in" type="number" min="50" max="99" step="1" id="pcAlertPct" data-agent="disk_alert_pct" value="${esc(s.disk_alert_pct ?? DISK_ALERT_DEFAULT)}"/></label>
+      <label style="grid-column:1/-1">${P.destRoot}<input class="in" id="pcDestRoot" value="${esc(s.dest_root || "")}" readonly/><span>${P.destHint}</span></label>
+    </div><div style="min-height:18px;margin-top:10px"><span id="pcSetMsg" role="status" style="font-size:12px;color:var(--ok)"></span></div></div>`;
+}
+function wireAgentPanel() {
+  $("#admin").querySelectorAll("[data-agent]").forEach((i) => i.addEventListener("change", async () => {
+    const P = t("pc"), msg = $("#pcSetMsg"), k = i.dataset.agent, v = Number(i.value), lo = Number(i.min), hi = Number(i.max);
+    msg.style.color = "var(--err)"; i.classList.remove("bad");
+    if (i.value === "" || !Number.isInteger(v) || v < lo || v > hi) { i.classList.add("bad"); msg.textContent = P.bad(lo, hi); return; }
+    const { error } = await sb.from("agent_settings").update({ [k]: v, updated_at: new Date().toISOString() }).eq("id", 1);
+    if (error) { msg.textContent = error.message; return; }
+    agentSettings = { ...agentSettings, [k]: v }; msg.style.color = "var(--ok)"; msg.textContent = "✓ " + P.saved; setTimeout(() => { const m = $("#pcSetMsg"); if (m) m.textContent = ""; }, 2000);
+    renderPc(); renderAlerts();
+  }));
+}
+async function loadAgent() {
+  try {
+    const [a, s] = await Promise.all([sb.from("agent_status").select("*").eq("id", 1), profile ? sb.from("agent_settings").select("dest_root,cleanup_days,disk_alert_pct").eq("id", 1) : null]); // lisible par toute l'équipe (orders_v1d.sql) ; la modification reste réservée à l'admin
+    agentOk = !a.error; if (agentOk) agent = (Array.isArray(a.data) ? a.data[0] : a.data) || null;
+    if (s && !s.error) agentSettings = (Array.isArray(s.data) ? s.data[0] : s.data) || null;
+  } catch (e) { console.warn(e); }
+}
+async function refreshAgent() { await loadAgent(); renderPc(); renderAlerts(); paintDl(); }
+// deux notes montantes : « fichiers prêts » (le bip des nouvelles commandes reste une note répétée)
+function beepReady(delay = 0) {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)(), t0 = ctx.currentTime + delay;
+    [[523.25, 0], [783.99, .2]].forEach(([f, at]) => { const o = ctx.createOscillator(), g = ctx.createGain(); o.type = "triangle"; o.frequency.value = f; o.connect(g); g.connect(ctx.destination); g.gain.setValueAtTime(.0001, t0 + at); g.gain.exponentialRampToValueAtTime(.14, t0 + at + .03); g.gain.exponentialRampToValueAtTime(.0001, t0 + at + .26); o.start(t0 + at); o.stop(t0 + at + .28); });
+    setTimeout(() => { try { ctx.close(); } catch {} }, (delay + 1.5) * 1000);
+  } catch {}
+}
 
 function applyText() {
   document.documentElement.lang = lang;
@@ -277,12 +600,14 @@ function renderStats() {
 }
 function renderToolbar() {
   const f = t("filters");
-  $("#toolbar").innerHTML = Object.keys(f).map((k) => `<button type="button" class="chip ${filter === k ? "on" : ""}" data-f="${k}">${f[k]}</button>`).join("") + `<input class="in search" id="search" placeholder="${t("search")}" value="${esc(q)}"/>`;
+  $("#toolbar").innerHTML = Object.keys(f).map((k) => `<button type="button" class="chip ${filter === k ? "on" : ""}" data-f="${k}">${f[k]}${k === "ready" ? ` <span class="n" id="readyN">0</span>` : ""}</button>`).join("") + `<input class="in search" id="search" placeholder="${t("search")}" value="${esc(q)}"/>`;
   $("#toolbar").querySelectorAll("[data-f]").forEach((b) => b.addEventListener("click", () => { filter = b.dataset.f; renderToolbar(); renderBoard(); }));
   $("#search").addEventListener("input", (e) => { q = e.target.value.toLowerCase(); renderBoard(); });
+  paintReady();
 }
 function visible() {
   return byEditor(jobs).filter((j) => {
+    if (filter === "ready" && !isReadyToStart(j)) return false;
     if (filter === "late" && !isLate(j)) return false;
     if (filter === "qc" && !(j.delivered_at && j.qc_status === "pending")) return false;
     if (filter === "done" && !isDone(j)) return false;
@@ -292,7 +617,8 @@ function visible() {
   }).sort((a, b) => (isDone(a) - isDone(b)) || (target(a) - target(b)));
 }
 function renderBoard() {
-  const list = visible(); const st = t("steps"); const qc = t("qc");
+  const list = visible(); const st = t("steps"); const qc = t("qc"); const now = Date.now();
+  paintReady();
   if (!list.length) { $("#board").innerHTML = `<div class="empty">${t("empty")}</div>`; return; }
   $("#board").innerHTML = list.map((j) => {
     const c = cls(j); const ed = canEdit(j); const dis = ed ? "" : 'aria-disabled="true"';
@@ -301,7 +627,7 @@ function renderBoard() {
       ? `<div class="row">${eds.map((e) => avatar(e, true)).join("")}</div><div class="names">${eds.map((e) => esc(e.name)).join(", ")}</div>`
       : `<div class="none">${isAdmin() ? "+ " + t("unassigned") : t("noEditor")}</div>`;
     const teamDate = j.delivery_date && j.delivery_date !== j.requested_deadline ? `<div class="team">${t("team")} : ${fmtD(j.delivery_date)}</div>` : "";
-    return `<div class="job ${c}" data-id="${j.id}">
+    return `<div class="job ${c}${openIds.has(j.id) ? " open" : ""}${(flashUntil.get(j.id) || 0) > now ? " flash" : ""}" data-id="${j.id}">
       <div class="tok">${esc(j.token)}<small>${t("received")} ${fmtDT(j.created_at)}</small></div>
       <div class="c"><b>${esc(j.client_name)}</b><em>${esc(j.project)}</em><span>${esc(j.work_to_do || "")}</span></div>
       <div class="edcell"><div class="eds ${isAdmin() ? "can" : ""}" data-eds="${j.id}">${edCell}</div></div>
@@ -311,11 +637,13 @@ function renderBoard() {
         <span class="st ${j.started_at ? "on" : ""}" data-step="started_at" data-id="${j.id}" ${dis}>${j.started_at ? "✓" : "○"} ${st.start}</span>
         <span class="st ${j.half_at ? "on" : ""}" data-step="half_at" data-id="${j.id}" ${dis}>${j.half_at ? "✓" : "○"} ${st.half}</span>
         <span class="st ${j.delivered_at ? "on" : ""}" data-step="delivered_at" data-id="${j.id}" ${dis}>${j.delivered_at ? "✓" : "○"} ${st.done}</span>
+        ${dlLine(j)}
       </div>
       <div class="qc ${j.qc_status}">${isAdmin() ? `<select class="in" data-act="qc" data-id="${j.id}">${["pending", "ok", "revisions"].map((k) => `<option value="${k}" ${k === j.qc_status ? "selected" : ""}>${qc[k]}</option>`).join("")}</select>` : `<span class="badge ${j.qc_status === "ok" ? "ok" : j.qc_status === "revisions" ? "err" : ""}">${qc[j.qc_status]}</span>`}</div>
       <div class="links">${j.brief_url ? `<a href="${j.brief_url}" target="_blank" rel="noopener">${t("brief")}</a>` : ""}${j.folder_url ? `<a href="${j.folder_url}" target="_blank" rel="noopener">${t("files")}</a>` : ""}${j.frameio_url ? `<a href="${j.frameio_url}" target="_blank" rel="noopener">${t("frame")}</a>` : ""}</div>
       <button type="button" class="more" data-more="${j.id}">⋯</button>
       <div class="detail">
+        ${filesBlock(j)}
         <div><b>${t("rushes")}</b><div class="lk">${(j.rushes_links || []).map((u) => `<a href="${esc(u)}" target="_blank" rel="noopener">${esc(u)}</a>`).join("\n") || "—"}</div></div>
         <div><b>${t("contact")}</b>${esc(j.contact || "—")}<br/><b style="margin-top:8px">${t("email")}</b>${esc(j.email || "—")}${j.description ? `<br/><b style="margin-top:8px">Brief</b><span style="white-space:pre-wrap">${esc(j.description)}</span>` : ""}</div>
         <div>
@@ -328,6 +656,7 @@ function renderBoard() {
     </div>`;
   }).join("");
   wireBoard();
+  flashUntil.forEach((until, id) => { setTimeout(() => { if ((flashUntil.get(id) || 0) <= Date.now()) { flashUntil.delete(id); const el = document.querySelector(`.job[data-id="${id}"]`); if (el) el.classList.remove("flash"); } }, Math.max(0, until - Date.now()) + 20); });
 }
 function amountBlock(j) {
   const s = studios.find((x) => x.id === j.studio_id); const cur = s ? s.currency : "EUR";
@@ -343,7 +672,18 @@ function amountBlock(j) {
 function wireBoard() {
   const B = $("#board");
   B.querySelectorAll("[data-recalc]").forEach((b) => b.addEventListener("click", async () => { const { error } = await sb.rpc("price_job", { p_job: b.dataset.recalc }); if (error) alert(error.message); await load(false); }));
-  B.querySelectorAll("[data-more]").forEach((b) => b.addEventListener("click", () => b.closest(".job").classList.toggle("open")));
+  B.querySelectorAll("[data-more]").forEach((b) => b.addEventListener("click", () => { const on = b.closest(".job").classList.toggle("open"); on ? openIds.add(b.dataset.more) : openIds.delete(b.dataset.more); }));
+  B.querySelectorAll("[data-copy]").forEach((b) => b.addEventListener("click", async () => {
+    const j = jobs.find((x) => x.id === b.dataset.copy); if (!j || !j.files_path) return;
+    const ok = await copyText(j.files_path); b.textContent = ok ? "✓ " + t("dl").copied : t("dl").copyFail; b.classList.toggle("okd", ok); b.dataset.copied = ok ? "1" : "0";
+    setTimeout(() => { if (b.isConnected) { b.textContent = t("dl").copy; b.classList.remove("okd"); delete b.dataset.copied; } }, 1800);
+  }));
+  B.querySelectorAll("[data-relaunch]").forEach((b) => b.addEventListener("click", async () => {
+    const id = b.dataset.relaunch; b.disabled = true; notes.set(id, Date.now() + 8000);
+    const ok = await update(id, { download_error: null, download_attempts: 0, access_request_sent_at: null });
+    if (!ok) { notes.delete(id); if (b.isConnected) b.disabled = false; return; }
+    setTimeout(() => { const m = document.querySelector(`[data-fxmsg="${id}"]`); if (m && (notes.get(id) || 0) <= Date.now()) m.textContent = ""; }, 8100);
+  }));
   B.querySelectorAll("[data-step]").forEach((el) => el.addEventListener("click", async () => {
     if (el.getAttribute("aria-disabled") === "true") return;
     const j = jobs.find((x) => x.id === el.dataset.id); const k = el.dataset.step; const val = j[k] ? null : new Date().toISOString();
@@ -371,8 +711,8 @@ function closePop() { document.querySelectorAll(".pop").forEach((p) => p.remove(
 document.addEventListener("click", closePop);
 async function update(id, patch, keepPop) {
   const { error } = await sb.from("jobs").update(patch).eq("id", id);
-  if (error) { alert((lang === "fr" ? "Modification refusée : " : "Update refused: ") + error.message); return; }
-  await load(false, keepPop);
+  if (error) { alert((lang === "fr" ? "Modification refusée : " : "Update refused: ") + error.message); return false; }
+  await load(false, keepPop); return true;
 }
 // chrono : mise à jour chaque seconde, sans re-rendu
 setInterval(() => { document.querySelectorAll("[data-cd]").forEach((el) => { const j = jobs.find((x) => x.id === el.dataset.cd); if (j) el.textContent = countdown(remaining(j), isDone(j)); }); }, 1000);
@@ -380,17 +720,17 @@ setInterval(() => { document.querySelectorAll("[data-cd]").forEach((el) => { con
 /* ===== onglets admin : Tarifs, Factures ===== */
 function renderTabs() {
   if (!isAdmin()) return; $("#tabs").hidden = false;
-  $("#tabs").innerHTML = ["prod", "tarifs", "factures"].map((k) => `<button type="button" class="tab ${tab === k ? "on" : ""}" data-tab="${k}">${t("tabs")[k]}</button>`).join("");
+  $("#tabs").innerHTML = ["prod", "tarifs", "factures", "rdv"].map((k) => `<button type="button" class="tab ${tab === k ? "on" : ""}" data-tab="${k}">${t("tabs")[k]}</button>`).join("");
   $("#tabs").querySelectorAll("[data-tab]").forEach((b) => b.addEventListener("click", () => { tab = b.dataset.tab; const u = new URL(location.href); tab === "prod" ? u.searchParams.delete("tab") : u.searchParams.set("tab", tab); history.replaceState(null, "", u); renderTabs(); renderAdmin(); }));
   renderAdmin();
 }
 function renderAdmin() {
-  const prod = tab === "prod"; ["#edbar", "#stats", "#toolbar", "#board"].forEach((s) => { $(s).style.display = prod ? "" : "none"; }); $("#admin").hidden = prod;
-  if (tab === "tarifs") renderTarifs(); else if (tab === "factures") renderFactures();
+  const prod = tab === "prod"; ["#edbar", "#stats", "#toolbar", "#alerts", "#board"].forEach((s) => { $(s).style.display = prod ? "" : "none"; }); $("#admin").hidden = prod;
+  if (tab === "tarifs") renderTarifs(); else if (tab === "factures") renderFactures(); else if (tab === "rdv") renderRdv();
 }
 function renderTarifs() {
   if (!tarifStudio && studios.length) tarifStudio = studios[0].id;
-  const s = studios.find((x) => x.id === tarifStudio); if (!s) { $("#admin").innerHTML = ""; return; }
+  const s = studios.find((x) => x.id === tarifStudio); if (!s) { $("#admin").innerHTML = agentPanel(); wireAgentPanel(); return; }
   const g = Object.fromEntries(grids.filter((x) => x.studio_id === s.id).map((x) => [x.item_key, x.unit_price]));
   const spaceUrl = `${location.origin}${location.pathname.replace(/team\/dashboard\.html$/, "")}client/espace.html?client=${s.slug}&k=${s.access_token}`;
   $("#admin").innerHTML = `<div class="panel">
@@ -406,7 +746,8 @@ function renderTarifs() {
       <label>${t("currency")}<select class="in" data-studio="currency"><option ${s.currency === "EUR" ? "selected" : ""}>EUR</option><option ${s.currency === "USD" ? "selected" : ""}>USD</option></select></label>
       <label>${t("tvaL")}<select class="in" data-studio="tva">${["ue", "hors_ue", "us", "none"].map((v) => `<option value="${v}" ${s.tva === v ? "selected" : ""}>${v}</option>`).join("")}</select></label>
       <label style="grid-column:1/-1">${t("billingAddress")}<textarea class="in" rows="3" data-studio="billing_address">${esc(s.billing_address || "")}</textarea></label>
-    </div></div>`;
+    </div></div>` + agentPanel();
+  wireAgentPanel();
   $("#tarifStudio").addEventListener("change", (e) => { tarifStudio = e.target.value; renderTarifs(); });
   $("#admin").querySelectorAll("[data-key]").forEach((i) => i.addEventListener("change", async () => {
     const v = i.value === "" ? null : Number(i.value);
@@ -434,8 +775,77 @@ function renderFactures() {
 }
 async function loadAdmin() {
   if (!isAdmin()) return;
-  const [a, b, c, d] = await Promise.all([sb.from("studios").select("*").order("name"), sb.from("price_grids").select("*"), sb.from("invoices").select("*").order("period_end", { ascending: false }).limit(300), sb.from("extra_lines").select("*").order("created_at", { ascending: false }).limit(200)]);
+  const [a, b, c, d, e, f] = await Promise.all([sb.from("studios").select("*").order("name"), sb.from("price_grids").select("*"), sb.from("invoices").select("*").order("period_end", { ascending: false }).limit(300), sb.from("extra_lines").select("*").order("created_at", { ascending: false }).limit(200),
+    sb.from("booking_settings").select("*").eq("id", 1), sb.from("bookings").select("*").order("starts_at", { ascending: false }).limit(400)]);
   studios = a.data || []; grids = b.data || []; invoicesAll = c.data || []; extras = d.data || [];
+  bookingSettings = Array.isArray(e.data) ? (e.data[0] || null) : (e.data || null); bookingsAll = f.data || [];
+}
+
+/* ===== onglet Rendez-vous : disponibilités du calendrier de l'accueil + liste des appels réservés ===== */
+const DAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
+const BK_STATUS = ["confirmed", "done", "cancelled", "no_show"];
+const localTz = (() => { try { return Intl.DateTimeFormat().resolvedOptions().timeZone; } catch { return ""; } })();
+const fmtIn = (d, tz) => d ? new Date(d).toLocaleString(loc(), { timeZone: tz, weekday: "short", day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" }) : "—";
+function renderRdv() {
+  const R = t("rdv"), s = bookingSettings;
+  if (!s) { $("#admin").innerHTML = `<div class="panel"><p style="color:var(--err);margin:0">${R.missing}</p></div>`; return; }
+  const tzP = s.timezone || "Europe/Paris";
+  const rangeIn = (day, i, j) => { const r = ((s.weekly || {})[day] || [])[i]; return `<input class="in" type="time" step="300" data-wk="${day}.${i}.${j}" value="${esc(r ? r[j] : "")}"/>`; };
+  const weekly = DAYS.map((day) => `<div class="wk ${((s.weekly || {})[day] || []).length ? "" : "off"}"><b>${R.days[day]}</b>${[0, 1].map((i) => `<span class="rg" title="${R.range(i + 1)}">${rangeIn(day, i, 0)} → ${rangeIn(day, i, 1)}</span>`).join("")}</div>`).join("");
+  const blockedTxt = (Array.isArray(s.blocked) ? s.blocked : []).map((b) => typeof b === "string" ? b : (b && b.from && b.to ? `${b.from}/${b.to}` : "")).filter(Boolean).join("\n");
+  const now = Date.now();
+  const upcoming = bookingsAll.filter((b) => new Date(b.starts_at).getTime() >= now).sort((x, y) => new Date(x.starts_at) - new Date(y.starts_at));
+  const past = bookingsAll.filter((b) => new Date(b.starts_at).getTime() < now);
+  const row = (b, old) => `<tr class="${old ? "rdv-past" : ""}" data-bk="${b.id}"><td class="rdv-when">${fmtIn(b.starts_at, tzP)}${localTz && localTz !== tzP ? `<small>${fmtIn(b.starts_at, localTz)} · ${R.local}</small>` : ""}</td>
+    <td><b>${esc(b.name)}</b>${b.website ? `<br/><a href="${esc(/^https?:\/\//i.test(b.website) ? b.website : "https://" + b.website)}" target="_blank" rel="noopener" style="font-size:12px;color:var(--accent2)">${esc(b.website)}</a>` : ""}<br/><span class="badge">${esc(b.lang || "fr")} · ${esc(b.tz || "")}</span></td>
+    <td>${esc(b.studio || "—")}</td><td><a href="mailto:${esc(b.email)}">${esc(b.email)}</a></td><td>${esc(b.phone || "—")}</td><td class="rdv-notes">${esc(b.notes || "")}</td>
+    <td><select class="in st-sel ${esc(b.status)}" data-bk-status="${b.id}">${BK_STATUS.map((k) => `<option value="${k}" ${k === b.status ? "selected" : ""}>${R.status[k]}</option>`).join("")}</select></td>
+    <td style="font-size:12px;color:var(--taupe);white-space:nowrap">${b.confirm_sent_at ? "✓" : "…"} ${R.confirm}<br/>${b.reminder_sent_at ? "✓" : "…"} ${R.reminder}</td></tr>`;
+  const table = (list, old) => `<table class="adm"><thead><tr>${R.cols.map((c) => `<th>${c}</th>`).join("")}</tr></thead><tbody>${list.map((b) => row(b, old)).join("") || `<tr><td colspan="8" style="color:var(--taupe)">${R.none}</td></tr>`}</tbody></table>`;
+  $("#admin").innerHTML = `<div class="panel"><h3>${R.settingsTitle}</h3><p style="font-size:12px;color:var(--taupe);margin:0 0 12px">${R.hint}</p>
+      <div id="rdvWeekly">${weekly}</div>
+      <div class="grid" style="margin-top:16px">
+        <label>${R.slot}<input class="in" type="number" min="10" max="180" step="5" id="rdvSlot" value="${s.slot_minutes ?? 30}"/></label>
+        <label>${R.lead}<input class="in" type="number" min="0" max="240" id="rdvLead" value="${s.lead_hours ?? 12}"/></label>
+        <label>${R.horizon}<input class="in" type="number" min="1" max="120" id="rdvHorizon" value="${s.horizon_days ?? 21}"/></label>
+        <label>${R.tz}<input class="in" id="rdvTz" value="${esc(tzP)}"/></label>
+        <label>${R.host}<input class="in" id="rdvHost" value="${esc(s.host_name || "")}"/></label>
+        <label>${R.notify}<input class="in" id="rdvNotify" value="${esc((s.notify_emails || []).join(", "))}"/></label>
+        <label style="grid-column:1/-1">${R.meet} <span style="opacity:.7">— ${R.meetHint}</span><input class="in" type="url" id="rdvMeet" placeholder="https://meet.google.com/xxx-xxxx-xxx" value="${esc(s.meet_url || "")}"/></label>
+        <label style="grid-column:1/-1">${R.blocked} <span style="opacity:.7">— ${R.blockedHint}</span><textarea class="in" rows="3" id="rdvBlocked">${esc(blockedTxt)}</textarea></label>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;margin-top:14px"><button type="button" class="btn" id="rdvSave">${R.save}</button><span id="rdvMsg" style="font-size:12px;color:var(--ok)"></span></div></div>
+    <div class="panel"><h3>${R.listTitle} · ${R.upcoming} (${upcoming.length})</h3>${table(upcoming, false)}</div>
+    <div class="panel"><h3>${R.past} (${past.length})</h3>${table(past, true)}</div>`;
+  $("#rdvSave").addEventListener("click", saveRdv);
+  $("#admin").querySelectorAll("[data-bk-status]").forEach((sel) => sel.addEventListener("change", async () => {
+    const { error } = await sb.from("bookings").update({ status: sel.value }).eq("id", sel.dataset.bkStatus);
+    if (error) { alert(error.message); return; } await loadAdmin(); renderRdv();
+  }));
+}
+async function saveRdv() {
+  const R = t("rdv"), msg = $("#rdvMsg"); msg.style.color = "var(--ok)"; msg.textContent = "";
+  const weekly = {};
+  for (const day of DAYS) {
+    weekly[day] = [];
+    for (const i of [0, 1]) {
+      const a = $(`[data-wk="${day}.${i}.0"]`).value, b = $(`[data-wk="${day}.${i}.1"]`).value;
+      if (!a && !b) continue;
+      if (!a || !b || a >= b) { msg.style.color = "var(--err)"; msg.textContent = `${R.badRange} (${R.days[day]})`; return; }
+      weekly[day].push([a, b]);
+    }
+    weekly[day].sort((x, y) => x[0].localeCompare(y[0]));
+  }
+  const blocked = $("#rdvBlocked").value.split("\n").map((l) => l.trim()).filter(Boolean).map((l) => {
+    const m = /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2})\/(\d{4}-\d{2}-\d{2}T\d{2}:\d{2})$/.exec(l); return m ? { from: m[1], to: m[2] } : l;
+  });
+  const patch = { weekly, blocked, slot_minutes: Math.max(10, Math.min(180, Number($("#rdvSlot").value) || 30)), lead_hours: Math.max(0, Number($("#rdvLead").value) || 0), horizon_days: Math.max(1, Number($("#rdvHorizon").value) || 21),
+    timezone: $("#rdvTz").value.trim() || "Europe/Paris", host_name: $("#rdvHost").value.trim() || "Cyriaque", meet_url: $("#rdvMeet").value.trim(),
+    notify_emails: $("#rdvNotify").value.split(",").map((x) => x.trim()).filter((x) => /@/.test(x)) };
+  try { new Intl.DateTimeFormat("en-US", { timeZone: patch.timezone }); } catch { msg.style.color = "var(--err)"; msg.textContent = `${R.tz} : ${patch.timezone} ?`; return; }
+  const { error } = await sb.from("booking_settings").update(patch).eq("id", 1);
+  if (error) { msg.style.color = "var(--err)"; msg.textContent = error.message; return; }
+  msg.textContent = "✓ " + R.saved; await loadAdmin(); renderRdv(); $("#rdvMsg").textContent = "✓ " + R.saved; setTimeout(() => { const m = $("#rdvMsg"); if (m) m.textContent = ""; }, 2000);
 }
 
 /* ===== données ===== */
@@ -443,15 +853,20 @@ async function load(first, keepPop) {
   const [{ data: rows, error }, { data: eds }] = await Promise.all([
     sb.from("jobs").select("*").order("created_at", { ascending: false }).limit(400),
     sb.from("editors").select("id,name,avatar_url,profile_id,active,sort").order("sort"),
-    loadAdmin(),
+    loadAdmin(), loadAgent(),
   ]);
   if (error) { console.error(error); return; }
-  if (!first) { const fresh = (rows || []).filter((j) => !known.has(j.id)); if (fresh.length) beep(fresh.length); }
-  jobs = rows || []; editors = eds || []; jobs.forEach((j) => known.add(j.id));
+  if (!first) {
+    const fresh = (rows || []).filter((j) => !known.has(j.id)); if (fresh.length) beep(fresh.length);
+    // fichiers arrivés pendant que la page est ouverte : bip à deux notes + la ligne clignote
+    const ready = (rows || []).filter((j) => j.files_downloaded_at && hadFiles.get(j.id) === false);
+    if (ready.length) { ready.forEach((j) => flashUntil.set(j.id, Date.now() + FLASH_MS)); beepReady(fresh.length ? Math.min(fresh.length, 3) * .25 + .2 : 0); }
+  }
+  jobs = rows || []; editors = eds || []; jobs.forEach((j) => { known.add(j.id); hadFiles.set(j.id, !!j.files_downloaded_at); });
   myEditor = editors.find((e) => e.profile_id === me.id) || null;
   if (first && !params.has("editor") && myEditor && profile.role === "editor") edFilter = myEditor.id;
   const openCell = keepPop && document.querySelector(".pop") ? document.querySelector(".pop").parentElement.querySelector("[data-eds]")?.dataset.eds : null;
-  renderEditorBar(); renderStats(); renderBoard();
+  renderEditorBar(); renderStats(); renderBoard(); renderPc(); renderAlerts();
   if (openCell) { const cell = document.querySelector(`[data-eds="${openCell}"]`); if (cell) openPop(cell); }
 }
 function beep(n) {
@@ -469,7 +884,10 @@ async function boot() {
   $("#logout").hidden = false; $("#gate").hidden = true; $("#app").hidden = false; $("#live").hidden = false;
   renderToolbar(); await load(true); renderTabs();
   sb.channel("jobs-live").on("postgres_changes", { event: "*", schema: "public", table: "jobs" }, () => load(false)).subscribe();
+  // état du PC du bureau : temps réel si la table est publiée, sinon le rafraîchissement de 60 s ci-dessous ; l'âge du dernier signal est réévalué toutes les 15 s
+  sb.channel("agent-live").on("postgres_changes", { event: "*", schema: "public", table: "agent_status" }, () => refreshAgent()).subscribe();
   setInterval(() => load(false), 60000);
+  setInterval(() => { renderPc(); renderAlerts(); paintDl(); }, 15000);
 }
 $("#loginBtn").addEventListener("click", async () => {
   $("#loginMsg").textContent = "";
@@ -479,8 +897,8 @@ $("#loginBtn").addEventListener("click", async () => {
 });
 $("#password").addEventListener("keydown", (e) => { if (e.key === "Enter") $("#loginBtn").click(); });
 $("#logout").addEventListener("click", async () => { await sb.auth.signOut(); location.reload(); });
-$("#langBtn").addEventListener("click", () => { lang = lang === "fr" ? "en" : "fr"; try { localStorage.setItem("ds_lang", lang); } catch {} applyText(); if (profile) { renderEditorBar(); renderToolbar(); renderStats(); renderBoard(); } });
-$("#tvBtn").addEventListener("click", () => { tv = !tv; document.body.classList.toggle("tv", tv); const u = new URL(location.href); tv ? u.searchParams.set("tv", "1") : u.searchParams.delete("tv"); history.replaceState(null, "", u); });
+$("#langBtn").addEventListener("click", () => { lang = lang === "fr" ? "en" : "fr"; try { localStorage.setItem("ds_lang", lang); } catch {} applyText(); if (profile) { renderEditorBar(); renderToolbar(); renderStats(); renderBoard(); renderTabs(); alertsHtml = null; renderPc(); renderAlerts(); } });
+$("#tvBtn").addEventListener("click", () => { tv = !tv; document.body.classList.toggle("tv", tv); closePc(); const u = new URL(location.href); tv ? u.searchParams.set("tv", "1") : u.searchParams.delete("tv"); history.replaceState(null, "", u); });
 boot();
 </script>
 </body>

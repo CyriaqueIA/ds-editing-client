@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta name="robots" content="noindex,nofollow"/>
+  <meta name="theme-color" content="#050607"/>
+  <title>DS Editing — Exemples de production</title>
+  <link rel="icon" type="image/png" href="../assets/logo.png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--bg:#050607;--surface:#0F1114;--surface-2:#161A1F;--line:rgba(255,255,255,.09);--line-strong:rgba(255,255,255,.22);--cream:#F5F5F1;--taupe:#9AA3AD;--amber:#DCE3EA;--amber-soft:rgba(220,227,234,.12);--ok:#46D369;--err:#F08A82;--warn:#F5C400;--blue:#7FB0E0;--accent2:#B9C9DA;--chrome:linear-gradient(180deg,#FFFFFF 0%,#E3E7EC 38%,#9BA4AE 72%,#D6DBE0 100%);--chrome2:linear-gradient(95deg,#B9C9DA 0%,#7FA3CF 45%,#E6ECF2 100%);--glass:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));color-scheme:dark}
+    *{box-sizing:border-box}
+    [hidden]{display:none!important}
+    html,body{margin:0;background:var(--bg);color:var(--cream);font-family:'Geist',system-ui,sans-serif;-webkit-font-smoothing:antialiased;height:100%}
+    body{background:radial-gradient(1200px 700px at 85% -5%,rgba(125,155,195,.16),transparent 60%),radial-gradient(900px 600px at -10% 40%,rgba(160,170,185,.08),transparent 60%),#050607;background-attachment:fixed;font-size:15px;line-height:1.55}
+    a{color:inherit;text-decoration:none}
+    .mono{font-family:'Geist',system-ui,sans-serif;font-weight:600;font-size:11px;letter-spacing:.06em;text-transform:uppercase;font-variant-numeric:tabular-nums;color:var(--taupe)}
+    .display{font-family:'Geist',system-ui,sans-serif;font-weight:600;letter-spacing:-.035em;text-transform:none;line-height:1.06;padding:.02em 0 .08em;background:var(--chrome);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .display em,.display .ac{font-style:normal;background:var(--chrome2);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .app{min-height:100vh;display:flex;flex-direction:column}
+    .app-header{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:14px;min-height:61px;padding:12px 20px;background:rgba(8,9,11,.62);-webkit-backdrop-filter:blur(22px) saturate(1.4);backdrop-filter:blur(22px) saturate(1.4);border-bottom:1px solid var(--line)}
+    .app-header .brand{display:flex;flex-direction:column;justify-content:center;line-height:1.1;min-height:22px;padding-left:12px;border-left:1px solid var(--line)}
+    .app-header .brand b{display:none} /* le nom est déjà porté par le logo « ● Rec » */
+    .app-header .right{margin-left:auto;display:flex;align-items:center;gap:10px}
+    .lv-rec{display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:22px;letter-spacing:-.04em;line-height:1;color:var(--cream);white-space:nowrap}
+    .lv-rec i{width:9px;height:9px;border-radius:50%;background:var(--amber);box-shadow:0 0 12px var(--amber);animation:blink 1.6s infinite;margin-right:2px}
+    .lv-rec em{font-style:normal;font-size:11px;font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:var(--taupe);margin-left:2px}
+    @keyframes blink{50%{opacity:.2}}
+    .btn{display:inline-flex;align-items:center;justify-content:center;border:1px solid transparent;border-radius:999px;height:36px;padding:0 18px;font:inherit;font-size:14px;font-weight:600;letter-spacing:-.01em;line-height:1;cursor:pointer;background:linear-gradient(180deg,#FFFFFF,#C9D0D7);color:#0A0B0D;box-shadow:inset 0 1px 0 #fff,0 8px 30px rgba(180,200,225,.18);white-space:nowrap;transition:background .2s,border-color .2s,box-shadow .2s}
+    .btn:hover{background:linear-gradient(180deg,#fff,#E4E8EC)}
+    .btn:empty{display:none} /* accès sans clé : le lien contact n'est pas encore rempli */
+    .lang{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.16);color:#fff;border-radius:999px;height:32px;padding:0 12px;cursor:pointer;font:inherit;font-size:12px;font-weight:600;-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);transition:border-color .2s,background .2s}
+    .lang:hover{border-color:rgba(220,230,240,.35);background:rgba(255,255,255,.08)}
+    .private{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:999px;height:32px;padding:0 12px;font-size:12px;color:var(--taupe)}
+    .private i{width:7px;height:7px;border-radius:50%;background:var(--amber);box-shadow:0 0 8px var(--amber);font-style:normal}
+    .btn:focus-visible,.lang:focus-visible,.type-item:focus-visible,.tier:focus-visible,.modal .bar button:focus-visible{outline:2px solid rgba(220,227,234,.6);outline-offset:2px}
+
+    .app-main{flex:1;display:grid;grid-template-columns:280px 1fr;min-height:0}
+    .sidebar{border-right:1px solid var(--line);padding:22px 14px;position:sticky;top:61px;height:calc(100vh - 61px);overflow:auto;background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.01))}
+    .sidebar .mono{padding:0 12px 12px}
+    .type-item{display:flex;flex-direction:column;gap:2px;padding:12px 14px;border-radius:14px;cursor:pointer;border:1px solid transparent;transition:border-color .2s,background .2s}
+    .type-item b{font-size:15px;font-weight:600}
+    .type-item span{font-size:12px;color:var(--taupe)}
+    .type-item:hover{background:var(--surface);border-color:var(--line)}
+    .type-item.active{background:var(--amber-soft);border-color:rgba(220,230,240,.5)}
+    .type-item.active b{color:#fff}
+    .type-item.active span{color:var(--accent2)}
+    .content{padding:26px 28px 60px;min-width:0}
+    .content h1{margin:0 0 4px;font-size:clamp(28px,4vw,44px)}
+    .content .sub{margin:0 0 18px;color:var(--taupe);font-size:14px}
+    .tier-tabs{display:flex;gap:8px;flex-wrap:wrap}
+    .tier{display:flex;flex-direction:column;gap:2px;min-width:150px;padding:12px 16px;border:1px solid var(--line);border-radius:14px;background:var(--surface);cursor:pointer;transition:border-color .2s,background .2s}
+    .tier b{font-size:15px;font-weight:600}
+    .tier span{font-family:'Geist',system-ui,sans-serif;font-size:12px;color:var(--taupe);font-variant-numeric:tabular-nums}
+    .tier:hover{border-color:var(--line-strong)}
+    .tier.active{border-color:rgba(220,230,240,.5);background:var(--amber-soft)}
+    .tier.active b{color:#fff}.tier.active span{color:var(--accent2)}
+    .tier-desc{margin:14px 0 18px;color:var(--taupe);font-size:14px;line-height:1.5;max-width:70ch}
+    .video-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .video-grid.vert{grid-template-columns:repeat(5,1fr)}
+    @media (max-width:1100px){.video-grid.vert{grid-template-columns:repeat(4,1fr)}}
+    @media (max-width:820px){.video-grid{grid-template-columns:repeat(2,1fr)}.video-grid.vert{grid-template-columns:repeat(3,1fr)}}
+    .video-cell{position:relative;aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:#000;border:1px solid var(--line);cursor:pointer;transition:border-color .2s,box-shadow .2s}
+    .video-cell:hover{border-color:var(--line-strong);box-shadow:0 12px 40px rgba(0,0,0,.45)}
+    .video-grid.vert .video-cell,.video-cell.v{aspect-ratio:9/16}
+    .video-grid:not(.vert) .video-cell.v{max-height:70vh;justify-self:start}
+    .video-cell video{object-fit:contain;background:#000}
+    .video-cell img,.video-cell video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+    .video-cell img{opacity:.85;transition:.3s}
+    .video-cell:hover img{opacity:1;transform:scale(1.03)}
+    .video-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(0deg,rgba(5,6,7,.78),transparent 45%)}
+    .play-btn{width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.88);display:flex;align-items:center;justify-content:center;color:#0A0B0D;font-size:18px;box-shadow:inset 0 1px 0 #fff,0 8px 30px rgba(0,0,0,.35);transition:.2s}
+    .video-cell:hover .play-btn{transform:scale(1.06);background:#fff}
+    .video-cell .cap{position:absolute;left:0;right:0;bottom:0;padding:12px;font-size:13px;font-weight:500;text-shadow:0 1px 8px rgba(0,0,0,.5)}
+    .video-cell .cap span{display:block;font-size:11px;font-weight:400;color:var(--taupe)}
+    .video-cell.playing .video-overlay,.video-cell.playing .cap,.video-cell.playing img{display:none}
+    .video-cell.soon{cursor:default;background:linear-gradient(135deg,var(--surface),var(--surface-2));display:flex;align-items:center;justify-content:center;color:var(--taupe);font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+    .gate{max-width:520px;margin:120px auto;text-align:center;color:var(--taupe);line-height:1.6;padding:0 20px}
+    .modal{position:fixed;inset:0;z-index:50;background:rgba(5,6,7,.85);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);display:none;align-items:center;justify-content:center;padding:16px}
+    .modal.open{display:flex}
+    .modal .box{width:min(1000px,100%);background:var(--glass),var(--surface);border:1px solid var(--line-strong);border-radius:22px;overflow:hidden;box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 30px 80px rgba(0,0,0,.6)}
+    .modal .bar{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--line);font-size:13px;font-weight:500}
+    .modal .bar button{background:none;border:none;color:var(--taupe);font-size:20px;line-height:1;cursor:pointer;transition:color .2s}
+    .modal .bar button:hover{color:var(--cream)}
+    .modal iframe,.modal video{display:block;width:100%;aspect-ratio:16/9;border:0;background:#000;max-height:80vh}
+    @media (max-width:860px){.app-main{grid-template-columns:1fr}.sidebar{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line);padding:12px;display:flex;gap:6px;overflow-x:auto}.sidebar .mono{display:none}.type-item{flex:none;padding:10px 12px}.type-item span{display:none}.content{padding:18px 16px 40px}.app-header .brand{display:none}.app-header .right{gap:8px}.private span{white-space:nowrap}}
+    @media (max-width:480px){.app-header{padding:12px 16px;gap:10px}.private span{display:none}.private{padding:0 10px}.btn{padding:0 14px;font-size:13px}}
+    @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+  </style>
+</head>
+<body>
+<div class="app" id="app">
+  <header class="app-header">
+    <span class="lv-rec"><i></i>DS<em>Editing</em></span>
+    <div class="brand"><b>DS Editing</b><small class="mono" data-t="sub"></small></div>
+    <div class="right"><span class="private"><i></i><span data-t="private"></span></span><button class="lang" id="langBtn" type="button">EN</button><a class="btn" id="contact" href="#" data-t="contact"></a></div>
+  </header>
+  <div class="app-main" id="main">
+    <nav class="sidebar"><div class="mono" data-t="types"></div><div id="types"></div></nav>
+    <div class="content">
+      <h1 class="display" id="typeTitle"></h1>
+      <p class="sub" id="typeSub"></p>
+      <div class="tier-tabs" id="tiers"></div>
+      <p class="tier-desc" id="tierDesc"></p>
+      <div class="video-grid" id="grid"></div>
+    </div>
+  </div>
+  <div class="gate" id="gate" hidden></div>
+</div>
+<div class="modal" id="modal"><div class="box"><div class="bar"><span id="modalTitle"></span><button type="button" id="modalClose">×</button></div><div id="modalMedia"></div></div></div>
+
+<script src="portfolio.js?v=5"></script>
+<script src="previews.js?v=5"></script>
+<script>
+(function () {
+  // Clé du lien privé. Le lien à envoyer : portfolio.html?k=CLÉ
+  const KEY = "dse-7f3a9";
+  const P = window.DS_PORTFOLIO;
+  // Vidéos du Drive (previews.js) ajoutées au portfolio : même source que l'espace client
+  (function () {
+    const D = window.DS_PREVIEWS || {}; const seen = new Set((P.items || []).map((x) => x.src));
+    const add = (cat, tier, list) => (list || []).forEach((v) => { if (!seen.has(v.src)) { P.items.push({ id: v.id, cat, tier, title: v.title, src: v.src, poster: v.poster, vertical: v.vertical, image: v.image, lang: v.lang, studio: v.studio || (P.videoStudios || {})[v.id] }); seen.add(v.src); } });
+    if (Array.isArray(D.items)) {
+      // v2 : liste plate, toutes catégories ; une vidéo sans formule (trailers, ads, miniatures…) garde tier = null
+      D.items.filter((v) => v.cat !== "cta").forEach((v) => add(v.cat, v.tier || null, [{ ...v, src: "../" + v.path, poster: "../" + v.posterPath }]));
+    } else ["fr", "en"].forEach((lg) => {
+      ["standard", "premium"].forEach((ti) => { add("podcast-interview", ti, D.podcast?.[ti]?.[lg]); add("vsl", ti, D.vsl?.[ti]?.[lg]); });
+      add("reels-shorts", "standard", D.reel_basique?.[lg]); add("reels-shorts", "premium", D.reel_signature?.[lg]);
+    });
+  })();
+  const $ = (s) => document.querySelector(s);
+  const params = new URLSearchParams(location.search);
+  let lang = params.get("lang") || (() => { try { return localStorage.getItem("ds_lang"); } catch { return null; } })() || ((navigator.language || "en").slice(0, 2) === "fr" ? "fr" : "en");
+  if (!["fr", "en"].includes(lang)) lang = "en";
+  const T = {
+    fr: { sub: "Exemples de production", private: "Lien privé", contact: "Prendre contact", types: "Type de contenu", soon: "Bientôt", quote: "Sur devis", gate: "Cet espace est réservé aux studios avec qui nous échangeons. Demandez votre lien à contact@ds-editing.com." },
+    en: { sub: "Production examples", private: "Private link", contact: "Get in touch", types: "Content type", soon: "Coming soon", quote: "On quote", gate: "This space is reserved for studios we're talking with. Ask for your link at contact@ds-editing.com." },
+  };
+  let type = params.get("type") || P.types[0].slug, tier = P.tiers[0].slug;
+  if (params.get("k") !== KEY) { $("#main").hidden = true; $("#gate").hidden = false; $("#gate").textContent = T[lang].gate; return; }
+
+  function render() {
+    const t = T[lang];
+    document.documentElement.lang = lang;
+    document.querySelectorAll("[data-t]").forEach((el) => { el.textContent = t[el.dataset.t] || ""; });
+    $("#langBtn").textContent = lang === "fr" ? "EN" : "FR";
+    $("#contact").href = P.contactPhone ? `https://wa.me/${P.contactPhone.replace(/\D/g, "")}` : `mailto:${P.contactEmail}`;
+    $("#types").innerHTML = P.types.map((ty) => `<div class="type-item ${ty.slug === type ? "active" : ""}" data-type="${ty.slug}"><b>${ty[lang][0]}</b><span>${ty[lang][1]}</span></div>`).join("");
+    $("#types").querySelectorAll("[data-type]").forEach((el) => el.addEventListener("click", () => { type = el.dataset.type; render(); }));
+    const ty = P.types.find((x) => x.slug === type);
+    $("#typeTitle").textContent = ty[lang][0]; $("#typeSub").textContent = ty[lang][1];
+    const prices = P.prices[type] || {};
+    // Type sans formules (aucune vidéo rangée en Standard/Premium/Signature) : pas d'onglets, toutes les vidéos
+    const ofType = (P.items || []).filter((it) => it.cat === type), tiered = ofType.some((it) => it.tier);
+    $("#tiers").hidden = $("#tierDesc").hidden = !tiered && ofType.length > 0;
+    $("#tiers").innerHTML = P.tiers.map((ti) => `<div class="tier ${ti.slug === tier ? "active" : ""}" data-tier="${ti.slug}"><b>${ti[lang][0]}</b><span>${prices[ti.slug] || t.quote}</span></div>`).join("");
+    $("#tiers").querySelectorAll("[data-tier]").forEach((el) => el.addEventListener("click", () => { tier = el.dataset.tier; render(); }));
+    $("#tierDesc").textContent = P.tiers.find((x) => x.slug === tier)[lang][1];
+    const items = ofType.filter((it) => !tiered || it.tier === tier)
+      .sort((a, b) => (a.lang && a.lang !== lang ? 1 : 0) - (b.lang && b.lang !== lang ? 1 : 0)); // langue de l'interface d'abord
+    const grid = $("#grid"); const allVert = items.length ? items.every((it) => it.vertical ?? ty.ratio === "9/16") : ty.ratio === "9/16"; grid.className = "video-grid" + (allVert ? " vert" : "");
+    grid.innerHTML = items.length
+      ? items.map((it, i) => `<div class="video-cell${it.vertical ? " v" : ""}" data-i="${i}"><img src="${window.dsThumb(it)}" alt=""/><div class="video-overlay"><div class="play-btn">▶</div></div><div class="cap">${it.title || ""}<span>${studio(it)}</span></div></div>`).join("")
+      : [0, 1, 2].map(() => `<div class="video-cell soon">${t.soon}</div>`).join("");
+    grid.querySelectorAll(".video-cell[data-i]").forEach((cell) => cell.addEventListener("click", () => play(cell, items[+cell.dataset.i])));
+  }
+  function studio(it) { const st = (P.studios || []).find((x) => x.name === it.studio); return st && st.ok ? it.studio : ""; }
+  function play(cell, it) {
+    if (it.image) { $("#modalTitle").textContent = it.title || ""; $("#modalMedia").innerHTML = `<img src="${it.src}" alt="" style="display:block;max-width:100%;max-height:80vh;margin:0 auto"/>`; $("#modal").classList.add("open"); return; }
+    if (it.src) { // mp4 hébergé : lecture dans la case, comme HTR
+      document.querySelectorAll(".video-cell.playing video").forEach((v) => { v.pause(); v.closest(".video-cell").classList.remove("playing"); v.remove(); });
+      const v = document.createElement("video"); v.src = it.src; v.controls = true; v.playsInline = true; v.autoplay = true; v.poster = it.poster || ""; v.setAttribute("controlsList", "nodownload noplaybackrate noremoteplayback"); v.disablePictureInPicture = true; v.disableRemotePlayback = true; v.addEventListener("contextmenu", (e) => e.preventDefault()); v.muted = false; v.volume = 1;
+      cell.classList.add("playing"); cell.appendChild(v);
+      return;
+    }
+    const em = window.dsEmbed(it.url);
+    if (!em) { window.open(it.url, "_blank", "noopener"); return; }
+    $("#modalTitle").textContent = it.title || ""; $("#modalMedia").innerHTML = `<iframe src="${em}" allow="autoplay; fullscreen" allowfullscreen></iframe>`; $("#modal").classList.add("open");
+  }
+  const closeModal = () => { $("#modal").classList.remove("open"); $("#modalMedia").innerHTML = ""; };
+  $("#modalClose").addEventListener("click", closeModal);
+  $("#modal").addEventListener("click", (e) => { if (e.target.id === "modal") closeModal(); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModal(); });
+  $("#langBtn").addEventListener("click", () => { lang = lang === "fr" ? "en" : "fr"; try { localStorage.setItem("ds_lang", lang); } catch {} render(); });
+  render();
+})();
+</script>
+</body>
+</html>

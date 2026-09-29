@@ -4,52 +4,64 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <meta name="robots" content="noindex,nofollow"/>
-  <meta name="theme-color" content="#0C0B10"/>
+  <meta name="theme-color" content="#050607"/>
   <title>DS Editing — Suivi de commande</title>
   <link rel="icon" type="image/png" href="assets/logo.png"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&display=swap" rel="stylesheet"/>
   <style>
-    :root{--bg:#0C0B10;--surface:#16141A;--line:rgba(237,232,220,.10);--line-strong:rgba(237,232,220,.22);--cream:#EDE8DC;--taupe:#8A8378;--amber:#FF6A2B;--amber-soft:rgba(255,106,43,.14);--ok:#5FD39A;--err:#F08A82}
+    :root{--bg:#050607;--surface:#0F1114;--surface-2:#161A1F;--line:rgba(255,255,255,.09);--line-strong:rgba(255,255,255,.22);--cream:#F5F5F1;--taupe:#9AA3AD;--amber:#DCE3EA;--amber-soft:rgba(220,227,234,.12);--ok:#46D369;--err:#F08A82;--warn:#F5C400;--blue:#7FB0E0;--accent2:#B9C9DA;--chrome:linear-gradient(180deg,#FFFFFF 0%,#E3E7EC 38%,#9BA4AE 72%,#D6DBE0 100%);--chrome2:linear-gradient(95deg,#B9C9DA 0%,#7FA3CF 45%,#E6ECF2 100%);--glass:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02))}
     *{box-sizing:border-box}
-    html,body{margin:0;background:var(--bg);color:var(--cream);font-family:"Archivo",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
-    body{min-height:100vh;display:flex;flex-direction:column}
+    html,body{margin:0;background:var(--bg);color:var(--cream);font-family:'Geist',system-ui,sans-serif;font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+    body{min-height:100vh;display:flex;flex-direction:column;background:radial-gradient(1200px 700px at 85% -5%,rgba(125,155,195,.16),transparent 60%),radial-gradient(900px 600px at -10% 40%,rgba(160,170,185,.08),transparent 60%),#050607;background-attachment:fixed}
     a{color:inherit}
-    .mono{font-family:"JetBrains Mono",ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;font-size:10px;color:var(--taupe)}
-    .display{font-family:"Anton",Impact,sans-serif;font-weight:400;letter-spacing:.01em;text-transform:uppercase;line-height:1}
-    header{border-bottom:1px solid var(--line)}
+    .mono{font-family:'Geist',system-ui,sans-serif;font-weight:600;font-size:11px;letter-spacing:.06em;text-transform:uppercase;font-variant-numeric:tabular-nums;color:var(--taupe)}
+    .display{font-family:'Geist',system-ui,sans-serif;font-weight:600;letter-spacing:-.035em;text-transform:none;line-height:.98;background:var(--chrome);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .display em,.display .ac{font-style:normal;background:var(--chrome2);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .lv-rec{display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:22px;letter-spacing:-.04em;line-height:1;color:var(--cream);white-space:nowrap}
+    .lv-rec i{width:9px;height:9px;border-radius:50%;background:var(--amber);box-shadow:0 0 12px var(--amber);animation:blink 1.6s infinite;margin-right:2px}
+    .lv-rec em{font-style:normal;font-size:11px;font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:var(--taupe);margin-left:2px}
+    @keyframes blink{50%{opacity:.2}}
+    header{position:sticky;top:0;z-index:10;background:rgba(8,9,11,.62);-webkit-backdrop-filter:blur(22px) saturate(1.4);backdrop-filter:blur(22px) saturate(1.4);border-bottom:1px solid var(--line)}
     .hd{max-width:760px;margin:0 auto;padding:14px 16px;display:flex;align-items:center;gap:12px}
-    .hd img{width:34px;height:34px;border-radius:50%;object-fit:cover}
-    .hd .brand{display:flex;flex-direction:column;line-height:1.1}.hd b{font-weight:600}
-    .lang{margin-left:auto;background:none;border:1px solid var(--line);color:var(--taupe);border-radius:999px;padding:6px 10px;cursor:pointer;font:inherit;font-size:12px}
+    .hd .brand{display:flex;flex-direction:column;line-height:1.1;padding-left:12px;border-left:1px solid var(--line)}.hd b{font-weight:600}
+    .hd .brand b{display:none} /* le nom est déjà porté par le logo « ● Rec » */
+    .lang{margin-left:auto;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.16);color:#fff;border-radius:999px;height:36px;padding:0 14px;cursor:pointer;font:inherit;font-size:12px;font-weight:600;letter-spacing:-.01em;-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);transition:border-color .2s,background .2s}.lang:hover{border-color:rgba(220,230,240,.35);background:rgba(255,255,255,.08)}
     main{flex:1;width:100%;max-width:760px;margin:0 auto;padding:36px 16px 80px}
     h1{font-size:clamp(34px,6vw,54px);margin:14px 0 8px}
     .lead{margin:0 0 22px;color:var(--taupe);line-height:1.55}
     .tokform{display:flex;gap:10px}
-    .in{flex:1;background:var(--surface);color:var(--cream);border:1px solid var(--line);border-radius:12px;padding:14px 16px;font:inherit;font-size:18px;letter-spacing:.2em;font-family:"JetBrains Mono",monospace;outline:none}
-    .in:focus{border-color:rgba(255,106,43,.6)}
-    .btn{border:none;border-radius:999px;padding:14px 22px;font:inherit;font-size:15px;font-weight:600;cursor:pointer;background:var(--amber);color:#0C0B10}
+    .in{flex:1;min-width:0;background:rgba(255,255,255,.04);color:var(--cream);border:1px solid var(--line);border-radius:12px;height:54px;padding:0 18px;font:inherit;font-family:'Geist',system-ui,sans-serif;font-size:22px;font-weight:600;letter-spacing:.12em;font-variant-numeric:tabular-nums;outline:none;transition:border-color .2s,box-shadow .2s}
+    .in::placeholder{color:rgba(154,163,173,.6);font-weight:500}
+    .in:focus{border-color:rgba(220,227,234,.6);box-shadow:0 0 0 3px rgba(220,227,234,.14)}
+    .in.bad{border-color:var(--err)}
+    .btn{border:none;border-radius:999px;height:54px;padding:0 26px;font:inherit;font-size:15px;font-weight:600;letter-spacing:-.01em;cursor:pointer;background:linear-gradient(180deg,#FFFFFF,#C9D0D7);color:#0A0B0D;box-shadow:inset 0 1px 0 #fff,0 8px 30px rgba(180,200,225,.18);display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;transition:background .2s}
+    .btn:hover{background:linear-gradient(180deg,#fff,#E4E8EC)}
+    .btn:disabled,.btn[disabled]{opacity:.45;cursor:default}
     .msg{margin-top:12px;color:var(--err);font-size:13px;min-height:18px}
-    .card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px;margin-top:22px}
-    .card .k{font-size:11px;color:var(--taupe);letter-spacing:.12em;text-transform:uppercase;font-family:"JetBrains Mono",monospace}
-    .card .v{font-size:16px;margin:4px 0 14px}
+    .card{background:var(--glass);border:1px solid var(--line);border-radius:22px;padding:24px;margin-top:22px;-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+    .card .k{font-family:'Geist',system-ui,sans-serif;font-weight:600;font-size:11px;color:var(--taupe);letter-spacing:.06em;text-transform:uppercase;font-variant-numeric:tabular-nums}
+    .card .v{font-size:16px;margin:4px 0 14px;font-variant-numeric:tabular-nums}
     .grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 18px}
     @media (max-width:560px){.grid{grid-template-columns:1fr}}
     .timeline{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:0}
     .timeline li{display:grid;grid-template-columns:28px 1fr auto;gap:12px;align-items:center;padding:12px 0;border-top:1px solid var(--line)}
-    .timeline li i{width:22px;height:22px;border-radius:50%;border:2px solid var(--line-strong);display:flex;align-items:center;justify-content:center;font-style:normal;font-size:11px;color:var(--taupe)}
-    .timeline li.done i{border-color:var(--ok);background:rgba(95,211,154,.15);color:var(--ok)}
-    .timeline li.now i{border-color:var(--amber);color:var(--amber);box-shadow:0 0 12px rgba(255,106,43,.5)}
-    .timeline li b{font-weight:500}.timeline li.done b{color:var(--cream)}.timeline li:not(.done) b{color:var(--taupe)}
-    .timeline li small{color:var(--taupe);font-family:"JetBrains Mono",monospace;font-size:11px}
-    .deliv{margin-top:18px;padding:16px;border:1px solid rgba(95,211,154,.4);border-radius:12px;background:rgba(95,211,154,.08)}
+    .timeline li i{width:22px;height:22px;border-radius:50%;border:2px solid var(--line-strong);display:flex;align-items:center;justify-content:center;font-style:normal;font-size:11px;font-weight:600;color:var(--taupe);font-variant-numeric:tabular-nums;transition:border-color .2s,background .2s}
+    .timeline li.done i{border-color:var(--ok);background:rgba(70,211,105,.12);color:var(--ok)}
+    .timeline li.now i{border-color:var(--amber);color:var(--amber);background:var(--amber-soft);box-shadow:0 0 12px rgba(220,227,234,.5)}
+    .timeline li b{font-weight:500}.timeline li.done b{color:var(--cream)}.timeline li:not(.done) b{color:var(--taupe)}.timeline li.now b{color:var(--cream);font-weight:600}
+    .timeline li small{color:var(--taupe);font-family:'Geist',system-ui,sans-serif;font-size:11px;font-variant-numeric:tabular-nums;letter-spacing:.02em}
+    .deliv{margin-top:18px;padding:16px 18px;border:1px solid rgba(70,211,105,.35);border-radius:14px;background:rgba(70,211,105,.12)}
     .deliv a{display:inline-block;margin-top:8px;color:var(--ok);font-weight:600}
+    /* état « ajustements demandés » : le script pose un style inline hérité (ancien orange) ; on l'aligne sur le statut attention de la charte sans toucher au script */
+    .deliv[style]{border-color:rgba(245,196,0,.35)!important;background:rgba(245,196,0,.12)!important}
     footer{padding:18px;text-align:center}
+    @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
   </style>
 </head>
 <body>
-<header><div class="hd"><img src="assets/logo.png" alt=""/><div class="brand"><b>DS Editing</b><span class="mono" data-t="sub"></span></div><button class="lang" id="langBtn" type="button">EN</button></div></header>
+<header><div class="hd"><span class="lv-rec"><i></i>DS<em>Editing</em></span><div class="brand"><b>DS Editing</b><span class="mono" data-t="sub"></span></div><button class="lang" id="langBtn" type="button">EN</button></div></header>
 <main>
   <div class="mono" data-t="kicker"></div>
   <h1 class="display" data-t="title"></h1>

@@ -3,43 +3,53 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <meta name="theme-color" content="#0C0B10"/>
+  <meta name="theme-color" content="#050607"/>
   <meta name="robots" content="noindex"/>
   <title>DS Editing — Nouveau projet</title>
   <link rel="icon" type="image/png" href="../assets/logo.png"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&display=swap" rel="stylesheet"/>
   <style>
     :root{
-      --bg:#0C0B10; --surface:#16141A; --surface-2:#1D1A22; --line:rgba(237,232,220,.10); --line-strong:rgba(237,232,220,.22);
-      --cream:#EDE8DC; --taupe:#8A8378; --amber:#FF6A2B; --amber-soft:rgba(255,106,43,.14); --ok:#5FD39A; --err:#F08A82;
-      --radius:14px;
+      --bg:#050607; --surface:#0F1114; --surface-2:#161A1F; --line:rgba(255,255,255,.09); --line-strong:rgba(255,255,255,.22);
+      --cream:#F5F5F1; --taupe:#9AA3AD; --amber:#DCE3EA; --amber-soft:rgba(220,227,234,.12); --ok:#46D369; --err:#F08A82;
+      --accent-blue:#B9C9DA;
+      --chrome:linear-gradient(180deg,#FFFFFF 0%,#E3E7EC 38%,#9BA4AE 72%,#D6DBE0 100%);
+      --chrome2:linear-gradient(95deg,#B9C9DA 0%,#7FA3CF 45%,#E6ECF2 100%);
+      --radius:22px;
     }
     *{box-sizing:border-box}
-    html,body{margin:0;background:var(--bg);color:var(--cream);font-family:"Archivo",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
-    body{min-height:100vh;display:flex;flex-direction:column}
+    html{color-scheme:dark}
+    html,body{margin:0;background:var(--bg);color:var(--cream);font-family:'Geist',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+    body{min-height:100vh;display:flex;flex-direction:column;background:radial-gradient(1200px 700px at 85% -5%, rgba(125,155,195,.16), transparent 60%), radial-gradient(900px 600px at -10% 40%, rgba(160,170,185,.08), transparent 60%), #050607;background-attachment:fixed}
     a{color:inherit}
-    .mono{font-family:"JetBrains Mono",ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;font-size:10px;color:var(--taupe)}
-    .display{font-family:"Anton",Impact,sans-serif;font-weight:400;letter-spacing:.01em;text-transform:uppercase;line-height:1}
+    .mono{font-family:'Geist',system-ui,sans-serif;font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-size:11px;font-variant-numeric:tabular-nums;color:var(--taupe)}
+    .display{font-family:'Geist',system-ui,sans-serif;font-weight:600;letter-spacing:-.035em;text-transform:none;line-height:.98;background:var(--chrome);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .display em,.display .ac{font-style:normal;background:var(--chrome2);-webkit-background-clip:text;background-clip:text;color:transparent}
 
-    header{position:sticky;top:0;z-index:20;background:rgba(12,11,16,.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+    header{position:sticky;top:0;z-index:20;background:rgba(8,9,11,.62);-webkit-backdrop-filter:blur(22px) saturate(1.4);backdrop-filter:blur(22px) saturate(1.4);border-bottom:1px solid var(--line)}
     .hd{max-width:960px;margin:0 auto;padding:14px 16px;display:flex;align-items:center;gap:14px}
     .hd img{width:34px;height:34px;border-radius:8px;object-fit:cover}
+    .lv-rec{display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:22px;letter-spacing:-.04em;line-height:1;color:var(--cream);white-space:nowrap}
+    .lv-rec i{width:9px;height:9px;border-radius:50%;background:var(--amber);box-shadow:0 0 12px var(--amber);animation:blink 1.6s infinite;margin-right:2px}
+    .lv-rec em{font-style:normal;font-size:11px;font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:var(--taupe);margin-left:2px}
+    @keyframes blink{50%{opacity:.2}}
     .hd .brand{display:flex;flex-direction:column;gap:2px}
-    .hd .brand b{font-weight:600;letter-spacing:.02em}
-    .hd .client{margin-left:auto;display:flex;align-items:center;gap:8px;padding:6px 12px;border:1px solid var(--line-strong);border-radius:999px;font-size:13px}
+    .hd .brand b{display:none} /* le nom est déjà porté par le logo « ● Rec » */
+    .hd .client{margin-left:auto;display:flex;align-items:center;gap:8px;padding:6px 12px;border:1px solid rgba(255,255,255,.16);border-radius:999px;font-size:13px;background:rgba(255,255,255,.06);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)}
     .hd .client i{width:7px;height:7px;border-radius:50%;background:var(--amber);box-shadow:0 0 12px var(--amber)}
-    .lang{margin-left:10px;background:none;border:1px solid var(--line);color:var(--taupe);border-radius:999px;padding:6px 10px;cursor:pointer;font:inherit;font-size:12px}
-    .lang:hover{color:var(--cream);border-color:var(--line-strong)}
+    .lang{margin-left:10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.16);color:var(--taupe);border-radius:999px;padding:6px 10px;cursor:pointer;font:inherit;font-size:12px;font-weight:600;-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);transition:border-color .2s,color .2s}
+    .lang:hover{color:var(--cream);border-color:rgba(220,230,240,.35)}
 
     main{flex:1;width:100%;max-width:960px;margin:0 auto;padding:28px 16px 90px}
     .intro h1{margin:18px 0 8px;font-size:clamp(34px,6vw,58px)}
     .intro p{margin:0;color:var(--taupe);max-width:60ch;font-size:15px;line-height:1.55}
 
     .steps{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin:26px 0 22px}
-    .step{padding:10px 10px 8px;border:1px solid var(--line);border-radius:10px;background:var(--surface);position:relative;overflow:hidden;cursor:pointer}
-    .step .n{font-family:"JetBrains Mono",monospace;font-size:10px;color:var(--taupe)}
+    .step{padding:10px 10px 8px;border:1px solid var(--line);border-radius:14px;background:var(--surface);position:relative;overflow:hidden;cursor:pointer;transition:border-color .2s}
+    .step:hover{border-color:var(--line-strong)}
+    .step .n{font-family:'Geist',system-ui,sans-serif;font-weight:600;font-size:10px;letter-spacing:.06em;font-variant-numeric:tabular-nums;color:var(--taupe)}
     .step .t{font-size:12px;margin-top:3px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .step::after{content:"";position:absolute;left:0;bottom:0;height:2px;width:0;background:var(--amber);transition:width .35s}
     .step.active{border-color:var(--line-strong)}
@@ -47,21 +57,21 @@
     .step.done .n{color:var(--ok)}
     @media (max-width:640px){.steps{grid-template-columns:repeat(3,1fr)}}
 
-    .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:22px;margin-bottom:16px}
-    .card h2{margin:0 0 4px;font-size:22px}
+    .card{background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.09);border-radius:var(--radius);padding:22px;margin-bottom:16px;-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+    .card h2{margin:0 0 4px;font-size:22px;font-weight:600;letter-spacing:-.02em}
     .card .hint{margin:0 0 18px;color:var(--taupe);font-size:14px;line-height:1.5}
     .panel{display:none}.panel.active{display:block;animation:fade .25s ease}
     @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
     .block{margin-top:22px;padding-top:18px;border-top:1px solid var(--line)}
     .block:first-of-type{margin-top:0;padding-top:0;border-top:0}
-    .block h3{margin:0 0 4px;font-size:16px}
+    .block h3{margin:0 0 4px;font-size:16px;font-weight:600}
     .block .sub{margin:0 0 12px;color:var(--taupe);font-size:13px;line-height:1.5}
 
     label.f{display:block;margin:14px 0 6px;font-size:14px;font-weight:500}
     label.f small{color:var(--taupe);font-weight:400;margin-left:6px}
-    .in,textarea.in{width:100%;background:var(--bg);color:var(--cream);border:1px solid var(--line);border-radius:10px;padding:12px 14px;font:inherit;font-size:15px;outline:none;transition:border-color .15s,box-shadow .15s}
-    .in:focus{border-color:rgba(255,106,43,.6);box-shadow:0 0 0 3px rgba(255,106,43,.18)}
-    .in::placeholder{color:rgba(138,131,120,.6)}
+    .in,textarea.in{width:100%;background:rgba(255,255,255,.04);color:var(--cream);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font:inherit;font-size:15px;outline:none;transition:border-color .15s,box-shadow .15s}
+    .in:focus{border-color:rgba(220,227,234,.6);box-shadow:0 0 0 3px rgba(220,227,234,.14)}
+    .in::placeholder{color:rgba(154,163,173,.6)}
     textarea.in{min-height:150px;resize:vertical;line-height:1.5}
     .in.bad{border-color:var(--err)}
     .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -72,27 +82,29 @@
     .choices.two{grid-template-columns:1fr 1fr}
     .choices.three{grid-template-columns:repeat(3,1fr)}
     @media (max-width:720px){.choices.two,.choices.three{grid-template-columns:1fr}}
-    .c{border:1px solid var(--line);border-radius:12px;padding:16px;background:var(--bg);display:flex;flex-direction:column;gap:8px;cursor:pointer;transition:border-color .15s,background .15s;position:relative}
+    .c{border:1px solid var(--line);border-radius:14px;padding:16px;background:var(--surface);display:flex;flex-direction:column;gap:8px;cursor:pointer;transition:border-color .2s,background .2s;position:relative}
     .c:hover{border-color:var(--line-strong)}
-    .c.on{border-color:rgba(255,106,43,.6);background:var(--amber-soft)}
+    .c.on{border-color:rgba(220,230,240,.5);background:var(--amber-soft)}
     .c .top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
     .c .name{font-weight:600;font-size:16px}
-    .c .price{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--taupe);border:1px solid var(--line);border-radius:999px;padding:4px 9px;white-space:nowrap}
-    .c.on .price{color:var(--amber);border-color:rgba(255,106,43,.5)}
+    .c .price{font-family:'Geist',system-ui,sans-serif;font-weight:600;font-size:11px;letter-spacing:.04em;font-variant-numeric:tabular-nums;color:var(--taupe);border:1px solid var(--line);border-radius:999px;padding:4px 9px;white-space:nowrap;transition:background .2s,color .2s,border-color .2s}
+    .c.on .price{color:#0A0B0D;background:rgba(255,255,255,.85);border-color:transparent}
     .c .desc{font-size:13px;color:var(--taupe);line-height:1.45;flex:1}
     .c .foot{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:4px}
-    .preview{background:none;border:none;color:var(--cream);font:inherit;font-size:13px;cursor:pointer;padding:0;display:inline-flex;align-items:center;gap:6px;opacity:.85}
-    .preview:hover{color:var(--amber);opacity:1}
-    .preview[disabled]{color:var(--taupe);cursor:default;opacity:.6}
+    .preview{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.16);border-radius:999px;color:#fff;font:inherit;font-size:13px;font-weight:600;letter-spacing:-.01em;cursor:pointer;padding:5px 12px 5px 5px;display:inline-flex;align-items:center;gap:6px;-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);transition:border-color .2s,color .2s}
+    .preview:hover{color:#fff;border-color:rgba(220,230,240,.35)}
+    .preview[disabled]{color:var(--taupe);cursor:default;opacity:.45}
     .preview i{width:20px;height:20px;border-radius:50%;border:1px solid currentColor;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-style:normal}
     .qty{display:flex;align-items:center;gap:6px}
-    .qty button{width:34px;height:34px;border-radius:9px;border:1px solid var(--line-strong);background:var(--surface);color:var(--cream);font-size:18px;cursor:pointer;line-height:1}
-    .qty button:hover{border-color:var(--amber);color:var(--amber)}
-    .qty input{width:52px;height:34px;text-align:center;background:var(--bg);border:1px solid var(--line);border-radius:9px;color:var(--cream);font:inherit;font-size:15px}
+    .qty button{width:34px;height:34px;border-radius:999px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);color:#fff;font-size:18px;cursor:pointer;line-height:1;transition:border-color .2s,background .2s}
+    .qty button:hover{border-color:rgba(220,230,240,.35);background:rgba(255,255,255,.1)}
+    .qty input{width:52px;height:34px;text-align:center;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:12px;color:var(--cream);font:inherit;font-size:15px;font-variant-numeric:tabular-nums;outline:none;transition:border-color .15s,box-shadow .15s}
+    .qty input:focus{border-color:rgba(220,227,234,.6);box-shadow:0 0 0 3px rgba(220,227,234,.14)}
     .qty input::-webkit-outer-spin-button,.qty input::-webkit-inner-spin-button{-webkit-appearance:none}
     .qty .lab{font-size:13px;color:var(--taupe);margin-right:6px}
+    .qty .price{font-weight:600;font-variant-numeric:tabular-nums}
     .thumbs{display:flex;gap:8px;margin:8px 0 4px}
-    .thumbs a,.thumbs span{width:96px;aspect-ratio:16/9;border-radius:8px;border:1px solid var(--line);background:linear-gradient(135deg,#1D1A22,#2A2530);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--taupe);text-decoration:none;overflow:hidden}
+    .thumbs a,.thumbs span{width:96px;aspect-ratio:16/9;border-radius:10px;border:1px solid var(--line);background:linear-gradient(135deg,var(--surface),var(--surface-2));display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--taupe);text-decoration:none;overflow:hidden;transition:border-color .2s}
     .thumbs a img{width:100%;height:100%;object-fit:cover}
     .thumbs a:hover{border-color:var(--amber)}
     .note{font-size:12px;color:var(--taupe);margin-top:8px;line-height:1.5}
@@ -100,55 +112,55 @@
     .links{display:flex;flex-direction:column;gap:8px}
     .links .l{display:flex;gap:8px}
     .links .l .in{flex:1}
-    .links .l button{width:44px;border-radius:10px;border:1px solid var(--line);background:none;color:var(--taupe);cursor:pointer;font-size:18px}
+    .links .l button{width:44px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--taupe);cursor:pointer;font-size:18px;transition:border-color .2s,color .2s}
     .links .l button:hover{color:var(--err);border-color:var(--err)}
-    .add{margin-top:8px;background:none;border:1px dashed var(--line-strong);color:var(--taupe);border-radius:10px;padding:10px 14px;cursor:pointer;font:inherit;font-size:13px;width:100%}
-    .add:hover{color:var(--cream);border-color:var(--cream)}
+    .add{margin-top:8px;background:rgba(255,255,255,.04);border:1px dashed var(--line-strong);color:var(--taupe);border-radius:999px;padding:11px 16px;cursor:pointer;font:inherit;font-size:13px;font-weight:600;width:100%;transition:border-color .2s,color .2s,background .2s}
+    .add:hover{color:var(--cream);border-color:rgba(220,230,240,.35);background:rgba(255,255,255,.06)}
     .chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 4px}
-    .chip{border:1px solid var(--line-strong);background:none;color:var(--cream);border-radius:999px;padding:7px 12px;font:inherit;font-size:13px;cursor:pointer}
-    .chip:hover{border-color:var(--amber);color:var(--amber);background:var(--amber-soft)}
+    .chip{border:1px solid var(--line-strong);background:rgba(255,255,255,.04);color:var(--cream);border-radius:999px;padding:7px 12px;font:inherit;font-size:13px;cursor:pointer;transition:border-color .2s,background .2s}
+    .chip:hover{border-color:rgba(220,230,240,.5);color:var(--cream);background:var(--amber-soft)}
     .swatches{display:flex;gap:6px;margin-top:8px;min-height:18px}
     .swatches i{width:22px;height:22px;border-radius:6px;border:1px solid var(--line-strong)}
     .brandkit{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:22px}
     @media (max-width:640px){.brandkit{grid-template-columns:1fr}}
-    .kh{display:flex;align-items:center;gap:8px;font-family:"JetBrains Mono",monospace;font-size:11px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--cream)}
-    .kh svg{color:var(--amber);flex:none}
+    .kh{display:flex;align-items:center;gap:8px;font-family:'Geist',system-ui,sans-serif;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--cream)}
+    .kh svg{color:var(--accent-blue);flex:none}
     .ks{margin:6px 0 10px;font-size:12px;color:var(--taupe)}
-    .drop{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:82px;border:1px dashed var(--line-strong);border-radius:12px;cursor:pointer;color:var(--taupe);font-size:13px;text-align:center;padding:12px;transition:.15s}
-    .drop .up{color:var(--amber)}
-    .drop:hover,.drop.over{border-color:var(--amber);background:var(--amber-soft);color:var(--cream)}
-    .drop.has{border-style:solid;border-color:rgba(255,106,43,.5);color:var(--cream)}
+    .drop{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:82px;border:1px dashed var(--line-strong);border-radius:14px;background:rgba(255,255,255,.03);cursor:pointer;color:var(--taupe);font-size:13px;text-align:center;padding:12px;transition:border-color .2s,background .2s,color .2s}
+    .drop .up{color:var(--accent-blue)}
+    .drop:hover,.drop.over{border-color:rgba(220,230,240,.5);background:var(--amber-soft);color:var(--cream)}
+    .drop.has{border-style:solid;border-color:rgba(220,227,234,.5);background:var(--surface);color:var(--cream)}
     .drop img{max-height:56px;max-width:80%;object-fit:contain;border-radius:6px}
     .cta-block{margin:22px 0 4px;padding-top:18px;border-top:1px solid var(--line)}
     .yn{display:flex;gap:10px}
-    .yn button{min-width:78px;border:1px solid var(--line-strong);border-radius:999px;background:none;color:var(--cream);font:inherit;font-size:14px;font-weight:600;padding:11px 20px;cursor:pointer;transition:.15s}
-    .yn button:hover{border-color:var(--amber)}
-    .yn button.on{background:var(--amber);border-color:var(--amber);color:#0C0B10}
+    .yn button{min-width:78px;border:1px solid rgba(255,255,255,.16);border-radius:999px;background:rgba(255,255,255,.06);color:#fff;font:inherit;font-size:14px;font-weight:600;letter-spacing:-.01em;padding:11px 20px;cursor:pointer;-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);transition:border-color .2s,background .2s,color .2s}
+    .yn button:hover{border-color:rgba(220,230,240,.35)}
+    .yn button.on{background:linear-gradient(180deg,#FFFFFF,#C9D0D7);border-color:transparent;color:#0A0B0D;box-shadow:inset 0 1px 0 #fff,0 8px 30px rgba(180,200,225,.18)}
     .cta-ex{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:14px;font-size:13px;color:var(--taupe)}
     .cta-ex #ctaChips{display:flex;gap:8px;flex-wrap:wrap}
-    .cx{position:relative;display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:999px;background:var(--surface-2);color:var(--cream);font:inherit;font-size:13px;padding:8px 12px;cursor:default}
-    .cx.live{cursor:pointer}.cx.live:hover{border-color:var(--amber)}
-    .cx i{width:14px;height:14px;border-radius:50%;border:1px solid var(--amber);color:var(--amber);font-size:9px;font-style:normal;display:inline-flex;align-items:center;justify-content:center}
-    .cx .pop{display:none;position:absolute;bottom:calc(100% + 10px);left:0;z-index:30;width:280px;background:var(--surface);border:1px solid var(--line-strong);border-radius:12px;padding:8px;box-shadow:0 20px 50px rgba(0,0,0,.5)}
+    .cx{position:relative;display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:999px;background:var(--surface-2);color:var(--cream);font:inherit;font-size:13px;padding:8px 12px;cursor:default;transition:border-color .2s}
+    .cx.live{cursor:pointer}.cx.live:hover{border-color:rgba(220,230,240,.5)}
+    .cx i{width:14px;height:14px;border-radius:50%;border:1px solid var(--accent-blue);color:var(--accent-blue);font-size:9px;font-style:normal;display:inline-flex;align-items:center;justify-content:center}
+    .cx .pop{display:none;position:absolute;bottom:calc(100% + 10px);left:0;z-index:30;width:280px;background:var(--surface-2);border:1px solid var(--line-strong);border-radius:14px;padding:8px;box-shadow:0 20px 50px rgba(0,0,0,.5)}
     .cx:hover .pop,.cx:focus .pop{display:block}
     .cx .pop img,.cx .pop video{display:block;width:100%;border-radius:8px;background:#000}
     .cx .pop span{display:block;padding:18px 8px;text-align:center;color:var(--taupe);font-size:12px}
     .fontpick{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
-    .fontpick button{border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--taupe);font:inherit;font-size:14px;text-align:left;padding:16px;cursor:pointer;transition:.15s}
+    .fontpick button{border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--taupe);font:inherit;font-size:14px;text-align:left;padding:16px;cursor:pointer;transition:border-color .2s,background .2s,color .2s}
     .fontpick button:hover{border-color:var(--line-strong);color:var(--cream)}
-    .fontpick button.on{border-color:var(--amber);background:var(--amber-soft);color:var(--cream)}
+    .fontpick button.on{border-color:rgba(220,230,240,.5);background:var(--amber-soft);color:var(--cream)}
     .check{display:flex;align-items:center;gap:10px;margin-top:10px;font-size:14px;color:var(--taupe);cursor:pointer}
     .check input{width:18px;height:18px;accent-color:var(--amber)}
 
-    .nav{position:sticky;bottom:0;background:rgba(12,11,16,.92);backdrop-filter:blur(10px);border-top:1px solid var(--line);margin:0 -16px;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px}
-    .btn{border:none;border-radius:999px;padding:14px 22px;font:inherit;font-size:15px;font-weight:600;cursor:pointer;transition:transform .12s,opacity .15s;white-space:nowrap}
+    .nav{position:sticky;bottom:0;background:rgba(8,9,11,.62);-webkit-backdrop-filter:blur(22px) saturate(1.4);backdrop-filter:blur(22px) saturate(1.4);border-top:1px solid var(--line);margin:0 -16px;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+    .btn{border:1px solid transparent;border-radius:999px;padding:13px 24px;line-height:1.2;font:inherit;font-size:15px;font-weight:600;letter-spacing:-.01em;cursor:pointer;transition:transform .12s,opacity .15s,background .2s,border-color .2s;white-space:nowrap;text-decoration:none}
     .btn:active{transform:scale(.98)}
-    .btn.primary{background:var(--amber);color:#0C0B10}
-    .btn.primary:hover{opacity:.92}
-    .btn.ghost{background:none;color:var(--taupe);border:1px solid var(--line)}
-    .btn.ghost:hover{color:var(--cream);border-color:var(--line-strong)}
-    .btn[disabled]{opacity:.5;cursor:not-allowed}
-    .summary{font-size:12px;color:var(--taupe);text-align:center;line-height:1.4;flex:1;min-width:0}
+    .btn.primary{background:linear-gradient(180deg,#FFFFFF,#C9D0D7);color:#0A0B0D;box-shadow:inset 0 1px 0 #fff,0 8px 30px rgba(180,200,225,.18)}
+    .btn.primary:hover{background:linear-gradient(180deg,#fff,#E4E8EC)}
+    .btn.ghost{background:rgba(255,255,255,.06);color:#fff;border-color:rgba(255,255,255,.16);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)}
+    .btn.ghost:hover{color:var(--cream);border-color:rgba(220,230,240,.35)}
+    .btn[disabled]{opacity:.45;cursor:not-allowed}
+    .summary{font-size:12px;color:var(--taupe);text-align:center;line-height:1.4;flex:1;min-width:0;padding:6px 14px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.04);font-variant-numeric:tabular-nums}
     .summary b{color:var(--cream);font-weight:500}
     .nav{flex-wrap:wrap}
     .msg{flex-basis:100%;order:-1;font-size:14px;font-weight:600;color:var(--err);text-align:center}
@@ -156,43 +168,50 @@
 
     .recap{display:grid;grid-template-columns:1fr 1fr;gap:14px}
     @media (max-width:640px){.recap{grid-template-columns:1fr}}
-    .recap .k{font-size:11px;color:var(--taupe);text-transform:uppercase;letter-spacing:.12em;font-family:"JetBrains Mono",monospace;margin-bottom:4px}
-    .recap .v{font-size:14px;line-height:1.5;white-space:pre-wrap;word-break:break-word}
+    .recap .k{font-size:11px;color:var(--taupe);text-transform:uppercase;letter-spacing:.06em;font-family:'Geist',system-ui,sans-serif;font-weight:600;margin-bottom:4px}
+    .recap .v{font-size:14px;line-height:1.5;white-space:pre-wrap;word-break:break-word;font-variant-numeric:tabular-nums}
     .recap .full{grid-column:1/-1}
 
     .success{text-align:center;padding:40px 10px}
-    .success .ok{width:64px;height:64px;border-radius:50%;background:rgba(95,211,154,.15);border:1px solid rgba(95,211,154,.5);display:inline-flex;align-items:center;justify-content:center;color:var(--ok);font-size:28px;margin-bottom:16px}
+    .success .ok{width:64px;height:64px;border-radius:50%;background:rgba(70,211,105,.12);border:1px solid rgba(70,211,105,.5);display:inline-flex;align-items:center;justify-content:center;color:var(--ok);font-size:28px;margin-bottom:16px}
     .success h2{font-size:34px;margin:0 0 8px}
     .success p{color:var(--taupe);max-width:52ch;margin:0 auto 22px;line-height:1.55}
     .next{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;text-align:left;margin-top:8px}
     @media (max-width:640px){.next{grid-template-columns:1fr}}
-    .next div{border:1px solid var(--line);border-radius:12px;padding:14px;background:var(--bg);font-size:14px;line-height:1.45}
+    .next div{border:1px solid var(--line);border-radius:14px;padding:14px;background:var(--surface);font-size:14px;line-height:1.45}
     .next b{display:block;margin-bottom:4px}
+    .track{display:flex;flex-direction:column;align-items:center;gap:6px;max-width:360px;margin:0 auto 22px;padding:16px 18px;border:1px solid var(--line-strong);border-radius:14px;background:var(--surface)}
+    .track b{font-size:34px;font-weight:600;letter-spacing:.14em;line-height:1.1;font-variant-numeric:tabular-nums;color:var(--cream);user-select:all}
+    .track small{font-size:12px;color:var(--taupe);line-height:1.45}
+    .success p.actions{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;max-width:none;margin:22px auto 0}
     footer{padding:18px 16px;text-align:center}
 
     /* aperçu vidéo */
-    .modal{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.78);display:none;align-items:center;justify-content:center;padding:16px}
+    .modal{position:fixed;inset:0;z-index:50;background:rgba(5,6,7,.85);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);display:none;align-items:center;justify-content:center;padding:16px}
     .modal.open{display:flex}
-    .modal .box{width:min(960px,100%);background:var(--surface);border:1px solid var(--line-strong);border-radius:14px;overflow:hidden}
+    .modal .box{width:min(960px,100%);background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02)),var(--surface);border:1px solid rgba(255,255,255,.09);border-radius:22px;overflow:hidden;box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 30px 80px rgba(0,0,0,.6)}
     .modal .bar{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--line);font-size:13px}
-    .modal .bar button{background:none;border:none;color:var(--taupe);font-size:20px;cursor:pointer}
+    .modal .bar button{background:none;border:none;color:var(--taupe);font-size:20px;cursor:pointer;transition:color .15s}
+    .modal .bar button:hover{color:var(--cream)}
     .modal iframe{display:block;width:100%;aspect-ratio:16/9;border:0;background:#000}
     .modal video{display:block;width:100%;aspect-ratio:16/9;background:#000;max-height:72vh}
     .plist{display:flex;gap:8px;padding:10px;overflow-x:auto;border-top:1px solid var(--line)}
     .plist:empty{display:none}
-    .plist button{flex:none;width:150px;border:1px solid var(--line);border-radius:8px;background:#000;padding:0;cursor:pointer;overflow:hidden;color:var(--cream);text-align:left}
+    .plist button{flex:none;width:150px;border:1px solid var(--line);border-radius:10px;background:#000;padding:0;cursor:pointer;overflow:hidden;color:var(--cream);text-align:left;transition:border-color .2s}
     .plist button img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;opacity:.75}
     .plist button span{display:block;padding:6px 8px;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .plist button.on{border-color:var(--amber)}.plist button.on img{opacity:1}
-    .terms{display:flex;gap:10px;align-items:flex-start;margin-top:16px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;font-size:13px;line-height:1.45;cursor:pointer}
+    .terms{display:flex;gap:10px;align-items:flex-start;margin-top:16px;padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.03);font-size:13px;line-height:1.45;cursor:pointer}
     .terms input{margin-top:3px;accent-color:var(--amber);width:16px;height:16px;flex:none}
-    .terms a{color:var(--amber)}
+    .terms a{color:var(--accent-blue);text-decoration:underline;text-underline-offset:2px}
+
+    @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
   </style>
 </head>
 <body>
 <header>
   <div class="hd">
-    <img src="../assets/logo.png" alt="DS Editing"/>
+    <span class="lv-rec"><i></i>DS<em>Editing</em></span>
     <div class="brand"><b>DS Editing</b><span class="mono" data-i="tagline"></span></div>
     <div class="client"><i></i><span id="clientName">—</span></div>
     <button class="lang" id="langBtn" type="button">EN</button>
@@ -335,12 +354,13 @@
     <div class="ok">✓</div>
     <h2 class="display" data-i="ok.title"></h2>
     <p data-i="ok.text"></p>
+    <div class="track" id="trackBox" style="display:none"><span class="mono" data-i="ok.track"></span><b id="trackToken"></b><small data-i="ok.trackHint"></small></div>
     <div class="next">
       <div><b data-i="ok.n1t"></b><span data-i="ok.n1"></span></div>
       <div><b data-i="ok.n2t"></b><span data-i="ok.n2"></span></div>
       <div><b data-i="ok.n3t"></b><span data-i="ok.n3"></span></div>
     </div>
-    <p style="margin-top:22px"><a class="btn primary" id="spaceLink" href="#" style="display:none" data-i="ok.space"></a> <button class="btn ghost" id="again" type="button" data-i="ok.again"></button></p>
+    <p class="actions" style="margin-top:22px"><a class="btn primary" id="trackLink" href="#" style="display:none" data-i="ok.follow"></a> <a class="btn primary" id="spaceLink" href="#" style="display:none" data-i="ok.space"></a> <button class="btn ghost" id="again" type="button" data-i="ok.again"></button></p>
   </section>
 </main>
 <footer class="mono">DS Editing · <span data-i="footer"></span></footer>
@@ -358,7 +378,8 @@
 const PREVIEWS = {
   // Vidéos d'aperçu : générées depuis le Drive par sync_previews.mjs (client/previews.js)
   ...(window.DS_PREVIEWS || {}),
-  trailer: "",
+  // Trailers : depuis le Drive (dossier « Trailers », previews.js v2 items[]) — vide = « Aperçu bientôt »
+  trailer: ((window.DS_PREVIEWS || {}).items || []).filter((i) => i.cat === "trailers").map((i) => ({ src: "../" + i.path, poster: "../" + i.posterPath, title: i.title, vertical: !!i.vertical })),
   portfolio: "",                 // lien vers le portfolio miniatures
   miniatures: ["", "", ""],      // 3 images d'exemple (URL d'image)
 };
@@ -406,8 +427,10 @@ const I18N = {
     "btn.prev":"Retour","btn.next":"Continuer","btn.send":"Envoyer à DS Editing","btn.sending":"Envoi…",
     saved:"Brouillon enregistré sur cet appareil", empty:"Votre commande apparaîtra ici",
     units:{episode:["épisode","épisodes"],reel_basique:["reel standard","reels standard"],reel_signature:["reel premium","reels premium"],miniature:["miniature","miniatures"],trailer:["trailer","trailers"]},
-    err:{projet:"Donnez un nom au projet.",produit:"Choisissez Podcast / Interview ou VSL.",formule:"Choisissez une formule.",rushes:"Ajoutez au moins un lien de rushes.",description:"Décrivez ce que vous attendez, même en trois lignes.",contact:"Indiquez un contact et un moyen de le joindre.",email:"Indiquez un e-mail valide, c'est là qu'arrivent la confirmation et le suivi.",send:"L'envoi a échoué. Réessayez, ou écrivez-nous sur WhatsApp.",terms:"Cochez les conditions de collaboration pour envoyer la commande."},
+    err:{projet:"Donnez un nom au projet.",produit:"Choisissez Podcast / Interview ou VSL.",formule:"Choisissez une formule.",rushes:"Ajoutez au moins un lien de rushes.",description:"Décrivez ce que vous attendez, même en trois lignes.",contact:"Indiquez un contact et un moyen de le joindre.",email:"Indiquez un e-mail valide, c'est là qu'arrivent la confirmation et le suivi.",send:"L'envoi a échoué. Réessayez, ou écrivez-nous sur WhatsApp.",terms:"Cochez les conditions de collaboration pour envoyer la commande.",
+      key:"Ouvrez cet espace depuis votre lien personnel ou l'Espace client pour envoyer votre commande.",keyLink:"Aller à l'Espace client",bad_key:"Votre accès n'est pas reconnu pour ce studio. Ouvrez cet espace depuis votre lien personnel ou l'Espace client.",bad_email:"L'e-mail n'est pas valide. Corrigez-le à l'étape Brief.",no_project:"Donnez un nom au projet, à l'étape Produit.",no_rushes:"Aucun lien de rushes valide. Collez au moins un lien complet (https://…) à l'étape Fichiers.",rate_limit:"Beaucoup de commandes viennent d'être envoyées depuis cet espace. Réessayez dans une heure, ou écrivez-nous sur WhatsApp."},
     "s6.terms":"J'accepte les conditions de collaboration DS Editing : facture hebdomadaire, paiement à réception, pénalité de 20 % par semaine de retard.","s6.termsLink":"Lire les conditions","ok.space":"Ouvrir mon espace (commandes, factures)",
+    "ok.track":"Votre numéro de suivi","ok.trackHint":"Gardez-le : il est aussi dans votre e-mail de confirmation.","ok.follow":"Suivre ma commande",
     "ok.title":"C'est parti","ok.text":"Votre projet est chez nous. Vous recevrez un lien de relecture frame.io dès que le premier montage sera prêt.",
     "ok.n1t":"1. On lit votre brief","ok.n1":"Et on revient vers vous si un lien ne s'ouvre pas.","ok.n2t":"2. On monte","ok.n2":"Un monteur dédié, validé par notre head of editing avant envoi.","ok.n3t":"3. Vous relisez","ok.n3":"Commentaires à la seconde près sur frame.io, puis vous approuvez.",
     "ok.again":"Déposer un autre projet", footer:"vos rushes sont pris en charge dès réception", none:"—", already:"déjà envoyés",
@@ -449,8 +472,10 @@ const I18N = {
     "btn.prev":"Back","btn.next":"Continue","btn.send":"Send to DS Editing","btn.sending":"Sending…",
     saved:"Draft saved on this device", empty:"Your order will appear here",
     units:{episode:["episode","episodes"],reel_basique:["standard reel","standard reels"],reel_signature:["premium reel","premium reels"],miniature:["thumbnail","thumbnails"],trailer:["trailer","trailers"]},
-    err:{projet:"Give the project a name.",produit:"Choose Podcast / Interview or VSL.",formule:"Choose a package.",rushes:"Add at least one footage link.",description:"Describe what you expect, even in three lines.",contact:"Give us a contact and a way to reach them.",email:"Enter a valid email, that's where the confirmation and tracking go.",send:"Sending failed. Try again, or message us on WhatsApp.",terms:"Tick the terms of collaboration to send the order."},
+    err:{projet:"Give the project a name.",produit:"Choose Podcast / Interview or VSL.",formule:"Choose a package.",rushes:"Add at least one footage link.",description:"Describe what you expect, even in three lines.",contact:"Give us a contact and a way to reach them.",email:"Enter a valid email, that's where the confirmation and tracking go.",send:"Sending failed. Try again, or message us on WhatsApp.",terms:"Tick the terms of collaboration to send the order.",
+      key:"Open this space from your personal link or the Client space to send your order.",keyLink:"Go to the Client space",bad_key:"Your access isn't recognised for this studio. Open this space from your personal link or the Client space.",bad_email:"The email isn't valid. Fix it in the Brief step.",no_project:"Give the project a name, in the Product step.",no_rushes:"No valid footage link. Paste at least one full link (https://…) in the Files step.",rate_limit:"A lot of orders were just sent from this space. Try again in an hour, or message us on WhatsApp."},
     "s6.terms":"I accept the DS Editing terms of collaboration: weekly invoice, payment on receipt, 20% penalty per week late.","s6.termsLink":"Read the terms","ok.space":"Open my space (orders, invoices)",
+    "ok.track":"Your tracking number","ok.trackHint":"Keep it: it's also in your confirmation email.","ok.follow":"Track my order",
     "ok.title":"You're all set","ok.text":"Your project is with us. You'll get a frame.io review link as soon as the first cut is ready.",
     "ok.n1t":"1. We read your brief","ok.n1":"And get back to you if a link doesn't open.","ok.n2t":"2. We edit","ok.n2":"One dedicated editor, checked by our head of editing before delivery.","ok.n3t":"3. You review","ok.n3":"Frame-accurate comments on frame.io, then you approve.",
     "ok.again":"Submit another project", footer:"your footage is handled on receipt", none:"—", already:"already sent",
@@ -463,11 +488,19 @@ const REELS = ["reel_basique", "reel_signature"];
 const params = new URLSearchParams(location.search);
 const slug = (params.get("client") || "").toLowerCase();
 const FORMS = window.DS_FORMS || {};
-const client = FORMS[slug];
+const client = FORMS[slug]; // ancien circuit Google Form : ne sert plus qu'au repli si la base est injoignable
 let lang = params.get("lang") || (client ? client.lang : "fr");
 if (!I18N[lang]) lang = "fr";
 const $ = (s) => document.querySelector(s);
 const t = (k) => (I18N[lang][k] ?? k);
+// Commande directe : la clé d'accès du studio vient du lien personnel (?k=…) ou de l'Espace client (mémorisée par client/index.html)
+const SB_URL = "https://xkanmjlpysxpohsuqvwg.supabase.co";
+const SB_KEY = "sb_publishable_lIZtV_WtN5NcGSb0dnfaiQ_AgKYBIVa"; // clé publique
+const accessKey = (params.get("k") || (() => { try { return localStorage.getItem("ds_client_key"); } catch { return null; } })() || "").trim();
+let studio = null;      // { slug, name, lang } retrouvé depuis la clé (RPC client_slug)
+let langTouched = false; // la langue choisie à la main l'emporte sur celle du studio
+let orderToken = "";    // numéro de suivi, une fois la commande enregistrée
+const clientLabel = () => (studio && studio.name) || (client && client.client) || (slug ? slug.split("-").filter(Boolean).map(cap).join(" ") : "Demo");
 const KEY = "ds-depot-" + (slug || "demo");
 let step = 0;
 const draft = Object.assign({ qty: {}, episodes: 1 }, load());
@@ -481,12 +514,13 @@ function applyText() {
   document.querySelectorAll("[data-i]").forEach((el) => { const v = t(el.dataset.i); if (typeof v === "string") el.innerHTML = v; });
   document.querySelectorAll("[data-ph]").forEach((el) => { el.placeholder = t(el.dataset.ph); });
   $("#langBtn").textContent = lang === "fr" ? "EN" : "FR";
-  $("#clientName").textContent = client ? client.client : (slug || "Demo");
+  $("#clientName").textContent = clientLabel();
   document.title = "DS Editing — " + (lang === "fr" ? "Nouveau projet" : "New project");
   $("#pMiniature").textContent = price("miniature"); $("#pTrailer").textContent = price("trailer");
+  if (orderToken) $("#trackLink").href = trackHref();
   renderSteps(); renderProduit(); renderFormule(); renderReels(); renderThumbs(); renderQty(); renderChips(); renderLinks("rushes"); renderLinks("references"); renderBrandkit(); renderCTA(); renderNav(); wirePreviews();
 }
-$("#langBtn").addEventListener("click", () => { lang = lang === "fr" ? "en" : "fr"; applyText(); });
+$("#langBtn").addEventListener("click", () => { lang = lang === "fr" ? "en" : "fr"; langTouched = true; applyText(); });
 
 /* ---------------- rendus ---------------- */
 function renderSteps() {
@@ -585,7 +619,7 @@ function embedUrl(u) {
 // Vidéos d'aperçu selon le produit choisi et la langue de l'espace → liste [{src, poster, title}]
 function prevList(key) {
   let v = ["standard", "premium"].includes(key) ? (PREVIEWS[draft.produit || "podcast"] || {})[key] : PREVIEWS[key];
-  if (v && !Array.isArray(v) && typeof v === "object") v = v[lang];
+  if (v && !Array.isArray(v) && typeof v === "object") v = [...(v[lang] || []), ...(v[lang === "fr" ? "en" : "fr"] || [])]; // toutes les langues, celle de l'espace d'abord
   if (!v) return [];
   return (Array.isArray(v) ? v : [v]).filter(Boolean).map((x) => (typeof x === "string" ? { src: x, poster: "", title: "" } : x));
 }
@@ -716,10 +750,74 @@ function go(s) { step = s; $("#msg").textContent = ""; if (step === 5) renderRec
 $("#prev").addEventListener("click", () => go(Math.max(0, step - 1)));
 $("#next").addEventListener("click", async () => { const err = validate(step); if (err) { $("#msg").textContent = err; const bad = document.querySelector(".in.bad"); if (bad) { if (bad.scrollIntoView) bad.scrollIntoView({ behavior: "smooth", block: "center" }); bad.focus(); } return; } if (step < 5) return go(step + 1); await submit(); });
 
-/* ---------------- envoi : même circuit que le formulaire Google, sans serveur ---------------- */
+/* ---------------- envoi : la commande est écrite directement en base (RPC create_order), le moteur fait l'accueil ---------------- */
+// Appel d'une RPC Supabase avec la clé publique. Erreur métier → e.code (bad_key, no_rushes…) ; base injoignable → e.offline.
+async function rpc(fn, args) {
+  const ctl = new AbortController(); const timer = setTimeout(() => ctl.abort(), 20000);
+  let r;
+  try { r = await fetch(`${SB_URL}/rest/v1/rpc/${fn}`, { method: "POST", headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY, "Content-Type": "application/json" }, body: JSON.stringify(args), signal: ctl.signal }); }
+  catch (e) { const err = new Error("offline"); err.offline = true; throw err; }
+  finally { clearTimeout(timer); }
+  const txt = await r.text(); let data = null; try { data = txt ? JSON.parse(txt) : null; } catch {}
+  if (!r.ok) { const err = new Error((data && data.message) || "http_" + r.status); err.code = (data && data.message) || ""; err.offline = r.status >= 500; throw err; }
+  return data;
+}
+// Même résumé lisible que le moteur (livrablesSummary de poll.mjs) : « 1 épisode podcast (16:9) · formule Premium · 10 reels standard (9:16) »
+const DELIV = {
+  fr: { podcast: ["épisode podcast", "épisodes podcast", "16:9"], vsl: ["VSL", "VSL", "16:9"], reels: ["reel standard", "reels standard", "9:16"], reels_signature: ["reel premium", "reels premium", "9:16"], intro: ["intro", "intros", ""], miniature: ["miniature", "miniatures", ""], trailer: ["trailer", "trailers", ""] },
+  en: { podcast: ["podcast episode", "podcast episodes", "16:9"], vsl: ["VSL", "VSLs", "16:9"], reels: ["standard reel", "standard reels", "9:16"], reels_signature: ["premium reel", "premium reels", "9:16"], intro: ["intro", "intros", ""], miniature: ["thumbnail", "thumbnails", ""], trailer: ["trailer", "trailers", ""] },
+};
+function workToDo(d) {
+  const out = [];
+  for (const [key, [sing, plur, fmt]] of Object.entries(DELIV[lang])) {
+    const raw = String(d[key] || "").trim(); if (!raw) continue;
+    const n = parseInt(raw, 10);
+    const label = Number.isFinite(n) ? `${n} ${n > 1 ? plur : sing}` : `${raw} ${plur}`;
+    out.push(fmt ? `${label} (${fmt})` : label);
+    if ((key === "podcast" || key === "vsl") && d.formule) out.push(`${lang === "fr" ? "formule" : "package"} ${d.formule}`);
+  }
+  return out.join(" · ");
+}
+function autreDemande(v) { return [v.autre_demande, draft.cta === "yes" ? `${t("cta.unit")}${draft.ctaNets ? " : " + draft.ctaNets : ""}` : ""].filter(Boolean).join(" · "); }
+// Liens en tableau ; un lien collé sans « https:// » est complété
+function linkList(k) { return (draft[k] || []).flatMap((s) => String(s).split(/\s+/)).filter(Boolean).map((u) => (/^https?:\/\//i.test(u) ? u : (/^[\w-]+(\.[\w-]+)+([/?#]\S*)?$/.test(u) ? "https://" + u : u))); }
+function order() {
+  const v = values(); const q = draft.qty; const n = (x) => (x > 0 ? String(x) : ""); const units = String(draft.episodes || 1);
+  const details = {
+    podcast: draft.produit === "podcast" ? units : "", vsl: draft.produit === "vsl" ? units : "", formule: draft.formule ? cap(draft.formule) : "",
+    reels: n(q.reel_basique), reels_signature: n(q.reel_signature), miniature: n(q.miniature), trailer: n(q.trailer),
+    autre_demande: autreDemande(v), palette: v.palette, logos: v.logos,
+    cta: draft.cta || "", cta_reseaux: draft.cta === "yes" ? (draft.ctaNets || "") : "", font: draft.font === "team" ? "team" : (draft.fontName || ""), autres: v.autres,
+  };
+  return { project: v.projet.trim(), email: v.email.trim(), contact: v.contact, lang, work_to_do: workToDo(details), details, rushes_links: linkList("rushes"), references_links: linkList("references"), logos: v.logos, description: v.description, deadline: v.deadline, terms_accepted: $("#terms").checked, terms_text: t("s6.terms") };
+}
+const orderSlug = () => slug || (studio && studio.slug) || "";
+const trackHref = () => `../suivi.html?token=${encodeURIComponent(orderToken)}&lang=${lang}`;
+const keyMsg = (k) => `${esc(t("err")[k])} <a href="index.html?lang=${lang}">${esc(t("err").keyLink)}</a>`;
+function done(token) {
+  try { localStorage.removeItem(KEY); } catch {}
+  orderToken = token || "";
+  if (orderToken) { $("#trackToken").textContent = orderToken; $("#trackBox").style.display = ""; const a = $("#trackLink"); a.href = trackHref(); a.style.display = "inline-block"; }
+  $("#form").style.display = "none"; $("#steps").style.display = "none"; $("#success").style.display = "block"; window.scrollTo({ top: 0, behavior: "smooth" });
+}
 async function submit() {
-  if (!client) { $("#msg").textContent = "Client inconnu dans l'adresse (?client=…)."; return; }
-  const btn = $("#next"); btn.disabled = true; btn.textContent = t("btn.sending");
+  const btn = $("#next");
+  const fail = (html) => { $("#msg").innerHTML = html; btn.disabled = false; btn.textContent = t("btn.send"); };
+  if (!accessKey) return fail(keyMsg("key"));
+  btn.disabled = true; btn.textContent = t("btn.sending");
+  try {
+    const res = await rpc("create_order", { p_slug: orderSlug(), p_key: accessKey, p_order: order() });
+    if (!res || !res.token) throw Object.assign(new Error("no_token"), { code: "send" });
+    done(String(res.token));
+  } catch (e) {
+    // Pas de repli vers les anciens formulaires Google (supprimés du circuit le 29/09) : le brouillon reste enregistré, le client réessaie.
+    if (e.offline) return fail(esc(t("err").send));
+    if (e.code === "bad_key") return fail(keyMsg("bad_key"));
+    fail(esc(["bad_email", "no_project", "no_rushes", "terms", "rate_limit"].includes(e.code) ? t("err")[e.code] : t("err").send));
+  }
+}
+/* repli : même circuit que le formulaire Google, sans serveur (seulement si la base est injoignable et que le studio a un formulaire) */
+async function sendForm() {
   const v = values(); const q = draft.qty; const fd = new FormData();
   const put = (key, val) => { const id = client.entries[key]; if (id && val !== undefined && val !== "") fd.append("entry." + id, val); };
   put("projet", v.projet);
@@ -727,20 +825,24 @@ async function submit() {
   put("formule", draft.formule ? cap(draft.formule) : "");
   put("reels", q.reel_basique ? String(q.reel_basique) : ""); put("reels_signature", q.reel_signature ? String(q.reel_signature) : "");
   put("miniature", q.miniature ? String(q.miniature) : ""); put("trailer", q.trailer ? String(q.trailer) : "");
-  put("autre_demande", [v.autre_demande, draft.cta === "yes" ? `${t("cta.unit")}${draft.ctaNets ? " : " + draft.ctaNets : ""}` : ""].filter(Boolean).join(" · ")); put("description", v.description); put("rushes", v.rushes); put("logos", v.logos); put("references", v.references); put("palette", v.palette); put("contact", v.contact); put("email", v.email); put("autres", v.autres);
+  put("autre_demande", autreDemande(v)); put("description", v.description); put("rushes", v.rushes); put("logos", v.logos); put("references", v.references); put("palette", v.palette); put("contact", v.contact); put("email", v.email); put("autres", v.autres);
   if ($("#terms").checked && client.options && client.options.terms) put("terms", client.options.terms);
   if (v.deadline && client.entries.deadline) { const [y, m, d] = v.deadline.split("-"); fd.append(`entry.${client.entries.deadline}_year`, y); fd.append(`entry.${client.entries.deadline}_month`, String(+m)); fd.append(`entry.${client.entries.deadline}_day`, String(+d)); }
-  try {
-    await fetch(client.action, { method: "POST", mode: "no-cors", body: fd });
-    try { localStorage.removeItem(KEY); } catch {}
-    $("#form").style.display = "none"; $("#steps").style.display = "none"; $("#success").style.display = "block"; window.scrollTo({ top: 0, behavior: "smooth" });
-  } catch (e) { $("#msg").textContent = t("err").send; btn.disabled = false; btn.textContent = t("btn.send"); }
+  await fetch(client.action, { method: "POST", mode: "no-cors", body: fd });
 }
 $("#again").addEventListener("click", () => location.reload());
 const spaceKey = params.get("k"); if (spaceKey && slug) { const a = $("#spaceLink"); a.href = `espace.html?client=${encodeURIComponent(slug)}&k=${encodeURIComponent(spaceKey)}&lang=${lang}`; a.style.display = "inline-block"; }
 $("#termsLink").href = `../conditions.html?lang=${lang}`;
 
 applyText();
+
+/* ---------------- accès : sans clé, on prévient tout de suite ; avec clé, on retrouve le nom et la langue du studio ---------------- */
+if (!accessKey) $("#msg").innerHTML = keyMsg("key");
+else rpc("client_slug", { p_key: accessKey }).then((d) => {
+  if (!d || !d.slug || (slug && d.slug !== slug)) { $("#msg").innerHTML = keyMsg("bad_key"); return; }
+  studio = d;
+  if (!params.get("lang") && !langTouched && I18N[d.lang] && d.lang !== lang) { lang = d.lang; applyText(); } else $("#clientName").textContent = clientLabel();
+}).catch(() => {}); // base injoignable : l'envoi tranchera (repli éventuel)
 </script>
 </body>
 </html>

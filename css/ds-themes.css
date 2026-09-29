@@ -1,0 +1,99 @@
+/* HBO — monochrome, editorial serif, hairlines */
+body.hbo{--accent:#FFFFFF;--accent-d:#D0D0D0;--on-accent:#000;--bg:#000;--bg2:#0B0B0B;--bg3:#141414;--line:rgba(255,255,255,.14);--mu:#9A9A9A;background:#000}
+body.hbo .disp,body.hbo .svc h4,body.hbo .clip h4,body.hbo .pk h4,body.hbo .tm .nm,body.hbo .stat .num,body.hbo .ep .t,body.hbo .mm a.ml,body.hbo .step,body.hbo .tm.crew b,body.hbo .float-stat b,body.hbo .chn b{font-family:'Instrument Serif',serif;font-stretch:100%;font-weight:400;text-transform:none;letter-spacing:-.01em}
+body.hbo .disp{line-height:.95}
+body.hbo .hero h1{font-size:clamp(64px,8.6vw,148px)}
+body.hbo .disp em,body.hbo .ac{font-style:italic;color:#fff}
+body.hbo .mono,body.hbo .kick,body.hbo .ruler,body.hbo .role,body.hbo .when,body.hbo .series,body.hbo .offer-strip span,body.hbo .nav-links a,body.hbo .meta{font-family:'Archivo',sans-serif;font-stretch:115%;font-weight:600;text-transform:uppercase;letter-spacing:.24em;font-size:11px}
+body.hbo .meta{font-size:12px;letter-spacing:.14em}
+body.hbo .offer-strip span{font-size:15px}
+body.hbo .kick::before{border-radius:0;width:28px;height:1px;background:#fff;box-shadow:none}
+body.hbo .series b{color:#fff;font-family:'Instrument Serif',serif;font-size:30px;letter-spacing:0;text-transform:none;font-weight:400}
+body.hbo .btn{border-radius:0;font-family:'Archivo',sans-serif;font-stretch:115%;text-transform:uppercase;letter-spacing:.18em;font-size:12px;font-weight:700}
+body.hbo .btn-play,body.hbo .btn-ac{background:#fff;color:#000}
+body.hbo .btn-play:hover,body.hbo .btn-ac:hover{background:#d9d9d9;color:#000}
+body.hbo .btn-gray,body.hbo .btn-line{background:transparent;border:1px solid rgba(255,255,255,.5);color:#fff;backdrop-filter:none}
+body.hbo image-slot,body.hbo .ep>img,body.hbo .hero-media video,body.hbo .cl img,body.hbo .svc .vid,body.hbo .chl img{filter:grayscale(1) contrast(1.08)}
+body.hbo .ep:hover>img,body.hbo .ep.playing video,body.hbo .tm:hover image-slot{filter:none}
+body.hbo .svc,body.hbo .pk,body.hbo .rc,body.hbo .clip,body.hbo .clk,body.hbo .cl,body.hbo .chn,body.hbo .float-stat,body.hbo .tl,body.hbo .ct,body.hbo .sticky{border-radius:0;background:#000;border:1px solid var(--line)}
+body.hbo .ep,body.hbo .tm,body.hbo .gl,body.hbo .suite{border-radius:0}
+body.hbo .ep .tag,body.hbo .ep .prog,body.hbo .pk .badge,body.hbo .top10 i{background:#fff;color:#000;border-radius:0}
+body.hbo .ep .n{color:#fff}
+body.hbo .offer{background:#fff;color:#000}
+body.hbo .offer .disp{color:#000}
+body.hbo .offer .oi{filter:grayscale(1)}
+body.hbo .offer .btn{background:#000;color:#fff}
+body.hbo .offer-strip{border-color:rgba(0,0,0,.2)}
+body.hbo .reels,body.hbo .final{background:#000}
+body.hbo .proc{background:#050505}
+body.hbo .clip{border-top:1px solid #fff!important}
+body.hbo .playhead{background:#fff;box-shadow:none}.body.hbo .playhead::before{border-top-color:#fff}
+body.hbo .wave{background:repeating-linear-gradient(90deg,rgba(255,255,255,.4) 0 1px,transparent 1px 4px)}
+body.hbo .pk.hot{background:#0B0B0B;border-color:#fff}
+body.hbo .pk li svg{stroke:#fff}
+body.hbo .tm .role,body.hbo .svc .mono,body.hbo .chb,body.hbo .pt .mono,body.hbo .clk.hq .st{color:#fff}
+body.hbo .clk.hq{border-color:#fff}
+body.hbo .stats{border-color:#fff}
+body.hbo .stat .num sup{color:#fff}
+body.hbo .step{color:#fff;font-style:italic}
+body.hbo .tm.crew b{color:#fff}
+body.hbo .phone{box-shadow:0 0 0 1px #fff,0 0 0 9px #000,0 0 0 10px #555,0 40px 90px rgba(0,0,0,.8)}
+body.hbo .hero-media::after{background:linear-gradient(90deg,#000 0%,rgba(0,0,0,.7) 40%,rgba(0,0,0,.15) 75%),linear-gradient(0deg,#000 0%,rgba(0,0,0,0) 40%)}
+body.hbo .hero-age{border-left:1px solid #fff;background:rgba(0,0,0,.6);font-family:'Archivo';font-stretch:115%;text-transform:uppercase;letter-spacing:.2em;font-size:11px}
+body.hbo .nav.solid{background:#000;border-bottom:1px solid var(--line)}
+body.hbo .lang,body.hbo .lang button{border-radius:0}
+body.hbo a:hover{color:#bdbdbd}
+body.hbo .sticky .l b{color:#fff}
+body.hbo .match,body.hbo .meta a.match{color:#fff}
+
+/* Apple TV light — white, graphite chrome */
+body.atv.light{--accent:#1D1D1F;--accent-d:#000;--on-accent:#fff;--bg:#F5F5F7;--bg2:rgba(255,255,255,.7);--bg3:#E8E8ED;--line:rgba(0,0,0,.09);--tx:#1D1D1F;--mu:#6E6E73;--chrome:linear-gradient(180deg,#1D1D1F 0%,#3A3D42 45%,#8A9099 100%);--chrome2:linear-gradient(95deg,#4A6A92 0%,#8FB0D6 50%,#3C5474 100%);color:#1D1D1F;background:radial-gradient(1200px 700px at 85% -5%,rgba(160,185,220,.35),transparent 60%),radial-gradient(900px 600px at -10% 40%,rgba(210,215,225,.6),transparent 60%),#F5F5F7}
+body.atv.light a{color:#1D1D1F}
+body.atv.light .svc,body.atv.light .pk,body.atv.light .rc,body.atv.light .clip,body.atv.light .clk,body.atv.light .cl,body.atv.light .chn,body.atv.light .float-stat,body.atv.light .tl,body.atv.light .stats,body.atv.light .sticky,body.atv.light .ct{background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(255,255,255,.6));border:1px solid rgba(0,0,0,.07);box-shadow:0 1px 0 #fff inset,0 20px 50px rgba(30,40,60,.08)}
+body.atv.light .svc p,body.atv.light .rc p,body.atv.light .pk li,body.atv.light .chn p,body.atv.light .clip p{color:#424245}
+body.atv.light .tags span,body.atv.light .tools span{color:#424245;border-color:rgba(0,0,0,.12)}
+body.atv.light .nav{background:linear-gradient(180deg,rgba(245,245,247,.85),transparent)}
+body.atv.light .nav.solid{background:rgba(245,245,247,.75)}
+body.atv.light .nav-links a{color:#1D1D1F}
+body.atv.light .lang button{color:#6E6E73}.body.atv.light .lang button.on{background:#1D1D1F;color:#fff}
+body.atv.light .burger{color:#1D1D1F}
+body.atv.light .logo-img{mix-blend-mode:multiply;filter:invert(1)}
+body.atv.light .btn-play,body.atv.light .btn-ac{background:linear-gradient(180deg,#3A3D42,#1D1D1F);color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,.2),0 10px 30px rgba(0,0,0,.15)}
+body.atv.light .btn-play:hover,body.atv.light .btn-ac:hover{background:#000;color:#fff}
+body.atv.light .btn-gray,body.atv.light .btn-line{background:rgba(255,255,255,.7);border:1px solid rgba(0,0,0,.14);color:#1D1D1F}
+body.atv.light .hero{color:#1D1D1F}
+body.atv.light .hero-media::after{background:linear-gradient(90deg,rgba(245,245,247,.97) 0%,rgba(245,245,247,.8) 38%,rgba(245,245,247,.15) 72%),linear-gradient(0deg,#F5F5F7 0%,rgba(245,245,247,0) 40%)}
+body.atv.light .hero p.lead,body.atv.light .meta{color:#424245}
+body.atv.light .meta .box{border-color:rgba(0,0,0,.2)}
+body.atv.light .meta a.match{color:#1E7F4A}
+body.atv.light .hero-age{background:rgba(255,255,255,.7);color:#1D1D1F}
+body.atv.light .top10 i{color:#fff}
+body.atv.light .ep .t,body.atv.light .ep .s{color:#fff}
+body.atv.light .offer{background:linear-gradient(115deg,#D9DCE1 0%,#F4F5F7 30%,#FFFFFF 50%,#E9EBEE 70%,#CFD3D9 100%);color:#1D1D1F}
+body.atv.light .offer .btn{background:linear-gradient(180deg,#3A3D42,#1D1D1F);color:#fff}
+body.atv.light .offer-strip{border-color:rgba(0,0,0,.1)}
+body.atv.light .reels{background:radial-gradient(70% 60% at 70% 50%,rgba(150,180,220,.35),transparent 70%)}
+body.atv.light .stage::after{background:radial-gradient(closest-side,transparent 40%,#F5F5F7 100%)}
+body.atv.light .float-stat span,body.atv.light .pt span,body.atv.light .proc-foot{color:#6E6E73}
+body.atv.light .phone{box-shadow:0 0 0 1.5px #fff,0 0 0 8px #D2D5DA,0 0 0 9.5px #9AA0A8,0 50px 100px rgba(30,40,60,.25)}
+body.atv.light .tm .nm,body.atv.light .tm .bio,body.atv.light .tm.crew p{color:#fff}
+body.atv.light .tm .nm{background:none;-webkit-background-clip:border-box;color:#fff}
+body.atv.light .tm .role{color:#DCE6F2}
+body.atv.light .svc .mono,body.atv.light .pt .mono,body.atv.light .chb,body.atv.light .pk li svg,body.atv.light .clk.hq .st{color:#3C5474;stroke:#3C5474}
+body.atv.light .svc .vid::after{background:linear-gradient(0deg,rgba(255,255,255,.96) 25%,rgba(255,255,255,.55))}
+body.atv.light .suite .rec{color:#fff}
+body.atv.light .playhead{background:#1D1D1F;box-shadow:none}
+body.atv.light .playhead::before{border-top-color:#1D1D1F}
+body.atv.light .wave{background:repeating-linear-gradient(90deg,rgba(60,84,116,.45) 0 2px,transparent 2px 5px)}
+body.atv.light .when{background:rgba(0,0,0,.05)}
+body.atv.light .pk.hot{background:linear-gradient(180deg,rgba(200,215,235,.6),rgba(255,255,255,.7) 65%);border-color:rgba(60,84,116,.35)}
+body.atv.light .pk .badge{color:#fff}
+body.atv.light .final{background:radial-gradient(60% 70% at 50% 110%,rgba(150,180,220,.45),transparent 70%)}
+body.atv.light .ct span,body.atv.light .cl span,body.atv.light .chn div>span{color:#6E6E73}
+body.atv.light .foot,body.atv.light .foot-col a{color:#6E6E73}
+body.atv.light .foot h6{color:#1D1D1F}
+body.atv.light .fq .a p,body.atv.light .lead,body.atv.light .addr{color:#6E6E73}
+body.atv.light .addr b{color:#1D1D1F}
+body.atv.light .rc .by .av{background:#fff}
+body.atv.light .mm{background:#F5F5F7}
+body.atv.light #tweaks{background:#fff;color:#1D1D1F}
