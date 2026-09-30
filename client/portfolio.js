@@ -36,6 +36,14 @@ window.DS_PORTFOLIO = {
     { slug: "signature", fr: ["Signature", "Premium + intro façon « Diary of a CEO », b-roll premium, livraison prioritaire."], en: ["Signature", "Premium + a “Diary of a CEO”-style intro, premium b-roll, priority delivery."] },
   ],
 
+  // Formules à masquer par type dans le portfolio privé, ex. { "vsl": ["signature"] }. Vide = les trois formules partout
+  // (décision du 30/09 : Standard, Premium et Signature restent affichées sur Podcast et VSL).
+  hiddenTiers: {},
+
+  // Types sans exemple qui affichent la scène animée « bientôt » (orbe + « Premier montage offert ») au lieu des cases vides.
+  // La scène disparaît d'elle-même dès qu'une vidéo du type arrive du Drive.
+  soon: ["ia", "youtube-docu"],
+
   // Prix par type et par formule, affichés dans le portfolio PRIVÉ seulement. Vide = « Sur devis ».
   // Écrire le texte tel qu'il doit apparaître, ex. "199 €", "à partir de 150 €", "$149".
   prices: {

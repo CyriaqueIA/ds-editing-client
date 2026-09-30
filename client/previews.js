@@ -57,13 +57,13 @@ window.DS_PREVIEWS = {
         {
           "src": "../ds-media/pod-daniel.mp4",
           "poster": "../ds-media/pod-daniel.jpg",
-          "title": "Intro Daniel V1",
+          "title": "Intro · Daniel",
           "vertical": false
         },
         {
           "src": "../ds-media/pod-pau.mp4",
           "poster": "../ds-media/pod-pau.jpg",
-          "title": "Intro Pau V1",
+          "title": "Intro · Pau",
           "vertical": false
         }
       ]
@@ -147,6 +147,12 @@ window.DS_PREVIEWS = {
         "src": "../videos/apercus/reels-signature-en-intro-trailer-elevate-vertical-v4-1Hhp3Q.mp4",
         "poster": "../videos/apercus/reels-signature-en-intro-trailer-elevate-vertical-v4-1Hhp3Q.jpg",
         "title": "Elevate · Trailer vertical",
+        "vertical": true
+      },
+      {
+        "src": "../videos/apercus/reels-signature-en-reels-5-v3-1HPqkB.mp4",
+        "poster": "../videos/apercus/reels-signature-en-reels-5-v3-1HPqkB.jpg",
+        "title": "Reel Signature · 5",
         "vertical": true
       },
       {
@@ -261,6 +267,16 @@ window.DS_PREVIEWS = {
       "title": "BrandRukus",
       "path": "videos/apercus/ads-brandrukus-vsl-1-132RfM.mp4",
       "posterPath": "videos/apercus/ads-brandrukus-vsl-1-132RfM.jpg",
+      "vertical": true
+    },
+    {
+      "id": "1bxLr1_4Ip_mKTrvaQpu9MbwggWk7tJk-",
+      "cat": "ads",
+      "tier": null,
+      "lang": null,
+      "title": "Houcine",
+      "path": "videos/apercus/ads-reels-1-houcine-final-1bxLr1.mp4",
+      "posterPath": "videos/apercus/ads-reels-1-houcine-final-1bxLr1.jpg",
       "vertical": true
     },
     {
@@ -384,6 +400,16 @@ window.DS_PREVIEWS = {
       "vertical": true
     },
     {
+      "id": "1HPqkBs83-F45jL7SDH2NxKAK7JmcDQrS",
+      "cat": "reels-shorts",
+      "tier": "signature",
+      "lang": "en",
+      "title": "Reel Signature · 5",
+      "path": "videos/apercus/reels-signature-en-reels-5-v3-1HPqkB.mp4",
+      "posterPath": "videos/apercus/reels-signature-en-reels-5-v3-1HPqkB.jpg",
+      "vertical": true
+    },
+    {
       "id": "1Wqwjvzpzf5EN59H0DStNpwZLQE1FlaL1",
       "cat": "reels-shorts",
       "tier": "signature",
@@ -448,7 +474,7 @@ window.DS_PREVIEWS = {
       "cat": "podcast-interview",
       "tier": "premium",
       "lang": "en",
-      "title": "Intro Daniel V1",
+      "title": "Intro · Daniel",
       "path": "ds-media/pod-daniel.mp4",
       "posterPath": "ds-media/pod-daniel.jpg",
       "vertical": false
@@ -458,7 +484,7 @@ window.DS_PREVIEWS = {
       "cat": "podcast-interview",
       "tier": "premium",
       "lang": "en",
-      "title": "Intro Pau V1",
+      "title": "Intro · Pau",
       "path": "ds-media/pod-pau.mp4",
       "posterPath": "ds-media/pod-pau.jpg",
       "vertical": false
