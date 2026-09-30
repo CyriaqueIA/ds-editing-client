@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta name="theme-color" content="#050607"/>
+  <meta name="robots" content="noindex,nofollow"/>
+  <title>DS Editing — Rapport du jour</title>
+  <link rel="icon" type="image/png" href="../assets/logo.png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--bg:#050607;--surface:#0F1114;--surface-2:#161A1F;--line:rgba(255,255,255,.09);--line-strong:rgba(255,255,255,.22);--cream:#F5F5F1;--taupe:#9AA3AD;--amber:#DCE3EA;--amber-soft:rgba(220,227,234,.12);--ok:#46D369;--err:#F08A82;--warn:#F5C400;--chrome:linear-gradient(180deg,#FFFFFF 0%,#E3E7EC 38%,#9BA4AE 72%,#D6DBE0 100%);--chrome2:linear-gradient(95deg,#B9C9DA 0%,#7FA3CF 45%,#E6ECF2 100%)}
+    *{box-sizing:border-box}
+    html,body{margin:0;color:var(--cream);font-family:'Geist',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+    body{min-height:100vh;display:flex;flex-direction:column;background:radial-gradient(1200px 700px at 85% -5%,rgba(125,155,195,.16),transparent 60%),radial-gradient(900px 600px at -10% 40%,rgba(160,170,185,.08),transparent 60%),#050607;background-attachment:fixed}
+    a{color:inherit}
+    button{font:inherit;cursor:pointer}
+    [hidden]{display:none!important}
+    .mono{font-weight:600;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--taupe);font-variant-numeric:tabular-nums}
+    .display{font-weight:600;letter-spacing:-.035em;line-height:.98;background:var(--chrome);-webkit-background-clip:text;background-clip:text;color:transparent}
+    header{position:sticky;top:0;z-index:20;background:rgba(8,9,11,.62);backdrop-filter:blur(22px) saturate(1.4);border-bottom:1px solid var(--line)}
+    .hd{max-width:960px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:14px}
+    .brand{display:flex;flex-direction:column;align-items:flex-start;gap:4px;text-decoration:none}
+    .lv-rec{display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:22px;letter-spacing:-.04em;line-height:1;color:var(--cream);white-space:nowrap}
+    .lv-rec i{width:9px;height:9px;border-radius:50%;background:var(--amber);box-shadow:0 0 12px var(--amber);animation:blink 1.6s infinite;margin-right:2px}
+    .lv-rec em{font-style:normal;font-size:11px;font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:var(--taupe);margin-left:2px}
+    @keyframes blink{50%{opacity:.2}}
+    .brand .mono{font-size:10px;color:#B9C9DA}
+    .seg{margin-left:auto;display:flex;padding:3px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.16);border-radius:999px;backdrop-filter:blur(16px)}
+    .seg button{border:0;background:transparent;color:var(--taupe);border-radius:999px;padding:7px 11px;font-size:12px;font-weight:600;letter-spacing:-.01em;white-space:nowrap;transition:.15s}
+    .seg button:hover{color:var(--cream)}
+    .seg button.on{background:rgba(255,255,255,.9);color:#0A0B0D}
+    @media(max-width:400px){.seg button{padding:6px 8px;font-size:11px}}
+    main{flex:1;width:100%;max-width:640px;margin:0 auto;padding:34px 16px 70px}
+    h1{margin:0 0 10px;font-size:clamp(36px,7vw,54px)}
+    .when{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+    .lead{margin:0;color:var(--taupe);font-size:15px;line-height:1.55}
+    .datebox{margin-top:12px;padding:14px 16px;background:var(--surface);border:1px solid var(--line);border-radius:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    .datebox label{margin:0;font-size:13px;color:var(--taupe)}
+    .datebox input{height:40px;padding:0 12px;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:12px;color:var(--cream);font:inherit;font-size:15px;color-scheme:dark;font-variant-numeric:tabular-nums}
+    .datebox input:focus{outline:none;border-color:rgba(220,227,234,.6);box-shadow:0 0 0 3px rgba(220,227,234,.14)}
+    .hint{margin:0;font-size:13px;color:var(--taupe);line-height:1.5}
+    .hint.warn{color:var(--warn);width:100%}
+    .sec{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin:28px 0 10px}
+    .card{background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.09);border-radius:22px;backdrop-filter:blur(20px);box-shadow:inset 0 1px 0 rgba(255,255,255,.08);padding:20px 16px}
+    @media(min-width:600px){.card{padding:24px}}
+    .card+.card{margin-top:12px}
+    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+    .ed{display:flex;align-items:center;gap:12px;min-height:60px;padding:10px 12px;background:var(--surface);border:1px solid var(--line);border-radius:14px;color:var(--cream);font-size:15px;font-weight:600;text-align:left;transition:border-color .15s,background .15s}
+    .ed:hover{border-color:var(--line-strong)}
+    .ed:focus-visible{outline:none;border-color:rgba(220,230,240,.5);background:var(--amber-soft)}
+    .av{flex:none;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-size:14px;font-weight:700;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.35)}
+    .loading{grid-column:1/-1;color:var(--taupe);font-size:14px;padding:6px 2px}
+    .me{display:flex;align-items:center;gap:12px;padding:14px 16px}
+    .me strong{font-size:16px;font-weight:600}
+    .me .ghost{margin-left:auto}
+    .ghost{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:48px;padding:0 22px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.16);color:#fff;font-weight:600;font-size:15px;letter-spacing:-.01em;backdrop-filter:blur(16px);text-decoration:none;transition:.15s;white-space:nowrap}
+    .ghost:hover{border-color:rgba(220,230,240,.35)}
+    .ghost.sm{height:34px;padding:0 14px;font-size:12px}
+    .ghost.wide{width:100%;margin-top:10px}
+    .notice{margin:0 0 12px;padding:12px 16px;border-radius:14px;background:rgba(220,227,234,.08);border:1px solid rgba(220,227,234,.22);font-size:14px;line-height:1.5}
+    .notice b{font-weight:600}
+    .cat{--c:#DCE3EA;position:relative}
+    .cat-top{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+    .ico{flex:none;width:44px;height:44px;border-radius:12px;background:var(--c);display:grid;place-items:center;color:#fff;box-shadow:0 8px 22px color-mix(in srgb,var(--c) 38%,transparent)}
+    .ico svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+    .cat-name{flex:1;min-width:140px}
+    .cat-name strong{display:block;font-size:16px;font-weight:600;letter-spacing:-.01em;line-height:1.25}
+    .cat-sub{display:flex;align-items:center;gap:8px;margin-top:5px}
+    .tag{font-size:10px;font-weight:700;letter-spacing:.08em;padding:2px 7px;border-radius:999px;background:var(--c);color:#fff}
+    .ctr{display:flex;align-items:center;gap:6px;margin-left:auto}
+    .ctr button{width:40px;height:40px;border-radius:12px;border:1px solid var(--line-strong);background:rgba(255,255,255,.06);color:var(--cream);font-size:20px;line-height:1;display:grid;place-items:center;transition:.15s}
+    .ctr button:hover{border-color:rgba(220,230,240,.5)}
+    .ctr button[disabled]{opacity:.35;cursor:default}
+    .ctr .plus{background:var(--c);border-color:transparent;color:#fff}
+    .ctr input{width:56px;height:40px;padding:0;text-align:center;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:12px;color:var(--cream);font:inherit;font-size:18px;font-weight:600;font-variant-numeric:tabular-nums;outline:none;transition:border-color .15s,box-shadow .15s}
+    .ctr input:focus{border-color:rgba(220,227,234,.6);box-shadow:0 0 0 3px rgba(220,227,234,.14)}
+    .cat-prog{margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
+    .cat-prog-l{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:10px}
+    .lbl{font-size:12px;color:var(--taupe);line-height:1.4}
+    .lbl b{font-weight:600;color:var(--cream)}
+    .pct{font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;color:var(--c)}
+    .rg{-webkit-appearance:none;appearance:none;display:block;width:100%;height:6px;margin:8px 0;border-radius:999px;background:linear-gradient(90deg,var(--c) var(--p,0%),rgba(255,255,255,.12) var(--p,0%));outline:none;cursor:pointer}
+    .rg::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;background:#0F1114;border:3px solid var(--c);box-shadow:0 2px 8px rgba(0,0,0,.5);transition:transform .15s}
+    .rg::-webkit-slider-thumb:active{transform:scale(1.1)}
+    .rg::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:#0F1114;border:3px solid var(--c);box-shadow:0 2px 8px rgba(0,0,0,.5)}
+    .rg::-moz-range-track{background:transparent}
+    .rg:focus-visible{box-shadow:0 0 0 3px rgba(220,227,234,.14)}
+    label{display:block;margin:0 0 8px;font-size:14px;font-weight:500}
+    label small{font-weight:400;color:var(--taupe)}
+    label+label,.ta+label{margin-top:16px}
+    .in{width:100%;padding:12px 14px;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:12px;color:var(--cream);font:inherit;font-size:15px;line-height:1.5;outline:none;transition:border-color .15s,box-shadow .15s}
+    .in::placeholder{color:rgba(154,163,173,.6)}
+    .in:focus{border-color:rgba(220,227,234,.6);box-shadow:0 0 0 3px rgba(220,227,234,.14)}
+    .in.bad{border-color:var(--err)}
+    .ta{resize:vertical;min-height:96px}
+    .ta.short{min-height:64px}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;width:100%;height:54px;margin-top:18px;padding:0 24px;border:0;border-radius:999px;font:inherit;font-weight:600;font-size:16px;cursor:pointer;background:linear-gradient(180deg,#FFFFFF,#C9D0D7);color:#0A0B0D;box-shadow:inset 0 1px 0 #fff,0 8px 30px rgba(180,200,225,.18);text-decoration:none;transition:.15s}
+    .btn:hover{background:linear-gradient(180deg,#fff,#E4E8EC)}
+    .btn[disabled]{opacity:.45;cursor:default}
+    .msg{min-height:22px;margin-top:12px;font-size:14px;color:var(--taupe);line-height:1.5}
+    .msg.err{color:var(--err)}
+    .done{text-align:center;padding:32px 20px}
+    .check{width:64px;height:64px;margin:0 auto 16px;border-radius:50%;background:rgba(70,211,105,.14);border:1px solid rgba(70,211,105,.35);color:var(--ok);display:grid;place-items:center}
+    .check svg{width:30px;height:30px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+    .done h2{margin:0 0 8px;font-size:34px}
+    .done .sum{margin:0 0 6px;font-size:17px;font-weight:600}
+    .done .hint{margin-bottom:6px}
+    .back{margin:28px 0 0;text-align:center;font-size:14px;color:var(--taupe)}
+    .back a{color:var(--cream);text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1px}
+    footer{padding:24px 16px;text-align:center}
+    @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+  </style>
+</head>
+<body>
+<header><div class="hd">
+  <a class="brand" href="../index.html"><span class="lv-rec"><i></i>DS<em>Editing</em></span><span class="mono" data-t="sub"></span></a>
+  <div class="seg" id="seg" role="group" aria-label="Bahasa · Langue · Language">
+    <button type="button" data-l="id" lang="id">Bahasa</button><button type="button" data-l="fr" lang="fr">Français</button><button type="button" data-l="en" lang="en">English</button>
+  </div>
+</div></header>
+
+<main>
+  <h1 class="display" data-t="title"></h1>
+  <div class="when">
+    <p class="lead" id="dateText"></p>
+    <button class="ghost sm" id="dateBtn" type="button" data-t="changeDate"></button>
+  </div>
+  <div class="datebox" id="dateBox" hidden>
+    <label for="date" data-t="dateLabel"></label>
+    <input type="date" id="date"/>
+    <button class="ghost sm" id="todayBtn" type="button" data-t="today"></button>
+    <p class="hint warn" id="otherDay" hidden data-t="otherDay"></p>
+  </div>
+
+  <section id="who">
+    <div class="sec"><span class="mono" data-t="who"></span></div>
+    <div class="card">
+      <div id="editors" class="grid"><div class="loading" data-t="loading"></div></div>
+      <div id="loadErr" class="msg err" hidden><span data-t="loadFail"></span> <button class="ghost sm" id="retry" type="button" data-t="retry"></button></div>
+    </div>
+  </section>
+
+  <section id="me" hidden>
+    <div class="card me"><span class="av" id="meAv"></span><strong id="meName"></strong><button class="ghost sm" id="notMe" type="button" data-t="notMe"></button></div>
+  </section>
+
+  <form id="report" hidden novalidate>
+    <div class="sec"><span class="mono" data-t="produced"></span><span class="mono" id="sum" aria-live="polite"></span></div>
+    <div class="notice" id="notice" hidden></div>
+    <div id="cats"></div>
+    <div class="card">
+      <label for="details" data-t="details"></label>
+      <textarea id="details" class="in ta" rows="4" data-p="detailsPh"></textarea>
+      <label for="comment"><span data-t="comment"></span> <small data-t="optional"></small></label>
+      <textarea id="comment" class="in ta short" rows="2" data-p="commentPh"></textarea>
+      <button class="btn" id="save" type="submit"><span data-t="save"></span></button>
+      <div class="msg" id="msg" role="alert"></div>
+    </div>
+  </form>
+
+  <section id="done" hidden>
+    <div class="card done">
+      <div class="check"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+      <h2 class="display" data-t="saved"></h2>
+      <p class="sum" id="doneSum"></p>
+      <p class="hint" id="doneMeta"></p>
+      <a class="btn" href="../index.html" data-t="back"></a>
+      <button class="ghost wide" id="editBtn" type="button" data-t="edit"></button>
+    </div>
+  </section>
+
+  <p class="back"><a href="../index.html" data-t="back"></a></p>
+</main>
+<footer class="mono" data-t="footer"></footer>
+
+<script type="module">
+  const SB_URL = "https://xkanmjlpysxpohsuqvwg.supabase.co";
+  const SB_KEY = "sb_publishable_lIZtV_WtN5NcGSb0dnfaiQ_AgKYBIVa";
+  const $ = (s) => document.querySelector(s);
+  const $$ = (s) => Array.from(document.querySelectorAll(s));
+  const LANGS = ["id", "fr", "en"];
+  const LOCALE = { id: "id-ID", fr: "fr-FR", en: "en-GB" };
+  const T = {
+    id: { sub: "Tim editor", title: "Laporan hari ini", who: "Siapa kamu?", notMe: "Bukan saya", produced: "Dibuat hari ini", done: "Selesai", progressA: "Sedang dikerjakan", progressB: "progres elemen saat ini", details: "Detail hari ini", detailsPh: "Contoh: Reels klien X (3 hook), intro podcast Y, revisi pada…", comment: "Komentar", optional: "(opsional)", commentPh: "Kendala, catatan, kebutuhan…", save: "Simpan laporan hari ini", back: "Kembali ke situs", saved: "Tersimpan!", edit: "Ubah", el1: "elemen", elN: "elemen", inProg: "sedang dikerjakan", loading: "Memuat…", loadFail: "Daftar tidak bisa dimuat. Periksa koneksi lalu coba lagi.", retry: "Coba lagi", already: "Sudah tersimpan pukul {t}, kamu bisa mengoreksi.", draft: "Draf dipulihkan (belum tersimpan).", empty: "Belum ada yang diisi: tambahkan minimal satu elemen selesai, satu progres, atau detail hari ini.", badDate: "Tanggal tidak diterima: maksimal 14 hari ke belakang.", badEditor: "Editor tidak dikenali. Pilih nama kamu lagi.", fail: "Belum bisa menyimpan sekarang. Draf kamu tetap ada di perangkat ini, coba lagi sebentar lagi.", saving: "Menyimpan…", changeDate: "Ubah tanggal", today: "Hari ini", otherDay: "Kamu mengisi laporan untuk hari lain.", dateLabel: "Tanggal laporan", footer: "DS Editing · Tim editor", minus: "Kurangi", plus: "Tambah", count: "Jumlah selesai", slider: "Progres elemen saat ini" },
+    fr: { sub: "Équipe montage", title: "Rapport du jour", who: "Qui es-tu ?", notMe: "Ce n'est pas moi", produced: "Produit aujourd'hui", done: "Terminés", progressA: "En cours", progressB: "avancement de l'élément en cours", details: "Détail de ma journée", detailsPh: "Ex : Reels client X (3 hooks), intro podcast Y, corrections sur…", comment: "Commentaire", optional: "(optionnel)", commentPh: "Blocages, remarques, besoins…", save: "Enregistrer ma journée", back: "Retour au site", saved: "Enregistré !", edit: "Modifier", el1: "élément", elN: "éléments", inProg: "en cours", loading: "Chargement…", loadFail: "Impossible de charger la liste. Vérifie ta connexion puis réessaie.", retry: "Réessayer", already: "Déjà enregistré à {t}, tu peux corriger.", draft: "Brouillon restauré (pas encore enregistré).", empty: "Rien saisi : ajoute au moins un élément terminé, un avancement ou le détail de ta journée.", badDate: "Date refusée : 14 jours en arrière maximum.", badEditor: "Monteur inconnu. Choisis à nouveau ton nom.", fail: "Enregistrement impossible pour l'instant. Ton brouillon est conservé sur cet appareil, réessaie dans un instant.", saving: "Enregistrement…", changeDate: "Changer de date", today: "Aujourd'hui", otherDay: "Tu saisis le rapport d'un autre jour.", dateLabel: "Date du rapport", footer: "DS Editing · Équipe montage", minus: "Retirer", plus: "Ajouter", count: "Nombre terminés", slider: "Avancement de l'élément en cours" },
+    en: { sub: "Editing team", title: "Today's report", who: "Who are you?", notMe: "Not me", produced: "Produced today", done: "Done", progressA: "In progress", progressB: "progress of the current item", details: "My day in detail", detailsPh: "E.g. Reels for client X (3 hooks), podcast intro Y, fixes on…", comment: "Comment", optional: "(optional)", commentPh: "Blockers, remarks, needs…", save: "Save my day", back: "Back to the site", saved: "Saved!", edit: "Edit", el1: "item", elN: "items", inProg: "in progress", loading: "Loading…", loadFail: "The list can't be loaded. Check your connection and try again.", retry: "Try again", already: "Already saved at {t}, you can still edit it.", draft: "Draft restored (not saved yet).", empty: "Nothing entered: add at least one finished item, some progress or your day's details.", badDate: "Date refused: 14 days back at most.", badEditor: "Unknown editor. Pick your name again.", fail: "Can't save right now. Your draft is kept on this device, try again in a moment.", saving: "Saving…", changeDate: "Change date", today: "Today", otherDay: "You're filling in the report for another day.", dateLabel: "Report date", footer: "DS Editing · Editing team", minus: "Remove one", plus: "Add one", count: "Number done", slider: "Progress of the current item" },
+  };
+  const ICONS = {
+    reel: '<svg viewBox="0 0 24 24"><path d="M4 9h16v10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M4 9l1.5-4h13L20 9"/><path d="M8.5 5 7 9M13 5l-1.5 4M17.5 5 16 9"/></svg>',
+    intro: '<svg viewBox="0 0 24 24"><path d="M11 3l1.9 4.9L17.8 9.8l-4.9 1.9L11 16.6l-1.9-4.9L4.2 9.8l4.9-1.9z"/><path d="M18.5 14l.9 2.3 2.3.9-2.3.9-.9 2.3-.9-2.3-2.3-.9 2.3-.9z"/></svg>',
+    podcast: '<svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3M9 21h6"/></svg>',
+    other: '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4"/></svg>',
+  };
+  const AV = ["linear-gradient(135deg,#FF7A2F,#F0476E)", "linear-gradient(135deg,#7B5CFF,#3D8BFF)", "linear-gradient(135deg,#16A085,#3D8BFF)", "linear-gradient(135deg,#E8A317,#FF7A2F)", "linear-gradient(135deg,#F0476E,#7B5CFF)", "linear-gradient(135deg,#3D8BFF,#16A085)", "linear-gradient(135deg,#7FA3CF,#B9C9DA)", "linear-gradient(135deg,#E8A317,#16A085)"];
+  const store = { get(k) { try { return localStorage.getItem(k); } catch { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch {} }, del(k) { try { localStorage.removeItem(k); } catch {} } };
+  const params = new URLSearchParams(location.search);
+  let lang = params.get("lang") || store.get("ds_lang") || "id";
+  if (!LANGS.includes(lang)) lang = "id";
+
+  const isoOf = (d) => d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+  const todayISO = () => isoOf(new Date());
+  const shiftISO = (n) => { const d = new Date(); d.setDate(d.getDate() + n); return isoOf(d); };
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const toInt = (v) => { const n = parseInt(String(v).replace(/[^\d]/g, ""), 10); return Number.isFinite(n) ? n : 0; };
+  function fmtDate(iso) { const [y, m, d] = iso.split("-").map(Number); const s = new Intl.DateTimeFormat(LOCALE[lang], { weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(new Date(y, m - 1, d)); return s.charAt(0).toUpperCase() + s.slice(1); }
+  function fmtTime(ts) { const d = new Date(ts); const h = d.getHours(), m = String(d.getMinutes()).padStart(2, "0"); if (lang === "fr") return `${h} h ${m}`; if (lang === "id") return `${String(h).padStart(2, "0")}.${m}`; return `${h % 12 || 12}:${m} ${h < 12 ? "am" : "pm"}`; }
+  function avStyle(name) { let h = 0; for (const ch of name) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return AV[h % AV.length]; }
+  const iconFor = (key) => ICONS[String(key).split("_")[0]] || ICONS.other;
+
+  const state = { editors: [], cats: [], me: null, date: todayISO(), counts: {}, server: null, draftUsed: false, last: null, token: 0 };
+  const ui = {};
+  let sbp = null; // promesse mise en cache : un seul client même si deux appels partent en parallèle
+  function client() { if (!sbp) sbp = import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm").then(({ createClient }) => createClient(SB_URL, SB_KEY, { auth: { persistSession: false, autoRefreshToken: false } })); return sbp; }
+  async function rpc(fn, args) { const { data, error } = await (await client()).rpc(fn, args || {}); if (error) throw error; return data; }
+
+  // ---------- textes
+  function totals() { let el = 0, ip = 0; for (const c of state.cats) { const v = state.counts[c.key] || { done: 0, progress: 0 }; el += v.done; if (v.progress > 0) ip++; } return { el, ip }; }
+  function sumText(el, ip) { const t = T[lang]; return `${el} ${el === 1 ? t.el1 : t.elN} · ${ip} ${t.inProg}`; }
+  function renderSummary() { const { el, ip } = totals(); $("#sum").textContent = sumText(el, ip); }
+  function renderNotice() {
+    const t = T[lang], parts = [];
+    if (state.server && state.server.updated_at) parts.push(t.already.replace("{t}", fmtTime(state.server.updated_at)));
+    if (state.draftUsed) parts.push(t.draft);
+    $("#notice").hidden = !parts.length; $("#notice").textContent = parts.join(" ");
+  }
+  function renderDone() {
+    if (!state.last) return; const t = T[lang];
+    $("#doneSum").textContent = sumText(state.last.elements || 0, state.last.in_progress || 0);
+    $("#doneMeta").textContent = `${state.me ? state.me.name : ""} · ${fmtDate(state.date)}`;
+  }
+  function render() {
+    const t = T[lang]; document.documentElement.lang = lang;
+    $$("[data-t]").forEach((el) => { el.textContent = t[el.dataset.t] || ""; });
+    $$("[data-p]").forEach((el) => { el.placeholder = t[el.dataset.p] || ""; });
+    $$("#seg button").forEach((b) => b.classList.toggle("on", b.dataset.l === lang));
+    $("#dateText").textContent = fmtDate(state.date);
+    for (const c of state.cats) { const u = ui[c.key]; if (!u) continue; u.name.textContent = c[lang] || c.fr; u.minus.setAttribute("aria-label", t.minus); u.plus.setAttribute("aria-label", t.plus); u.input.setAttribute("aria-label", t.count); u.range.setAttribute("aria-label", t.slider); }
+    renderSummary(); renderNotice(); renderDone();
+  }
+  $$("#seg button").forEach((b) => b.addEventListener("click", () => { lang = b.dataset.l; store.set("ds_lang", lang); render(); }));
+
+  // ---------- date
+  const dateInput = $("#date");
+  dateInput.min = shiftISO(-14); dateInput.max = todayISO(); dateInput.value = state.date;
+  function setDate(iso) {
+    if (!iso || iso < dateInput.min || iso > dateInput.max) { dateInput.value = state.date; return; }
+    if (iso === state.date) return;
+    state.date = iso; dateInput.value = iso; $("#otherDay").hidden = iso === todayISO(); $("#dateText").textContent = fmtDate(iso);
+    if (state.me) loadReport();
+  }
+  $("#dateBtn").addEventListener("click", () => { $("#dateBox").hidden = !$("#dateBox").hidden; if (!$("#dateBox").hidden) dateInput.focus(); });
+  dateInput.addEventListener("change", () => setDate(dateInput.value));
+  $("#todayBtn").addEventListener("click", () => { setDate(todayISO()); $("#dateBox").hidden = true; });
+
+  // ---------- monteurs
+  function renderEditors() {
+    const box = $("#editors"); box.innerHTML = "";
+    for (const e of state.editors) {
+      const b = document.createElement("button"); b.type = "button"; b.className = "ed"; b.dataset.id = e.id;
+      const av = document.createElement("span"); av.className = "av"; av.textContent = e.name.charAt(0).toUpperCase(); av.style.background = avStyle(e.name);
+      const n = document.createElement("span"); n.textContent = e.name;
+      b.append(av, n); b.addEventListener("click", () => selectEditor(e, true)); box.appendChild(b);
+    }
+  }
+  function selectEditor(e, remember) {
+    state.me = e; if (remember) store.set("ds_prod_editor", JSON.stringify({ id: e.id, name: e.name }));
+    $("#who").hidden = true; $("#me").hidden = false; $("#report").hidden = false; $("#done").hidden = true;
+    $("#meName").textContent = e.name; $("#meAv").textContent = e.name.charAt(0).toUpperCase(); $("#meAv").style.background = avStyle(e.name);
+    loadReport();
+  }
+  $("#notMe").addEventListener("click", () => {
+    state.me = null; state.server = null; state.draftUsed = false; store.del("ds_prod_editor");
+    $("#who").hidden = false; $("#me").hidden = true; $("#report").hidden = true; $("#done").hidden = true;
+    applyValues({ counts: {}, details: "", comment: "" }); renderNotice(); window.scrollTo({ top: 0 });
+  });
+
+  // ---------- catégories
+  function buildCats() {
+    const box = $("#cats"); box.innerHTML = "";
+    for (const c of state.cats) {
+      state.counts[c.key] = { done: 0, progress: 0 };
+      const card = document.createElement("div"); card.className = "card cat"; card.dataset.key = c.key; card.style.setProperty("--c", c.color || "#DCE3EA");
+      card.innerHTML = `<div class="cat-top"><div class="ico">${iconFor(c.key)}</div><div class="cat-name"><strong data-cat-name></strong><div class="cat-sub"><span class="tag">${c.tag || ""}</span><span class="mono" data-t="done"></span></div></div><div class="ctr"><button type="button" class="minus">−</button><input type="text" inputmode="numeric" pattern="[0-9]*" value="0" autocomplete="off"/><button type="button" class="plus">+</button></div></div><div class="cat-prog"><div class="cat-prog-l"><span class="lbl"><b data-t="progressA"></b> · <span data-t="progressB"></span></span><span class="pct">0%</span></div><input type="range" class="rg" min="0" max="100" step="5" value="0" style="--p:0%"/></div>`;
+      const u = { name: card.querySelector("[data-cat-name]"), minus: card.querySelector(".minus"), plus: card.querySelector(".plus"), input: card.querySelector(".ctr input"), range: card.querySelector(".rg"), pct: card.querySelector(".pct") };
+      ui[c.key] = u;
+      u.minus.addEventListener("click", () => setDone(c.key, state.counts[c.key].done - 1));
+      u.plus.addEventListener("click", () => setDone(c.key, state.counts[c.key].done + 1));
+      u.input.addEventListener("input", () => setDone(c.key, toInt(u.input.value), true));
+      u.input.addEventListener("blur", () => { u.input.value = state.counts[c.key].done; });
+      u.input.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); u.input.blur(); } });
+      u.range.addEventListener("input", () => setProg(c.key, toInt(u.range.value)));
+      box.appendChild(card);
+    }
+  }
+  function setDone(key, n, typing) {
+    n = clamp(n, 0, 500); state.counts[key].done = n; const u = ui[key];
+    if (!typing) u.input.value = n; u.minus.disabled = n === 0;
+    renderSummary(); scheduleDraft();
+  }
+  function setProg(key, p) {
+    p = clamp(p, 0, 100); state.counts[key].progress = p; const u = ui[key];
+    u.range.value = p; u.range.style.setProperty("--p", p + "%"); u.pct.textContent = p + "%";
+    renderSummary(); scheduleDraft();
+  }
+  function applyValues(v) {
+    for (const c of state.cats) { const x = (v.counts || {})[c.key] || {}; setDone(c.key, toInt(x.done)); setProg(c.key, toInt(x.progress)); }
+    $("#details").value = v.details || ""; $("#comment").value = v.comment || "";
+    clearTimeout(draftTimer); // ne pas réécrire un brouillon à partir d'un pré-remplissage
+  }
+
+  // ---------- brouillon (par monteur et par date, sur cet appareil)
+  let draftTimer = null;
+  const draftKey = () => `ds_prod_draft:${state.me.id}:${state.date}`;
+  function scheduleDraft() { if (!state.me) return; clearTimeout(draftTimer); draftTimer = setTimeout(saveDraft, 300); }
+  function saveDraft() { if (!state.me) return; store.set(draftKey(), JSON.stringify({ counts: state.counts, details: $("#details").value, comment: $("#comment").value, at: Date.now() })); }
+  function readDraft() { try { const raw = store.get(draftKey()); return raw ? JSON.parse(raw) : null; } catch { return null; } }
+  $("#details").addEventListener("input", () => { $("#details").classList.remove("bad"); scheduleDraft(); }); $("#comment").addEventListener("input", scheduleDraft);
+
+  // ---------- rapport déjà saisi ce jour → pré-remplir
+  async function loadReport() {
+    const token = ++state.token; state.server = null; state.draftUsed = false;
+    applyValues({ counts: {}, details: "", comment: "" }); $("#msg").textContent = ""; $("#msg").className = "msg";
+    $("#notice").hidden = false; $("#notice").textContent = T[lang].loading;
+    let server = null;
+    try { server = await rpc("prod_get_report", { p_editor: state.me.id, p_date: state.date }); } catch { server = null; }
+    if (token !== state.token || !state.me) return;
+    const draft = readDraft();
+    state.server = server || null;
+    const useDraft = draft && draft.counts && (!server || !server.updated_at || draft.at > Date.parse(server.updated_at));
+    if (useDraft) { applyValues(draft); state.draftUsed = true; } else if (server) { applyValues(server); }
+    renderNotice();
+  }
+
+  // ---------- enregistrer
+  async function submit(e) {
+    e.preventDefault(); const t = T[lang], msg = $("#msg"), btn = $("#save");
+    msg.className = "msg"; msg.textContent = "";
+    if (!state.me) return;
+    const { el, ip } = totals(); const details = $("#details").value.trim(), comment = $("#comment").value.trim();
+    if (!el && !ip && !details) { msg.textContent = t.empty; msg.className = "msg err"; $("#details").classList.add("bad"); $("#details").focus(); return; }
+    $("#details").classList.remove("bad"); btn.disabled = true; msg.textContent = t.saving;
+    try {
+      const res = await rpc("prod_submit", { p_editor: state.me.id, p_date: state.date, p_counts: state.counts, p_details: details, p_comment: comment, p_lang: lang });
+      clearTimeout(draftTimer); store.del(draftKey());
+      state.server = { updated_at: new Date().toISOString() }; state.draftUsed = false; state.last = res || { elements: el, in_progress: ip };
+      msg.textContent = ""; showDone();
+    } catch (err) {
+      const m = String((err && err.message) || "");
+      msg.textContent = /bad_date/.test(m) ? t.badDate : /bad_editor/.test(m) ? t.badEditor : /\bempty\b/.test(m) ? t.empty : t.fail;
+      msg.className = "msg err";
+    } finally { btn.disabled = false; if (msg.textContent === t.saving) msg.textContent = ""; }
+  }
+  $("#report").addEventListener("submit", submit);
+  function showDone() { $("#report").hidden = true; $("#me").hidden = true; $("#done").hidden = false; renderDone(); window.scrollTo({ top: 0 }); }
+  $("#editBtn").addEventListener("click", () => { $("#done").hidden = true; $("#me").hidden = false; $("#report").hidden = false; renderNotice(); window.scrollTo({ top: 0 }); });
+
+  // ---------- démarrage
+  async function init() {
+    render(); $("#loadErr").hidden = true; $("#editors").innerHTML = `<div class="loading">${T[lang].loading}</div>`;
+    try {
+      const [eds, cats] = await Promise.all([rpc("prod_editors"), rpc("prod_categories_public")]);
+      state.editors = Array.isArray(eds) ? eds : []; state.cats = Array.isArray(cats) ? cats : [];
+      buildCats(); renderEditors(); render();
+      let rem = null; try { rem = JSON.parse(store.get("ds_prod_editor") || "null"); } catch { rem = null; }
+      const found = rem && state.editors.find((e) => e.id === rem.id);
+      if (found) selectEditor(found, false);
+    } catch (err) { $("#editors").innerHTML = ""; $("#loadErr").hidden = false; }
+  }
+  $("#retry").addEventListener("click", init);
+  init();
+</script>
+</body>
+</html>

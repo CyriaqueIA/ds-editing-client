@@ -1,0 +1,600 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta name="robots" content="noindex,nofollow"/>
+  <meta name="theme-color" content="#050607"/>
+  <title>DS Editing — Production · Direction</title>
+  <link rel="icon" type="image/png" href="../assets/logo.png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--bg:#050607;--surface:#0F1114;--surface-2:#161A1F;--line:rgba(255,255,255,.09);--line-strong:rgba(255,255,255,.22);--cream:#F5F5F1;--taupe:#9AA3AD;--amber:#DCE3EA;--amber-soft:rgba(220,227,234,.12);--ok:#46D369;--warn:#F5C400;--err:#F08A82;--blue:#7FB0E0;--accent2:#B9C9DA;--chrome:linear-gradient(180deg,#FFFFFF 0%,#E3E7EC 38%,#9BA4AE 72%,#D6DBE0 100%);--chrome2:linear-gradient(95deg,#B9C9DA 0%,#7FA3CF 45%,#E6ECF2 100%);--glass:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));--av:44px;color-scheme:dark}
+    *{box-sizing:border-box}
+    [hidden]{display:none!important}
+    html,body{margin:0;background:var(--bg);color:var(--cream);font-family:'Geist',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+    body{background:radial-gradient(1200px 700px at 85% -5%,rgba(125,155,195,.16),transparent 60%),radial-gradient(900px 600px at -10% 40%,rgba(160,170,185,.08),transparent 60%),#050607;background-attachment:fixed;line-height:1.45;font-size:15px}
+    a{color:inherit}
+    .mono{font-family:'Geist',system-ui,sans-serif;font-weight:600;font-size:11px;letter-spacing:.06em;text-transform:uppercase;font-variant-numeric:tabular-nums;color:var(--taupe)}
+    .display{font-family:'Geist',system-ui,sans-serif;font-weight:600;letter-spacing:-.035em;text-transform:none;line-height:1.06;padding:.02em 0 .08em;background:var(--chrome);-webkit-background-clip:text;background-clip:text;color:transparent}
+    button,input,select,textarea{font:inherit}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;border:1px solid rgba(255,255,255,.16);border-radius:999px;height:38px;padding:0 16px;font-size:13px;font-weight:600;letter-spacing:-.01em;line-height:1;cursor:pointer;background:rgba(255,255,255,.06);color:#fff;text-decoration:none;white-space:nowrap;-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);transition:background .2s,border-color .2s,color .2s,box-shadow .2s}
+    .btn:hover{border-color:rgba(220,230,240,.35);background:rgba(255,255,255,.08)}
+    .btn.primary{border-color:transparent;background:linear-gradient(180deg,#FFFFFF,#C9D0D7);color:#0A0B0D;box-shadow:inset 0 1px 0 #fff,0 8px 30px rgba(180,200,225,.18);-webkit-backdrop-filter:none;backdrop-filter:none}
+    .btn.primary:hover{background:linear-gradient(180deg,#fff,#E4E8EC);border-color:transparent}
+    .btn.sm{height:32px;padding:0 12px;font-size:12px}
+    .btn.ic{width:38px;padding:0}
+    .btn.ic.sm{width:32px}
+    .btn:disabled,.btn[disabled]{opacity:.45;cursor:default}
+    .btn svg,.chip svg{width:14px;height:14px;flex:none}
+    .btn:focus-visible,.chip:focus-visible,.tab:focus-visible,.seg button:focus-visible,.rep .head:focus-visible{outline:2px solid rgba(220,227,234,.6);outline-offset:2px}
+    .in{background:rgba(255,255,255,.04);color:var(--cream);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:13px;outline:none;width:100%;transition:border-color .2s,box-shadow .2s;font-variant-numeric:tabular-nums}
+    .in::placeholder{color:rgba(154,163,173,.6)}
+    .in:focus{border-color:rgba(220,227,234,.6);box-shadow:0 0 0 3px rgba(220,227,234,.14)}
+    .in.bad{border-color:var(--err)}
+    .in:disabled{opacity:.45;cursor:not-allowed}
+    input[type="date"].in{width:auto;padding:8px 10px;color-scheme:dark}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    @keyframes blink{50%{opacity:.2}}
+
+    /* ---- en-tête verre ---- */
+    header{position:sticky;top:0;z-index:20;background:rgba(8,9,11,.62);-webkit-backdrop-filter:blur(22px) saturate(1.4);backdrop-filter:blur(22px) saturate(1.4);border-bottom:1px solid var(--line)}
+    .hd{display:flex;align-items:center;gap:14px;padding:12px 20px}
+    .hd .brand{display:flex;flex-direction:column;justify-content:center;line-height:1.1;min-height:22px;padding-left:12px;border-left:1px solid var(--line)}
+    .hd .right{margin-left:auto;display:flex;align-items:center;gap:10px}
+    .lv-rec{display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:22px;letter-spacing:-.04em;line-height:1;color:var(--cream);white-space:nowrap;text-decoration:none}
+    .lv-rec i{width:9px;height:9px;border-radius:50%;background:var(--amber);box-shadow:0 0 12px var(--amber);animation:blink 1.6s infinite;margin-right:2px}
+    .lv-rec em{font-style:normal;font-size:11px;font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:var(--taupe);margin-left:2px}
+    .who{font-size:13px;color:var(--taupe);white-space:nowrap}
+    .who b{color:var(--cream);font-weight:500}
+    .tabs{display:flex;gap:4px;margin-left:18px;flex-wrap:wrap}
+    .tab{background:none;border:1px solid transparent;color:var(--taupe);border-radius:999px;padding:8px 14px;font-size:13px;font-weight:500;cursor:pointer;transition:border-color .2s,background .2s,color .2s}
+    .tab:hover{color:var(--cream)}
+    .tab.on{color:#fff;border-color:rgba(220,230,240,.5);background:var(--amber-soft)}
+    .seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:3px;background:rgba(255,255,255,.04)}
+    .seg button{border:0;background:none;color:var(--taupe);border-radius:999px;padding:6px 11px;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:background .2s,color .2s}
+    .seg button:hover{color:var(--cream)}
+    .seg button.on{background:rgba(255,255,255,.85);color:#0A0B0D}
+    #refreshBtn.busy svg{animation:spin .8s linear infinite}
+
+    main{padding:18px 20px 60px;max-width:1500px;margin:0 auto}
+    .top{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:6px 0 16px}
+    .top h1{margin:0;font-size:40px}
+    .top .period{margin-top:4px}
+    .toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+    .chip{border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.04);color:var(--cream);border-radius:999px;padding:8px 13px;font-size:13px;font-weight:500;cursor:pointer;transition:border-color .2s,background .2s,color .2s;display:inline-flex;align-items:center;gap:6px}
+    .chip:hover{border-color:rgba(220,230,240,.35)}
+    .chip.on{border-color:rgba(220,230,240,.5);background:var(--amber-soft);color:#fff}
+    .dates{display:inline-flex;align-items:center;gap:6px;color:var(--taupe);font-size:13px}
+    .toolbar .spacer{flex:1}
+
+    /* ---- cartes ---- */
+    .stats{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px}
+    .stat{position:relative;overflow:hidden;background:var(--glass);border:1px solid var(--line);border-radius:22px;padding:14px 18px 34px;-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+    .stat.main{border-color:rgba(220,230,240,.32)}
+    .stat .v{font-family:'Geist',system-ui,sans-serif;font-weight:600;font-size:34px;line-height:1;letter-spacing:-.035em;font-variant-numeric:tabular-nums;margin-top:8px}
+    .stat .v small{font-size:13px;font-weight:500;color:var(--taupe);letter-spacing:0;margin-left:4px}
+    .stat .sub{font-size:12px;color:var(--taupe);margin-top:6px}
+    .stat .spark{position:absolute;left:0;right:0;bottom:0;width:100%;height:28px;display:block;opacity:.9}
+    .stat.main .v{color:var(--amber)}
+    .panel{background:var(--glass);border:1px solid var(--line);border-radius:22px;padding:18px 20px;-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);box-shadow:inset 0 1px 0 rgba(255,255,255,.08);margin-bottom:14px;min-width:0}
+    .panel .ph{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+    .panel h2{margin:2px 0 0;font-size:20px;font-weight:600;letter-spacing:-.025em}
+    .chart{position:relative;height:320px;min-width:0}
+    .two{display:grid;grid-template-columns:1fr 1.4fr;gap:14px}
+    .two>.panel{margin-bottom:14px}
+    .empty{padding:40px 16px;text-align:center;color:var(--taupe);font-size:14px}
+    /* anneau + légende */
+    .donut{display:grid;grid-template-columns:200px 1fr;gap:18px;align-items:center}
+    .donut .chart{height:200px}
+    .donut .center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
+    .donut .center b{font-size:26px;font-weight:600;letter-spacing:-.03em;font-variant-numeric:tabular-nums;line-height:1}
+    .dlg{display:flex;flex-direction:column;gap:8px;font-size:13px}
+    .dlg div{display:flex;align-items:center;gap:8px}
+    .dlg i{width:9px;height:9px;border-radius:50%;flex:none}
+    .dlg span{flex:1}
+    .dlg em{font-style:normal;color:var(--taupe);font-variant-numeric:tabular-nums;white-space:nowrap}
+    .dlg em b{color:var(--cream);font-weight:600}
+    /* tableau jours × monteurs */
+    .scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+    table.grid{width:100%;border-collapse:separate;border-spacing:3px 3px;font-size:13px;min-width:520px}
+    table.grid th{font-family:'Geist',system-ui,sans-serif;font-weight:600;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--taupe);padding:8px 8px;text-align:center;white-space:nowrap}
+    table.grid th.d,table.grid td.d{text-align:left;position:sticky;left:0;background:var(--surface);z-index:1;border-radius:10px;white-space:nowrap}
+    table.grid td{padding:9px 8px;text-align:center;font-variant-numeric:tabular-nums;border-radius:10px;background:rgba(255,255,255,.02);color:var(--taupe)}
+    table.grid td.c{color:var(--cream);font-weight:500}
+    table.grid td.t,table.grid tr.t td{font-weight:600;color:var(--accent2);background:none}
+    table.grid tr.t td.d{color:var(--taupe)}
+    .tag{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:500;border:1px solid var(--line);border-radius:999px;padding:4px 10px;color:var(--cream);white-space:nowrap;font-variant-numeric:tabular-nums}
+    .tag b{font-weight:600}
+    .tag.lt{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--taupe);padding:2px 7px}
+    .tag.prog{border-color:currentColor}
+    .av{width:var(--av);height:var(--av);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:calc(var(--av) * .38);color:#0A0B0D;flex:none;overflow:hidden;letter-spacing:.02em}
+    .av img{width:100%;height:100%;object-fit:cover}
+    .av.sm{--av:34px}
+
+    /* ---- monteurs ---- */
+    .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:12px}
+    .card{background:var(--glass);border:1px solid var(--line);border-radius:22px;padding:18px 20px;-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);box-shadow:inset 0 1px 0 rgba(255,255,255,.08);display:flex;flex-direction:column;gap:14px;min-width:0}
+    .card .top2{display:flex;align-items:center;gap:12px}
+    .card .top2 .nm{font-size:16px;font-weight:600}
+    .card .top2 .meta{font-size:12px;color:var(--taupe);font-variant-numeric:tabular-nums}
+    .card .rank{margin-left:auto;font-size:11px;font-weight:600;letter-spacing:.06em;border:1px solid var(--line);border-radius:999px;padding:3px 9px;color:var(--taupe);font-variant-numeric:tabular-nums}
+    .card .rank.first{color:#0A0B0D;background:rgba(255,255,255,.85);border-color:transparent}
+    .card .kv{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .card .kv .v{font-size:28px;font-weight:600;letter-spacing:-.03em;font-variant-numeric:tabular-nums;line-height:1;margin-top:4px}
+    .card .vs{display:flex;justify-content:space-between;font-size:12px;color:var(--taupe);font-variant-numeric:tabular-nums}
+    .bar{height:7px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:5px}
+    .bar .fill{height:100%;display:flex;border-radius:999px;overflow:hidden}
+    .bar .fill i{display:block;height:100%}
+    .pills{display:flex;gap:6px;flex-wrap:wrap}
+    .card .last{font-size:12px;color:var(--taupe);font-variant-numeric:tabular-nums}
+
+    /* ---- déclarations ---- */
+    .list{display:flex;flex-direction:column;gap:8px}
+    .rep{background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden;transition:border-color .2s}
+    .rep:hover{border-color:var(--line-strong)}
+    .rep .head{display:flex;align-items:center;gap:12px;padding:10px 14px;cursor:pointer;background:none;border:0;color:inherit;width:100%;text-align:left}
+    .rep .nm{font-size:14px;font-weight:600}
+    .rep .dt{font-size:12px;color:var(--taupe);font-variant-numeric:tabular-nums}
+    .rep .pts{margin-left:auto;font-size:18px;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums;color:var(--amber);white-space:nowrap}
+    .rep .pts small{font-size:11px;font-weight:600;color:var(--taupe);letter-spacing:.06em;text-transform:uppercase;margin-left:4px}
+    .rep .chev{width:16px;height:16px;color:var(--taupe);transition:transform .2s;flex:none}
+    .rep.open .chev{transform:rotate(180deg)}
+    .rep .body{display:none;border-top:1px solid var(--line);padding:14px;gap:12px;flex-direction:column;font-size:13px}
+    .rep.open .body{display:flex}
+    .rep .txt{margin:4px 0 0;white-space:pre-wrap;line-height:1.5}
+    .rep .act{display:flex;justify-content:flex-end;gap:8px}
+    .rep .lang{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--taupe);border:1px solid var(--line);border-radius:999px;padding:2px 7px}
+
+    /* ---- paramètres ---- */
+    .set2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .addrow{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin-bottom:12px}
+    .edrows{display:flex;flex-direction:column;gap:6px}
+    .edrow{display:grid;grid-template-columns:auto 1fr auto auto;gap:8px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:8px 10px}
+    .edrow.off{opacity:.55}
+    .edrow .in{padding:8px 10px;font-size:14px;font-weight:500;background:none;border-color:transparent}
+    .edrow .in:hover,.edrow .in:focus{border-color:var(--line);background:rgba(255,255,255,.04)}
+    .edrow .photo{grid-column:1/-1;display:none}
+    .edrow.ph .photo{display:block}
+    .edrow .photo .in{font-size:12px;font-weight:400;border-color:var(--line);background:rgba(255,255,255,.04)}
+    .tog{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:5px 10px;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;background:none;color:var(--taupe);cursor:pointer;transition:border-color .2s,color .2s,background .2s}
+    .tog i{width:7px;height:7px;border-radius:50%;background:currentColor}
+    .tog.on{color:var(--ok);border-color:rgba(70,211,105,.4);background:rgba(70,211,105,.12)}
+    .tog:disabled{cursor:default}
+    .scale{display:flex;flex-direction:column;gap:6px}
+    .srow{display:grid;grid-template-columns:1fr 96px;gap:8px;align-items:center}
+    .srow .lab{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:9px 12px;font-size:14px;min-width:0}
+    .srow .lab i{width:9px;height:9px;border-radius:50%;flex:none}
+    .srow .lab span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .srow .in{text-align:center;padding:9px 8px}
+    .note{font-size:12px;color:var(--taupe);margin:12px 0}
+    .act2{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+    .msg{font-size:12px;color:var(--ok);min-height:16px}
+    .msg.err{color:var(--err)}
+
+    /* connexion */
+    .gate{max-width:380px;margin:90px auto;background:var(--glass);border:1px solid var(--line);border-radius:22px;padding:28px;-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 30px 80px rgba(0,0,0,.4)}
+    .gate h1{font-size:28px;margin:0 0 6px}
+    .gate p{color:var(--taupe);font-size:14px;margin:0 0 16px}
+    .gate .in{margin-bottom:10px;padding:12px 14px}
+    .gate .btn{width:100%;height:46px;margin-top:4px;font-size:14px}
+    .gate .msg{font-size:13px;color:var(--err);min-height:18px;margin-top:8px}
+
+    @media (max-width:1100px){.two{grid-template-columns:1fr}.set2{grid-template-columns:1fr}}
+    @media (max-width:900px){.stats{grid-template-columns:repeat(2,1fr)}.stat{min-height:118px}.stat .v{font-size:30px}}
+    @media (max-width:700px){
+      .hd{flex-wrap:wrap;gap:8px 10px;padding:10px 16px}.hd .right{flex-wrap:wrap;justify-content:flex-start;margin-left:0;width:100%}
+      .tabs{margin-left:0;width:100%;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}.tabs::-webkit-scrollbar{display:none}.tab{padding:7px 11px;font-size:12px;white-space:nowrap;flex:none}
+      .who{display:none}
+      main{padding:14px 16px 50px}.top h1{font-size:32px}
+      .dates{width:100%}.dates input[type="date"].in{flex:1;min-width:0}
+      .donut{grid-template-columns:1fr}.donut .chart{height:190px}
+      .chart{height:260px}
+      .addrow{grid-template-columns:1fr}.srow{grid-template-columns:1fr 84px}
+    }
+    @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+  </style>
+</head>
+<body>
+<header><div class="hd">
+  <a class="lv-rec" href="../team/dashboard.html"><i></i>DS<em>Editing</em></a>
+  <div class="brand"><span class="mono" data-t="kicker"></span></div>
+  <div class="tabs" id="tabs" hidden></div>
+  <div class="right">
+    <span class="who" id="who"></span>
+    <div class="seg" id="langSeg" role="group" aria-label="Langue"><button type="button" data-lang="id">Bahasa</button><button type="button" data-lang="fr">Français</button><button type="button" data-lang="en">English</button></div>
+    <a class="btn" id="formBtn" href="../prod/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14 21 3"/></svg><span data-t="form"></span></a>
+    <button class="btn ic" id="refreshBtn" type="button" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg></button>
+    <button class="btn" id="logout" type="button" data-t="logout" hidden></button>
+  </div>
+</div></header>
+
+<main>
+  <div class="gate" id="gate" hidden>
+    <h1 class="display" data-t="login"></h1>
+    <p data-t="loginSub"></p>
+    <input class="in" id="email" type="email" placeholder="email" autocomplete="username"/>
+    <input class="in" id="password" type="password" placeholder="mot de passe" autocomplete="current-password"/>
+    <button class="btn primary" id="loginBtn" type="button" data-t="loginBtn"></button>
+    <div class="msg" id="loginMsg"></div>
+  </div>
+
+  <div id="app" hidden>
+    <div class="top">
+      <div><h1 class="display" data-t="title"></h1><div class="mono period" id="period"></div></div>
+    </div>
+    <div class="toolbar" id="toolbar"></div>
+    <section id="v-overview"></section>
+    <section id="v-editors" hidden></section>
+    <section id="v-reports" hidden></section>
+    <section id="v-settings" hidden></section>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script type="module">
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+/* ===== Configuration (clé publique uniquement, comme team/dashboard.html) ===== */
+const SUPABASE_URL = "https://xkanmjlpysxpohsuqvwg.supabase.co";
+const SUPABASE_ANON = "sb_publishable_lIZtV_WtN5NcGSb0dnfaiQ_AgKYBIVa";
+const TABS = ["overview", "editors", "reports", "settings"];
+const PERIODS = ["today", "week", "month", "lastMonth", "d30"];
+// Colonnes de l'export CSV : format de l'ancien outil (libellés français fixes, séparateur « ; », BOM UTF-8, CRLF)
+const CSV_KEYS = ["reel_en", "reel_fr", "intro_fr", "intro_en", "podcast_fr", "podcast_en"];
+
+const T = {
+  fr: { kicker: "Direction", title: "Production", form: "Formulaire", refresh: "Rafraîchir", logout: "Déconnexion", login: "Espace équipe", loginSub: "Connecte-toi avec ton e-mail DS Editing.", loginBtn: "Entrer", pwd: "mot de passe", denied: "Accès réservé à l'équipe DS Editing.", loadErr: "Chargement impossible :",
+    tabs: { overview: "Vue d'ensemble", editors: "Monteurs", reports: "Déclarations", settings: "Paramètres" },
+    periods: { today: "Aujourd'hui", week: "Cette semaine", month: "Ce mois", lastMonth: "Mois dernier", d30: "30 jours" }, csv: "CSV / Excel",
+    stats: { points: "Points produits", perDecl: (x) => `${x} pts / déclaration`, elements: "Éléments livrés", elementsSub: "reels, intros, podcasts", avg: "Moyenne / jour", avgSub: "sur les jours déclarés", decl: "Déclarations", declSub: "journées remplies", active: "Monteurs actifs", activeSub: "sur la période" },
+    charts: { evo: "Évolution", evoT: "Points produits par jour", points: "Points", elements: "Éléments", avg7: "Moyenne 7 j", dist: "Répartition", distT: "Points par catégorie", cmp: "Comparaison", cmpT: "Points par monteur et catégorie", detail: "Détail", detailT: "Points par jour et par monteur", day: "Jour", total: "Total", pts: "pts", empty: "Aucune déclaration sur la période.", noChart: "Graphiques indisponibles (Chart.js n'a pas pu être chargé)." },
+    ed: { days: (n) => `${n} jour${n > 1 ? "s" : ""}`, perDay: "pts/j", points: "Points", elements: "Éléments", vs: "vs leader", groups: { reel: "Reels", intro: "Intros", podcast: "Podcasts" }, last: "Dernière saisie" },
+    rep: { details: "Détails", comment: "Commentaire", del: "Supprimer", confirm: (n, d) => `Supprimer la déclaration de ${n} du ${d} ?`, progress: "En cours", none: "Aucune déclaration sur la période." },
+    set: { team: "Équipe", editors: "Monteurs", namePh: "Prénom Nom", photoPh: "URL photo (optionnel)", add: "Ajouter", on: "Actif", off: "Inactif", photo: "Photo", saved: "enregistré", scale: "Barème", scaleT: "Points par unité", note: "Les scores déjà enregistrés conservent le barème en vigueur au moment de la déclaration.", save: "Enregistrer le barème", ro: "Lecture seule : les modifications sont réservées à l'administration.", dup: "Ce nom existe déjà.", bad: "Valeur attendue : un nombre positif." } },
+  en: { kicker: "Management", title: "Production", form: "Form", refresh: "Refresh", logout: "Log out", login: "Team space", loginSub: "Sign in with your DS Editing email.", loginBtn: "Enter", pwd: "password", denied: "Access restricted to the DS Editing team.", loadErr: "Could not load:",
+    tabs: { overview: "Overview", editors: "Editors", reports: "Reports", settings: "Settings" },
+    periods: { today: "Today", week: "This week", month: "This month", lastMonth: "Last month", d30: "30 days" }, csv: "CSV / Excel",
+    stats: { points: "Points produced", perDecl: (x) => `${x} pts / report`, elements: "Delivered items", elementsSub: "reels, intros, podcasts", avg: "Average / day", avgSub: "over reported days", decl: "Reports", declSub: "days filled in", active: "Active editors", activeSub: "over the period" },
+    charts: { evo: "Trend", evoT: "Points produced per day", points: "Points", elements: "Items", avg7: "7-day average", dist: "Breakdown", distT: "Points by category", cmp: "Comparison", cmpT: "Points by editor and category", detail: "Detail", detailT: "Points per day and per editor", day: "Day", total: "Total", pts: "pts", empty: "No report over the period.", noChart: "Charts unavailable (Chart.js could not be loaded)." },
+    ed: { days: (n) => `${n} day${n > 1 ? "s" : ""}`, perDay: "pts/day", points: "Points", elements: "Items", vs: "vs leader", groups: { reel: "Reels", intro: "Intros", podcast: "Podcasts" }, last: "Last entry" },
+    rep: { details: "Details", comment: "Comment", del: "Delete", confirm: (n, d) => `Delete ${n}'s report of ${d}?`, progress: "In progress", none: "No report over the period." },
+    set: { team: "Team", editors: "Editors", namePh: "First name Last name", photoPh: "Photo URL (optional)", add: "Add", on: "Active", off: "Inactive", photo: "Photo", saved: "saved", scale: "Point scale", scaleT: "Points per unit", note: "Scores already recorded keep the scale that applied when they were reported.", save: "Save the scale", ro: "Read only: changes are restricted to administrators.", dup: "This name already exists.", bad: "Expected value: a positive number." } },
+  id: { kicker: "Manajemen", title: "Produksi", form: "Formulir", refresh: "Muat ulang", logout: "Keluar", login: "Ruang tim", loginSub: "Masuk dengan e-mail DS Editing kamu.", loginBtn: "Masuk", pwd: "kata sandi", denied: "Akses khusus tim DS Editing.", loadErr: "Gagal memuat:",
+    tabs: { overview: "Ringkasan", editors: "Editor", reports: "Laporan", settings: "Pengaturan" },
+    periods: { today: "Hari ini", week: "Minggu ini", month: "Bulan ini", lastMonth: "Bulan lalu", d30: "30 hari" }, csv: "CSV / Excel",
+    stats: { points: "Poin dihasilkan", perDecl: (x) => `${x} poin / laporan`, elements: "Elemen selesai", elementsSub: "reel, intro, podcast", avg: "Rata-rata / hari", avgSub: "pada hari yang dilaporkan", decl: "Laporan", declSub: "hari terisi", active: "Editor aktif", activeSub: "pada periode ini" },
+    charts: { evo: "Perkembangan", evoT: "Poin per hari", points: "Poin", elements: "Elemen", avg7: "Rata-rata 7 hari", dist: "Distribusi", distT: "Poin per kategori", cmp: "Perbandingan", cmpT: "Poin per editor dan kategori", detail: "Rincian", detailT: "Poin per hari dan per editor", day: "Hari", total: "Total", pts: "poin", empty: "Tidak ada laporan pada periode ini.", noChart: "Grafik tidak tersedia (Chart.js gagal dimuat)." },
+    ed: { days: (n) => `${n} hari`, perDay: "poin/hari", points: "Poin", elements: "Elemen", vs: "vs pemimpin", groups: { reel: "Reel", intro: "Intro", podcast: "Podcast" }, last: "Input terakhir" },
+    rep: { details: "Rincian", comment: "Komentar", del: "Hapus", confirm: (n, d) => `Hapus laporan ${n} tanggal ${d}?`, progress: "Sedang dikerjakan", none: "Tidak ada laporan pada periode ini." },
+    set: { team: "Tim", editors: "Editor", namePh: "Nama lengkap", photoPh: "URL foto (opsional)", add: "Tambah", on: "Aktif", off: "Nonaktif", photo: "Foto", saved: "tersimpan", scale: "Skala poin", scaleT: "Poin per unit", note: "Skor yang sudah tersimpan tetap memakai skala poin yang berlaku saat laporan dibuat.", save: "Simpan skala poin", ro: "Hanya baca: perubahan khusus administrator.", dup: "Nama ini sudah ada.", bad: "Nilai yang diharapkan: angka positif." } },
+};
+
+const $ = (s) => document.querySelector(s);
+const params = new URLSearchParams(location.search);
+const store = { get: (k) => { try { return localStorage.getItem(k); } catch { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch {} } };
+let lang = params.get("lang") || store.get("ds_prod_lang") || store.get("ds_lang") || "fr"; if (!T[lang]) lang = "fr";
+const t = (path) => path.split(".").reduce((o, k) => (o == null ? undefined : o[k]), T[lang]);
+let tab = params.get("tab") || "overview"; if (!TABS.includes(tab)) tab = "overview";
+let sb = null, me = null, profile = null, cats = [], editors = [], reports = [], charts = {}, loadError = "";
+let period = { kind: "d30", from: "", to: "" };
+const openIds = new Set();
+
+/* ===== utilitaires ===== */
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const loc = () => (lang === "fr" ? "fr-FR" : lang === "id" ? "id-ID" : "en-GB");
+const pad = (n) => String(n).padStart(2, "0");
+const ymd = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const fromYmd = (s) => { const [y, m, d] = String(s).split("-").map(Number); return new Date(y, m - 1, d); };
+const fmtDay = (s) => s ? fromYmd(s).toLocaleDateString(loc(), { weekday: "short", day: "2-digit", month: "2-digit" }) : "—";
+const fmtDT = (d) => d ? new Date(d).toLocaleString(loc(), { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }) : "—";
+const nf = (x, max = 1) => Number(x || 0).toLocaleString(loc(), { maximumFractionDigits: max });
+const isAdmin = () => !!profile && profile.role === "admin";
+const canEditReports = () => !!profile && ["admin", "dispatcher"].includes(profile.role);
+const COLORS = ["#FF6A2B", "#5FD39A", "#7FB0E0", "#F5C400", "#E38BFF", "#F08A82", "#7CE0D6", "#FFB86B", "#B6E36B", "#FF8FC7", "#9BA8FF", "#EDE8DC"];
+const color = (name) => COLORS[[...String(name)].reduce((a, c) => a + c.charCodeAt(0), 0) % COLORS.length];
+const avatar = (e, sm) => `<span class="av ${sm ? "sm" : ""}" style="background:${color(e.name)}" title="${esc(e.name)}">${e.avatar_url ? `<img src="${esc(e.avatar_url)}" alt=""/>` : esc(String(e.name || "?").slice(0, 2).toUpperCase())}</span>`;
+const catLabel = (c) => (lang === "en" ? c.label_en : lang === "id" ? c.label_id : c.label_fr) || c.label_fr || c.key;
+const group = (key) => String(key).split("_")[0];
+const rate = (r, c) => { const v = r.rates && r.rates[c.key]; return Number(v == null ? c.points : v) || 0; };
+const edKey = (r) => r.editor_id || ("name:" + r.editor_name);
+const edInfo = (r) => { const e = r.editor_id ? editors.find((x) => x.id === r.editor_id) : null; return { id: r.editor_id, name: (e && e.name) || r.editor_name || "?", avatar_url: e ? e.avatar_url : null }; };
+const ICONS = { chev: `<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`,
+  dl: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></svg>`,
+  trash: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>`,
+  photo: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></svg>`,
+  loop: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>` };
+
+/* ===== période ===== */
+function bounds(kind) {
+  const now = new Date(), today = ymd(now);
+  if (kind === "today") return [today, today];
+  if (kind === "week") { const d = new Date(now); d.setDate(d.getDate() - (d.getDay() + 6) % 7); const e = new Date(d); e.setDate(d.getDate() + 6); return [ymd(d), ymd(e)]; }
+  if (kind === "month") return [ymd(new Date(now.getFullYear(), now.getMonth(), 1)), ymd(new Date(now.getFullYear(), now.getMonth() + 1, 0))];
+  if (kind === "lastMonth") return [ymd(new Date(now.getFullYear(), now.getMonth() - 1, 1)), ymd(new Date(now.getFullYear(), now.getMonth(), 0))];
+  if (kind === "d30") { const d = new Date(now); d.setDate(d.getDate() - 29); return [ymd(d), today]; }
+  return [period.from, period.to];
+}
+function setPeriod(kind, from, to) {
+  if (kind !== "custom") [from, to] = bounds(kind);
+  if (from && to && from > to) [from, to] = [to, from];
+  period = { kind, from, to }; renderToolbar(); render();
+}
+const inPeriod = () => reports.filter((r) => r.report_date >= period.from && r.report_date <= period.to);
+
+/* ===== agrégats ===== */
+function agg(list) {
+  const days = new Map(), byCat = new Map(), eds = new Map(), cell = new Map();
+  let points = 0, elements = 0;
+  for (const r of list) {
+    const p = Number(r.points) || 0, el = Number(r.elements) || 0; points += p; elements += el;
+    const d = days.get(r.report_date) || { points: 0, elements: 0, n: 0 }; d.points += p; d.elements += el; d.n++; days.set(r.report_date, d);
+    const k = edKey(r); const e = eds.get(k) || { key: k, ...edInfo(r), points: 0, elements: 0, days: new Set(), cats: new Map(), groups: {}, last: null };
+    e.points += p; e.elements += el; e.days.add(r.report_date);
+    if (!e.last || r.report_date > e.last.report_date || (r.report_date === e.last.report_date && String(r.updated_at) > String(e.last.updated_at))) e.last = r;
+    for (const c of cats) {
+      const done = Number((r.counts || {})[c.key] && r.counts[c.key].done) || 0; if (!done) continue;
+      const cp = done * rate(r, c);
+      const b = byCat.get(c.key) || { points: 0, done: 0 }; b.points += cp; b.done += done; byCat.set(c.key, b);
+      const eb = e.cats.get(c.key) || { points: 0, done: 0 }; eb.points += cp; eb.done += done; e.cats.set(c.key, eb);
+      const g = group(c.key); e.groups[g] = (e.groups[g] || 0) + done;
+    }
+    eds.set(k, e);
+    const ck = r.report_date + "|" + k; cell.set(ck, (cell.get(ck) || 0) + p);
+  }
+  const sortedEds = [...eds.values()].sort((a, b) => b.points - a.points || a.name.localeCompare(b.name));
+  const sortedDays = [...days.keys()].sort();
+  return { points, elements, n: list.length, days, sortedDays, byCat, eds: sortedEds, cell };
+}
+
+/* ===== rendu : cadre ===== */
+function applyText() {
+  document.documentElement.lang = lang;
+  document.querySelectorAll("[data-t]").forEach((el) => { const v = t(el.dataset.t); if (typeof v === "string") el.textContent = v; });
+  $("#password").placeholder = t("pwd"); $("#refreshBtn").title = t("refresh"); $("#formBtn").title = t("form");
+  document.querySelectorAll("#langSeg button").forEach((b) => b.classList.toggle("on", b.dataset.lang === lang));
+}
+function renderTabs() {
+  $("#tabs").innerHTML = TABS.map((k) => `<button type="button" class="tab ${tab === k ? "on" : ""}" data-tab="${k}">${t("tabs." + k)}</button>`).join("");
+  $("#tabs").querySelectorAll("[data-tab]").forEach((b) => b.addEventListener("click", () => { tab = b.dataset.tab; const u = new URL(location.href); u.searchParams.set("tab", tab); history.replaceState(null, "", u); renderTabs(); render(); }));
+}
+function renderToolbar() {
+  $("#toolbar").innerHTML = PERIODS.map((k) => `<button type="button" class="chip ${period.kind === k ? "on" : ""}" data-period="${k}">${t("periods." + k)}</button>`).join("")
+    + `<span class="dates"><input class="in" type="date" id="dFrom" value="${period.from}"/> → <input class="in" type="date" id="dTo" value="${period.to}"/></span><span class="spacer"></span>`
+    + `<button type="button" class="btn" id="csvBtn">${ICONS.dl}${t("csv")}</button>`;
+  $("#toolbar").querySelectorAll("[data-period]").forEach((b) => b.addEventListener("click", () => setPeriod(b.dataset.period)));
+  const custom = () => { const a = $("#dFrom").value, b = $("#dTo").value; if (a && b) setPeriod("custom", a, b); };
+  $("#dFrom").addEventListener("change", custom); $("#dTo").addEventListener("change", custom);
+  $("#csvBtn").addEventListener("click", exportCsv);
+  $("#period").textContent = `${fmtDay(period.from)} → ${fmtDay(period.to)}`;
+}
+function render() {
+  TABS.forEach((k) => { $("#v-" + k).hidden = k !== tab; });
+  if (tab === "overview") renderOverview(); else if (tab === "editors") renderEditors(); else if (tab === "reports") renderReports(); else renderSettings();
+}
+
+/* ===== vue d'ensemble ===== */
+function spark(vals, col) {
+  if (vals.length < 2) return "";
+  const w = 120, h = 36, max = Math.max(...vals, 1), n = vals.length;
+  const pts = vals.map((v, i) => [(i / (n - 1)) * w, h - 3 - (v / max) * (h - 8)]);
+  const d = pts.map((p, i) => (i ? "L" : "M") + p[0].toFixed(1) + " " + p[1].toFixed(1)).join(" ");
+  return `<svg class="spark" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" aria-hidden="true"><path d="${d} L${w} ${h} L0 ${h} Z" fill="${col}" opacity=".12"/><path d="${d}" fill="none" stroke="${col}" stroke-width="1.5" vector-effect="non-scaling-stroke"/></svg>`;
+}
+function destroyCharts() { Object.values(charts).forEach((c) => { try { c.destroy(); } catch {} }); charts = {}; }
+function renderOverview() {
+  destroyCharts();
+  const S = t("stats"), C = t("charts"), list = inPeriod(), A = agg(list);
+  const dayVals = (f) => A.sortedDays.map((d) => f(A.days.get(d)));
+  const avg = A.sortedDays.length ? A.points / A.sortedDays.length : 0;
+  const stat = (cls, k, v, unit, sub, sp) => `<div class="stat ${cls}"><div class="mono">${k}</div><div class="v">${v}${unit ? `<small>${unit}</small>` : ""}</div><div class="sub">${sub}</div>${sp || ""}</div>`;
+  const head = (k, title, extra) => `<div class="ph"><div><div class="mono">${k}</div><h2>${title}</h2></div>${extra || ""}</div>`;
+  const catsSorted = cats.filter((c) => A.byCat.has(c.key)).sort((a, b) => A.byCat.get(b.key).points - A.byCat.get(a.key).points);
+  $("#v-overview").innerHTML = `<div class="stats" id="stats">
+      ${stat("main", S.points, nf(A.points), C.pts, S.perDecl(nf(A.n ? A.points / A.n : 0, 2)), spark(dayVals((d) => d.points), "#DCE3EA"))}
+      ${stat("", S.elements, nf(A.elements, 0), "", S.elementsSub, spark(dayVals((d) => d.elements), "#7FB0E0"))}
+      ${stat("", S.avg, nf(avg), C.pts, S.avgSub)}
+      ${stat("", S.decl, nf(A.n, 0), "", S.declSub, spark(dayVals((d) => d.n), "#46D369"))}
+      ${stat("", S.active, nf(A.eds.length, 0), "", S.activeSub)}
+    </div>
+    <div class="panel">${head(C.evo, C.evoT)}${A.n ? `<div class="chart" style="height:320px"><canvas id="cEvo"></canvas></div>` : `<div class="empty">${C.empty}</div>`}</div>
+    <div class="two">
+      <div class="panel">${head(C.dist, C.distT)}${A.n ? `<div class="donut"><div class="chart"><canvas id="cDist"></canvas><div class="center"><b>${nf(A.points)}</b><span class="mono">${C.points}</span></div></div>
+        <div class="dlg">${catsSorted.map((c) => `<div><i style="background:${esc(c.color)}"></i><span>${esc(catLabel(c))}</span><em><b>${nf(A.byCat.get(c.key).points)}</b> ${C.pts} · ${nf(A.byCat.get(c.key).done, 0)}</em></div>`).join("")}</div></div>` : `<div class="empty">${C.empty}</div>`}</div>
+      <div class="panel">${head(C.cmp, C.cmpT)}${A.n ? `<div class="chart" style="height:${Math.max(220, 90 + 36 * A.eds.length)}px"><canvas id="cCmp"></canvas></div>` : `<div class="empty">${C.empty}</div>`}</div>
+    </div>
+    <div class="panel">${head(C.detail, C.detailT)}${A.n ? renderGrid(A) : `<div class="empty">${C.empty}</div>`}</div>`;
+  if (!A.n) return;
+  if (typeof Chart === "undefined") { document.querySelectorAll("#v-overview .chart").forEach((el) => { el.innerHTML = `<div class="empty">${C.noChart}</div>`; }); return; }
+  Chart.defaults.color = "#9AA3AD"; Chart.defaults.font.family = "'Geist', system-ui, sans-serif"; Chart.defaults.font.size = 12;
+  const tip = { backgroundColor: "#161A1F", borderColor: "rgba(255,255,255,.14)", borderWidth: 1, titleColor: "#F5F5F1", bodyColor: "#F5F5F1", padding: 10, cornerRadius: 10, boxPadding: 4, usePointStyle: true };
+  const grid = { color: "rgba(255,255,255,.06)" };
+  // 1. évolution : courbe des points, barres des éléments (axe caché), moyenne glissante sur 7 journées déclarées
+  const pts = dayVals((d) => d.points), els = dayVals((d) => d.elements);
+  const avg7 = pts.map((_, i) => { const w = pts.slice(Math.max(0, i - 6), i + 1); return w.reduce((a, b) => a + b, 0) / w.length; });
+  const ctxEvo = $("#cEvo").getContext("2d");
+  const fill = (ctx) => { const a = ctx.chart.chartArea; if (!a) return "rgba(220,227,234,.1)"; const g = ctx.chart.ctx.createLinearGradient(0, a.top, 0, a.bottom); g.addColorStop(0, "rgba(220,227,234,.28)"); g.addColorStop(1, "rgba(220,227,234,0)"); return g; };
+  charts.evo = new Chart(ctxEvo, { data: { labels: A.sortedDays.map(fmtDay), datasets: [
+      { type: "line", label: C.points, data: pts, borderColor: "#DCE3EA", backgroundColor: fill, fill: true, tension: .4, borderWidth: 2, pointRadius: 3, pointBackgroundColor: "#DCE3EA", yAxisID: "y", order: 0 },
+      { type: "bar", label: C.elements, data: els, backgroundColor: "rgba(127,176,224,.32)", borderRadius: 6, barPercentage: .22, yAxisID: "y2", order: 1 },
+      { type: "line", label: C.avg7, data: avg7, borderColor: "#9AA3AD", borderDash: [4, 4], borderWidth: 1.5, pointRadius: 0, tension: .3, yAxisID: "y", order: 2 } ] },
+    options: { maintainAspectRatio: false, interaction: { mode: "index", intersect: false }, plugins: { legend: { position: "top", align: "end", labels: { usePointStyle: true, pointStyle: "circle", boxWidth: 6, boxHeight: 6 } }, tooltip: tip },
+      scales: { x: { grid: { display: false } }, y: { beginAtZero: true, grid, ticks: { maxTicksLimit: 5 } }, y2: { beginAtZero: true, display: false, suggestedMax: Math.max(...els, 1) * 1.15 } } } });
+  // 2. répartition par catégorie
+  charts.dist = new Chart($("#cDist").getContext("2d"), { type: "doughnut", data: { labels: catsSorted.map(catLabel), datasets: [{ data: catsSorted.map((c) => A.byCat.get(c.key).points), backgroundColor: catsSorted.map((c) => c.color), borderColor: "#0F1114", borderWidth: 2, hoverOffset: 4 }] },
+    options: { maintainAspectRatio: false, cutout: "72%", plugins: { legend: { display: false }, tooltip: { ...tip, callbacks: { label: (x) => ` ${x.label} · ${nf(x.parsed)} ${C.pts}` } } } } });
+  // 3. comparaison : barres empilées horizontales par monteur
+  charts.cmp = new Chart($("#cCmp").getContext("2d"), { type: "bar", data: { labels: A.eds.map((e) => e.name), datasets: cats.filter((c) => A.byCat.has(c.key)).map((c) => ({ label: catLabel(c), data: A.eds.map((e) => (e.cats.get(c.key) || { points: 0 }).points), backgroundColor: c.color, borderRadius: 3, barThickness: 18 })) },
+    options: { maintainAspectRatio: false, indexAxis: "y", plugins: { legend: { position: "bottom", labels: { usePointStyle: true, pointStyle: "circle", boxWidth: 6, boxHeight: 6, padding: 14 } }, tooltip: { ...tip, callbacks: { label: (x) => ` ${x.dataset.label} · ${nf(x.parsed.x)} ${C.pts}` } } },
+      scales: { x: { stacked: true, beginAtZero: true, grid, ticks: { maxTicksLimit: 6 } }, y: { stacked: true, grid: { display: false }, ticks: { color: "#F5F5F1", font: { weight: 500 } } } } } });
+}
+function renderGrid(A) {
+  const C = t("charts"), days = [...A.sortedDays].reverse(), eds = A.eds;
+  let max = 0; A.cell.forEach((v) => { if (v > max) max = v; });
+  const cell = (v) => { if (!v) return `<td>·</td>`; const a = .1 + .6 * (v / (max || 1)); return `<td class="c" style="background:rgba(220,227,234,${a.toFixed(2)});${a > .42 ? "color:#0A0B0D" : ""}">${nf(v)}</td>`; };
+  const rows = days.map((d) => `<tr><td class="d">${fmtDay(d)}</td>${eds.map((e) => cell(A.cell.get(d + "|" + e.key) || 0)).join("")}<td class="t">${nf(A.days.get(d).points)}</td></tr>`).join("");
+  return `<div class="scroll"><table class="grid" id="gridTable"><thead><tr><th class="d">${C.day}</th>${eds.map((e) => `<th>${esc(e.name)}</th>`).join("")}<th>${C.total}</th></tr></thead>
+    <tbody>${rows}<tr class="t"><td class="d">${C.total}</td>${eds.map((e) => `<td>${nf(e.points)}</td>`).join("")}<td>${nf(A.points)}</td></tr></tbody></table></div>`;
+}
+
+/* ===== monteurs ===== */
+function lastEntry(r) {
+  // date de la déclaration ; l'heure d'enregistrement n'est affichée que si elle est du même jour (sinon saisie/import a posteriori)
+  if (!r) return "—";
+  const u = r.updated_at ? new Date(r.updated_at) : null;
+  if (u && ymd(u) === r.report_date) return `${fmtDay(r.report_date)} ${u.toLocaleTimeString(loc(), { hour: "2-digit", minute: "2-digit" })}`;
+  return fmtDay(r.report_date);
+}
+function renderEditors() {
+  const E = t("ed"), C = t("charts"), A = agg(inPeriod()), leader = A.eds.length ? A.eds[0].points : 0;
+  if (!A.eds.length) { $("#v-editors").innerHTML = `<div class="panel"><div class="empty">${C.empty}</div></div>`; return; }
+  $("#v-editors").innerHTML = `<div class="cards">` + A.eds.map((e, i) => {
+    const pct = leader ? Math.round((e.points / leader) * 100) : 0, nd = e.days.size;
+    const segs = cats.filter((c) => e.cats.has(c.key)).map((c) => `<i style="width:${((e.cats.get(c.key).points / (e.points || 1)) * 100).toFixed(1)}%;background:${esc(c.color)}"></i>`).join("");
+    return `<div class="card" data-editor="${esc(e.key)}"><div class="top2">${avatar(e)}<div><div class="nm">${esc(e.name)}</div><div class="meta">${E.days(nd)} · ${nf(nd ? e.points / nd : 0)} ${E.perDay}</div></div><span class="rank ${i === 0 ? "first" : ""}">#${i + 1}</span></div>
+      <div class="kv"><div><div class="mono">${E.points}</div><div class="v">${nf(e.points)}</div></div><div><div class="mono">${E.elements}</div><div class="v">${nf(e.elements, 0)}</div></div></div>
+      <div><div class="vs"><span>${E.vs}</span><span>${pct}%</span></div><div class="bar"><div class="fill" style="width:${pct}%">${segs}</div></div></div>
+      <div class="pills">${["reel", "intro", "podcast"].map((g) => `<span class="tag">${E.groups[g]} <b>${nf(e.groups[g] || 0, 0)}</b></span>`).join("")}</div>
+      <div class="last">${E.last} · ${lastEntry(e.last)}</div></div>`;
+  }).join("") + `</div>`;
+}
+
+/* ===== déclarations ===== */
+function renderReports() {
+  const R = t("rep"), list = inPeriod().slice().sort((a, b) => b.report_date.localeCompare(a.report_date) || edInfo(a).name.localeCompare(edInfo(b).name));
+  if (!list.length) { $("#v-reports").innerHTML = `<div class="panel"><div class="empty">${R.none}</div></div>`; return; }
+  $("#v-reports").innerHTML = `<div class="list">` + list.map((r) => {
+    const e = edInfo(r), counts = r.counts || {};
+    const done = cats.filter((c) => Number(counts[c.key] && counts[c.key].done) > 0).map((c) => `<span class="tag">${esc(catLabel(c))} <b>×${nf(counts[c.key].done, 0)}</b></span>`).join("");
+    const prog = cats.filter((c) => Number(counts[c.key] && counts[c.key].progress) > 0).map((c) => `<span class="tag prog" style="color:${esc(c.color)};background:${esc(c.color)}1f" title="${R.progress}">${ICONS.loop} ${esc(catLabel(c))} <b>${nf(counts[c.key].progress, 0)}%</b></span>`).join("");
+    const block = (k, v) => v ? `<div><div class="mono">${k}</div><p class="txt">${esc(v)}</p></div>` : "";
+    return `<div class="rep ${openIds.has(r.id) ? "open" : ""}" data-rep="${r.id}"><button type="button" class="head" aria-expanded="${openIds.has(r.id)}">${avatar(e, true)}<div><div class="nm">${esc(e.name)}</div><div class="dt">${fmtDay(r.report_date)}</div></div><span class="pts">${nf(r.points)}<small>${t("charts.pts")}</small></span>${ICONS.chev}</button>
+      <div class="body"><div class="pills">${done}${prog}${r.lang ? `<span class="lang">${esc(r.lang)}</span>` : ""}</div>${block(R.details, r.details)}${block(R.comment, r.comment)}
+      ${canEditReports() ? `<div class="act"><button type="button" class="btn sm" data-del="${r.id}">${ICONS.trash}${R.del}</button></div>` : ""}</div></div>`;
+  }).join("") + `</div>`;
+  $("#v-reports").querySelectorAll(".rep .head").forEach((h) => h.addEventListener("click", () => { const el = h.parentElement, id = el.dataset.rep; el.classList.toggle("open"); el.classList.contains("open") ? openIds.add(id) : openIds.delete(id); h.setAttribute("aria-expanded", el.classList.contains("open")); }));
+  $("#v-reports").querySelectorAll("[data-del]").forEach((b) => b.addEventListener("click", async () => {
+    const r = reports.find((x) => x.id === b.dataset.del); if (!r) return;
+    if (!confirm(R.confirm(edInfo(r).name, fmtDay(r.report_date)))) return;
+    b.disabled = true; const { error } = await sb.from("prod_reports").delete().eq("id", r.id);
+    if (error) { alert(error.message); b.disabled = false; return; }
+    await load(true);
+  }));
+}
+
+/* ===== paramètres : équipe + barème ===== */
+function renderSettings() {
+  const S = t("set"), admin = isAdmin();
+  const row = (e) => `<div class="edrow ${e.active === false ? "off" : ""}" data-ed="${e.id}">${avatar(e, true)}<input class="in" value="${esc(e.name)}" data-name="${e.id}" ${admin ? "" : "readonly"} aria-label="${S.namePh}"/>
+      <button type="button" class="btn ic sm" data-photo="${e.id}" title="${S.photo}" ${admin ? "" : "disabled"}>${ICONS.photo}</button>
+      <button type="button" class="tog ${e.active === false ? "" : "on"}" data-toggle="${e.id}" ${admin ? "" : "disabled"}><i></i>${e.active === false ? S.off : S.on}</button>
+      <div class="photo"><input class="in" placeholder="${S.photoPh}" value="${esc(e.avatar_url || "")}" data-url="${e.id}" ${admin ? "" : "readonly"}/></div></div>`;
+  const sorted = editors.slice().sort((a, b) => (a.sort ?? 100) - (b.sort ?? 100) || a.name.localeCompare(b.name));
+  const srow = (c) => `<div class="srow"><div class="lab"><i style="background:${esc(c.color)}"></i><span>${esc(catLabel(c))}</span><span class="tag lt" style="flex:none">${esc(c.lang_tag || "")}</span></div><input class="in" type="number" min="0" step="0.1" inputmode="decimal" value="${Number(c.points)}" data-pts="${esc(c.key)}" ${admin ? "" : "readonly"}/></div>`;
+  $("#v-settings").innerHTML = `<div class="set2">
+    <div class="panel"><div class="ph"><div><div class="mono">${S.team}</div><h2>${S.editors}</h2></div></div>
+      ${admin ? `<div class="addrow"><input class="in" id="edName" placeholder="${S.namePh}" maxlength="60"/><input class="in" id="edPhoto" placeholder="${S.photoPh}"/><button type="button" class="btn primary" id="edAdd">${S.add}</button></div>` : `<p class="note">${S.ro}</p>`}
+      <div class="edrows" id="edRows">${sorted.map(row).join("")}</div><div class="msg" id="edMsg" role="status"></div></div>
+    <div class="panel"><div class="ph"><div><div class="mono">${S.scale}</div><h2>${S.scaleT}</h2></div></div>
+      <div class="scale" id="scale">${cats.slice().sort((a, b) => a.sort - b.sort).map(srow).join("")}</div>
+      <p class="note">${S.note}</p>
+      ${admin ? `<div class="act2"><button type="button" class="btn primary" id="scaleSave">${S.save}</button><span class="msg" id="scaleMsg" role="status"></span></div>` : `<p class="note">${S.ro}</p>`}</div></div>`;
+  if (!admin) return;
+  const flash = (sel, txt, bad) => { const m = $(sel); if (!m) return; m.classList.toggle("err", !!bad); m.textContent = txt; if (!bad) setTimeout(() => { if (m.textContent === txt) m.textContent = ""; }, 2500); };
+  $("#edAdd").addEventListener("click", async () => {
+    const name = $("#edName").value.trim(), url = $("#edPhoto").value.trim(); if (!name) { $("#edName").focus(); return; }
+    if (editors.some((e) => e.name.toLowerCase() === name.toLowerCase())) { flash("#edMsg", S.dup, true); return; }
+    $("#edAdd").disabled = true;
+    const { error } = await sb.from("editors").insert({ name, avatar_url: url || null, active: true, sort: Math.max(0, ...editors.map((e) => Number(e.sort) || 0)) + 1 });
+    $("#edAdd").disabled = false; if (error) { flash("#edMsg", error.message, true); return; }
+    await loadEditors(); renderSettings(); flash("#edMsg", "✓ " + S.saved);
+  });
+  $("#edName").addEventListener("keydown", (e) => { if (e.key === "Enter") $("#edAdd").click(); });
+  const patch = async (id, p) => { const { error } = await sb.from("editors").update(p).eq("id", id); if (error) { flash("#edMsg", error.message, true); return false; } await loadEditors(); return true; };
+  $("#edRows").querySelectorAll("[data-name]").forEach((inp) => inp.addEventListener("change", async () => {
+    const name = inp.value.trim(), e = editors.find((x) => x.id === inp.dataset.name); if (!e || !name || name === e.name) { inp.value = e ? e.name : ""; return; }
+    if (editors.some((x) => x.id !== e.id && x.name.toLowerCase() === name.toLowerCase())) { inp.value = e.name; flash("#edMsg", S.dup, true); return; }
+    if (await patch(e.id, { name })) { renderSettings(); flash("#edMsg", "✓ " + S.saved); }
+  }));
+  $("#edRows").querySelectorAll("[data-url]").forEach((inp) => inp.addEventListener("change", async () => { if (await patch(inp.dataset.url, { avatar_url: inp.value.trim() || null })) { renderSettings(); flash("#edMsg", "✓ " + S.saved); } }));
+  $("#edRows").querySelectorAll("[data-photo]").forEach((b) => b.addEventListener("click", () => { const r = b.closest(".edrow"); r.classList.toggle("ph"); if (r.classList.contains("ph")) r.querySelector("[data-url]").focus(); }));
+  $("#edRows").querySelectorAll("[data-toggle]").forEach((b) => b.addEventListener("click", async () => { const e = editors.find((x) => x.id === b.dataset.toggle); if (!e) return; b.disabled = true; if (await patch(e.id, { active: e.active === false })) { renderSettings(); flash("#edMsg", "✓ " + S.saved); } else b.disabled = false; }));
+  $("#scaleSave").addEventListener("click", async () => {
+    const changes = [];
+    for (const inp of $("#scale").querySelectorAll("[data-pts]")) {
+      const v = Number(String(inp.value).replace(",", ".")); inp.classList.toggle("bad", !(v >= 0 && isFinite(v)));
+      if (!(v >= 0 && isFinite(v))) { flash("#scaleMsg", S.bad, true); return; }
+      const c = cats.find((x) => x.key === inp.dataset.pts); if (c && Number(c.points) !== v) changes.push({ key: c.key, points: v });
+    }
+    $("#scaleSave").disabled = true;
+    for (const ch of changes) { const { error } = await sb.from("prod_categories").update({ points: ch.points, updated_at: new Date().toISOString() }).eq("key", ch.key); if (error) { flash("#scaleMsg", error.message, true); $("#scaleSave").disabled = false; return; } }
+    await loadCats(); $("#scaleSave").disabled = false; renderSettings(); flash("#scaleMsg", "✓ " + S.saved);
+  });
+}
+
+/* ===== export CSV (format de l'ancien outil) ===== */
+function exportCsv() {
+  const list = inPeriod().slice().sort((a, b) => a.report_date.localeCompare(b.report_date) || edInfo(a).name.localeCompare(edInfo(b).name));
+  const q = (s) => { s = String(s ?? ""); return /[;"\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
+  const dec = (x, d) => Number(x || 0).toFixed(d).replace(".", ",");
+  const byKey = Object.fromEntries(cats.map((c) => [c.key, c]));
+  const head = ["Date", "Monteur", ...CSV_KEYS.map((k) => (byKey[k] || { label_fr: k }).label_fr), "Score", "En cours", "Détails", "Commentaire"];
+  const rows = list.map((r) => { const c = r.counts || {};
+    const prog = cats.filter((x) => Number(c[x.key] && c[x.key].progress) > 0).map((x) => `${x.label_fr} ${Number(c[x.key].progress)}%`).join(" | ");
+    return [r.report_date, edInfo(r).name, ...CSV_KEYS.map((k) => String(Number(c[k] && c[k].done) || 0)), dec(r.points, 1), prog, r.details || "", r.comment || ""].map(q).join(";"); });
+  const blob = new Blob(["﻿" + [head.join(";"), ...rows].join("\r\n") + "\r\n"], { type: "text/csv;charset=utf-8" });
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `production_${period.from}_${period.to}.csv`; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+}
+
+/* ===== données ===== */
+async function loadCats() { const { data, error } = await sb.from("prod_categories").select("*").order("sort"); if (error) throw error; cats = data || []; }
+async function loadEditors() { const { data, error } = await sb.from("editors").select("id,name,avatar_url,active,sort").order("sort"); if (error) throw error; editors = data || []; }
+async function loadReports() { const { data, error } = await sb.from("prod_reports").select("*").order("report_date", { ascending: false }).limit(5000); if (error) throw error; reports = data || []; }
+async function load(force) {
+  const btn = $("#refreshBtn"); btn.classList.add("busy"); loadError = "";
+  try { await Promise.all([loadCats(), loadEditors(), loadReports()]); }
+  catch (e) { loadError = e.message || String(e); console.error(e); }
+  btn.classList.remove("busy");
+  if (loadError) { $("#v-" + tab).innerHTML = `<div class="panel"><p class="msg err" style="margin:0;font-size:13px">${t("loadErr")} ${esc(loadError)}</p></div>`; return; }
+  // rafraîchissement automatique (temps réel / 60 s) : on ne repeint pas les Paramètres pendant une saisie
+  if (!force && tab === "settings" && document.activeElement && $("#v-settings").contains(document.activeElement)) return;
+  render();
+}
+async function boot() {
+  applyText();
+  sb = createClient(SUPABASE_URL, SUPABASE_ANON);
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { $("#gate").hidden = false; return; }
+  me = session.user;
+  const { data: p } = await sb.from("profiles").select("*").eq("id", me.id).single();
+  profile = p || { role: "editor", display_name: me.email };
+  $("#who").innerHTML = `<b>${esc(profile.display_name)}</b> · ${esc(profile.role)}`;
+  $("#logout").hidden = false;
+  if (profile.role === "client") { $("#gate").hidden = false; $("#loginMsg").textContent = t("denied"); $("#email").hidden = $("#password").hidden = $("#loginBtn").hidden = true; return; }
+  $("#gate").hidden = true; $("#app").hidden = false; $("#tabs").hidden = false; $("#refreshBtn").hidden = false;
+  setPeriod("d30"); renderTabs();
+  await load(true);
+  // temps réel sur les déclarations (publication supabase_realtime, cf. supabase/prod_v1b.sql) + filet de sécurité toutes les 60 s
+  sb.channel("prod-live").on("postgres_changes", { event: "*", schema: "public", table: "prod_reports" }, () => load()).subscribe();
+  setInterval(() => { if (document.visibilityState === "visible") load(); }, 60000);
+}
+$("#loginBtn").addEventListener("click", async () => {
+  $("#loginMsg").textContent = "";
+  const { error } = await sb.auth.signInWithPassword({ email: $("#email").value.trim(), password: $("#password").value });
+  if (error) { $("#loginMsg").textContent = error.message; return; }
+  location.reload();
+});
+$("#password").addEventListener("keydown", (e) => { if (e.key === "Enter") $("#loginBtn").click(); });
+$("#logout").addEventListener("click", async () => { await sb.auth.signOut(); location.reload(); });
+$("#refreshBtn").addEventListener("click", () => load(true));
+$("#langSeg").querySelectorAll("[data-lang]").forEach((b) => b.addEventListener("click", () => {
+  if (b.dataset.lang === lang) return; lang = b.dataset.lang; store.set("ds_prod_lang", lang);
+  const u = new URL(location.href); u.searchParams.set("lang", lang); history.replaceState(null, "", u);
+  applyText(); if (profile && !$("#app").hidden) { renderTabs(); renderToolbar(); render(); }
+}));
+boot();
+</script>
+</body>
+</html>
