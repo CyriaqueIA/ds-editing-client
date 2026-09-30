@@ -269,7 +269,7 @@
     },
     /* service : kicker + titre + lead + « ce que vous recevez » + onglets + exemples */
     service: function (d) {
-      var l = lang(), slug = d.cat === 'trailers' ? 'autres' : d.cat, cats = d.cat === 'trailers' ? ['trailers', 'ia', 'miniatures'] : [d.cat];
+      var l = lang(), slug = d.cat === 'trailers' ? 'autres' : d.cat, cats = d.cat === 'trailers' ? ['trailers', 'ia', 'miniatures'] : d.cat === 'vsl' ? ['vsl', 'ads'] : [d.cat]; /* Ads et VSL : un seul service */
       var s = find(window.DS_SERVICES, function (x) { return x.slug === slug; }), tx = s ? s[l] : null;
       var items = sortItems(allItems().filter(function (it) { return cats.indexOf(it.cat) >= 0; }));
       state.items = items;

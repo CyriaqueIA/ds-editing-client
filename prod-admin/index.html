@@ -152,7 +152,8 @@
     .set2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
     .addrow{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin-bottom:12px}
     .edrows{display:flex;flex-direction:column;gap:6px}
-    .edrow{display:grid;grid-template-columns:auto 1fr auto auto;gap:8px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:8px 10px}
+    .edrow .lk2{display:flex;gap:4px}
+    .edrow{display:grid;grid-template-columns:auto 1fr auto auto auto;gap:8px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:8px 10px}
     .edrow.off{opacity:.55}
     .edrow .in{padding:8px 10px;font-size:14px;font-weight:500;background:none;border-color:transparent}
     .edrow .in:hover,.edrow .in:focus{border-color:var(--line);background:rgba(255,255,255,.04)}
@@ -233,9 +234,9 @@
   </div>
 </main>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js" integrity="sha384-jb8JQMbMoBUzgWatfe6COACi2ljcDdZQ2OxczGA3bGNeWe+6DChMTBJemed7ZnvJ" crossorigin="anonymous"></script>
 <script type="module">
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/+esm";
 
 /* ===== Configuration (clé publique uniquement, comme team/dashboard.html) ===== */
 const SUPABASE_URL = "https://xkanmjlpysxpohsuqvwg.supabase.co";
@@ -253,7 +254,7 @@ const T = {
     charts: { evo: "Évolution", evoT: "Points produits par jour", points: "Points", elements: "Éléments", avg7: "Moyenne 7 j", dist: "Répartition", distT: "Points par catégorie", cmp: "Comparaison", cmpT: "Points par monteur et catégorie", detail: "Détail", detailT: "Points par jour et par monteur", day: "Jour", total: "Total", pts: "pts", empty: "Aucune déclaration sur la période.", noChart: "Graphiques indisponibles (Chart.js n'a pas pu être chargé)." },
     ed: { days: (n) => `${n} jour${n > 1 ? "s" : ""}`, perDay: "pts/j", points: "Points", elements: "Éléments", vs: "vs leader", groups: { reel: "Reels", intro: "Intros", podcast: "Podcasts" }, last: "Dernière saisie" },
     rep: { details: "Détails", comment: "Commentaire", del: "Supprimer", confirm: (n, d) => `Supprimer la déclaration de ${n} du ${d} ?`, progress: "En cours", none: "Aucune déclaration sur la période." },
-    set: { team: "Équipe", editors: "Monteurs", namePh: "Prénom Nom", photoPh: "URL photo (optionnel)", add: "Ajouter", on: "Actif", off: "Inactif", photo: "Photo", saved: "enregistré", scale: "Barème", scaleT: "Points par unité", note: "Les scores déjà enregistrés conservent le barème en vigueur au moment de la déclaration.", save: "Enregistrer le barème", ro: "Lecture seule : les modifications sont réservées à l'administration.", dup: "Ce nom existe déjà.", bad: "Valeur attendue : un nombre positif." } },
+    set: { team: "Équipe", editors: "Monteurs", namePh: "Prénom Nom", photoPh: "URL photo (optionnel)", add: "Ajouter", on: "Actif", off: "Inactif", photo: "Photo", saved: "enregistré", scale: "Barème", scaleT: "Points par unité", note: "Les scores déjà enregistrés conservent le barème en vigueur au moment de la déclaration.", save: "Enregistrer le barème", ro: "Lecture seule : les modifications sont réservées à l'administration.", dup: "Ce nom existe déjà.", link: "Lien", linkT: "Copier le lien personnel du rapport du jour", copied: "lien copié", renew: "Remplacer le lien de {n} ? L'ancien ne fonctionnera plus.", renewT: "Nouveau lien (l'ancien est coupé)", bad: "Valeur attendue : un nombre positif." } },
   en: { kicker: "Management", title: "Production", form: "Form", refresh: "Refresh", logout: "Log out", login: "Team space", loginSub: "Sign in with your DS Editing email.", loginBtn: "Enter", pwd: "password", denied: "Access restricted to the DS Editing team.", loadErr: "Could not load:",
     tabs: { overview: "Overview", editors: "Editors", reports: "Reports", settings: "Settings" },
     periods: { today: "Today", week: "This week", month: "This month", lastMonth: "Last month", d30: "30 days" }, csv: "CSV / Excel",
@@ -261,7 +262,7 @@ const T = {
     charts: { evo: "Trend", evoT: "Points produced per day", points: "Points", elements: "Items", avg7: "7-day average", dist: "Breakdown", distT: "Points by category", cmp: "Comparison", cmpT: "Points by editor and category", detail: "Detail", detailT: "Points per day and per editor", day: "Day", total: "Total", pts: "pts", empty: "No report over the period.", noChart: "Charts unavailable (Chart.js could not be loaded)." },
     ed: { days: (n) => `${n} day${n > 1 ? "s" : ""}`, perDay: "pts/day", points: "Points", elements: "Items", vs: "vs leader", groups: { reel: "Reels", intro: "Intros", podcast: "Podcasts" }, last: "Last entry" },
     rep: { details: "Details", comment: "Comment", del: "Delete", confirm: (n, d) => `Delete ${n}'s report of ${d}?`, progress: "In progress", none: "No report over the period." },
-    set: { team: "Team", editors: "Editors", namePh: "First name Last name", photoPh: "Photo URL (optional)", add: "Add", on: "Active", off: "Inactive", photo: "Photo", saved: "saved", scale: "Point scale", scaleT: "Points per unit", note: "Scores already recorded keep the scale that applied when they were reported.", save: "Save the scale", ro: "Read only: changes are restricted to administrators.", dup: "This name already exists.", bad: "Expected value: a positive number." } },
+    set: { team: "Team", editors: "Editors", namePh: "First name Last name", photoPh: "Photo URL (optional)", add: "Add", on: "Active", off: "Inactive", photo: "Photo", saved: "saved", scale: "Point scale", scaleT: "Points per unit", note: "Scores already recorded keep the scale that applied when they were reported.", save: "Save the scale", ro: "Read only: changes are restricted to administrators.", dup: "This name already exists.", link: "Link", linkT: "Copy the personal daily-report link", copied: "link copied", renew: "Replace {n}'s link? The old one will stop working.", renewT: "New link (the old one is cut)", bad: "Expected value: a positive number." } },
   id: { kicker: "Manajemen", title: "Produksi", form: "Formulir", refresh: "Muat ulang", logout: "Keluar", login: "Ruang tim", loginSub: "Masuk dengan e-mail DS Editing kamu.", loginBtn: "Masuk", pwd: "kata sandi", denied: "Akses khusus tim DS Editing.", loadErr: "Gagal memuat:",
     tabs: { overview: "Ringkasan", editors: "Editor", reports: "Laporan", settings: "Pengaturan" },
     periods: { today: "Hari ini", week: "Minggu ini", month: "Bulan ini", lastMonth: "Bulan lalu", d30: "30 hari" }, csv: "CSV / Excel",
@@ -269,7 +270,7 @@ const T = {
     charts: { evo: "Perkembangan", evoT: "Poin per hari", points: "Poin", elements: "Elemen", avg7: "Rata-rata 7 hari", dist: "Distribusi", distT: "Poin per kategori", cmp: "Perbandingan", cmpT: "Poin per editor dan kategori", detail: "Rincian", detailT: "Poin per hari dan per editor", day: "Hari", total: "Total", pts: "poin", empty: "Tidak ada laporan pada periode ini.", noChart: "Grafik tidak tersedia (Chart.js gagal dimuat)." },
     ed: { days: (n) => `${n} hari`, perDay: "poin/hari", points: "Poin", elements: "Elemen", vs: "vs pemimpin", groups: { reel: "Reel", intro: "Intro", podcast: "Podcast" }, last: "Input terakhir" },
     rep: { details: "Rincian", comment: "Komentar", del: "Hapus", confirm: (n, d) => `Hapus laporan ${n} tanggal ${d}?`, progress: "Sedang dikerjakan", none: "Tidak ada laporan pada periode ini." },
-    set: { team: "Tim", editors: "Editor", namePh: "Nama lengkap", photoPh: "URL foto (opsional)", add: "Tambah", on: "Aktif", off: "Nonaktif", photo: "Foto", saved: "tersimpan", scale: "Skala poin", scaleT: "Poin per unit", note: "Skor yang sudah tersimpan tetap memakai skala poin yang berlaku saat laporan dibuat.", save: "Simpan skala poin", ro: "Hanya baca: perubahan khusus administrator.", dup: "Nama ini sudah ada.", bad: "Nilai yang diharapkan: angka positif." } },
+    set: { team: "Tim", editors: "Editor", namePh: "Nama lengkap", photoPh: "URL foto (opsional)", add: "Tambah", on: "Aktif", off: "Nonaktif", photo: "Foto", saved: "tersimpan", scale: "Skala poin", scaleT: "Poin per unit", note: "Skor yang sudah tersimpan tetap memakai skala poin yang berlaku saat laporan dibuat.", save: "Simpan skala poin", ro: "Hanya baca: perubahan khusus administrator.", dup: "Nama ini sudah ada.", link: "Tautan", linkT: "Salin tautan pribadi laporan harian", copied: "tautan disalin", renew: "Ganti tautan {n}? Tautan lama tidak akan berfungsi lagi.", renewT: "Tautan baru (yang lama diputus)", bad: "Nilai yang diharapkan: angka positif." } },
 };
 
 const $ = (s) => document.querySelector(s);
@@ -278,7 +279,7 @@ const store = { get: (k) => { try { return localStorage.getItem(k); } catch { re
 let lang = params.get("lang") || store.get("ds_prod_lang") || store.get("ds_lang") || "fr"; if (!T[lang]) lang = "fr";
 const t = (path) => path.split(".").reduce((o, k) => (o == null ? undefined : o[k]), T[lang]);
 let tab = params.get("tab") || "overview"; if (!TABS.includes(tab)) tab = "overview";
-let sb = null, me = null, profile = null, cats = [], editors = [], reports = [], charts = {}, loadError = "";
+let sb = null, me = null, profile = null, cats = [], editors = [], edKeys = {}, reports = [], charts = {}, loadError = "";
 let period = { kind: "d30", from: "", to: "" };
 const openIds = new Set();
 
@@ -490,6 +491,7 @@ function renderSettings() {
   const row = (e) => `<div class="edrow ${e.active === false ? "off" : ""}" data-ed="${e.id}">${avatar(e, true)}<input class="in" value="${esc(e.name)}" data-name="${e.id}" ${admin ? "" : "readonly"} aria-label="${S.namePh}"/>
       <button type="button" class="btn ic sm" data-photo="${e.id}" title="${S.photo}" ${admin ? "" : "disabled"}>${ICONS.photo}</button>
       <button type="button" class="tog ${e.active === false ? "" : "on"}" data-toggle="${e.id}" ${admin ? "" : "disabled"}><i></i>${e.active === false ? S.off : S.on}</button>
+      ${edKeys[e.id] ? `<span class="lk2"><button type="button" class="btn sm" data-link="${e.id}" title="${S.linkT}">${S.link}</button><button type="button" class="btn sm" data-renew="${e.id}" title="${S.renewT}">↻</button></span>` : ""}
       <div class="photo"><input class="in" placeholder="${S.photoPh}" value="${esc(e.avatar_url || "")}" data-url="${e.id}" ${admin ? "" : "readonly"}/></div></div>`;
   const sorted = editors.slice().sort((a, b) => (a.sort ?? 100) - (b.sort ?? 100) || a.name.localeCompare(b.name));
   const srow = (c) => `<div class="srow"><div class="lab"><i style="background:${esc(c.color)}"></i><span>${esc(catLabel(c))}</span><span class="tag lt" style="flex:none">${esc(c.lang_tag || "")}</span></div><input class="in" type="number" min="0" step="0.1" inputmode="decimal" value="${Number(c.points)}" data-pts="${esc(c.key)}" ${admin ? "" : "readonly"}/></div>`;
@@ -519,6 +521,19 @@ function renderSettings() {
     if (await patch(e.id, { name })) { renderSettings(); flash("#edMsg", "✓ " + S.saved); }
   }));
   $("#edRows").querySelectorAll("[data-url]").forEach((inp) => inp.addEventListener("change", async () => { if (await patch(inp.dataset.url, { avatar_url: inp.value.trim() || null })) { renderSettings(); flash("#edMsg", "✓ " + S.saved); } }));
+  // lien personnel du rapport du jour (/prod/?e=<clé>) : copier, ou remplacer si le lien a circulé
+  const prodLink = (id) => `${location.origin}${location.pathname.replace(/prod-admin\/(index\.html)?$/, "")}prod/?e=${edKeys[id]}`;
+  $("#edRows").querySelectorAll("[data-link]").forEach((b) => b.addEventListener("click", async () => {
+    const url = prodLink(b.dataset.link);
+    try { await navigator.clipboard.writeText(url); flash("#edMsg", "✓ " + S.copied); } catch { window.prompt(S.linkT, url); }
+  }));
+  $("#edRows").querySelectorAll("[data-renew]").forEach((b) => b.addEventListener("click", async () => {
+    const e = editors.find((x) => x.id === b.dataset.renew); if (!e || !window.confirm(S.renew.replace("{n}", e.name))) return;
+    const key = [...crypto.getRandomValues(new Uint8Array(12))].map((x) => x.toString(16).padStart(2, "0")).join("");
+    const { error } = await sb.from("editor_keys").update({ report_key: key }).eq("editor_id", e.id);
+    if (error) { flash("#edMsg", error.message, true); return; }
+    edKeys[e.id] = key; try { await navigator.clipboard.writeText(prodLink(e.id)); flash("#edMsg", "✓ " + S.copied); } catch { window.prompt(S.linkT, prodLink(e.id)); }
+  }));
   $("#edRows").querySelectorAll("[data-photo]").forEach((b) => b.addEventListener("click", () => { const r = b.closest(".edrow"); r.classList.toggle("ph"); if (r.classList.contains("ph")) r.querySelector("[data-url]").focus(); }));
   $("#edRows").querySelectorAll("[data-toggle]").forEach((b) => b.addEventListener("click", async () => { const e = editors.find((x) => x.id === b.dataset.toggle); if (!e) return; b.disabled = true; if (await patch(e.id, { active: e.active === false })) { renderSettings(); flash("#edMsg", "✓ " + S.saved); } else b.disabled = false; }));
   $("#scaleSave").addEventListener("click", async () => {
@@ -537,7 +552,7 @@ function renderSettings() {
 /* ===== export CSV (format de l'ancien outil) ===== */
 function exportCsv() {
   const list = inPeriod().slice().sort((a, b) => a.report_date.localeCompare(b.report_date) || edInfo(a).name.localeCompare(edInfo(b).name));
-  const q = (s) => { s = String(s ?? ""); return /[;"\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
+  const q = (s) => { s = String(s ?? ""); if (/^[=+\-@\t\r]/.test(s)) s = "'" + s; /* pas de formule exécutée par Excel */ return /[;"\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
   const dec = (x, d) => Number(x || 0).toFixed(d).replace(".", ",");
   const byKey = Object.fromEntries(cats.map((c) => [c.key, c]));
   const head = ["Date", "Monteur", ...CSV_KEYS.map((k) => (byKey[k] || { label_fr: k }).label_fr), "Score", "En cours", "Détails", "Commentaire"];
@@ -550,7 +565,10 @@ function exportCsv() {
 
 /* ===== données ===== */
 async function loadCats() { const { data, error } = await sb.from("prod_categories").select("*").order("sort"); if (error) throw error; cats = data || []; }
-async function loadEditors() { const { data, error } = await sb.from("editors").select("id,name,avatar_url,active,sort").order("sort"); if (error) throw error; editors = data || []; }
+async function loadEditors() {
+  const { data, error } = await sb.from("editors").select("id,name,avatar_url,active,sort").order("sort"); if (error) throw error; editors = data || [];
+  const k = await sb.from("editor_keys").select("editor_id,report_key"); edKeys = Object.fromEntries((k.data || []).map((x) => [x.editor_id, x.report_key])); // vide pour les rôles qui n'y ont pas droit
+}
 async function loadReports() { const { data, error } = await sb.from("prod_reports").select("*").order("report_date", { ascending: false }).limit(5000); if (error) throw error; reports = data || []; }
 async function load(force) {
   const btn = $("#refreshBtn"); btn.classList.add("busy"); loadError = "";

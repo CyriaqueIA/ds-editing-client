@@ -79,11 +79,11 @@
     <section><h2 data-t="weekTitle"></h2><div class="week" id="week"></div></section>
     <section><h2 data-t="invTitle"></h2><div id="invoices"></div></section>
     <section><h2 data-t="ordersTitle"></h2><div id="orders"></div></section>
-    <p class="empty"><a href="../conditions.html" id="cgv" target="_blank" data-t="cgv"></a></p>
+    <p class="empty"><a href="../conditions.html" id="cgv" target="_blank" rel="noopener" data-t="cgv"></a></p>
   </div>
 </main>
 <script type="module">
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/+esm";
 const SUPABASE_URL = "https://xkanmjlpysxpohsuqvwg.supabase.co"; const SUPABASE_ANON = "sb_publishable_lIZtV_WtN5NcGSb0dnfaiQ_AgKYBIVa";
 const T = {
   fr: { sub: "Espace client", track: "Suivre une commande", new: "Nouvelle commande", gate: "Ce lien n'est pas valide. Utilisez le lien reçu par e-mail ou écrivez à contact@ds-editing.com.", kicker: "Votre espace", lead: "Vos commandes, vos livraisons validées et vos factures, semaine par semaine.",
@@ -98,7 +98,8 @@ const T = {
 const $ = (s) => document.querySelector(s); const params = new URLSearchParams(location.search);
 const slug = params.get("client") || "", key = params.get("k") || "";
 let lang = params.get("lang") || "fr", data = null; if (!T[lang]) lang = "fr";
-const t = (k) => T[lang][k]; const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const t = (k) => T[lang][k]; const safeUrl = (u) => /^https?:\/\//i.test(String(u || "").trim()) ? esc(String(u).trim()) : "#"; // seuls les liens http(s) deviennent cliquables
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const loc = () => (lang === "fr" ? "fr-FR" : "en-GB");
 const money = (x, cur) => x == null ? t("noPrice") : (cur === "USD" ? "$" + Number(x).toLocaleString("en-US", { minimumFractionDigits: 2 }) : Number(x).toLocaleString("fr-FR", { minimumFractionDigits: 2 }) + " €");
 const fmtD = (d) => d ? new Date(d).toLocaleDateString(loc(), { day: "2-digit", month: "short" }) : "—";
@@ -129,13 +130,13 @@ function render() {
       <div class="p"><b>${t("week")} ${fmtD(i.period_start + "T12:00:00")} ${t("to")} ${fmtD(i.period_end + "T12:00:00")}</b><span>${(i.lines || []).length} ${lang === "fr" ? "ligne(s)" : "line(s)"}${i.paid_at ? " · " + t("paidOn") + " " + fmtDL(i.paid_at.slice(0, 10)) : ""}</span></div>
       <div class="amt">${money(i.total, i.currency)}</div>
       <div><span class="badge ${st}">${t("badge")[st]}</span></div>
-      <div style="display:flex;gap:6px;justify-content:flex-end">${i.pdf_url ? `<a class="btn ghost" href="${esc(i.pdf_url)}" target="_blank" rel="noopener">${t("pdf")}</a>` : ""}<button type="button" class="toggle" data-tg="${i.id}">${t("detail")}</button></div>
+      <div style="display:flex;gap:6px;justify-content:flex-end">${i.pdf_url ? `<a class="btn ghost" href="${safeUrl(i.pdf_url)}" target="_blank" rel="noopener">${t("pdf")}</a>` : ""}<button type="button" class="toggle" data-tg="${i.id}">${t("detail")}</button></div>
       <div class="lines">${(i.lines || []).map((l) => `<div><span class="${l.offert ? "strike" : ""}">${esc(l.titre)} × ${l.qte}</span><span>${money(l.qte * l.tarif, i.currency)}</span></div>`).join("")}</div></div>`; }).join("")).join("");
     $("#invoices").querySelectorAll("[data-tg]").forEach((b) => b.addEventListener("click", () => b.closest(".inv").classList.toggle("open"))); }
   // commandes
   if (!jobs.length) $("#orders").innerHTML = `<div class="empty">${t("ordersEmpty")}</div>`;
   else { const invByJob = {}; for (const i of invoices) invByJob[i.id] = i.number;
-    $("#orders").innerHTML = `<table><thead><tr>${t("cols").map((c) => `<th>${c}</th>`).join("")}</tr></thead><tbody>${jobs.map((j) => { const st = j.qc_ok ? "ok" : j.delivered ? "qc" : j.started ? "run" : "new"; return `<tr><td><span class="tk">${esc(j.token)}</span><small>${fmtDL(j.created_at.slice(0, 10))}</small></td><td><b>${esc(j.project)}</b><small><a href="../suivi.html?token=${j.token}&lang=${lang}" target="_blank" rel="noopener">${lang === "fr" ? "suivi" : "tracking"}</a>${j.frameio_url ? ` · <a href="${esc(j.frameio_url)}" target="_blank" rel="noopener">${t("review")}</a>` : ""}</small></td><td>${esc(j.work_to_do || "")}</td><td><span class="st ${st}">${t("st")[st]}</span></td><td>${j.qc_ok ? money(j.amount, cur) : "—"}</td><td>${j.invoice_id ? esc(invByJob[j.invoice_id] || "") : (j.qc_ok ? `<span style="color:var(--taupe)">${lang === "fr" ? "dimanche" : "Sunday"}</span>` : "")}</td></tr>`; }).join("")}</tbody></table>`; }
+    $("#orders").innerHTML = `<table><thead><tr>${t("cols").map((c) => `<th>${c}</th>`).join("")}</tr></thead><tbody>${jobs.map((j) => { const st = j.qc_ok ? "ok" : j.delivered ? "qc" : j.started ? "run" : "new"; return `<tr><td><span class="tk">${esc(j.token)}</span><small>${fmtDL(j.created_at.slice(0, 10))}</small></td><td><b>${esc(j.project)}</b><small><a href="../suivi.html?token=${j.token}&lang=${lang}" target="_blank" rel="noopener">${lang === "fr" ? "suivi" : "tracking"}</a>${j.frameio_url ? ` · <a href="${safeUrl(j.frameio_url)}" target="_blank" rel="noopener">${t("review")}</a>` : ""}</small></td><td>${esc(j.work_to_do || "")}</td><td><span class="st ${st}">${t("st")[st]}</span></td><td>${j.qc_ok ? money(j.amount, cur) : "—"}</td><td>${j.invoice_id ? esc(invByJob[j.invoice_id] || "") : (j.qc_ok ? `<span style="color:var(--taupe)">${lang === "fr" ? "dimanche" : "Sunday"}</span>` : "")}</td></tr>`; }).join("")}</tbody></table>`; }
 }
 async function boot() {
   applyText();
@@ -143,6 +144,7 @@ async function boot() {
   const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
   const { data: d, error } = await sb.rpc("client_space", { p_slug: slug, p_key: key });
   if (error || !d) { $("#gate").hidden = false; return; }
+  try { localStorage.setItem("ds_client_key", key); } catch {} // la page de suivi s'en sert pour afficher le lien de la vidéo
   data = d; if (!params.get("lang") && T[d.studio.lang]) { lang = d.studio.lang; applyText(); }
   $("#app").hidden = false; render();
   setInterval(async () => { const { data: d2 } = await sb.rpc("client_space", { p_slug: slug, p_key: key }); if (d2) { data = d2; render(); } }, 600000);

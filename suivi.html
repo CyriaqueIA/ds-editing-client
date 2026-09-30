@@ -73,14 +73,14 @@
 <footer class="mono">DS Editing · <span data-t="footer"></span></footer>
 
 <script type="module">
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/+esm";
 const SUPABASE_URL = "https://xkanmjlpysxpohsuqvwg.supabase.co";
 const SUPABASE_ANON = "sb_publishable_lIZtV_WtN5NcGSb0dnfaiQ_AgKYBIVa";   // même clé publique que team/dashboard.html
 const T = {
   fr: { sub: "Suivi de commande", kicker: "Où en est ma vidéo ?", title: "Suivi de<br/>votre commande", lead: "Entrez le numéro à 7 chiffres reçu par e-mail à la commande.", go: "Voir", footer: "mise à jour en continu",
-    notfound: "Aucune commande avec ce numéro. Vérifiez les 7 chiffres.", setup: "Page en cours d'installation.", project: "Projet", client: "Client", work: "Commande", received: "Reçue le", due: "Livraison prévue", requested: "souhaitée", steps: ["Commande reçue", "Fichiers récupérés", "Montage commencé", "Montage à 50 %", "Montage terminé", "Contrôle qualité validé"], review: "Votre vidéo est prête. Relisez-la et commentez directement sur frame.io.", open: "Ouvrir la vidéo", revisions: "Notre contrôle qualité a demandé des ajustements au monteur. Vous recevrez le lien dès validation." },
+    notfound: "Aucune commande avec ce numéro. Vérifiez les 7 chiffres.", many: "Trop de recherches d'affilée. Réessayez dans quelques minutes.", readyHint: "Votre vidéo est prête. Le lien se trouve dans votre e-mail de livraison et dans votre espace client.", space: "Ouvrir mon espace client", setup: "Page en cours d'installation.", project: "Projet", client: "Client", work: "Commande", received: "Reçue le", due: "Livraison prévue", requested: "souhaitée", steps: ["Commande reçue", "Fichiers récupérés", "Montage commencé", "Montage à 50 %", "Montage terminé", "Contrôle qualité validé"], review: "Votre vidéo est prête. Relisez-la et commentez directement sur frame.io.", open: "Ouvrir la vidéo", revisions: "Notre contrôle qualité a demandé des ajustements au monteur. Vous recevrez le lien dès validation." },
   en: { sub: "Order tracking", kicker: "Where is my video?", title: "Track<br/>your order", lead: "Enter the 7-digit number you received by email when ordering.", go: "View", footer: "updated continuously",
-    notfound: "No order with this number. Check the 7 digits.", setup: "Page being set up.", project: "Project", client: "Client", work: "Order", received: "Received on", due: "Planned delivery", requested: "requested", steps: ["Order received", "Files retrieved", "Editing started", "Editing at 50%", "Editing finished", "Quality check passed"], review: "Your video is ready. Review and comment directly on frame.io.", open: "Open the video", revisions: "Our quality team asked the editor for adjustments. You'll get the link once validated." },
+    notfound: "No order with this number. Check the 7 digits.", many: "Too many lookups in a row. Try again in a few minutes.", readyHint: "Your video is ready. The link is in your delivery email and in your client space.", space: "Open my client space", setup: "Page being set up.", project: "Project", client: "Client", work: "Order", received: "Received on", due: "Planned delivery", requested: "requested", steps: ["Order received", "Files retrieved", "Editing started", "Editing at 50%", "Editing finished", "Quality check passed"], review: "Your video is ready. Review and comment directly on frame.io.", open: "Open the video", revisions: "Our quality team asked the editor for adjustments. You'll get the link once validated." },
 };
 const $ = (s) => document.querySelector(s);
 const params = new URLSearchParams(location.search);
@@ -88,6 +88,7 @@ let lang = params.get("lang") || ((navigator.language || "en").slice(0, 2) === "
 let last = null;
 const t = (k) => T[lang][k];
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const safeUrl = (u) => /^https?:\/\//i.test(String(u || "").trim()) ? esc(String(u).trim()) : "#"; // seuls les liens http(s) deviennent cliquables
 const fmt = (d) => d ? new Date(d).toLocaleDateString(lang === "fr" ? "fr-FR" : "en-GB", { day: "2-digit", month: "long" }) : "—";
 function applyText() { document.documentElement.lang = lang; document.querySelectorAll("[data-t]").forEach((el) => { const v = t(el.dataset.t); if (typeof v === "string") el.innerHTML = v; }); $("#langBtn").textContent = lang === "fr" ? "EN" : "FR"; if (last) render(last); }
 function addBusinessDays(date, n) { const d = new Date(date); let k = 0; while (k < n) { d.setDate(d.getDate() + 1); if (d.getDay() !== 0 && d.getDay() !== 6) k++; } return d; }
@@ -97,22 +98,24 @@ function render(j) {
   const due = j.delivery_date ? new Date(j.delivery_date) : (j.requested_deadline && new Date(j.requested_deadline) < addBusinessDays(j.created_at, 5) ? new Date(j.requested_deadline) : addBusinessDays(j.created_at, 5));
   $("#result").innerHTML = `<div class="card">
     <div class="grid">
-      <div><div class="k">${t("client")}</div><div class="v">${esc(j.client)}</div></div>
+      ${j.client ? `<div><div class="k">${t("client")}</div><div class="v">${esc(j.client)}</div></div>` : ""}
       <div><div class="k">${t("project")}</div><div class="v">${esc(j.project)}</div></div>
       <div><div class="k">${t("work")}</div><div class="v">${esc(j.work_to_do || "—")}</div></div>
       <div><div class="k">${t("received")}</div><div class="v">${fmt(j.created_at)}</div></div>
       <div><div class="k">${t("due")}</div><div class="v">${fmt(due)}${j.requested_deadline ? ` <span style="color:var(--taupe);font-size:12px">· ${t("requested")} ${fmt(j.requested_deadline)}</span>` : ""}</div></div>
     </div>
     <ul class="timeline">${t("steps").map((label, i) => `<li class="${order[i] ? "done" : ""} ${i === nowIdx ? "now" : ""}"><i>${order[i] ? "✓" : i + 1}</i><b>${label}</b><small>${order[i] ? new Date(order[i]).toLocaleDateString(lang === "fr" ? "fr-FR" : "en-GB", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" }) : ""}</small></li>`).join("")}</ul>
-    ${j.frameio_url ? `<div class="deliv">${t("review")}<br/><a href="${esc(j.frameio_url)}" target="_blank" rel="noopener">${t("open")} →</a></div>` : (j.qc_status === "revisions" ? `<div class="deliv" style="border-color:rgba(255,106,43,.4);background:var(--amber-soft)">${t("revisions")}</div>` : "")}
+    ${j.frameio_url ? `<div class="deliv">${t("review")}<br/><a href="${safeUrl(j.frameio_url)}" target="_blank" rel="noopener">${t("open")} →</a></div>` : j.ready ? `<div class="deliv">${t("readyHint")}<br/><a href="client/?lang=${lang}">${t("space")} →</a></div>` : (j.qc_status === "revisions" ? `<div class="deliv" style="border-color:rgba(255,106,43,.4);background:var(--amber-soft)">${t("revisions")}</div>` : "")}
   </div>`;
 }
 async function lookup(token) {
   $("#msg").textContent = ""; $("#result").innerHTML = "";
   if (!SUPABASE_ANON) { $("#msg").textContent = t("setup"); return; }
   const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
-  const { data, error } = await sb.rpc("job_status", { p_token: token });
-  if (error || !data) { $("#msg").textContent = t("notfound"); return; }
+  // Le numéro seul donne l'avancement ; le code d'accès du studio, s'il est déjà connu de ce navigateur (espace client), ajoute le client et le lien de la vidéo.
+  const key = (() => { try { return localStorage.getItem("ds_client_key"); } catch { return null; } })();
+  const { data, error } = await sb.rpc("job_status", { p_token: token, p_key: key || null });
+  if (error || !data) { $("#msg").textContent = error && /too_many/.test(error.message || "") ? t("many") : t("notfound"); return; }
   if (data.lang && T[data.lang] && !params.get("lang")) { lang = data.lang; applyText(); }
   render(data); const u = new URL(location.href); u.searchParams.set("token", token); history.replaceState(null, "", u);
 }

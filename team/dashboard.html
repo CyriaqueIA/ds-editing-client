@@ -319,7 +319,7 @@
 </main>
 
 <script type="module">
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/+esm";
 
 /* ===== Configuration ===== */
 const SUPABASE_URL = "https://xkanmjlpysxpohsuqvwg.supabase.co";
@@ -390,6 +390,7 @@ let tab = params.get("tab") || "prod", studios = [], grids = [], invoicesAll = [
 const money = (x, cur) => x == null ? "—" : (cur === "USD" ? "$" + Number(x).toLocaleString("en-US", { minimumFractionDigits: 2 }) : Number(x).toLocaleString("fr-FR", { minimumFractionDigits: 2 }) + " €");
 
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const safeUrl = (u) => /^https?:\/\//i.test(String(u || "").trim()) ? esc(String(u).trim()) : "#"; // seuls les liens http(s) deviennent cliquables
 const loc = () => (lang === "fr" ? "fr-FR" : "en-GB");
 const fmtD = (d) => d ? new Date(d).toLocaleDateString(loc(), { weekday: "short", day: "2-digit", month: "short" }) : "—";
 const fmtDT = (d) => d ? new Date(d).toLocaleString(loc(), { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" }) : "—";
@@ -641,11 +642,11 @@ function renderBoard() {
         ${dlLine(j)}
       </div>
       <div class="qc ${j.qc_status}">${isAdmin() ? `<select class="in" data-act="qc" data-id="${j.id}">${["pending", "ok", "revisions"].map((k) => `<option value="${k}" ${k === j.qc_status ? "selected" : ""}>${qc[k]}</option>`).join("")}</select>` : `<span class="badge ${j.qc_status === "ok" ? "ok" : j.qc_status === "revisions" ? "err" : ""}">${qc[j.qc_status]}</span>`}</div>
-      <div class="links">${j.brief_url ? `<a href="${j.brief_url}" target="_blank" rel="noopener">${t("brief")}</a>` : ""}${j.folder_url ? `<a href="${j.folder_url}" target="_blank" rel="noopener">${t("files")}</a>` : ""}${j.frameio_url ? `<a href="${j.frameio_url}" target="_blank" rel="noopener">${t("frame")}</a>` : ""}</div>
+      <div class="links">${j.brief_url ? `<a href="${safeUrl(j.brief_url)}" target="_blank" rel="noopener">${t("brief")}</a>` : ""}${j.folder_url ? `<a href="${safeUrl(j.folder_url)}" target="_blank" rel="noopener">${t("files")}</a>` : ""}${j.frameio_url ? `<a href="${safeUrl(j.frameio_url)}" target="_blank" rel="noopener">${t("frame")}</a>` : ""}</div>
       <button type="button" class="more" data-more="${j.id}">⋯</button>
       <div class="detail">
         ${filesBlock(j)}
-        <div><b>${t("rushes")}</b><div class="lk">${(j.rushes_links || []).map((u) => `<a href="${esc(u)}" target="_blank" rel="noopener">${esc(u)}</a>`).join("\n") || "—"}</div></div>
+        <div><b>${t("rushes")}</b><div class="lk">${(j.rushes_links || []).map((u) => `<a href="${safeUrl(u)}" target="_blank" rel="noopener">${esc(u)}</a>`).join("\n") || "—"}</div></div>
         <div><b>${t("contact")}</b>${esc(j.contact || "—")}<br/><b style="margin-top:8px">${t("email")}</b>${esc(j.email || "—")}${j.description ? `<br/><b style="margin-top:8px">Brief</b><span style="white-space:pre-wrap">${esc(j.description)}</span>` : ""}</div>
         <div>
           <b>${t("frame")}</b><input class="in" data-field="frameio_url" data-id="${j.id}" value="${esc(j.frameio_url || "")}" placeholder="${t("frameioPh")}" ${ed ? "" : "disabled"}/>
@@ -694,7 +695,11 @@ function wireBoard() {
     await update(j.id, patch);
   }));
   B.querySelectorAll("[data-act='qc']").forEach((s) => s.addEventListener("change", async () => { await update(s.dataset.id, { qc_status: s.value, qc_at: s.value === "pending" ? null : new Date().toISOString(), qc_owner: s.value === "pending" ? null : profile.display_name }); }));
-  B.querySelectorAll("[data-field]").forEach((i) => i.addEventListener("change", async () => { await update(i.dataset.id, { [i.dataset.field]: i.value || null }); }));
+  B.querySelectorAll("[data-field]").forEach((i) => i.addEventListener("change", async () => {
+    let v = i.value.trim() || null;
+    if (v && i.dataset.field === "frameio_url" && !/^https?:\/\//i.test(v)) v = "https://" + v.replace(/^\/+/, ""); // « f.io/abc » collé sans https : on complète (la base n'accepte que des liens http(s))
+    await update(i.dataset.id, { [i.dataset.field]: v });
+  }));
   if (isAdmin()) B.querySelectorAll("[data-eds]").forEach((el) => el.addEventListener("click", (ev) => { ev.stopPropagation(); openPop(el); }));
 }
 function openPop(cell) {

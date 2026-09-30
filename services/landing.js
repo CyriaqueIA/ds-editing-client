@@ -21,7 +21,7 @@
     $("#deliver").innerHTML = s.deliver.map((d) => `<li><span>${d}</span></li>`).join("");
     $("#steps").innerHTML = u.steps.map((st, i) => `<li><span class="n">0${i + 1}</span><div><b>${st[0]}</b><p>${st[1]}</p></div></li>`).join("");
     // exemples : vidéos du portfolio pour ce service (3 max), sinon emplacements
-    const cats = slug === "autres" ? ["ia", "miniatures", "trailers"] : [slug];
+    const cats = slug === "autres" ? ["ia", "miniatures", "trailers"] : slug === "vsl" ? ["vsl", "ads"] : [slug]; // Ads et VSL : un seul service
     const items = (P.items || []).filter((it) => cats.includes(it.cat)).slice(0, 3);
     const vert = slug === "reels-shorts";
     $("#examples").innerHTML = items.length
@@ -33,7 +33,7 @@
     $("#trust").hidden = !ok.length;
     $("#studios").innerHTML = ok.map((st) => st.url ? `<a href="${st.url}" target="_blank" rel="noopener">${st.name}</a>` : `<span>${st.name}</span>`).join("");
     // autres services
-    $("#other").innerHTML = window.DS_SERVICES.filter((x) => x.slug !== slug).map((x) => `<a href="${x.slug}.html?lang=${lang}">${x[lang].nav}</a>`).join("");
+    $("#other").innerHTML = window.DS_SERVICES.filter((x) => x.slug !== slug && x.slug !== "ads").map((x) => `<a href="${x.slug}.html?lang=${lang}">${x[lang].nav}</a>`).join("");
   }
   function studioName(it) { const st = (P.studios || []).find((x) => x.name === it.studio); return st && st.ok ? it.studio : ""; }
   function openItem(it) {

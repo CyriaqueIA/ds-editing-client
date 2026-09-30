@@ -13,7 +13,7 @@
   'use strict';
   var SB_URL = 'https://xkanmjlpysxpohsuqvwg.supabase.co';
   var SB_KEY = 'sb_publishable_lIZtV_WtN5NcGSb0dnfaiQ_AgKYBIVa'; /* clé publique (anon) : les règles sont dans les RPC + RLS */
-  var SB_SDK = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+  var SB_SDK = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/+esm';
   var HOST_PHOTO = 'ds-media/team2/cyriaque2.jpg';
   /* Pile de portraits de la fenêtre : 3 conseillères + l'hôte (conseillere-1/2 = portraits d'illustration générés le 29/09) */
   var TEAM_PHOTOS = ['ds-media/team2/candice-c.jpg', 'ds-media/team2/conseillere-1.jpg', 'ds-media/team2/conseillere-2.jpg', HOST_PHOTO];

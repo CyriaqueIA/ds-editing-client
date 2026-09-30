@@ -24,14 +24,14 @@ window.DS_SERVICES = [
   {
     slug: "vsl", icon: "target",
     fr: {
-      nav: "Tunnel de vente & VSL", kicker: "Tunnel de vente & VSL",
+      nav: "Ads / VSL", kicker: "Ads / VSL",
       title: "Une VSL qui tient jusqu'au ", accent: "bouton.",
       lead: "Rythme serré, sous-titres, preuves à l'écran, appel à l'action clair. Une vidéo de vente pensée pour être regardée jusqu'au bout, pas pour être belle dans un dossier.",
       deliver: ["VSL 16:9 montée pour la conversion, chapitres et rappels visuels", "Versions courtes pour vos pubs et vos pages", "Sous-titres animés et habillage à votre charte"],
       strip: "Vidéos de vente montées pour convertir",
     },
     en: {
-      nav: "Sales funnel & VSL", kicker: "Sales funnel & VSL",
+      nav: "Ads / VSL", kicker: "Ads / VSL",
       title: "A VSL that holds until the ", accent: "button.",
       lead: "Tight pacing, captions, on-screen proof, a clear call to action. A sales video built to be watched to the end, not to look nice in a folder.",
       deliver: ["16:9 VSL edited for conversion, chapters and visual callbacks", "Short cuts for your ads and pages", "Animated captions and graphics in your brand"],
