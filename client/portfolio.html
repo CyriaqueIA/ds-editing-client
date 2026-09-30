@@ -150,8 +150,8 @@
 </div>
 <div class="modal" id="modal"><div class="box"><div class="bar"><span id="modalTitle"></span><button type="button" id="modalClose">×</button></div><div id="modalMedia"></div></div></div>
 
-<script src="portfolio.js?v=8"></script>
-<script src="previews.js?v=8"></script>
+<script src="portfolio.js?v=9"></script>
+<script src="previews.js?v=9"></script>
 <script>
 (function () {
   // Clé du lien privé. Le lien à envoyer : portfolio.html?k=CLÉ
@@ -181,7 +181,9 @@
       soonKicker: "Coming soon to the portfolio", soonTitle: "We already do it.", soonText: "Our {type} examples are on their way. No need to wait: send us a project, the first edit is on us.", soonBtn: "First edit on us",
       soonSubject: "First edit on us — {type}", soonBody: "Hi Cyriaque,\n\nI'd like to try DS Editing on a {type} project.\n\n" },
   };
-  let type = params.get("type") || P.types[0].slug, tier = P.tiers[0].slug;
+  // Type demandé dans le lien (?type=…) : un type fusionné (ex. ads → vsl) ou inconnu retombe sur un type existant
+  const typeOf = (slug) => P.types.find((x) => x.slug === slug || (x.also || []).includes(slug));
+  let type = (typeOf(params.get("type")) || P.types[0]).slug, tier = P.tiers[0].slug;
   if (params.get("k") !== KEY) { $("#main").hidden = true; $("#gate").hidden = false; $("#gate").textContent = T[lang].gate; return; }
 
   function render() {
@@ -199,7 +201,8 @@
     const tiers = P.tiers.filter((ti) => !((P.hiddenTiers || {})[type] || []).includes(ti.slug));
     if (!tiers.some((ti) => ti.slug === tier)) tier = tiers[0].slug;
     // Type sans formules (aucune vidéo rangée en Standard/Premium/Signature) : pas d'onglets, toutes les vidéos
-    const ofType = (P.items || []).filter((it) => it.cat === type && tiers.some((ti) => ti.slug === it.tier || !it.tier)), tiered = ofType.some((it) => it.tier);
+    // Type fusionné (types[].also, ex. Ads / VSL) : tant qu'une de ses vidéos n'a pas de formule, tout s'affiche dans une seule grille
+    const ofType = (P.items || []).filter((it) => typeOf(it.cat) === ty && tiers.some((ti) => ti.slug === it.tier || !it.tier)), tiered = ofType.some((it) => it.tier) && !(ty.also && ofType.some((it) => !it.tier));
     // Type sans aucun exemple et listé dans portfolio.js → soon : scène animée à la place de la grille (disparaît dès qu'une vidéo arrive du Drive)
     const soon = (P.soon || []).includes(type) && ofType.length === 0;
     $("#tiers").hidden = $("#tierDesc").hidden = soon || (!tiered && ofType.length > 0);
@@ -207,7 +210,7 @@
     $("#tiers").querySelectorAll("[data-tier]").forEach((el) => el.addEventListener("click", () => { tier = el.dataset.tier; render(); }));
     $("#tierDesc").textContent = tiers.find((x) => x.slug === tier)[lang][1];
     const items = ofType.filter((it) => !tiered || it.tier === tier)
-      .sort((a, b) => (a.lang && a.lang !== lang ? 1 : 0) - (b.lang && b.lang !== lang ? 1 : 0)); // langue de l'interface d'abord
+      .sort((a, b) => (a.lang && a.lang !== lang ? 1 : 0) - (b.lang && b.lang !== lang ? 1 : 0) || (a.vertical ? 1 : 0) - (b.vertical ? 1 : 0)); // langue de l'interface d'abord, puis 16:9 avant 9:16
     const grid = $("#grid");
     if (soon) { grid.className = "soon-host"; grid.innerHTML = soonScene(ty); return; }
     const allVert = items.length ? items.every((it) => it.vertical ?? ty.ratio === "9/16") : ty.ratio === "9/16"; grid.className = "video-grid" + (allVert ? " vert" : "");

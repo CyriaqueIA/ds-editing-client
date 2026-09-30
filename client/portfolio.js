@@ -20,9 +20,9 @@ window.DS_PORTFOLIO = {
   // Types de contenu (colonne de gauche du portfolio privé, onglets du showreel)
   types: [
     { slug: "podcast-interview", ratio: "16/9", fr: ["Podcast & Interview", "Multicam · Talk"], en: ["Podcast & Interview", "Multicam · Talk"] },
-    { slug: "vsl", ratio: "16/9", fr: ["VSL", "Vidéo de vente longue"], en: ["VSL", "Long-form sales video"] },
+    // Ads et VSL = un seul type (décision du 30/09) : `also` rattache les vidéos rangées en cat "ads" au type "vsl".
+    { slug: "vsl", also: ["ads"], ratio: "16/9", fr: ["Ads / VSL", "Vidéos de vente · Meta · TikTok · YouTube"], en: ["Ads / VSL", "Sales videos · Meta · TikTok · YouTube"] },
     { slug: "reels-shorts", ratio: "9/16", fr: ["Reels & Shorts", "TikTok · Instagram · Shorts"], en: ["Reels & Shorts", "TikTok · Instagram · Shorts"] },
-    { slug: "ads", ratio: "9/16", fr: ["Ads", "Meta · TikTok · YouTube"], en: ["Ads", "Meta · TikTok · YouTube"] },
     { slug: "youtube-docu", ratio: "16/9", fr: ["YouTube & Docu", "Long format · Brand film"], en: ["YouTube & Docu", "Long-form · Brand film"] },
     { slug: "ia", ratio: "16/9", fr: ["Vidéos IA", "Générées · Montées"], en: ["AI videos", "Generated · Edited"] },
     { slug: "miniatures", ratio: "16/9", fr: ["Miniatures", "Visuels de couverture"], en: ["Thumbnails", "Cover visuals"] },
@@ -50,7 +50,6 @@ window.DS_PORTFOLIO = {
     "podcast-interview": { standard: "", premium: "" },
     "vsl": { standard: "", premium: "" },
     "reels-shorts": { standard: "", premium: "" },
-    "ads": { standard: "", premium: "" },
     "youtube-docu": { standard: "", premium: "" },
     "ia": { standard: "", premium: "" },
     "miniatures": { standard: "", premium: "" },

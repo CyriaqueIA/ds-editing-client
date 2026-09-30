@@ -41,13 +41,25 @@ window.DS_PREVIEWS = {
     "premium": {
       "fr": [
         {
-          "src": "../videos/apercus/podcast-premium-fr-premium-fr-intro-creative-final-1rJiZH.mp4",
-          "poster": "../videos/apercus/podcast-premium-fr-premium-fr-intro-creative-final-1rJiZH.jpg",
+          "src": "../ds-media/pod-fr-creative.mp4",
+          "poster": "../ds-media/pod-fr-creative.jpg",
           "title": "Intro créative · Podcast FR",
           "vertical": false
         }
       ],
       "en": [
+        {
+          "src": "../videos/apercus/podcast-premium-en-my-skin-is-the-greatest-sin-i-could-have-1hIvkk.mp4",
+          "poster": "../videos/apercus/podcast-premium-en-my-skin-is-the-greatest-sin-i-could-have-1hIvkk.jpg",
+          "title": "A Black Woman in Asia · Best of",
+          "vertical": false
+        },
+        {
+          "src": "../videos/apercus/podcast-premium-en-dubai-vs-california-real-estate-which-ma-1oDMpQ.mp4",
+          "poster": "../videos/apercus/podcast-premium-en-dubai-vs-california-real-estate-which-ma-1oDMpQ.jpg",
+          "title": "Dubai vs California Real Estate",
+          "vertical": false
+        },
         {
           "src": "../videos/apercus/podcast-premium-en-the-move-miami-hannah-podcast-extrait-po-1f_J_-.mp4",
           "poster": "../videos/apercus/podcast-premium-en-the-move-miami-hannah-podcast-extrait-po-1f_J_-.jpg",
@@ -87,7 +99,14 @@ window.DS_PREVIEWS = {
     }
   },
   "reel_basique": {
-    "fr": [],
+    "fr": [
+      {
+        "src": "../videos/apercus/reels-standard-fr-reels-editing-style-3-1VuPLB.mp4",
+        "poster": "../videos/apercus/reels-standard-fr-reels-editing-style-3-1VuPLB.jpg",
+        "title": "Reel · Style 3",
+        "vertical": true
+      }
+    ],
     "en": [
       {
         "src": "../videos/apercus/reels-standard-en-network-to-your-dream-job-a-fashion-care-1c1dBI.mp4",
@@ -100,9 +119,33 @@ window.DS_PREVIEWS = {
   "reel_signature": {
     "fr": [
       {
-        "src": "../videos/apercus/reels-premium-fr-reels-editing-style-3-1iwZfe.mp4",
-        "poster": "../videos/apercus/reels-premium-fr-reels-editing-style-3-1iwZfe.jpg",
-        "title": "Reel · Style 3",
+        "src": "../videos/apercus/reels-premium-fr-shorts-11-1n-nad.mp4",
+        "poster": "../videos/apercus/reels-premium-fr-shorts-11-1n-nad.jpg",
+        "title": "Short · 11",
+        "vertical": true
+      },
+      {
+        "src": "../videos/apercus/reels-premium-fr-thomas-shorts-9-1I_eJg.mp4",
+        "poster": "../videos/apercus/reels-premium-fr-thomas-shorts-9-1I_eJg.jpg",
+        "title": "Thomas · Short 9",
+        "vertical": true
+      },
+      {
+        "src": "../videos/apercus/reels-signature-fr-arouna-shorts-1mAfjK.mp4",
+        "poster": "../videos/apercus/reels-signature-fr-arouna-shorts-1mAfjK.jpg",
+        "title": "Arouna",
+        "vertical": true
+      },
+      {
+        "src": "../videos/apercus/reels-signature-fr-emilya-reels-project-1-1EoQv5.mp4",
+        "poster": "../videos/apercus/reels-signature-fr-emilya-reels-project-1-1EoQv5.jpg",
+        "title": "Emilya · Reel 1",
+        "vertical": true
+      },
+      {
+        "src": "../videos/apercus/reels-signature-fr-reels-2-1OkJPB.mp4",
+        "poster": "../videos/apercus/reels-signature-fr-reels-2-1OkJPB.jpg",
+        "title": "Reel Signature FR · 2",
         "vertical": true
       }
     ],
@@ -250,6 +293,17 @@ window.DS_PREVIEWS = {
       "image": true
     },
     {
+      "id": "1MGi2ULl9-0uJZtHFIaEoLTjPvpFKlKi6",
+      "cat": "miniatures",
+      "tier": null,
+      "lang": null,
+      "title": "The Gospel Changed His Life",
+      "path": "videos/apercus/miniatures-whatsapp-image-2026-09-30-at-15-26-43-1MGi2U.jpg",
+      "posterPath": "videos/apercus/miniatures-whatsapp-image-2026-09-30-at-15-26-43-1MGi2U.jpg",
+      "vertical": false,
+      "image": true
+    },
+    {
       "id": "1pIDNma--o5i_Vhw49T_AzOm8p38LbV0l",
       "cat": "ads",
       "tier": null,
@@ -320,6 +374,16 @@ window.DS_PREVIEWS = {
       "vertical": true
     },
     {
+      "id": "1VuPLBPrOyVWZ5HUepgPKh2WT2gaAmD0V",
+      "cat": "reels-shorts",
+      "tier": "standard",
+      "lang": "fr",
+      "title": "Reel · Style 3",
+      "path": "videos/apercus/reels-standard-fr-reels-editing-style-3-1VuPLB.mp4",
+      "posterPath": "videos/apercus/reels-standard-fr-reels-editing-style-3-1VuPLB.jpg",
+      "vertical": true
+    },
+    {
       "id": "1yFTfdK97HQfZ5AqAkZqROMkozCtIOCZD",
       "cat": "reels-shorts",
       "tier": "premium",
@@ -370,13 +434,23 @@ window.DS_PREVIEWS = {
       "vertical": true
     },
     {
-      "id": "1iwZfeBYhDf7foOHUwPC2lTzf389YW5ZT",
+      "id": "1n-nadUk9j5ygX2mH_aT3rUshSnoUrCgm",
       "cat": "reels-shorts",
       "tier": "premium",
       "lang": "fr",
-      "title": "Reel · Style 3",
-      "path": "videos/apercus/reels-premium-fr-reels-editing-style-3-1iwZfe.mp4",
-      "posterPath": "videos/apercus/reels-premium-fr-reels-editing-style-3-1iwZfe.jpg",
+      "title": "Short · 11",
+      "path": "videos/apercus/reels-premium-fr-shorts-11-1n-nad.mp4",
+      "posterPath": "videos/apercus/reels-premium-fr-shorts-11-1n-nad.jpg",
+      "vertical": true
+    },
+    {
+      "id": "1I_eJgeCfxVjohg2QqTvK-nulNCBCeRo_",
+      "cat": "reels-shorts",
+      "tier": "premium",
+      "lang": "fr",
+      "title": "Thomas · Short 9",
+      "path": "videos/apercus/reels-premium-fr-thomas-shorts-9-1I_eJg.mp4",
+      "posterPath": "videos/apercus/reels-premium-fr-thomas-shorts-9-1I_eJg.jpg",
       "vertical": true
     },
     {
@@ -420,6 +494,56 @@ window.DS_PREVIEWS = {
       "vertical": true
     },
     {
+      "id": "1mAfjKtjPBukmi0Mf5xQt8lPHiogFMH9_",
+      "cat": "reels-shorts",
+      "tier": "signature",
+      "lang": "fr",
+      "title": "Arouna",
+      "path": "videos/apercus/reels-signature-fr-arouna-shorts-1mAfjK.mp4",
+      "posterPath": "videos/apercus/reels-signature-fr-arouna-shorts-1mAfjK.jpg",
+      "vertical": true
+    },
+    {
+      "id": "1EoQv5z15rJ4_NsiAUppNSQUKAIe04F-q",
+      "cat": "reels-shorts",
+      "tier": "signature",
+      "lang": "fr",
+      "title": "Emilya · Reel 1",
+      "path": "videos/apercus/reels-signature-fr-emilya-reels-project-1-1EoQv5.mp4",
+      "posterPath": "videos/apercus/reels-signature-fr-emilya-reels-project-1-1EoQv5.jpg",
+      "vertical": true
+    },
+    {
+      "id": "1OkJPBm0BSeDYZvHioFMNo5MfZ1pXO3LB",
+      "cat": "reels-shorts",
+      "tier": "signature",
+      "lang": "fr",
+      "title": "Reel Signature FR · 2",
+      "path": "videos/apercus/reels-signature-fr-reels-2-1OkJPB.mp4",
+      "posterPath": "videos/apercus/reels-signature-fr-reels-2-1OkJPB.jpg",
+      "vertical": true
+    },
+    {
+      "id": "1hIvkk9431OmmQM6usDhbXG3eydu11pOn",
+      "cat": "podcast-interview",
+      "tier": "premium",
+      "lang": "en",
+      "title": "A Black Woman in Asia · Best of",
+      "path": "videos/apercus/podcast-premium-en-my-skin-is-the-greatest-sin-i-could-have-1hIvkk.mp4",
+      "posterPath": "videos/apercus/podcast-premium-en-my-skin-is-the-greatest-sin-i-could-have-1hIvkk.jpg",
+      "vertical": false
+    },
+    {
+      "id": "1oDMpQw9L_F6AGkrmnILbe2rulsPz0kgP",
+      "cat": "podcast-interview",
+      "tier": "premium",
+      "lang": "en",
+      "title": "Dubai vs California Real Estate",
+      "path": "videos/apercus/podcast-premium-en-dubai-vs-california-real-estate-which-ma-1oDMpQ.mp4",
+      "posterPath": "videos/apercus/podcast-premium-en-dubai-vs-california-real-estate-which-ma-1oDMpQ.jpg",
+      "vertical": false
+    },
+    {
       "id": "1f_J_-BPF7y_SVGedwqcicnV0o9NsbVYZ",
       "cat": "podcast-interview",
       "tier": "premium",
@@ -427,16 +551,6 @@ window.DS_PREVIEWS = {
       "title": "The Move Miami · Hannah",
       "path": "videos/apercus/podcast-premium-en-the-move-miami-hannah-podcast-extrait-po-1f_J_-.mp4",
       "posterPath": "videos/apercus/podcast-premium-en-the-move-miami-hannah-podcast-extrait-po-1f_J_-.jpg",
-      "vertical": false
-    },
-    {
-      "id": "1rJiZHTxBr9m6RNf4gMaSOtcf9V5AMnz5",
-      "cat": "podcast-interview",
-      "tier": "premium",
-      "lang": "fr",
-      "title": "Intro créative · Podcast FR",
-      "path": "videos/apercus/podcast-premium-fr-premium-fr-intro-creative-final-1rJiZH.mp4",
-      "posterPath": "videos/apercus/podcast-premium-fr-premium-fr-intro-creative-final-1rJiZH.jpg",
       "vertical": false
     },
     {
@@ -487,6 +601,16 @@ window.DS_PREVIEWS = {
       "title": "Intro · Pau",
       "path": "ds-media/pod-pau.mp4",
       "posterPath": "ds-media/pod-pau.jpg",
+      "vertical": false
+    },
+    {
+      "id": "1rJiZHTxBr9m6RNf4gMaSOtcf9V5AMnz5",
+      "cat": "podcast-interview",
+      "tier": "premium",
+      "lang": "fr",
+      "title": "Intro créative · Podcast FR",
+      "path": "ds-media/pod-fr-creative.mp4",
+      "posterPath": "ds-media/pod-fr-creative.jpg",
       "vertical": false
     }
   ]

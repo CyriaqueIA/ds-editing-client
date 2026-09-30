@@ -104,7 +104,7 @@
     return out;
   }
   var tierName = function (slug) { var tr = find(pf().tiers, function (x) { return x.slug === slug; }); return tr ? tr[lang()][0] : ''; };
-  var typeName = function (slug) { var ty = find(pf().types, function (x) { return x.slug === slug; }); return ty ? ty[lang()][0] : ''; };
+  var typeName = function (slug) { var ty = find(pf().types, function (x) { return x.slug === slug || (x.also || []).indexOf(slug) >= 0; }); return ty ? ty[lang()][0] : ''; };
   /* tri : langue courante d'abord, puis 16:9 avant 9:16 (deux grilles), ordre source sinon */
   function sortItems(items) {
     var l = lang();
