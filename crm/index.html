@@ -1,0 +1,572 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta name="robots" content="noindex,nofollow"/>
+<title>DS Editing — CRM</title>
+<link rel="icon" type="image/png" href="../assets/logo.png"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&display=swap" rel="stylesheet"/>
+<style>
+/* CRM DS Editing — tranche 1 : fiches, tunnel, chronologie. Tous les onglets de la maquette validée le 30/09/2026 sont affichés ; Mailing et Bot restent à construire. */
+:root{
+  --bg:#FCFCFB; --surface:#F2F4F5; --surface-2:#E8EBEE; --line:rgba(12,22,34,.12); --line-strong:rgba(12,22,34,.28);
+  --fg:#0B0D10; --muted:#5A6570; --accent:#24466F; --accent-soft:rgba(36,70,111,.10);
+  --ok:#1E8A45; --warn:#9A6B00; --err:#C2413A; --btn-fg:#FCFCFB; --shade:rgba(8,12,18,.45);
+  --font:'Geist',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#050607; --surface:#0F1114; --surface-2:#161A1F; --line:rgba(255,255,255,.10); --line-strong:rgba(255,255,255,.24);
+    --fg:#F5F5F1; --muted:#9AA3AD; --accent:#B9C9DA; --accent-soft:rgba(185,201,218,.12);
+    --ok:#46D369; --warn:#F5C400; --err:#F08A82; --btn-fg:#0A0B0D; --shade:rgba(0,0,0,.6); color-scheme:dark;
+  }
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{background:var(--bg);color:var(--fg);font-family:var(--font);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+h1,h2,h3,p{margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:inherit}
+button:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.shell{max-width:1240px;margin:0 auto;padding:16px 16px 60px;display:flex;flex-direction:column;gap:16px}
+.top{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between}
+.brand{display:inline-flex;align-items:center;gap:8px;font-weight:700;letter-spacing:-.03em;font-size:20px}
+.brand i{width:9px;height:9px;border-radius:50%;background:var(--accent)}
+.brand em{font-style:normal;font-size:11px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
+.who{display:flex;flex-wrap:wrap;align-items:center;gap:10px;font-size:13.5px;color:var(--muted)}
+.who b{color:var(--fg);font-weight:600}
+.tabs{display:flex;gap:4px;overflow-x:auto;border-bottom:1px solid var(--line)}
+.tabs button{border:0;background:transparent;padding:10px 12px;font-weight:600;font-size:14.5px;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap}
+.tabs button[aria-selected="true"]{color:var(--fg);border-bottom-color:var(--fg)}
+.muted{color:var(--muted)} .small{font-size:13px}
+.lbl{font-size:11.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.btn{font-size:13.5px;font-weight:600;border-radius:999px;padding:7px 14px;border:1px solid var(--line-strong);background:transparent;color:var(--fg);cursor:pointer;text-decoration:none;display:inline-block}
+.btn:hover{border-color:var(--fg)}
+.btn.pri{background:var(--fg);color:var(--btn-fg);border-color:var(--fg)}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.field{border:1px solid var(--line-strong);border-radius:10px;background:var(--bg);padding:8px 11px;font-size:14px;min-width:0}
+textarea.field{width:100%;min-height:74px;resize:vertical}
+.pill{font-size:11.5px;font-weight:600;border-radius:999px;padding:2px 9px;border:1px solid var(--line-strong);white-space:nowrap;display:inline-block}
+.pill.late{color:var(--err);border-color:var(--err)}
+.pill.today{color:var(--warn);border-color:var(--warn)}
+.pill.ok{color:var(--ok);border-color:var(--ok)}
+.ro{font-size:13px;color:var(--warn);border:1px solid var(--warn);border-radius:10px;padding:8px 12px}
+
+/* connexion */
+#login{max-width:380px;margin:12vh auto 0;padding:0 16px;display:flex;flex-direction:column;gap:14px}
+#login form{display:flex;flex-direction:column;gap:10px}
+#login label{font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:4px}
+#loginMsg{font-size:13.5px;color:var(--err);min-height:20px}
+
+/* fiches */
+.vh{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;justify-content:space-between}
+.vh h2{font-size:22px;font-weight:600;letter-spacing:-.03em}
+.filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.filters .field{padding:7px 10px;font-size:13.5px}
+.counts{display:flex;flex-wrap:wrap;gap:8px}
+.count{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:8px 14px;cursor:pointer;text-align:left;display:flex;flex-direction:column;min-width:120px}
+.count[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.count b{font-size:22px;font-weight:600;letter-spacing:-.02em;line-height:1.15}
+.count span{font-size:12.5px;color:var(--muted)}
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:12px}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:0}
+th{font-size:12px;font-weight:600;color:var(--muted);white-space:nowrap}
+tbody tr{cursor:pointer}
+tbody tr:hover{background:var(--surface)}
+td.nw{white-space:nowrap}
+td .sub{display:block;color:var(--muted);font-size:12.5px;max-width:340px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.link{all:unset;cursor:pointer;font-weight:600}
+.link:hover{text-decoration:underline;text-underline-offset:2px}
+
+/* tunnel */
+.seg{display:inline-flex;flex-wrap:wrap;border:1px solid var(--line-strong);border-radius:999px;padding:3px;gap:2px}
+.seg button{font-size:13.5px;font-weight:600;border:0;background:transparent;color:var(--muted);padding:6px 13px;border-radius:999px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--fg);color:var(--btn-fg)}
+.kan{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;align-items:flex-start}
+.col{flex:0 0 190px;background:var(--surface);border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.col h3{font-size:12.5px;font-weight:600;display:flex;justify-content:space-between;gap:6px}
+.col h3 span{color:var(--muted);font-variant-numeric:tabular-nums}
+.kcard{all:unset;box-sizing:border-box;cursor:pointer;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px;display:flex;flex-direction:column;gap:3px;font-size:13px}
+.kcard:hover{border-color:var(--line-strong)}
+.kcard b{font-weight:600;overflow-wrap:anywhere}
+.kcard small{color:var(--muted);font-size:12px}
+.kcard small.late{color:var(--err);font-weight:600}
+.more{all:unset;cursor:pointer;font-size:12.5px;font-weight:600;color:var(--accent);text-align:center;padding:4px}
+
+/* fiche */
+#overlay{position:fixed;inset:0;background:var(--shade);display:flex;justify-content:flex-end;z-index:10}
+#drawer{background:var(--bg);width:min(620px,100%);height:100%;overflow-y:auto;border-left:1px solid var(--line-strong)}
+.fiche{padding:14px 18px 40px;display:flex;flex-direction:column;gap:16px}
+.fh{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:space-between}
+.fh h2{font-size:22px;font-weight:600;letter-spacing:-.02em;overflow-wrap:anywhere}
+.fh select{border:1px solid var(--line-strong);border-radius:999px;background:var(--bg);padding:6px 10px;font-size:13px;font-weight:600}
+.meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px 16px;font-size:13.5px}
+.meta div{min-width:0;overflow-wrap:anywhere}
+.meta span{display:block;color:var(--muted);font-size:12px}
+.people{display:flex;flex-direction:column;gap:8px}
+.person{background:var(--surface);border-radius:10px;padding:9px 12px;font-size:13.5px;overflow-wrap:anywhere}
+.person b{font-weight:600}
+.box{border:1px solid var(--line-strong);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:10px}
+.rowf{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.rowf .grow{flex:1 1 220px}
+.ctx{font-size:13.5px;display:flex;flex-direction:column;gap:8px}
+.ctx p{white-space:pre-line}
+.tl{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px;font-size:13.5px}
+.tl li{display:grid;grid-template-columns:78px minmax(0,1fr);gap:10px}
+.tl time{color:var(--muted);font-variant-numeric:tabular-nums;font-size:12.5px;padding-top:1px}
+.tl .body{color:var(--muted);white-space:pre-line;overflow-wrap:anywhere}
+.tl .body.clip{display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom,0px));background:var(--fg);color:var(--btn-fg);border-radius:12px;padding:10px 16px;font-size:14px;font-weight:500;max-width:min(520px,calc(100% - 32px));z-index:20}
+.empty{padding:26px 14px;color:var(--muted);font-size:14px;text-align:center}
+/* tuiles */
+.tiles{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px}
+@media (max-width:980px){.tiles{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:460px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.tile{background:var(--surface);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.tile .l{font-size:12.5px;color:var(--muted)}
+.tile .v{font-size:26px;font-weight:600;letter-spacing:-.02em;line-height:1.1}
+.tile .s{font-size:12px;color:var(--muted);min-height:18px}
+.tiles.big .v{font-size:clamp(34px,5vw,52px)}
+.tiles.big .tile{padding:18px}
+/* ma journée */
+.day{display:grid;grid-template-columns:minmax(0,370px) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:900px){.day{grid-template-columns:1fr}}
+.panel{border:1px solid var(--line);border-radius:14px;background:var(--bg);min-width:0}
+.panel > .ph{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:12px 14px;border-bottom:1px solid var(--line)}
+.qgroup{font-size:11.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:12px 14px 6px;border-top:1px solid var(--line)}
+.qgroup:first-child{border-top:0}
+.qrow{display:grid;grid-template-columns:minmax(0,1fr) auto;border-top:1px solid var(--line)}
+.qrow.sel{background:var(--accent-soft)}
+.qmain{all:unset;box-sizing:border-box;cursor:pointer;padding:9px 6px 9px 14px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 8px;min-width:0}
+.qmain b{font-weight:600;overflow-wrap:anywhere}
+.qmain small{grid-column:1/-1;color:var(--muted);font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.qpin{border:1px solid transparent;background:transparent;border-radius:8px;height:28px;cursor:pointer;color:var(--muted);font-size:12px;font-weight:600;padding:0 8px;margin:8px 8px 0 0}
+.qpin:hover{border-color:var(--line-strong);color:var(--fg)}
+.qpin.on{color:var(--accent);border-color:var(--accent)}
+.soon{border:1px dashed var(--line-strong);border-radius:14px;padding:22px;display:flex;flex-direction:column;gap:12px;max-width:760px}
+.soon ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+.hint{font-size:13px;color:var(--muted);border-left:2px solid var(--line-strong);padding-left:10px}
+</style>
+</head>
+<body>
+
+<section id="login" hidden>
+  <span class="brand"><i></i>DS<em>Editing CRM</em></span>
+  <h1 style="font-size:26px;font-weight:600;letter-spacing:-.03em">Connexion</h1>
+  <form id="loginForm">
+    <label>E-mail<input class="field" type="email" id="email" autocomplete="username" required/></label>
+    <label>Mot de passe<input class="field" type="password" id="password" autocomplete="current-password" required/></label>
+    <button class="btn pri" type="submit" id="loginBtn">Se connecter</button>
+    <p id="loginMsg" role="alert"></p>
+  </form>
+</section>
+
+<div class="shell" id="app" hidden>
+  <div class="top">
+    <span class="brand"><i></i>DS<em>Editing CRM</em></span>
+    <div class="who"><span id="whoami"></span><button class="btn" type="button" id="logout">Se déconnecter</button></div>
+  </div>
+  <div class="tabs" id="tabs" role="tablist"></div>
+  <main id="view"></main>
+</div>
+<div id="overlay" hidden><div id="drawer" role="dialog" aria-label="Fiche"></div></div>
+<div id="toast" role="status" hidden></div>
+
+<script type="module">
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+const SUPABASE_URL = "https://xkanmjlpysxpohsuqvwg.supabase.co";
+const SUPABASE_ANON = "sb_publishable_lIZtV_WtN5NcGSb0dnfaiQ_AgKYBIVa";
+const HUBSPOT_COMPANY = "https://app-na2.hubspot.com/contacts/247385305/record/0-2/";
+
+const STAGES = [["a_contacter", "À contacter"], ["contacte", "Contacté"], ["en_conversation", "En conversation"], ["rdv_pris", "RDV pris"], ["visio_faite", "Visio faite"], ["test_en_cours", "Test en cours"], ["test_livre", "Test livré"], ["gagne", "Gagné"], ["perdu", "Perdu"], ["ecarte", "Écarté"]];
+const STAGE_LABEL = Object.fromEntries(STAGES);
+const OPEN = STAGES.slice(0, 7).map((s) => s[0]);
+const MARKET = { france_metropole: "France", usa: "USA", quebec: "Québec", uk: "UK", antilles_guyane: "Antilles-Guyane", suisse: "Suisse", belgique: "Belgique", luxembourg: "Luxembourg", acadie_n_b: "Acadie", pays_bas: "Pays-Bas", autre: "Autre" };
+const TYPE = { studio_podcast: "Studio podcast", agence_smm_contenu: "Agence contenu", agence_video_production: "Agence vidéo", createur_media: "Créateur / média", formateur_coach: "Formateur / coach", autre: "Autre" };
+const KIND = { call: "Appel", email: "Mail", message: "Message", note: "Note", task: "Tâche", meeting: "Rendez-vous", stage: "Étape", assistant: "Assistant" };
+const TABS = [["jour", "Ma journée"], ["fiches", "Fiches"], ["tunnel", "Tunnel"], ["clients", "Clients"], ["mail", "Mailing"], ["chiffres", "Chiffres"], ["bot", "Bot et alertes"], ["tele", "Mode télé"]];
+const VIEWER_TABS = ["fiches", "tunnel", "clients", "chiffres", "tele"];
+const PROSPECTING = ["a_contacter", "contacte", "en_conversation"], CLOSING = ["rdv_pris", "visio_faite", "test_en_cours", "test_livre"];
+const CLIENT_STATUS = { client_actif: "Actif", en_pause: "En pause", perdu: "Perdu", test_livre: "Test livré", prospect: "Prospect" };
+
+const $ = (id) => document.getElementById(id);
+function h(tag, a, kids) {
+  const e = document.createElement(tag);
+  if (a) for (const k in a) { const v = a[k]; if (v == null || v === false) continue;
+    if (k === "class") e.className = v; else if (k === "text") e.textContent = v;
+    else if (k.slice(0, 2) === "on") e.addEventListener(k.slice(2), v);
+    else if (k === "value") e.value = v; else e.setAttribute(k, v === true ? "" : v); }
+  (kids || []).forEach((c) => { if (c == null || c === false) return; e.appendChild(typeof c === "string" ? document.createTextNode(c) : c); });
+  return e;
+}
+const p2 = (n) => String(n).padStart(2, "0");
+const cap = (s) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : "");
+function todayIso() { const d = new Date(); return `${d.getFullYear()}-${p2(d.getMonth() + 1)}-${p2(d.getDate())}`; }
+function dayDiff(iso) { const [y, m, d] = iso.split("-").map(Number), [ty, tm, td] = todayIso().split("-").map(Number); return Math.round((Date.UTC(y, m - 1, d) - Date.UTC(ty, tm - 1, td)) / 864e5); }
+function frDate(iso) { if (!iso) return ""; const d = iso.length === 10 ? iso.split("-") : null; if (d) return `${d[2]}/${d[1]}/${d[0]}`; const x = new Date(iso); return `${p2(x.getDate())}/${p2(x.getMonth() + 1)}/${x.getFullYear()}`; }
+function rel(iso) { const n = dayDiff(iso); if (n < 0) return `En retard de ${-n} j`; if (n === 0) return "Aujourd'hui"; if (n === 1) return "Demain"; return `Le ${frDate(iso).slice(0, 5)}`; }
+function relClass(iso) { const n = dayDiff(iso); return n < 0 ? "late" : n === 0 ? "today" : ""; }
+let toastTimer = null;
+function toast(x) { const t = $("toast"); t.textContent = x; t.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true; }, 3800); }
+
+let sb = null;
+const S = { me: null, members: [], deals: [], contacts: new Map(), tab: "fiches", q: "", stage: "open", market: "", setter: "", quick: "", mine: false, open: null, acts: null, more: {}, busy: false, note: "", sel: null, actsFor: null, week: [], jourMore: {} };
+const canEdit = () => S.me && (S.me.role === "admin" || S.me.role === "sales");
+const isOpen = (d) => OPEN.includes(d.stage);
+const ownerName = (d) => (S.members.find((m) => m.user_id === d.owner_id)?.display_name) || cap(d.setter) || "Non attribué";
+const byId = (id) => S.deals.find((d) => d.id === id);
+
+/* ---------- données ---------- */
+async function load() {
+  const [deals, contacts, members, week] = await Promise.all([
+    sb.from("crm_deals").select("*, company:crm_companies(*)").order("created_at", { ascending: true }).limit(2000),
+    sb.from("crm_contacts").select("*").limit(5000),
+    sb.from("crm_members").select("*"),
+    loadWeek(),
+  ]);
+  const err = deals.error || contacts.error || members.error;
+  if (err) throw err;
+  S.deals = deals.data; S.members = members.data; S.week = week;
+  S.contacts = new Map();
+  for (const c of contacts.data) { if (!S.contacts.has(c.company_id)) S.contacts.set(c.company_id, []); S.contacts.get(c.company_id).push(c); }
+}
+function monday() { const d = new Date(); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); return d; }
+async function loadWeek() {
+  const { data, error } = await sb.from("crm_activities").select("kind,outcome,subject,author_id,occurred_at").in("kind", ["call", "stage"]).gte("occurred_at", monday().toISOString()).limit(5000);
+  if (error) throw error;
+  return data;
+}
+function stats(userId) {
+  const rows = userId ? S.week.filter((a) => a.author_id === userId) : S.week, to = (k) => rows.filter((a) => a.kind === "stage" && (a.subject || "").endsWith("> " + k)).length;
+  const calls = rows.filter((a) => a.kind === "call");
+  return { a: calls.length, d: calls.filter((a) => a.outcome === "Décroché").length, r: to("rdv_pris"), v: to("visio_faite"), t: to("test_en_cours"), g: to("gagne") };
+}
+function ensureActs(id) {
+  if (S.actsFor === id) return;
+  S.actsFor = id; S.acts = null;
+  loadActs(byId(id)).then((a) => { if (S.actsFor === id) { S.acts = a; render(); } }).catch((e) => toast("Chronologie indisponible : " + (e.message || e)));
+}
+async function loadActs(d) {
+  const { data, error } = await sb.from("crm_activities").select("*").or(`deal_id.eq.${d.id},company_id.eq.${d.company_id}`).order("occurred_at", { ascending: false }).limit(500);
+  if (error) throw error;
+  return data;
+}
+async function patchDeal(id, patch, okMsg) {
+  if (S.busy) return; S.busy = true;
+  try {
+    const { data, error } = await sb.from("crm_deals").update(patch).eq("id", id).select("*, company:crm_companies(*)").single();
+    if (error) throw error;
+    S.deals[S.deals.findIndex((d) => d.id === id)] = data;
+    if (S.actsFor === id) S.acts = await loadActs(data);
+    if (patch.stage) S.week = await loadWeek();
+    toast(okMsg);
+  } catch (e) { toast("Enregistrement impossible : " + (e.message || e)); }
+  S.busy = false; render();
+}
+async function addNote(d, body) {
+  if (S.busy) return; S.busy = true;
+  try {
+    const { error } = await sb.from("crm_activities").insert({ deal_id: d.id, company_id: d.company_id, kind: "note", body, author_id: S.me.user_id, author_label: S.me.display_name });
+    if (error) throw error;
+    S.note = ""; S.acts = await loadActs(d); toast("Note ajoutée à la chronologie.");
+  } catch (e) { toast("Note non enregistrée : " + (e.message || e)); }
+  S.busy = false; render();
+}
+
+/* ---------- filtres ---------- */
+function filtered() {
+  const q = S.q.trim().toLowerCase();
+  return S.deals.filter((d) => {
+    if (S.stage === "open" ? !isOpen(d) : S.stage && d.stage !== S.stage) return false;
+    if (S.market && d.company.market !== S.market) return false;
+    if (S.setter && (d.setter || "") !== S.setter) return false;
+    if (S.quick === "late" && !(d.next_action_at && dayDiff(d.next_action_at) < 0)) return false;
+    if (S.quick === "today" && !(d.next_action_at && dayDiff(d.next_action_at) === 0)) return false;
+    if (S.quick === "nodate" && !(isOpen(d) && !d.next_action_at)) return false;
+    if (q && !(d.company.name.toLowerCase().includes(q) || (S.contacts.get(d.company_id) || []).some((c) => `${c.first_name || ""} ${c.last_name || ""} ${c.email || ""}`.toLowerCase().includes(q)))) return false;
+    return true;
+  }).sort((a, b) => (a.next_action_at || "9999").localeCompare(b.next_action_at || "9999") || a.company.name.localeCompare(b.company.name));
+}
+function options(map, present) { return Object.keys(map).filter((k) => present.has(k)).map((k) => [k, map[k]]); }
+function select(id, label, value, opts, onchange) {
+  return h("select", { class: "field", id, "aria-label": label, onchange: (ev) => onchange(ev.target.value) }, opts.map(([v, l]) => { const o = h("option", { value: v }, [l]); if (v === value) o.selected = true; return o; }));
+}
+
+/* ---------- vues ---------- */
+function vFiches() {
+  const open = S.deals.filter(isOpen);
+  const late = open.filter((d) => d.next_action_at && dayDiff(d.next_action_at) < 0).length;
+  const today = open.filter((d) => d.next_action_at && dayDiff(d.next_action_at) === 0).length;
+  const nodate = open.filter((d) => !d.next_action_at).length;
+  const list = filtered();
+  const markets = new Set(S.deals.map((d) => d.company.market)), setters = [...new Set(S.deals.map((d) => d.setter).filter(Boolean))];
+  const count = (key, n, label) => h("button", { type: "button", class: "count", "aria-pressed": String(S.quick === key), onclick: () => { S.quick = S.quick === key ? "" : key; if (S.quick) S.stage = "open"; render(); } }, [h("b", { text: String(n) }), h("span", { text: label })]);
+  const search = h("input", { class: "field", type: "search", id: "q", placeholder: "Chercher une société ou un contact", "aria-label": "Chercher", value: S.q, oninput: (ev) => { S.q = ev.target.value; renderTable(); } });
+  const holder = h("div", { id: "tableHolder" });
+  function renderTable() {
+    const rows = filtered(); holder.textContent = "";
+    holder.appendChild(h("p", { class: "small muted", style: "margin:0 0 8px", text: `${rows.length} fiche${rows.length > 1 ? "s" : ""}` }));
+    holder.appendChild(rows.length ? h("div", { class: "tw" }, [h("table", null, [
+      h("thead", null, [h("tr", null, ["Société", "Étape", "Marché", "Prospecté par", "Prochaine action", "Dernier contact"].map((x) => h("th", { text: x })))]),
+      h("tbody", null, rows.map((d) => h("tr", { onclick: () => openFiche(d.id) }, [
+        h("td", null, [h("button", { type: "button", class: "link", onclick: (ev) => { ev.stopPropagation(); openFiche(d.id); } }, [d.company.name]), h("span", { class: "sub", text: TYPE[d.company.type_structure] || "" })]),
+        h("td", { class: "nw" }, [h("span", { class: "pill" + (d.stage === "gagne" ? " ok" : ""), text: STAGE_LABEL[d.stage] })]),
+        h("td", { class: "nw", text: MARKET[d.company.market] || d.company.market || "" }),
+        h("td", { class: "nw", text: ownerName(d) }),
+        h("td", null, [d.next_action_at ? h("span", { class: "pill " + relClass(d.next_action_at), text: rel(d.next_action_at) }) : (isOpen(d) ? h("span", { class: "pill", text: "À planifier" }) : null), d.next_action ? h("span", { class: "sub", text: d.next_action }) : null]),
+        h("td", { class: "nw muted", text: d.last_contact_at ? frDate(d.last_contact_at) : "" }),
+      ]))),
+    ])]) : h("div", { class: "empty", text: "Aucune fiche ne correspond à ces filtres." }));
+  }
+  renderTable();
+  return h("div", { style: "display:flex;flex-direction:column;gap:14px" }, [
+    h("div", { class: "vh" }, [h("h2", { text: "Fiches" }), h("span", { class: "muted small", text: `${S.deals.length} sociétés importées de HubSpot · ${open.length} ouvertes` })]),
+    h("div", { class: "counts" }, [count("late", late, "relances en retard"), count("today", today, "à faire aujourd'hui"), count("nodate", nodate, "ouvertes sans date")]),
+    h("div", { class: "filters" }, [
+      search,
+      select("fStage", "Étape", S.stage, [["open", "Étapes ouvertes"], ["", "Toutes les étapes"], ...STAGES], (v) => { S.stage = v; if (v !== "open") S.quick = ""; render(); }),
+      select("fMarket", "Marché", S.market, [["", "Tous les marchés"], ...options(MARKET, markets)], (v) => { S.market = v; render(); }),
+      select("fSetter", "Prospecté par", S.setter, [["", "Toute l'équipe"], ...setters.map((s) => [s, cap(s)])], (v) => { S.setter = v; render(); }),
+    ]),
+    holder,
+  ]);
+}
+function vTunnel() {
+  const list = S.deals.filter((d) => !S.mine || d.owner_id === S.me.user_id);
+  const cols = STAGES.slice(0, 8).map(([k, l]) => {
+    const cards = list.filter((d) => d.stage === k).sort((a, b) => (a.next_action_at || "9999").localeCompare(b.next_action_at || "9999") || a.company.name.localeCompare(b.company.name));
+    const limit = S.more[k] ? cards.length : 20;
+    return h("div", { class: "col" }, [h("h3", null, [l, h("span", { text: String(cards.length) })]),
+      ...cards.slice(0, limit).map((d) => h("button", { type: "button", class: "kcard", onclick: () => openFiche(d.id) }, [
+        h("b", { text: d.company.name }), h("small", { text: `${ownerName(d)} · ${MARKET[d.company.market] || ""}` }),
+        d.next_action_at ? h("small", { class: dayDiff(d.next_action_at) < 0 ? "late" : null, text: rel(d.next_action_at) }) : (k === "gagne" ? null : h("small", { text: "À planifier" })),
+      ])),
+      cards.length > limit ? h("button", { type: "button", class: "more", onclick: () => { S.more[k] = true; render(); } }, [`Afficher les ${cards.length - limit} autres`]) : null,
+    ]);
+  });
+  const out = (k) => list.filter((d) => d.stage === k).length;
+  return h("div", { style: "display:flex;flex-direction:column;gap:14px" }, [
+    h("div", { class: "vh" }, [h("h2", { text: "Tunnel" }), h("div", { class: "seg", role: "group", "aria-label": "Filtre" }, [
+      h("button", { type: "button", "aria-pressed": String(!S.mine), onclick: () => { S.mine = false; render(); } }, ["Toutes les fiches"]),
+      h("button", { type: "button", "aria-pressed": String(S.mine), onclick: () => { S.mine = true; render(); } }, ["Les miennes"]),
+    ])]),
+    h("div", { class: "kan" }, cols),
+    h("p", { class: "small muted" }, ["Sorties : ",
+      h("button", { type: "button", class: "link", onclick: () => { S.tab = "fiches"; S.stage = "perdu"; S.quick = ""; render(); } }, [`Perdu (${out("perdu")})`]), " · ",
+      h("button", { type: "button", class: "link", onclick: () => { S.tab = "fiches"; S.stage = "ecarte"; S.quick = ""; render(); } }, [`Écarté (${out("ecarte")})`])]),
+  ]);
+}
+function actLine(a) {
+  const bits = [KIND[a.kind] || a.kind];
+  if (a.kind === "call" && a.outcome) bits.push(a.outcome);
+  if (a.kind === "call" && a.duration_s) bits.push(`${Math.max(1, Math.round(a.duration_s / 60))} min`);
+  if (a.kind === "email") bits.push(a.direction === "in" ? "reçu" : "envoyé");
+  if (a.kind === "message" && a.channel) bits.push(a.channel);
+  if (a.kind === "task") bits.push(a.done ? "faite" : "à faire");
+  if (a.author_label && a.author_label !== "Import HubSpot") bits.push(a.author_label);
+  let subject = a.subject;
+  if (a.kind === "stage" && subject) subject = subject.split(" > ").map((s) => STAGE_LABEL[s] || s).join(" → ");
+  const body = a.body ? h("div", { class: "body" + (a.body.length > 320 ? " clip" : ""), text: a.body }) : null;
+  return h("li", null, [h("time", { text: frDate(a.kind === "task" && a.due_at ? a.due_at : a.occurred_at) }), h("div", null, [
+    h("b", { text: bits.join(" · ") }), subject ? h("div", { text: subject }) : null, body,
+    body && a.body.length > 320 ? h("button", { type: "button", class: "more", style: "text-align:left;padding:2px 0", onclick: (ev) => { body.classList.toggle("clip"); ev.target.textContent = body.classList.contains("clip") ? "Lire la suite" : "Réduire"; } }, ["Lire la suite"]) : null,
+  ])]);
+}
+function fiche(d, inline) {
+  const c = d.company, people = S.contacts.get(d.company_id) || [], edit = canEdit(), kids = [], acts = S.actsFor === d.id ? S.acts : null;
+  kids.push(h("div", { style: "display:flex;justify-content:space-between;gap:10px;align-items:center" }, [
+    c.hubspot_id ? h("a", { class: "small muted", href: HUBSPOT_COMPANY + c.hubspot_id, target: "_blank", rel: "noopener" }, ["Voir dans HubSpot"]) : h("span"),
+    inline ? null : h("button", { type: "button", class: "btn", id: "closeFiche", onclick: closeFiche }, ["Fermer"])]));
+  kids.push(h("div", { class: "fh" }, [h("h2", { text: c.name }), edit
+    ? select("stageSel", "Étape", d.stage, STAGES, (v) => patchDeal(d.id, { stage: v }, `Étape : ${STAGE_LABEL[v]}.`))
+    : h("span", { class: "pill", text: STAGE_LABEL[d.stage] })]));
+  if (!edit) kids.push(h("div", { class: "ro", text: "Lecture seule." }));
+  const site = c.website ? (c.website.startsWith("http") ? c.website : "https://" + c.website) : null;
+  const cell = (l, v) => (v ? h("div", null, [h("span", { text: l }), v]) : null);
+  kids.push(h("div", { class: "meta" }, [
+    cell("Société", [TYPE[c.type_structure], MARKET[c.market] || c.market].filter(Boolean).join(" · ")),
+    cell("Téléphone", c.phone),
+    site ? h("div", null, [h("span", { text: "Site" }), h("a", { href: site, target: "_blank", rel: "noopener" }, [c.website.replace(/^https?:\/\//, "")])]) : null,
+    cell("Prospecté par", ownerName(d)),
+    cell("Tentatives", String(d.tries)),
+    cell("Premier canal", d.first_channel), cell("Offre proposée", d.offer), cell("Source", c.source), cell("Langue", c.lang),
+    cell("Dernier contact", d.last_contact_at ? frDate(d.last_contact_at) : null),
+    cell("Raison de la perte", d.lost_reason),
+  ]));
+  if (people.length) kids.push(h("div", null, [h("span", { class: "lbl", text: people.length > 1 ? "Contacts" : "Contact" }), h("div", { class: "people", style: "margin-top:6px" }, people.map((p) => h("div", { class: "person" }, [
+    h("b", { text: [p.first_name, p.last_name].filter(Boolean).join(" ") || "Sans nom" }), p.job_title ? ` · ${p.job_title}` : "", h("br"),
+    h("span", { class: "muted", text: [p.email, p.phone].filter(Boolean).join(" · ") || "Pas de coordonnées" }),
+    p.linkedin_url ? h("span", null, [" · ", h("a", { href: p.linkedin_url, target: "_blank", rel: "noopener" }, ["LinkedIn"])]) : null,
+  ])))]));
+  if (isOpen(d)) {
+    if (edit) {
+      const txt = h("input", { class: "field grow", type: "text", id: "nextText", "aria-label": "Prochaine action", placeholder: "Prochaine action", value: d.next_action || "" });
+      const date = h("input", { class: "field", type: "date", id: "nextDate", "aria-label": "Date de la prochaine action", value: d.next_action_at || "" });
+      kids.push(h("div", { class: "box" }, [
+        h("div", { style: "display:flex;justify-content:space-between;gap:8px;align-items:center" }, [h("span", { class: "lbl", text: "Prochaine action" }), d.next_action_at ? h("span", { class: "pill " + relClass(d.next_action_at), text: rel(d.next_action_at) }) : h("span", { class: "pill", text: "À planifier" })]),
+        h("div", { class: "rowf" }, [txt, date, h("button", { type: "button", class: "btn pri", onclick: () => { if (!txt.value.trim() || !date.value) { toast("Il faut une action et une date."); return; } patchDeal(d.id, { next_action: txt.value.trim(), next_action_at: date.value }, `Prochaine action : ${rel(date.value).toLowerCase()}.`); } }, ["Enregistrer"])]),
+      ]));
+    } else if (d.next_action || d.next_action_at) kids.push(h("div", { class: "box" }, [h("span", { class: "lbl", text: "Prochaine action" }), h("div", null, [d.next_action_at ? h("span", { class: "pill " + relClass(d.next_action_at), text: rel(d.next_action_at) }) : null, " ", d.next_action || ""])]));
+  }
+  const ctx = [["Angle", c.angle], ["Montage actuel", c.montage_actuel], ["Volume estimé", c.volume_estime], ["Prix publics", c.prix_publics]].filter((x) => x[1]);
+  if (ctx.length) kids.push(h("div", { class: "ctx" }, ctx.map(([l, v]) => h("div", null, [h("span", { class: "lbl", text: l }), h("p", { text: v })]))));
+  if (edit) {
+    const note = h("textarea", { class: "field", id: "noteText", "aria-label": "Nouvelle note", placeholder: "Ajouter une note à la chronologie", oninput: (ev) => { S.note = ev.target.value; } });
+    note.value = S.note;
+    kids.push(h("div", { class: "box" }, [note, h("div", null, [h("button", { type: "button", class: "btn", onclick: () => { const v = note.value.trim(); if (!v) { toast("La note est vide."); return; } addNote(d, v); } }, ["Ajouter la note"])])]));
+  }
+  kids.push(h("span", { class: "lbl", text: "Chronologie" }));
+  kids.push(acts == null ? h("p", { class: "muted small", text: "Chargement…" }) : acts.length ? h("ul", { class: "tl" }, acts.map(actLine)) : h("p", { class: "muted small", text: "Aucun échange enregistré." }));
+  return h("div", { class: "fiche" }, kids);
+}
+function openFiche(id) { S.open = id; S.note = ""; ensureActs(id); render(); }
+function closeFiche() { S.open = null; S.note = ""; render(); }
+
+/* ---------- onglets de la maquette ---------- */
+function weekLabel() { const m = monday(), e = new Date(m); e.setDate(m.getDate() + 6); return `Semaine du ${p2(m.getDate())}/${p2(m.getMonth() + 1)} au ${p2(e.getDate())}/${p2(e.getMonth() + 1)}`; }
+function tiles(k, big) {
+  const tile = (l, v, sub) => h("div", { class: "tile" }, [h("span", { class: "l", text: l }), h("span", { class: "v", text: v }), h("span", { class: "s", text: sub || "" })]);
+  return h("div", { class: "tiles" + (big ? " big" : "") }, [
+    tile("Appels passés", String(k.a)), tile("Taux de décroché", (k.a ? Math.round(k.d / k.a * 100) : 0) + " %", k.d + " décroché" + (k.d > 1 ? "s" : "")),
+    tile("Rendez-vous pris", String(k.r)), tile("Visios faites", String(k.v)), tile("Tests lancés", String(k.t)), tile("Clients gagnés", String(k.g)),
+  ]);
+}
+function queue() {
+  const me = S.me, pin = (a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0);
+  const mine = S.deals.filter((d) => (PROSPECTING.includes(d.stage) && d.owner_id === me.user_id) || (me.role === "admin" && CLOSING.includes(d.stage)));
+  const byDate = (a, b) => pin(a, b) || a.next_action_at.localeCompare(b.next_action_at) || a.company.name.localeCompare(b.company.name);
+  return [
+    ["late", "En retard", mine.filter((d) => d.next_action_at && dayDiff(d.next_action_at) < 0).sort(byDate)],
+    ["today", "Aujourd'hui", mine.filter((d) => d.next_action_at && dayDiff(d.next_action_at) === 0).sort(byDate)],
+    ["fresh", "Nouveaux, à contacter", mine.filter((d) => d.stage === "a_contacter" && !d.next_action_at).sort((a, b) => pin(a, b) || a.company.name.localeCompare(b.company.name))],
+  ];
+}
+function vJour() {
+  const groups = queue(), all = groups.flatMap((g) => g[2]);
+  if (!S.sel || !all.some((d) => d.id === S.sel)) S.sel = all.length ? all[0].id : null;
+  if (S.sel && !S.open) ensureActs(S.sel);
+  const list = [];
+  groups.forEach(([key, label, items]) => {
+    if (!items.length) return;
+    const limit = S.jourMore[key] ? items.length : 12;
+    list.push(h("div", { class: "qgroup", text: `${label} · ${items.length}` }));
+    items.slice(0, limit).forEach((d) => list.push(h("div", { class: "qrow" + (d.id === S.sel ? " sel" : "") }, [
+      h("button", { type: "button", class: "qmain", onclick: () => { S.sel = d.id; S.note = ""; render(); } }, [
+        h("b", { text: d.company.name }), d.next_action_at ? h("span", { class: "pill " + relClass(d.next_action_at), text: rel(d.next_action_at) }) : h("span", { class: "pill", text: "Nouveau" }),
+        h("small", { text: STAGE_LABEL[d.stage] + (d.next_action ? " · " + d.next_action : "") })]),
+      canEdit() ? h("button", { type: "button", class: "qpin" + (d.pinned ? " on" : ""), "aria-pressed": String(!!d.pinned), onclick: () => patchDeal(d.id, { pinned: !d.pinned }, d.pinned ? "Fiche désépinglée." : "Fiche épinglée en haut de sa liste.") }, [d.pinned ? "Épinglé" : "Épingler"]) : null,
+    ])));
+    if (items.length > limit) list.push(h("button", { type: "button", class: "more", style: "display:block;width:100%;padding:10px", onclick: () => { S.jourMore[key] = true; render(); } }, [`Afficher les ${items.length - limit} autres`]));
+  });
+  const sel = S.sel ? byId(S.sel) : null, late = groups[0][2].length;
+  return h("div", { style: "display:flex;flex-direction:column;gap:14px" }, [
+    h("div", { class: "vh" }, [h("h2", { text: "Ma journée · " + S.me.display_name }), h("span", { class: "muted small", text: weekLabel() })]),
+    tiles(stats(S.me.user_id)),
+    h("p", { class: "hint", text: "Les six chiffres comptent ce qui est fait dans ce CRM depuis lundi. L'appel en un clic, le résultat en deux clics et la règle des 4 tentatives arrivent à la tranche 2." }),
+    h("div", { class: "day" }, [
+      h("div", { class: "panel" }, [h("div", { class: "ph" }, [h("b", { text: "File du jour" }), h("span", { class: "muted small", text: `${all.length} fiche${all.length > 1 ? "s" : ""}${late ? " · " + late + " en retard" : ""}` })]), list.length ? h("div", null, list) : h("div", { class: "empty", text: "La file est vide. Aucune action due aujourd'hui." })]),
+      h("div", { class: "panel" }, [sel ? fiche(sel, true) : h("div", { class: "empty", text: "Choisis une fiche dans la file." })]),
+    ]),
+  ]);
+}
+function vClients() {
+  const cl = S.deals.filter((d) => d.stage === "gagne").sort((a, b) => a.company.name.localeCompare(b.company.name));
+  return h("div", { style: "display:flex;flex-direction:column;gap:14px" }, [
+    h("div", { class: "vh" }, [h("h2", { text: "Clients" }), h("span", { class: "muted small", text: `${cl.length} client${cl.length > 1 ? "s" : ""} gagné${cl.length > 1 ? "s" : ""}` })]),
+    cl.length ? h("div", { class: "tw" }, [h("table", null, [
+      h("thead", null, [h("tr", null, ["Client", "Marché", "Prospecté par", "Statut", "Gagné le"].map((x) => h("th", { text: x })))]),
+      h("tbody", null, cl.map((d) => h("tr", { onclick: () => openFiche(d.id) }, [
+        h("td", null, [h("button", { type: "button", class: "link", onclick: (ev) => { ev.stopPropagation(); openFiche(d.id); } }, [d.company.name])]),
+        h("td", { class: "nw", text: MARKET[d.company.market] || d.company.market || "" }), h("td", { class: "nw", text: ownerName(d) }),
+        h("td", { class: "nw" }, [h("span", { class: "pill ok", text: CLIENT_STATUS[d.company.statut_client] || "Actif" })]),
+        h("td", { class: "nw muted", text: d.closed_at ? frDate(d.closed_at) : "avant l'import" }),
+      ]))),
+    ])]) : h("div", { class: "empty", text: "Aucun client gagné pour l'instant." }),
+    h("p", { class: "hint", text: "L'ancienneté et le revenu mensuel seront calculés depuis les factures à la tranche 3. Le revenu ne sera visible que par Cyriaque et Sajid." }),
+  ]);
+}
+function vChiffres() {
+  const team = S.me.role !== "sales", sellers = S.members.filter((m) => m.active && m.role !== "viewer");
+  const kids = [h("div", { class: "vh" }, [h("h2", { text: team ? "Chiffres de l'équipe" : "Mes chiffres" }), h("span", { class: "muted small", text: weekLabel() })]), tiles(stats(team ? null : S.me.user_id))];
+  if (team) kids.push(h("div", { class: "tw" }, [h("table", null, [
+    h("thead", null, [h("tr", null, ["Personne", "Appels", "Décroché", "RDV pris", "Visios", "Tests", "Gagnés"].map((x) => h("th", { text: x })))]),
+    h("tbody", null, sellers.map((m) => { const k = stats(m.user_id); return h("tr", { style: "cursor:default" }, [h("td", { text: m.display_name }), ...[k.a, (k.a ? Math.round(k.d / k.a * 100) : 0) + " %", k.r, k.v, k.t, k.g].map((x) => h("td", { text: String(x) }))]); })),
+  ])]));
+  kids.push(h("p", { class: "hint", text: "Ces chiffres comptent ce qui est fait dans ce CRM depuis lundi : ils démarrent à zéro. Les objectifs de la semaine et le chiffre d'affaires arrivent à la tranche 3." }));
+  return h("div", { style: "display:flex;flex-direction:column;gap:14px" }, kids);
+}
+function vTele() {
+  return h("div", { style: "display:flex;flex-direction:column;gap:14px" }, [
+    h("div", { class: "vh" }, [h("h2", { text: "Mode télé · équipe" }), h("span", { class: "muted small", text: weekLabel() + " · sans chiffre d'affaires" })]),
+    tiles(stats(null), true),
+    h("p", { class: "hint", text: "Totaux de l'équipe depuis lundi. L'affichage plein écran pour la télé du bureau et les objectifs arrivent à la tranche 3." }),
+  ]);
+}
+const SOON = {
+  mail: ["Mailing", "Tranche 4", ["Envoi depuis la boîte @ds-editing.com de chacun.", "Séquence de 3 mails (J0, J+3, J+7), arrêtée dès que le prospect répond.", "Réponses lues dans Outlook et copiées dans la fiche.", "Suivi des clics seulement."], "Il faut d'abord la boîte de Ghali."],
+  bot: ["Bot et alertes", "Tranche 5", ["Un bot Telegram par personne.", "Tout par réponses toutes prêtes : Fait, Reporter, Ouvrir la fiche, Ma file du jour, Mes relances en retard, Mes chiffres, Ajouter une note.", "Les 7 alertes, à toute heure."], "Il faut Telegram installé sur ton téléphone et celui de Ghali."],
+};
+function vSoon(key) {
+  const [title, when, items, need] = SOON[key];
+  return h("div", { style: "display:flex;flex-direction:column;gap:14px" }, [
+    h("div", { class: "vh" }, [h("h2", { text: title }), h("span", { class: "pill today", text: "Pas encore construit · " + when })]),
+    h("div", { class: "soon" }, [h("b", { text: "Ce que fera cet onglet" }), h("ul", null, items.map((x) => h("li", { text: x }))), h("p", { class: "muted small", text: need })]),
+  ]);
+}
+const VIEWS = { jour: vJour, fiches: vFiches, tunnel: vTunnel, clients: vClients, mail: () => vSoon("mail"), chiffres: vChiffres, bot: () => vSoon("bot"), tele: vTele };
+
+function render() {
+  const tb = $("tabs"); tb.textContent = "";
+  const tabs = S.me.role === "viewer" ? TABS.filter(([k]) => VIEWER_TABS.includes(k)) : TABS;
+  if (!tabs.some(([k]) => k === S.tab)) S.tab = tabs[0][0];
+  tabs.forEach(([k, l]) => tb.appendChild(h("button", { type: "button", role: "tab", "aria-selected": String(S.tab === k), onclick: () => { S.tab = k; S.note = ""; render(); } }, [l])));
+  const v = $("view"); v.textContent = "";
+  v.appendChild(VIEWS[S.tab]());
+  const ov = $("overlay"), dr = $("drawer");
+  if (S.open && byId(S.open)) {
+    const top = dr.scrollTop;
+    dr.textContent = ""; dr.appendChild(fiche(byId(S.open))); ov.hidden = false; dr.scrollTop = top;
+  } else { ov.hidden = true; dr.textContent = ""; }
+}
+
+/* ---------- session ---------- */
+async function boot(user) {
+  const { data, error } = await sb.from("crm_members").select("*");
+  const me = !error && data ? data.find((m) => m.user_id === user.id && m.active) : null;
+  if (!me) {
+    await sb.auth.signOut(); $("app").hidden = true; $("login").hidden = false;
+    $("loginMsg").textContent = "Ce compte n'a pas accès au CRM. Demande l'accès à Cyriaque."; return;
+  }
+  S.me = me; S.tab = me.role === "viewer" ? "fiches" : "jour"; S.sel = null; S.open = null; S.actsFor = null;
+  $("login").hidden = true; $("app").hidden = false;
+  const who = $("whoami"); who.textContent = "";
+  who.appendChild(h("b", { text: me.display_name })); who.appendChild(document.createTextNode(me.role === "viewer" ? " · lecture seule" : me.role === "admin" ? " · admin" : ""));
+  $("view").textContent = ""; $("view").appendChild(h("div", { class: "empty", text: "Chargement des fiches…" }));
+  try { await load(); render(); } catch (e) { $("view").textContent = ""; $("view").appendChild(h("div", { class: "empty", text: "Chargement impossible : " + (e.message || e) })); }
+}
+async function init() {
+  sb = createClient(SUPABASE_URL, SUPABASE_ANON);
+  $("loginForm").addEventListener("submit", async (ev) => {
+    ev.preventDefault(); $("loginMsg").textContent = ""; $("loginBtn").disabled = true;
+    const { data, error } = await sb.auth.signInWithPassword({ email: $("email").value.trim(), password: $("password").value });
+    $("loginBtn").disabled = false;
+    if (error) { $("loginMsg").textContent = "E-mail ou mot de passe incorrect."; return; }
+    $("password").value = ""; boot(data.user);
+  });
+  $("logout").addEventListener("click", async () => { await sb.auth.signOut(); S.me = null; S.open = null; $("app").hidden = true; $("overlay").hidden = true; $("login").hidden = false; });
+  $("overlay").addEventListener("click", (ev) => { if (ev.target === $("overlay")) closeFiche(); });
+  document.addEventListener("keydown", (ev) => { if (ev.key === "Escape" && S.open) closeFiche(); });
+  const { data } = await sb.auth.getSession();
+  if (data.session) boot(data.session.user); else $("login").hidden = false;
+}
+init();
+</script>
+</body>
+</html>
