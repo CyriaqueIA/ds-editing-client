@@ -44,16 +44,18 @@ window.DS_PORTFOLIO = {
   // La scène disparaît d'elle-même dès qu'une vidéo du type arrive du Drive.
   soon: ["ia", "youtube-docu"],
 
-  // Prix par type et par formule, affichés dans le portfolio PRIVÉ seulement. Vide = « Sur devis ».
-  // Écrire le texte tel qu'il doit apparaître, ex. "199 €", "à partir de 150 €", "$149".
+  // Prix par type et par formule, affichés dans le portfolio PRIVÉ seulement (maquette validée par Cyriaque le 01/10/2026 : prix du marché quantifié).
+  // Hors taxes, par vidéo livrée. Écrire le texte tel qu'il doit apparaître ; vide = « Sur devis ».
+  // `unique` = une seule formule pour ce type (un seul onglet « Formule unique », toutes ses vidéos ensemble).
+  // Jamais de prix dans la colonne de gauche (demande de Cyriaque).
   prices: {
-    "podcast-interview": { standard: "", premium: "" },
-    "vsl": { standard: "", premium: "" },
-    "reels-shorts": { standard: "", premium: "" },
-    "youtube-docu": { standard: "", premium: "" },
-    "ia": { standard: "", premium: "" },
-    "miniatures": { standard: "", premium: "" },
-    "trailers": { standard: "", premium: "" },
+    "podcast-interview": { standard: "119 €", premium: "199 €", signature: "279 €" },
+    "vsl": { unique: "49 €" },
+    "reels-shorts": { standard: "19 €", premium: "29 €", signature: "45 €" },
+    "trailers": { unique: "49 €" },
+    "miniatures": { unique: "25 €" },
+    "youtube-docu": { standard: "99 €", premium: "169 €", signature: "239 €" },
+    "ia": { standard: "", premium: "", signature: "" },
   },
 
   // Studios et créateurs qui nous confient leurs montages (section « Ils nous font confiance »).

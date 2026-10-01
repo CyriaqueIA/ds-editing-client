@@ -59,6 +59,12 @@
     .tier.active{border-color:rgba(220,230,240,.5);background:var(--amber-soft)}
     .tier.active b{color:#fff}.tier.active span{color:var(--accent2)}
     .tier-desc{margin:14px 0 18px;color:var(--taupe);font-size:14px;line-height:1.5;max-width:70ch}
+    .tier-desc em{font-style:normal;color:var(--accent2);font-weight:600;font-variant-numeric:tabular-nums}
+    .tier span{font-weight:600}
+    .tier.unique{cursor:default}.tier.unique span{color:var(--blue,#7FB0E0)}
+    .none-tier{grid-column:1/-1;border:1px solid var(--line);border-radius:18px;padding:34px 24px;text-align:center;background:linear-gradient(135deg,var(--surface),var(--surface-2))}
+    .none-tier b{display:block;font-size:18px;font-weight:600;margin-bottom:6px}.none-tier span{color:var(--taupe);font-size:14px}
+    .foot{margin:26px 0 0;padding-top:16px;border-top:1px solid var(--line);color:var(--taupe);font-size:12.5px}.foot:empty{display:none}
     .video-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
     .video-grid.vert{grid-template-columns:repeat(5,1fr)}
     @media (max-width:1100px){.video-grid.vert{grid-template-columns:repeat(4,1fr)}}
@@ -144,14 +150,15 @@
       <div class="tier-tabs" id="tiers"></div>
       <p class="tier-desc" id="tierDesc"></p>
       <div class="video-grid" id="grid"></div>
+      <p class="foot" id="foot"></p>
     </div>
   </div>
   <div class="gate" id="gate" hidden></div>
 </div>
 <div class="modal" id="modal"><div class="box"><div class="bar"><span id="modalTitle"></span><button type="button" id="modalClose">×</button></div><div id="modalMedia"></div></div></div>
 
-<script src="portfolio.js?v=9"></script>
-<script src="previews.js?v=9"></script>
+<script src="portfolio.js?v=10"></script>
+<script src="previews.js?v=10"></script>
 <script>
 (function () {
   // Clé du lien privé. Le lien à envoyer : portfolio.html?k=CLÉ
@@ -170,14 +177,15 @@
     });
   })();
   const $ = (s) => document.querySelector(s);
+  const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const params = new URLSearchParams(location.search);
   let lang = params.get("lang") || (() => { try { return localStorage.getItem("ds_lang"); } catch { return null; } })() || ((navigator.language || "en").slice(0, 2) === "fr" ? "fr" : "en");
   if (!["fr", "en"].includes(lang)) lang = "en";
   const T = {
-    fr: { sub: "Exemples de production", private: "Lien privé", contact: "Prendre contact", types: "Type de contenu", soon: "Bientôt", quote: "Sur devis", gate: "Cet espace est réservé aux studios avec qui nous échangeons. Demandez votre lien à contact@ds-editing.com.",
+    fr: { sub: "Exemples de production", private: "Lien privé", contact: "Prendre contact", types: "Type de contenu", soon: "Bientôt", quote: "Sur devis", unique: "Formule unique", uniqueDesc: "Une seule formule pour ce format.", perVideo: "par vidéo livrée, hors taxes", noneTier: "Aucun exemple dans cette formule", noneTierSub: "Le tarif reste affiché : {p} par vidéo livrée.", count1: "{n} exemple en {f}", countN: "{n} exemples en {f}", footPrice: "prix hors taxes, par vidéo livrée", soonPrice: "Tarif prévu pour ce format : {p}.", gate: "Cet espace est réservé aux studios avec qui nous échangeons. Demandez votre lien à contact@ds-editing.com.",
       soonKicker: "Bientôt dans le portfolio", soonTitle: "On le fait déjà.", soonText: "Nos exemples {type} arrivent. Pas besoin d'attendre : envoyez-nous un projet, le premier montage est offert.", soonBtn: "Premier montage offert",
       soonSubject: "Premier montage offert — {type}", soonBody: "Bonjour Cyriaque,\n\nJe souhaite tester DS Editing sur un projet {type}.\n\n" },
-    en: { sub: "Production examples", private: "Private link", contact: "Get in touch", types: "Content type", soon: "Coming soon", quote: "On quote", gate: "This space is reserved for studios we're talking with. Ask for your link at contact@ds-editing.com.",
+    en: { sub: "Production examples", private: "Private link", contact: "Get in touch", types: "Content type", soon: "Coming soon", quote: "On quote", unique: "Single package", uniqueDesc: "One package for this format.", perVideo: "per delivered video, excl. VAT", noneTier: "No example in this package yet", noneTierSub: "The price still applies: {p} per delivered video.", count1: "{n} example in {f}", countN: "{n} examples in {f}", footPrice: "prices excl. VAT, per delivered video", soonPrice: "Planned price for this format: {p}.", gate: "This space is reserved for studios we're talking with. Ask for your link at contact@ds-editing.com.",
       soonKicker: "Coming soon to the portfolio", soonTitle: "We already do it.", soonText: "Our {type} examples are on their way. No need to wait: send us a project, the first edit is on us.", soonBtn: "First edit on us",
       soonSubject: "First edit on us — {type}", soonBody: "Hi Cyriaque,\n\nI'd like to try DS Editing on a {type} project.\n\n" },
   };
@@ -200,29 +208,37 @@
     // Formules visibles pour ce type (portfolio.js → hiddenTiers) ; si la formule courante est masquée, on repart sur la première
     const tiers = P.tiers.filter((ti) => !((P.hiddenTiers || {})[type] || []).includes(ti.slug));
     if (!tiers.some((ti) => ti.slug === tier)) tier = tiers[0].slug;
-    // Type sans formules (aucune vidéo rangée en Standard/Premium/Signature) : pas d'onglets, toutes les vidéos
+    // Type à formule unique (portfolio.js → prices[type].unique) : un seul onglet « Formule unique », toutes ses vidéos ensemble.
+    // Type sans formules ni prix unique : pas d'onglets, toutes les vidéos.
     // Type fusionné (types[].also, ex. Ads / VSL) : tant qu'une de ses vidéos n'a pas de formule, tout s'affiche dans une seule grille
-    const ofType = (P.items || []).filter((it) => typeOf(it.cat) === ty && tiers.some((ti) => ti.slug === it.tier || !it.tier)), tiered = ofType.some((it) => it.tier) && !(ty.also && ofType.some((it) => !it.tier));
+    const unique = prices.unique || "";
+    const ofType = (P.items || []).filter((it) => typeOf(it.cat) === ty && (unique || tiers.some((ti) => ti.slug === it.tier || !it.tier)));
+    const tiered = !unique && ofType.some((it) => it.tier) && !(ty.also && ofType.some((it) => !it.tier));
     // Type sans aucun exemple et listé dans portfolio.js → soon : scène animée à la place de la grille (disparaît dès qu'une vidéo arrive du Drive)
     const soon = (P.soon || []).includes(type) && ofType.length === 0;
-    $("#tiers").hidden = $("#tierDesc").hidden = soon || (!tiered && ofType.length > 0);
-    $("#tiers").innerHTML = tiers.map((ti) => `<div class="tier ${ti.slug === tier ? "active" : ""}" data-tier="${ti.slug}"><b>${ti[lang][0]}</b><span>${prices[ti.slug] || t.quote}</span></div>`).join("");
+    const price = unique || prices[tier] || "";
+    $("#tiers").hidden = $("#tierDesc").hidden = !unique && !tiered && !soon && ofType.length > 0;
+    $("#tiers").innerHTML = unique
+      ? `<div class="tier active unique"><b>${t.unique}</b><span>${esc(unique)}</span></div>`
+      : tiers.map((ti) => `<div class="tier ${ti.slug === tier ? "active" : ""}" data-tier="${ti.slug}"><b>${ti[lang][0]}</b><span>${esc(prices[ti.slug] || t.quote)}</span></div>`).join("");
     $("#tiers").querySelectorAll("[data-tier]").forEach((el) => el.addEventListener("click", () => { tier = el.dataset.tier; render(); }));
-    $("#tierDesc").textContent = tiers.find((x) => x.slug === tier)[lang][1];
+    $("#tierDesc").innerHTML = `${unique ? t.uniqueDesc : esc(tiers.find((x) => x.slug === tier)[lang][1])}${price ? ` <em>${esc(price)}</em> ${t.perVideo}.` : ""}`;
     const items = ofType.filter((it) => !tiered || it.tier === tier)
       .sort((a, b) => (a.lang && a.lang !== lang ? 1 : 0) - (b.lang && b.lang !== lang ? 1 : 0) || (a.vertical ? 1 : 0) - (b.vertical ? 1 : 0)); // langue de l'interface d'abord, puis 16:9 avant 9:16
     const grid = $("#grid");
-    if (soon) { grid.className = "soon-host"; grid.innerHTML = soonScene(ty); return; }
+    $("#foot").textContent = "";
+    if (soon) { grid.className = "soon-host"; grid.innerHTML = soonScene(ty, price); return; }
     const allVert = items.length ? items.every((it) => it.vertical ?? ty.ratio === "9/16") : ty.ratio === "9/16"; grid.className = "video-grid" + (allVert ? " vert" : "");
     grid.innerHTML = items.length
       ? items.map((it, i) => `<div class="video-cell${it.vertical ? " v" : ""}" data-i="${i}"><img src="${window.dsThumb(it)}" alt=""/><div class="video-overlay"><div class="play-btn">▶</div></div><div class="cap">${it.title || ""}<span>${studio(it)}</span></div></div>`).join("")
-      : [0, 1, 2].map(() => `<div class="video-cell soon">${t.soon}</div>`).join("");
+      : `<div class="none-tier"><b>${t.noneTier}</b>${price ? `<span>${t.noneTierSub.replace("{p}", esc(price))}</span>` : ""}</div>`;
+    if (items.length) { const f = unique ? t.unique.toLowerCase() : tiers.find((x) => x.slug === tier)[lang][0].toLowerCase(); $("#foot").textContent = `${(items.length === 1 ? t.count1 : t.countN).replace("{n}", items.length).replace("{f}", f)}${price ? ` · ${t.footPrice}` : ""}`; }
     grid.querySelectorAll(".video-cell[data-i]").forEach((cell) => cell.addEventListener("click", () => play(cell, items[+cell.dataset.i])));
   }
   // Scène « bientôt » : orbe ● du logo (yeux, rebond, clin d'œil) + accessoire selon le type, texte et bouton mail
-  function soonScene(ty) {
+  function soonScene(ty, price) {
     const t = T[lang], name = ty[lang][0], kind = ty.slug === "ia" ? "ia" : "yt";
-    const fill = (s) => s.replace(/\{type\}/g, name);
+    const fill = (s) => s.replace(/\{type\}/g, name) + (price && s === t.soonText ? ` ${t.soonPrice.replace("{p}", esc(price))}` : "");
     const href = `mailto:${P.contactEmail}?subject=${encodeURIComponent(fill(t.soonSubject))}&body=${encodeURIComponent(fill(t.soonBody))}`;
     const extra = kind === "yt"
       ? '<span class="badge"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M8 5v14l11-7z" fill="#0A0B0D"/></svg></span>'
