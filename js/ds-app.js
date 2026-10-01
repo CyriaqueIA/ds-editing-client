@@ -26,12 +26,14 @@ document.querySelectorAll('.pscreen video').forEach(function(v){io3.observe(v)})
 /* faq */
 document.querySelectorAll('.fq button').forEach(function(b){b.onclick=function(){var f=b.parentNode,a=f.querySelector('.a'),o=f.classList.toggle('open');a.style.maxHeight=o?a.scrollHeight+'px':'0'}});
 /* clocks */
-function clocks(){document.querySelectorAll('[data-tz]').forEach(function(c){var d=new Date(),f=new Intl.DateTimeFormat('en-GB',{hour:'2-digit',minute:'2-digit',timeZone:c.dataset.tz,hour12:false}).format(d);c.querySelector('.tm2').textContent=f;var h=parseInt(f,10),st=c.querySelector('.st');if(!c.classList.contains('hq'))st.textContent=(h>=22||h<7)?(LANG==='fr'?'Vous dormez':'You\u2019re asleep'):(LANG==='fr'?'Vous enregistrez':'You\u2019re recording');})}
-/* lang */
-var LANG='en';
+function clocks(){document.querySelectorAll('[data-tz]').forEach(function(c){var d=new Date(),f=new Intl.DateTimeFormat('en-GB',{hour:'2-digit',minute:'2-digit',timeZone:c.dataset.tz,hour12:false}).format(d);c.querySelector('.tm2').textContent=f;var h=parseInt(f,10),st=c.querySelector('.st');if(!c.classList.contains('hq'))st.textContent=(h>=22||h<7)?CLK[LANG][0]:CLK[LANG][1];})}
+/* lang : en (texte de la balise), fr (data-fr), nl (data-nl), da (data-da) ; à défaut, l'anglais */
+var LANGS=['en','fr','nl','da'],LANG='en';
+var CLK={en:['You\u2019re asleep','You\u2019re recording'],fr:['Vous dormez','Vous enregistrez'],nl:['Jij slaapt','Jij neemt op'],da:['Du sover','Du optager']};
 document.querySelectorAll('[data-fr]').forEach(function(el){el.dataset.en=el.innerHTML});
-function setLang(l){LANG=l;document.documentElement.lang=l;document.querySelectorAll('[data-fr]').forEach(function(el){el.innerHTML=l==='fr'?el.dataset.fr:el.dataset.en});document.querySelectorAll('.lang button').forEach(function(b){b.classList.toggle('on',b.dataset.l===l)});clocks();try{localStorage.setItem('ds_lang',l)}catch(e){}}
+function setLang(l){if(LANGS.indexOf(l)<0)l='en';LANG=l;document.documentElement.lang=l;document.querySelectorAll('[data-fr]').forEach(function(el){el.innerHTML=el.dataset[l]||el.dataset.en});document.querySelectorAll('.lang button').forEach(function(b){b.classList.toggle('on',b.dataset.l===l)});clocks();try{localStorage.setItem('ds_lang',l)}catch(e){}}
 document.querySelectorAll('.lang button').forEach(function(b){b.onclick=function(){setLang(b.dataset.l)}});
+window.dsSetLang=setLang;
 try{var sl=localStorage.getItem('ds_lang');if(sl)setLang(sl)}catch(e){}
 clocks();setInterval(clocks,20000);
 /* réglages de la charte, figés dans window.__DS_TWEAKS__ (index.html) */

@@ -13,7 +13,7 @@
    ============================================================ */
 (function () {
   'use strict';
-  var lang = function () { return document.documentElement.lang === 'fr' ? 'fr' : 'en'; };
+  var lang = function () { var l = document.documentElement.lang; return T[l] ? l : 'en'; };
   var pf = function () { return window.DS_PORTFOLIO || {}; };
   var reduced = function () { return window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches; };
   var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
@@ -54,6 +54,8 @@
       bookNow: 'Book a call now', askPf: 'Request the private portfolio', image: 'Visual', video: 'Video',
     }
   };
+  T.nl = {"close": "Sluiten", "work": "Onze edits", "reelKick": "Showreel", "all": "Alles", "examples": "Voorbeelden", "exSoon": "Voorbeelden volgen binnenkort", "exSoonSub": "De edits voor deze categorie zijn onderweg. Vraag het privéportfolio aan om ze nu al te bekijken.", "deliver": "Wat je krijgt", "book": "Plan een call", "servicePage": "Bekijk de servicepagina", "trust": "Zij vertrouwen ons", "forStudio": "Gemonteerd voor", "vidSoon": "Video’s volgen binnenkort", "vidSoonSub": "De edits die we voor {studio} hebben gemaakt zijn onderweg. Vraag het privéportfolio aan om ze nu al te bekijken.", "pfKick": "Privéportfolio", "pfTitle": "Ontvang het <span class=\"ac\">privéportfolio.</span>", "pfLead": "Onze beste edits, gesorteerd per categorie en per pack, exclusief voor studio’s en agencies. We mailen het je binnen 24 uur.", "name": "Naam", "email": "E-mail", "studio": "Studio / bedrijf", "phName": "Jan Jansen", "phEmail": "jij@email.nl", "phStudio": "Jouw studio", "send": "Ontvang het portfolio", "sending": "Versturen…", "note": "Geen nieuwsbrief, alleen het portfolio.", "errFields": "Vul je naam en e-mail in.", "errEmail": "Dit e-mailadres lijkt niet geldig.", "fail": "Er ging iets mis. Probeer het opnieuw.", "sentTitle": "Het komt eraan <span class=\"ac\">binnen 24 uur.</span>", "sentLead": "Bedankt {name}, het privéportfolio is onderweg naar {email}. Plan intussen je kennismakingscall: 20 minuten, en je eerste edit is gratis.", "bookNow": "Plan nu een call", "askPf": "Vraag het privéportfolio aan", "image": "Visual", "video": "Video"};
+  T.da = {"close": "Luk", "work": "Vores klip", "reelKick": "Showreel", "all": "Alle", "examples": "Eksempler", "exSoon": "Eksempler på vej", "exSoonSub": "Klip i denne kategori er på vej. Anmod om den private portfolio for at se dem med det samme.", "deliver": "Det får du", "book": "Book et opkald", "servicePage": "Se servicesiden", "trust": "De stoler på os", "forStudio": "Klippet for", "vidSoon": "Videoer på vej", "vidSoonSub": "Klippene, vi har lavet for {studio}, er på vej. Anmod om den private portfolio for at se dem med det samme.", "pfKick": "Privat portfolio", "pfTitle": "Få den <span class=\"ac\">private portfolio.</span>", "pfLead": "Vores bedste klip, sorteret efter kategori og pakke, forbeholdt studier og bureauer. Vi sender den til dig på e-mail inden for 24 timer.", "name": "Navn", "email": "E-mail", "studio": "Studie / virksomhed", "phName": "Mads Jensen", "phEmail": "dig@email.dk", "phStudio": "Dit studie", "send": "Få portfolioen", "sending": "Sender…", "note": "Intet nyhedsbrev, kun portfolioen.", "errFields": "Skriv venligst dit navn og din e-mail.", "errEmail": "Den e-mail ser ikke gyldig ud.", "fail": "Noget gik galt. Prøv igen.", "sentTitle": "Den er på vej <span class=\"ac\">inden for 24 timer.</span>", "sentLead": "Tak, {name}, den private portfolio er på vej til {email}. Book i mellemtiden dit introopkald: 20 minutter, og dit første klip er gratis.", "bookNow": "Book et opkald nu", "askPf": "Anmod om den private portfolio", "image": "Visuel", "video": "Video"};
   var t = function () { return T[lang()]; };
   var PLAY = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l15 8-15 8z"></path></svg>';
   var EYE = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
@@ -103,8 +105,8 @@
     });
     return out;
   }
-  var tierName = function (slug) { var tr = find(pf().tiers, function (x) { return x.slug === slug; }); return tr ? tr[lang()][0] : ''; };
-  var typeName = function (slug) { var ty = find(pf().types, function (x) { return x.slug === slug || (x.also || []).indexOf(slug) >= 0; }); return ty ? ty[lang()][0] : ''; };
+  var tierName = function (slug) { var tr = find(pf().tiers, function (x) { return x.slug === slug; }); return tr ? (tr[lang()] || tr.en)[0] : ''; };
+  var typeName = function (slug) { var ty = find(pf().types, function (x) { return x.slug === slug || (x.also || []).indexOf(slug) >= 0; }); return ty ? (ty[lang()] || ty.en)[0] : ''; };
   /* tri : langue courante d'abord, puis 16:9 avant 9:16 (deux grilles), ordre source sinon */
   function sortItems(items) {
     var l = lang();
@@ -229,7 +231,7 @@
     var tiers = tiersOf(items);
     if (tiers.length < 2) { if (state.tier !== 'all') state.tier = 'all'; return ''; }
     if (state.tier !== 'all' && !find(tiers, function (x) { return x.slug === state.tier; })) state.tier = 'all';
-    var l = lang(), all = [{ slug: 'all', name: t().all }].concat(tiers.map(function (x) { return { slug: x.slug, name: x[l][0] }; }));
+    var l = lang(), all = [{ slug: 'all', name: t().all }].concat(tiers.map(function (x) { return { slug: x.slug, name: (x[l] || x.en)[0] }; }));
     return '<div class="ds-tabs" role="tablist">' + all.map(function (x) { return '<button type="button" role="tab" class="ds-tab' + (state.tier === x.slug ? ' on' : '') + '" aria-selected="' + (state.tier === x.slug) + '" data-tier="' + x.slug + '">' + esc(x.name) + '</button>'; }).join('') + '</div>';
   }
   function cellHtml(it) {
@@ -270,10 +272,10 @@
     /* service : kicker + titre + lead + « ce que vous recevez » + onglets + exemples */
     service: function (d) {
       var l = lang(), slug = d.cat === 'trailers' ? 'autres' : d.cat, cats = d.cat === 'trailers' ? ['trailers', 'ia', 'miniatures'] : d.cat === 'vsl' ? ['vsl', 'ads'] : [d.cat]; /* Ads et VSL : un seul service */
-      var s = find(window.DS_SERVICES, function (x) { return x.slug === slug; }), tx = s ? s[l] : null;
+      var s = find(window.DS_SERVICES, function (x) { return x.slug === slug; }), tx = s ? (s[l] || s.en) : null;
       var items = sortItems(allItems().filter(function (it) { return cats.indexOf(it.cat) >= 0; }));
       state.items = items;
-      var ui = (window.DS_SERVICES_UI || {})[l] || {};
+      var ui = (window.DS_SERVICES_UI || {})[l] || (window.DS_SERVICES_UI || {}).en || {};
       return {
         kick: tx ? tx.kicker : (d.label || ''),
         title: tx ? esc(tx.title) + '<span class="ac">' + esc(tx.accent) + '</span>' : esc(d.label || ''),

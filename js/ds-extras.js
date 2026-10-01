@@ -7,12 +7,12 @@
    ============================================================ */
 (function () {
   'use strict';
-  var lang = function () { return document.documentElement.lang === 'fr' ? 'fr' : 'en'; };
+  var lang = function () { var l = document.documentElement.lang; return ['en', 'fr', 'nl', 'da'].indexOf(l) >= 0 ? l : 'en'; };
 
   /* 1. placeholders bilingues */
   function placeholders() {
     var l = lang();
-    document.querySelectorAll('[data-ph-en]').forEach(function (el) { el.placeholder = l === 'fr' ? el.dataset.phFr : el.dataset.phEn; });
+    document.querySelectorAll('[data-ph-en]').forEach(function (el) { el.placeholder = el.dataset['ph' + l.charAt(0).toUpperCase() + l.slice(1)] || el.dataset.phEn; });
   }
   new MutationObserver(placeholders)
     .observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
@@ -32,13 +32,15 @@
     fr: { err: 'Merci de remplir nom, email et message.', sending: 'Envoi…', ok: 'Envoyé ! Réponse sous 24h.', fail: 'Une erreur est survenue. Réessayez.' },
     en: { err: 'Please fill name, email and message.', sending: 'Sending…', ok: 'Sent! We’ll reply within 24 hours.', fail: 'Something went wrong. Please try again.' }
   };
+  T.nl = {"err": "Vul je naam, e-mail en bericht in.", "sending": "Versturen…", "ok": "Verstuurd! We reageren binnen 24 uur.", "fail": "Er ging iets mis. Probeer het opnieuw."};
+  T.da = {"err": "Udfyld venligst navn, e-mail og besked.", "sending": "Sender…", "ok": "Sendt! Vi svarer inden for 24 timer.", "fail": "Noget gik galt. Prøv igen."};
   document.addEventListener('submit', function (ev) {
     var form = ev.target.closest('#contact-form'); if (!form) return;
     ev.preventDefault();
     var e = T[lang()], data = Object.fromEntries(new FormData(form).entries());
     if (!data.name.trim() || !data.email.trim() || !data.message.trim()) { toast(e.err, 'error'); return; }
     var btn = form.querySelector('button[type="submit"]'), label = btn.querySelector('.js-submit-label');
-    var restore = function () { btn.disabled = false; label.innerHTML = lang() === 'fr' ? label.dataset.fr : (label.dataset.en || label.dataset.fr); };
+    var restore = function () { btn.disabled = false; label.innerHTML = label.dataset[lang()] || label.dataset.en || label.dataset.fr; };
     btn.disabled = true; label.textContent = e.sending;
     fetch(ENDPOINT, {
       method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' },

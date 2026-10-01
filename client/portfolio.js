@@ -98,3 +98,9 @@ window.dsEmbed = function (url) {
   if (vm) return `https://player.vimeo.com/video/${vm[1]}?autoplay=1`;
   return null;
 };
+
+// Traductions NL / DA (accueil). Le français et l'anglais restent au-dessus.
+(function () {
+  var X = {"nl": {"types": {"podcast-interview": ["Podcast & Interview", "Multicam · Talk"], "vsl": ["Ads / VSL", "Salesvideo’s · Meta · TikTok · YouTube"], "reels-shorts": ["Reels & Shorts", "TikTok · Instagram · Shorts"], "youtube-docu": ["YouTube & Docu", "Long-form · Brand film"], "ia": ["AI-video’s", "Gegenereerd · Gemonteerd"], "miniatures": ["Thumbnails", "Covervisuals"], "trailers": ["Trailers", "60–90 s voor socials"]}, "tiers": {"standard": ["Standard", "Strakke, goed getimede montage, eenvoudige graphics, gemixt geluid."], "premium": ["Premium", "Standard + een pakkende cold open van 20–30 s, motion titles, sound design."], "signature": ["Signature", "Premium + een intro in “Diary of a CEO”-stijl, premium B-roll, prioritaire levering."]}}, "da": {"types": {"podcast-interview": ["Podcast & Interview", "Multicam · Talk"], "vsl": ["Ads / VSL", "Salgsvideoer · Meta · TikTok · YouTube"], "reels-shorts": ["Reels & Shorts", "TikTok · Instagram · Shorts"], "youtube-docu": ["YouTube & Docu", "Long-form · Brandfilm"], "ia": ["AI-videoer", "Genereret · Klippet"], "miniatures": ["Thumbnails", "Covervisuals"], "trailers": ["Trailere", "60–90 s til sociale medier"]}, "tiers": {"standard": ["Standard", "Rent klip med tempo, enkel grafik, mixet lyd."], "premium": ["Premium", "Standard + en slagkraftig cold open på 20–30 s, animerede titler, sounddesign."], "signature": ["Signature", "Premium + en intro i “Diary of a CEO”-stil, premium b-roll, prioriteret levering."]}}}, P = window.DS_PORTFOLIO;
+  Object.keys(X).forEach(function (l) { ["types", "tiers"].forEach(function (k) { (P[k] || []).forEach(function (o) { if (X[l][k][o.slug]) o[l] = X[l][k][o.slug]; }); }); });
+})();
