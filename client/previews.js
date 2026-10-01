@@ -65,18 +65,6 @@ window.DS_PREVIEWS = {
           "poster": "../videos/apercus/podcast-premium-en-the-move-miami-hannah-podcast-extrait-po-1f_J_-.jpg",
           "title": "The Move Miami · Hannah",
           "vertical": false
-        },
-        {
-          "src": "../ds-media/pod-daniel.mp4",
-          "poster": "../ds-media/pod-daniel.jpg",
-          "title": "Intro · Daniel",
-          "vertical": false
-        },
-        {
-          "src": "../ds-media/pod-pau.mp4",
-          "poster": "../ds-media/pod-pau.jpg",
-          "title": "Intro · Pau",
-          "vertical": false
         }
       ]
     }
@@ -586,7 +574,7 @@ window.DS_PREVIEWS = {
     {
       "id": "1L98dZWhSbc_1a777VxV44_a4e28Y2qm7",
       "cat": "podcast-interview",
-      "tier": "premium",
+      "tier": "signature",
       "lang": "en",
       "title": "Intro · Daniel",
       "path": "ds-media/pod-daniel.mp4",
@@ -596,7 +584,7 @@ window.DS_PREVIEWS = {
     {
       "id": "1x2oJ8Nz06jL2XJvL9pRllIBxra_mwHiA",
       "cat": "podcast-interview",
-      "tier": "premium",
+      "tier": "signature",
       "lang": "en",
       "title": "Intro · Pau",
       "path": "ds-media/pod-pau.mp4",
