@@ -367,7 +367,6 @@
 
 <div class="modal" id="modal"><div class="box"><div class="bar"><span id="modalTitle"></span><button type="button" id="modalClose">×</button></div><iframe id="modalFrame" allow="autoplay; fullscreen" allowfullscreen></iframe><div class="plist" id="plist"></div></div></div>
 
-<script src="forms.js?v=4"></script>
 <script src="previews.js?v=4"></script>
 <script>
 /* =========================================================================
@@ -487,9 +486,7 @@ const REELS = ["reel_basique", "reel_signature"];
 /* ---------------- client & langue ---------------- */
 const params = new URLSearchParams(location.search);
 const slug = (params.get("client") || "").toLowerCase();
-const FORMS = window.DS_FORMS || {};
-const client = FORMS[slug]; // ancien circuit Google Form : ne sert plus qu'au repli si la base est injoignable
-let lang = params.get("lang") || (client ? client.lang : "fr");
+let lang = params.get("lang") || "fr";
 if (!I18N[lang]) lang = "fr";
 const $ = (s) => document.querySelector(s);
 const t = (k) => (I18N[lang][k] ?? k);
@@ -500,7 +497,7 @@ const accessKey = (params.get("k") || (() => { try { return localStorage.getItem
 let studio = null;      // { slug, name, lang } retrouvé depuis la clé (RPC client_slug)
 let langTouched = false; // la langue choisie à la main l'emporte sur celle du studio
 let orderToken = "";    // numéro de suivi, une fois la commande enregistrée
-const clientLabel = () => (studio && studio.name) || (client && client.client) || (slug ? slug.split("-").filter(Boolean).map(cap).join(" ") : "Demo");
+const clientLabel = () => (studio && studio.name) || (slug ? slug.split("-").filter(Boolean).map(cap).join(" ") : "Demo");
 const KEY = "ds-depot-" + (slug || "demo");
 let step = 0;
 const draft = Object.assign({ qty: {}, episodes: 1 }, load());
@@ -810,25 +807,11 @@ async function submit() {
     if (!res || !res.token) throw Object.assign(new Error("no_token"), { code: "send" });
     done(String(res.token));
   } catch (e) {
-    // Pas de repli vers les anciens formulaires Google (supprimés du circuit le 29/09) : le brouillon reste enregistré, le client réessaie.
+    // Pas de repli : le brouillon reste enregistré sur l'appareil, le client réessaie.
     if (e.offline) return fail(esc(t("err").send));
     if (e.code === "bad_key") return fail(keyMsg("bad_key"));
     fail(esc(["bad_email", "no_project", "no_rushes", "terms", "rate_limit"].includes(e.code) ? t("err")[e.code] : t("err").send));
   }
-}
-/* repli : même circuit que le formulaire Google, sans serveur (seulement si la base est injoignable et que le studio a un formulaire) */
-async function sendForm() {
-  const v = values(); const q = draft.qty; const fd = new FormData();
-  const put = (key, val) => { const id = client.entries[key]; if (id && val !== undefined && val !== "") fd.append("entry." + id, val); };
-  put("projet", v.projet);
-  put("podcast", draft.produit === "podcast" ? "1" : ""); put("vsl", draft.produit === "vsl" ? "1" : "");
-  put("formule", draft.formule ? cap(draft.formule) : "");
-  put("reels", q.reel_basique ? String(q.reel_basique) : ""); put("reels_signature", q.reel_signature ? String(q.reel_signature) : "");
-  put("miniature", q.miniature ? String(q.miniature) : ""); put("trailer", q.trailer ? String(q.trailer) : "");
-  put("autre_demande", autreDemande(v)); put("description", v.description); put("rushes", v.rushes); put("logos", v.logos); put("references", v.references); put("palette", v.palette); put("contact", v.contact); put("email", v.email); put("autres", v.autres);
-  if ($("#terms").checked && client.options && client.options.terms) put("terms", client.options.terms);
-  if (v.deadline && client.entries.deadline) { const [y, m, d] = v.deadline.split("-"); fd.append(`entry.${client.entries.deadline}_year`, y); fd.append(`entry.${client.entries.deadline}_month`, String(+m)); fd.append(`entry.${client.entries.deadline}_day`, String(+d)); }
-  await fetch(client.action, { method: "POST", mode: "no-cors", body: fd });
 }
 $("#again").addEventListener("click", () => location.reload());
 const spaceKey = params.get("k"); if (spaceKey && slug) { const a = $("#spaceLink"); a.href = `espace.html?client=${encodeURIComponent(slug)}&k=${encodeURIComponent(spaceKey)}&lang=${lang}`; a.style.display = "inline-block"; }
@@ -842,7 +825,7 @@ else rpc("client_slug", { p_key: accessKey }).then((d) => {
   if (!d || !d.slug || (slug && d.slug !== slug)) { $("#msg").innerHTML = keyMsg("bad_key"); return; }
   studio = d;
   if (!params.get("lang") && !langTouched && I18N[d.lang] && d.lang !== lang) { lang = d.lang; applyText(); } else $("#clientName").textContent = clientLabel();
-}).catch(() => {}); // base injoignable : l'envoi tranchera (repli éventuel)
+}).catch(() => {}); // base injoignable : l'envoi tranchera
 </script>
 </body>
 </html>

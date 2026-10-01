@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@300..900&family=Sora:wght@300..700&display=swap');
 body.chrome{--accent:#E9F1FA;--accent-d:#AAB6C3;--on-accent:#05070A;--bg:#030406;--bg2:rgba(255,255,255,.03);--bg3:#0D1116;--line:rgba(200,225,255,.12);--mu:#8C98A6;--holo:#7CF7FF;--chr:linear-gradient(180deg,#FFFFFF 0%,#E6EDF5 26%,#8793A0 47%,#1B2027 50%,#56616D 56%,#C9D3DE 74%,#FFFFFF 88%,#A7B2BF 100%);--sheen:linear-gradient(105deg,transparent 38%,rgba(255,255,255,.95) 48%,rgba(160,240,255,.6) 52%,transparent 62%);--iri:linear-gradient(90deg,#7CF7FF,#B69CFF 50%,#FF9CE6);font-family:'Sora',sans-serif;background:radial-gradient(900px 500px at 80% 0%,rgba(124,247,255,.10),transparent 60%),radial-gradient(800px 600px at 0% 60%,rgba(182,156,255,.10),transparent 60%),radial-gradient(700px 500px at 100% 100%,rgba(255,156,230,.07),transparent 60%),#030406;background-attachment:fixed}
 body.chrome::before{content:"";position:fixed;left:-50%;right:-50%;bottom:-10vh;height:55vh;z-index:0;pointer-events:none;background:repeating-linear-gradient(90deg,rgba(124,247,255,.10) 0 1px,transparent 1px 80px),repeating-linear-gradient(0deg,rgba(124,247,255,.10) 0 1px,transparent 1px 80px);transform:perspective(500px) rotateX(65deg);transform-origin:bottom;-webkit-mask:linear-gradient(0deg,#000,transparent 85%);mask:linear-gradient(0deg,#000,transparent 85%)}
-body.chrome>*:not(.nav):not(.sticky):not(.mm):not(#tweaks){position:relative;z-index:1}
+body.chrome>*:not(.nav):not(.sticky):not(.mm){position:relative;z-index:1}
 body.chrome .nav{z-index:50}body.chrome .sticky{z-index:40}body.chrome .mm{z-index:60}
 body.chrome .disp,body.chrome .svc h4,body.chrome .clip h4,body.chrome .pk h4,body.chrome .tm .nm,body.chrome .stat .num,body.chrome .ep .t,body.chrome .offer-strip span,body.chrome .mm a.ml,body.chrome .step,body.chrome .tm.crew b,body.chrome .float-stat b,body.chrome .chn b,body.chrome .lv{font-family:'Unbounded',sans-serif;font-stretch:100%;text-transform:uppercase;letter-spacing:-.02em;font-weight:800}
 body.chrome .disp,body.chrome .step,body.chrome .stat .num,body.chrome .pk h4,body.chrome .tm.crew b{background:var(--sheen),var(--chr);background-size:250% 100%,100% 100%;background-position:120% 0,0 0;-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 1px 0 rgba(255,255,255,.35)) drop-shadow(0 8px 24px rgba(124,247,255,.18));animation:sheen 6s cubic-bezier(.6,0,.2,1) infinite}
@@ -55,5 +55,4 @@ body.chrome .stars i{background:#00B67A}
 body.chrome a:hover{color:var(--holo)}
 body.chrome .sticky .l b,body.chrome .meta a.match{color:var(--holo)}
 body.chrome .fq,body.chrome .foot{border-color:var(--line)}
-body.chrome #tweaks{border-radius:18px}
 @media(prefers-reduced-motion:reduce){body.chrome *{animation:none!important}}

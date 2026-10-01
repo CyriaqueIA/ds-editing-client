@@ -209,6 +209,7 @@
     <a class="btn" id="formBtn" href="../prod/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14 21 3"/></svg><span data-t="form"></span></a>
     <button class="btn ic" id="refreshBtn" type="button" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg></button>
     <button class="btn" id="logout" type="button" data-t="logout" hidden></button>
+    <button class="btn" id="loginOpen" type="button" data-t="adminLogin" hidden></button>
   </div>
 </div></header>
 
@@ -220,6 +221,7 @@
     <input class="in" id="password" type="password" placeholder="mot de passe" autocomplete="current-password"/>
     <button class="btn primary" id="loginBtn" type="button" data-t="loginBtn"></button>
     <div class="msg" id="loginMsg"></div>
+    <button class="btn" id="gateBack" type="button" data-t="backStats" style="margin-top:10px"></button>
   </div>
 
   <div id="app" hidden>
@@ -247,30 +249,30 @@ const PERIODS = ["today", "week", "month", "lastMonth", "d30"];
 const CSV_KEYS = ["reel_en", "reel_fr", "intro_fr", "intro_en", "podcast_fr", "podcast_en"];
 
 const T = {
-  fr: { kicker: "Direction", title: "Production", form: "Formulaire", refresh: "Rafraîchir", logout: "Déconnexion", login: "Espace équipe", loginSub: "Connecte-toi avec ton e-mail DS Editing.", loginBtn: "Entrer", pwd: "mot de passe", denied: "Accès réservé à l'équipe DS Editing.", loadErr: "Chargement impossible :",
+  fr: { kicker: "Direction", title: "Production", form: "Formulaire", refresh: "Rafraîchir", logout: "Déconnexion", login: "Espace équipe", loginSub: "Uniquement pour modifier le barème ou l'équipe. Les statistiques se consultent sans connexion.", loginBtn: "Entrer", pwd: "mot de passe", adminLogin: "Connexion admin", backStats: "Retour aux statistiques", denied: "Accès réservé à l'équipe DS Editing.", loadErr: "Chargement impossible :",
     tabs: { overview: "Vue d'ensemble", editors: "Monteurs", reports: "Déclarations", settings: "Paramètres" },
     periods: { today: "Aujourd'hui", week: "Cette semaine", month: "Ce mois", lastMonth: "Mois dernier", d30: "30 jours" }, csv: "CSV / Excel",
     stats: { points: "Points produits", perDecl: (x) => `${x} pts / déclaration`, elements: "Éléments livrés", elementsSub: "reels, intros, podcasts", avg: "Moyenne / jour", avgSub: "sur les jours déclarés", decl: "Déclarations", declSub: "journées remplies", active: "Monteurs actifs", activeSub: "sur la période" },
     charts: { evo: "Évolution", evoT: "Points produits par jour", points: "Points", elements: "Éléments", avg7: "Moyenne 7 j", dist: "Répartition", distT: "Points par catégorie", cmp: "Comparaison", cmpT: "Points par monteur et catégorie", detail: "Détail", detailT: "Points par jour et par monteur", day: "Jour", total: "Total", pts: "pts", empty: "Aucune déclaration sur la période.", noChart: "Graphiques indisponibles (Chart.js n'a pas pu être chargé)." },
     ed: { days: (n) => `${n} jour${n > 1 ? "s" : ""}`, perDay: "pts/j", points: "Points", elements: "Éléments", vs: "vs leader", groups: { reel: "Reels", intro: "Intros", podcast: "Podcasts" }, last: "Dernière saisie" },
     rep: { details: "Détails", comment: "Commentaire", del: "Supprimer", confirm: (n, d) => `Supprimer la déclaration de ${n} du ${d} ?`, progress: "En cours", none: "Aucune déclaration sur la période." },
-    set: { team: "Équipe", editors: "Monteurs", namePh: "Prénom Nom", photoPh: "URL photo (optionnel)", add: "Ajouter", on: "Actif", off: "Inactif", photo: "Photo", saved: "enregistré", scale: "Barème", scaleT: "Points par unité", note: "Les scores déjà enregistrés conservent le barème en vigueur au moment de la déclaration.", save: "Enregistrer le barème", ro: "Lecture seule : les modifications sont réservées à l'administration.", dup: "Ce nom existe déjà.", link: "Lien", linkT: "Copier le lien personnel du rapport du jour", copied: "lien copié", renew: "Remplacer le lien de {n} ? L'ancien ne fonctionnera plus.", renewT: "Nouveau lien (l'ancien est coupé)", bad: "Valeur attendue : un nombre positif." } },
-  en: { kicker: "Management", title: "Production", form: "Form", refresh: "Refresh", logout: "Log out", login: "Team space", loginSub: "Sign in with your DS Editing email.", loginBtn: "Enter", pwd: "password", denied: "Access restricted to the DS Editing team.", loadErr: "Could not load:",
+    set: { team: "Équipe", editors: "Monteurs", namePh: "Prénom Nom", photoPh: "URL photo (optionnel)", add: "Ajouter", on: "Actif", off: "Inactif", photo: "Photo", saved: "enregistré", scale: "Barème", scaleT: "Points par unité", note: "Les scores déjà enregistrés conservent le barème en vigueur au moment de la déclaration.", save: "Enregistrer le barème", ro: "Lecture seule : « Connexion admin » en haut à droite pour modifier.", dup: "Ce nom existe déjà.", link: "Lien", linkT: "Copier le lien personnel du rapport du jour", copied: "lien copié", renew: "Remplacer le lien de {n} ? L'ancien ne fonctionnera plus.", renewT: "Nouveau lien (l'ancien est coupé)", bad: "Valeur attendue : un nombre positif." } },
+  en: { kicker: "Management", title: "Production", form: "Form", refresh: "Refresh", logout: "Log out", login: "Team space", loginSub: "Only needed to change the point scale or the team. Stats are open without signing in.", loginBtn: "Enter", pwd: "password", adminLogin: "Admin sign-in", backStats: "Back to the stats", denied: "Access restricted to the DS Editing team.", loadErr: "Could not load:",
     tabs: { overview: "Overview", editors: "Editors", reports: "Reports", settings: "Settings" },
     periods: { today: "Today", week: "This week", month: "This month", lastMonth: "Last month", d30: "30 days" }, csv: "CSV / Excel",
     stats: { points: "Points produced", perDecl: (x) => `${x} pts / report`, elements: "Delivered items", elementsSub: "reels, intros, podcasts", avg: "Average / day", avgSub: "over reported days", decl: "Reports", declSub: "days filled in", active: "Active editors", activeSub: "over the period" },
     charts: { evo: "Trend", evoT: "Points produced per day", points: "Points", elements: "Items", avg7: "7-day average", dist: "Breakdown", distT: "Points by category", cmp: "Comparison", cmpT: "Points by editor and category", detail: "Detail", detailT: "Points per day and per editor", day: "Day", total: "Total", pts: "pts", empty: "No report over the period.", noChart: "Charts unavailable (Chart.js could not be loaded)." },
     ed: { days: (n) => `${n} day${n > 1 ? "s" : ""}`, perDay: "pts/day", points: "Points", elements: "Items", vs: "vs leader", groups: { reel: "Reels", intro: "Intros", podcast: "Podcasts" }, last: "Last entry" },
     rep: { details: "Details", comment: "Comment", del: "Delete", confirm: (n, d) => `Delete ${n}'s report of ${d}?`, progress: "In progress", none: "No report over the period." },
-    set: { team: "Team", editors: "Editors", namePh: "First name Last name", photoPh: "Photo URL (optional)", add: "Add", on: "Active", off: "Inactive", photo: "Photo", saved: "saved", scale: "Point scale", scaleT: "Points per unit", note: "Scores already recorded keep the scale that applied when they were reported.", save: "Save the scale", ro: "Read only: changes are restricted to administrators.", dup: "This name already exists.", link: "Link", linkT: "Copy the personal daily-report link", copied: "link copied", renew: "Replace {n}'s link? The old one will stop working.", renewT: "New link (the old one is cut)", bad: "Expected value: a positive number." } },
-  id: { kicker: "Manajemen", title: "Produksi", form: "Formulir", refresh: "Muat ulang", logout: "Keluar", login: "Ruang tim", loginSub: "Masuk dengan e-mail DS Editing kamu.", loginBtn: "Masuk", pwd: "kata sandi", denied: "Akses khusus tim DS Editing.", loadErr: "Gagal memuat:",
+    set: { team: "Team", editors: "Editors", namePh: "First name Last name", photoPh: "Photo URL (optional)", add: "Add", on: "Active", off: "Inactive", photo: "Photo", saved: "saved", scale: "Point scale", scaleT: "Points per unit", note: "Scores already recorded keep the scale that applied when they were reported.", save: "Save the scale", ro: "Read only: use « Admin sign-in » at the top right to make changes.", dup: "This name already exists.", link: "Link", linkT: "Copy the personal daily-report link", copied: "link copied", renew: "Replace {n}'s link? The old one will stop working.", renewT: "New link (the old one is cut)", bad: "Expected value: a positive number." } },
+  id: { kicker: "Manajemen", title: "Produksi", form: "Formulir", refresh: "Muat ulang", logout: "Keluar", login: "Ruang tim", loginSub: "Hanya untuk mengubah skala poin atau tim. Statistik bisa dilihat tanpa masuk.", loginBtn: "Masuk", pwd: "kata sandi", adminLogin: "Masuk admin", backStats: "Kembali ke statistik", denied: "Akses khusus tim DS Editing.", loadErr: "Gagal memuat:",
     tabs: { overview: "Ringkasan", editors: "Editor", reports: "Laporan", settings: "Pengaturan" },
     periods: { today: "Hari ini", week: "Minggu ini", month: "Bulan ini", lastMonth: "Bulan lalu", d30: "30 hari" }, csv: "CSV / Excel",
     stats: { points: "Poin dihasilkan", perDecl: (x) => `${x} poin / laporan`, elements: "Elemen selesai", elementsSub: "reel, intro, podcast", avg: "Rata-rata / hari", avgSub: "pada hari yang dilaporkan", decl: "Laporan", declSub: "hari terisi", active: "Editor aktif", activeSub: "pada periode ini" },
     charts: { evo: "Perkembangan", evoT: "Poin per hari", points: "Poin", elements: "Elemen", avg7: "Rata-rata 7 hari", dist: "Distribusi", distT: "Poin per kategori", cmp: "Perbandingan", cmpT: "Poin per editor dan kategori", detail: "Rincian", detailT: "Poin per hari dan per editor", day: "Hari", total: "Total", pts: "poin", empty: "Tidak ada laporan pada periode ini.", noChart: "Grafik tidak tersedia (Chart.js gagal dimuat)." },
     ed: { days: (n) => `${n} hari`, perDay: "poin/hari", points: "Poin", elements: "Elemen", vs: "vs pemimpin", groups: { reel: "Reel", intro: "Intro", podcast: "Podcast" }, last: "Input terakhir" },
     rep: { details: "Rincian", comment: "Komentar", del: "Hapus", confirm: (n, d) => `Hapus laporan ${n} tanggal ${d}?`, progress: "Sedang dikerjakan", none: "Tidak ada laporan pada periode ini." },
-    set: { team: "Tim", editors: "Editor", namePh: "Nama lengkap", photoPh: "URL foto (opsional)", add: "Tambah", on: "Aktif", off: "Nonaktif", photo: "Foto", saved: "tersimpan", scale: "Skala poin", scaleT: "Poin per unit", note: "Skor yang sudah tersimpan tetap memakai skala poin yang berlaku saat laporan dibuat.", save: "Simpan skala poin", ro: "Hanya baca: perubahan khusus administrator.", dup: "Nama ini sudah ada.", link: "Tautan", linkT: "Salin tautan pribadi laporan harian", copied: "tautan disalin", renew: "Ganti tautan {n}? Tautan lama tidak akan berfungsi lagi.", renewT: "Tautan baru (yang lama diputus)", bad: "Nilai yang diharapkan: angka positif." } },
+    set: { team: "Tim", editors: "Editor", namePh: "Nama lengkap", photoPh: "URL foto (opsional)", add: "Tambah", on: "Aktif", off: "Nonaktif", photo: "Foto", saved: "tersimpan", scale: "Skala poin", scaleT: "Poin per unit", note: "Skor yang sudah tersimpan tetap memakai skala poin yang berlaku saat laporan dibuat.", save: "Simpan skala poin", ro: "Hanya baca: pakai « Masuk admin » di kanan atas untuk mengubah.", dup: "Nama ini sudah ada.", link: "Tautan", linkT: "Salin tautan pribadi laporan harian", copied: "tautan disalin", renew: "Ganti tautan {n}? Tautan lama tidak akan berfungsi lagi.", renewT: "Tautan baru (yang lama diputus)", bad: "Nilai yang diharapkan: angka positif." } },
 };
 
 const $ = (s) => document.querySelector(s);
@@ -279,7 +281,7 @@ const store = { get: (k) => { try { return localStorage.getItem(k); } catch { re
 let lang = params.get("lang") || store.get("ds_prod_lang") || store.get("ds_lang") || "fr"; if (!T[lang]) lang = "fr";
 const t = (path) => path.split(".").reduce((o, k) => (o == null ? undefined : o[k]), T[lang]);
 let tab = params.get("tab") || "overview"; if (!TABS.includes(tab)) tab = "overview";
-let sb = null, me = null, profile = null, cats = [], editors = [], edKeys = {}, reports = [], charts = {}, loadError = "";
+let sb = null, me = null, profile = null, pub = false, cats = [], editors = [], edKeys = {}, reports = [], charts = {}, loadError = "";
 let period = { kind: "d30", from: "", to: "" };
 const openIds = new Set();
 
@@ -570,9 +572,14 @@ async function loadEditors() {
   const k = await sb.from("editor_keys").select("editor_id,report_key"); edKeys = Object.fromEntries((k.data || []).map((x) => [x.editor_id, x.report_key])); // vide pour les rôles qui n'y ont pas droit
 }
 async function loadReports() { const { data, error } = await sb.from("prod_reports").select("*").order("report_date", { ascending: false }).limit(5000); if (error) throw error; reports = data || []; }
+// sans connexion : une seule RPC en lecture seule (supabase/prod_open_v1.sql)
+async function loadPublic() {
+  const { data, error } = await sb.rpc("prod_stats_public"); if (error) throw error;
+  cats = (data && data.cats) || []; editors = (data && data.editors) || []; reports = (data && data.reports) || []; edKeys = {};
+}
 async function load(force) {
   const btn = $("#refreshBtn"); btn.classList.add("busy"); loadError = "";
-  try { await Promise.all([loadCats(), loadEditors(), loadReports()]); }
+  try { await (pub ? loadPublic() : Promise.all([loadCats(), loadEditors(), loadReports()])); }
   catch (e) { loadError = e.message || String(e); console.error(e); }
   btn.classList.remove("busy");
   if (loadError) { $("#v-" + tab).innerHTML = `<div class="panel"><p class="msg err" style="margin:0;font-size:13px">${t("loadErr")} ${esc(loadError)}</p></div>`; return; }
@@ -584,18 +591,20 @@ async function boot() {
   applyText();
   sb = createClient(SUPABASE_URL, SUPABASE_ANON);
   const { data: { session } } = await sb.auth.getSession();
-  if (!session) { $("#gate").hidden = false; return; }
-  me = session.user;
-  const { data: p } = await sb.from("profiles").select("*").eq("id", me.id).single();
-  profile = p || { role: "editor", display_name: me.email };
-  $("#who").innerHTML = `<b>${esc(profile.display_name)}</b> · ${esc(profile.role)}`;
-  $("#logout").hidden = false;
-  if (profile.role === "client") { $("#gate").hidden = false; $("#loginMsg").textContent = t("denied"); $("#email").hidden = $("#password").hidden = $("#loginBtn").hidden = true; return; }
+  if (session) {
+    me = session.user;
+    const { data: p } = await sb.from("profiles").select("*").eq("id", me.id).single();
+    profile = p || { role: "editor", display_name: me.email };
+    $("#who").innerHTML = `<b>${esc(profile.display_name)}</b> · ${esc(profile.role)}`;
+    $("#logout").hidden = false;
+  }
+  // pas connecté, ou compte client : statistiques en lecture seule, sans mot de passe
+  if (!session || profile.role === "client") { pub = true; profile = null; $("#loginOpen").hidden = !!session; }
   $("#gate").hidden = true; $("#app").hidden = false; $("#tabs").hidden = false; $("#refreshBtn").hidden = false;
   setPeriod("d30"); renderTabs();
   await load(true);
   // temps réel sur les déclarations (publication supabase_realtime, cf. supabase/prod_v1b.sql) + filet de sécurité toutes les 60 s
-  sb.channel("prod-live").on("postgres_changes", { event: "*", schema: "public", table: "prod_reports" }, () => load()).subscribe();
+  if (!pub) sb.channel("prod-live").on("postgres_changes", { event: "*", schema: "public", table: "prod_reports" }, () => load()).subscribe();
   setInterval(() => { if (document.visibilityState === "visible") load(); }, 60000);
 }
 $("#loginBtn").addEventListener("click", async () => {
@@ -605,6 +614,8 @@ $("#loginBtn").addEventListener("click", async () => {
   location.reload();
 });
 $("#password").addEventListener("keydown", (e) => { if (e.key === "Enter") $("#loginBtn").click(); });
+$("#loginOpen").addEventListener("click", () => { $("#app").hidden = $("#tabs").hidden = true; $("#gate").hidden = false; $("#email").focus(); });
+$("#gateBack").addEventListener("click", () => { $("#gate").hidden = true; $("#app").hidden = $("#tabs").hidden = false; });
 $("#logout").addEventListener("click", async () => { await sb.auth.signOut(); location.reload(); });
 $("#refreshBtn").addEventListener("click", () => load(true));
 $("#langSeg").querySelectorAll("[data-lang]").forEach((b) => b.addEventListener("click", () => {
