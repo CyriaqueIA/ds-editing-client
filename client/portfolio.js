@@ -40,6 +40,12 @@ window.DS_PORTFOLIO = {
   // (décision du 30/09 : Standard, Premium et Signature restent affichées sur Podcast et VSL).
   hiddenTiers: {},
 
+  // Ouverture du portfolio privé sans ?type= dans le lien : ce type et cette formule (demande de Cyriaque du 03/10 : Podcast Signature).
+  landing: { type: "podcast-interview", tier: "signature" },
+
+  // true = aucun prix affiché dans le portfolio privé (demande de Cyriaque du 03/10). Repasser à false pour les réafficher.
+  hidePrices: true,
+
   // Types sans exemple qui affichent la scène animée « bientôt » (orbe + « Premier montage offert ») au lieu des cases vides.
   // La scène disparaît d'elle-même dès qu'une vidéo du type arrive du Drive.
   soon: ["ia", "youtube-docu"],

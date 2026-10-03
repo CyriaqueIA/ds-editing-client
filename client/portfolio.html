@@ -157,7 +157,7 @@
 </div>
 <div class="modal" id="modal"><div class="box"><div class="bar"><span id="modalTitle"></span><button type="button" id="modalClose">×</button></div><div id="modalMedia"></div></div></div>
 
-<script src="portfolio.js?v=10"></script>
+<script src="portfolio.js?v=11"></script>
 <script src="previews.js?v=10"></script>
 <script>
 (function () {
@@ -191,7 +191,8 @@
   };
   // Type demandé dans le lien (?type=…) : un type fusionné (ex. ads → vsl) ou inconnu retombe sur un type existant
   const typeOf = (slug) => P.types.find((x) => x.slug === slug || (x.also || []).includes(slug));
-  let type = (typeOf(params.get("type")) || P.types[0]).slug, tier = P.tiers[0].slug;
+  const land = (!params.get("type") && P.landing) || {};
+  let type = (typeOf(params.get("type") || land.type) || P.types[0]).slug, tier = land.tier || P.tiers[0].slug;
   if (params.get("k") !== KEY) { $("#main").hidden = true; $("#gate").hidden = false; $("#gate").textContent = T[lang].gate; return; }
 
   function render() {
@@ -205,6 +206,8 @@
     const ty = P.types.find((x) => x.slug === type);
     $("#typeTitle").textContent = ty[lang][0]; $("#typeSub").textContent = ty[lang][1];
     const prices = P.prices[type] || {};
+    // portfolio.js → hidePrices : aucun prix nulle part (onglets, description, pied, scène « bientôt »)
+    const show = (p) => (P.hidePrices ? "" : p);
     // Formules visibles pour ce type (portfolio.js → hiddenTiers) ; si la formule courante est masquée, on repart sur la première
     const tiers = P.tiers.filter((ti) => !((P.hiddenTiers || {})[type] || []).includes(ti.slug));
     if (!tiers.some((ti) => ti.slug === tier)) tier = tiers[0].slug;
@@ -216,11 +219,11 @@
     const tiered = !unique && ofType.some((it) => it.tier) && !(ty.also && ofType.some((it) => !it.tier));
     // Type sans aucun exemple et listé dans portfolio.js → soon : scène animée à la place de la grille (disparaît dès qu'une vidéo arrive du Drive)
     const soon = (P.soon || []).includes(type) && ofType.length === 0;
-    const price = unique || prices[tier] || "";
+    const price = show(unique || prices[tier] || "");
     $("#tiers").hidden = $("#tierDesc").hidden = !unique && !tiered && !soon && ofType.length > 0;
     $("#tiers").innerHTML = unique
-      ? `<div class="tier active unique"><b>${t.unique}</b><span>${esc(unique)}</span></div>`
-      : tiers.map((ti) => `<div class="tier ${ti.slug === tier ? "active" : ""}" data-tier="${ti.slug}"><b>${ti[lang][0]}</b><span>${esc(prices[ti.slug] || t.quote)}</span></div>`).join("");
+      ? `<div class="tier active unique"><b>${t.unique}</b>${P.hidePrices ? "" : `<span>${esc(unique)}</span>`}</div>`
+      : tiers.map((ti) => `<div class="tier ${ti.slug === tier ? "active" : ""}" data-tier="${ti.slug}"><b>${ti[lang][0]}</b>${P.hidePrices ? "" : `<span>${esc(prices[ti.slug] || t.quote)}</span>`}</div>`).join("");
     $("#tiers").querySelectorAll("[data-tier]").forEach((el) => el.addEventListener("click", () => { tier = el.dataset.tier; render(); }));
     $("#tierDesc").innerHTML = `${unique ? t.uniqueDesc : esc(tiers.find((x) => x.slug === tier)[lang][1])}${price ? ` <em>${esc(price)}</em> ${t.perVideo}.` : ""}`;
     const items = ofType.filter((it) => !tiered || it.tier === tier)
