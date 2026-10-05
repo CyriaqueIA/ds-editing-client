@@ -248,6 +248,7 @@
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/+esm";
 
 /* ===== Configuration (clé publique uniquement, comme team/dashboard.html) ===== */
+const OPEN_ACCESS = { email: "acces.libre@ds-editing.com", password: "HAs0lMotAKsCmNdx" }; // 05/10 : accès libre demandé par Cyriaque (compte partagé « Équipe »). Pour remettre les mots de passe : null ici + désactiver le compte.
 const SUPABASE_URL = "https://xkanmjlpysxpohsuqvwg.supabase.co";
 const SUPABASE_ANON = "sb_publishable_lIZtV_WtN5NcGSb0dnfaiQ_AgKYBIVa";
 const TABS = ["overview", "editors", "reports", "settings"];
@@ -634,13 +635,14 @@ async function load(force) {
 async function boot() {
   applyText();
   sb = createClient(SUPABASE_URL, SUPABASE_ANON);
-  const { data: { session } } = await sb.auth.getSession();
+  let { data: { session } } = await sb.auth.getSession();
+  if (!session && OPEN_ACCESS) ({ data: { session } } = await sb.auth.signInWithPassword(OPEN_ACCESS));
   if (session) {
     me = session.user;
     const { data: p } = await sb.from("profiles").select("*").eq("id", me.id).single();
     profile = p || { role: "editor", display_name: me.email };
     $("#who").innerHTML = `<b>${esc(profile.display_name)}</b> · ${esc(profile.role)}`;
-    $("#logout").hidden = false;
+    $("#logout").hidden = !!OPEN_ACCESS;
   }
   // pas connecté, ou compte client : statistiques en lecture seule, sans mot de passe
   if (!session || profile.role === "client") { pub = true; profile = null; $("#loginOpen").hidden = !!session; }

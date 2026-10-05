@@ -181,6 +181,7 @@ td .sub{display:block;color:var(--muted);font-size:12.5px;max-width:340px;overfl
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
+const OPEN_ACCESS = { email: "acces.libre@ds-editing.com", password: "HAs0lMotAKsCmNdx" }; // 05/10 : accès libre demandé par Cyriaque (compte partagé « Équipe »). Pour remettre les mots de passe : null ici + désactiver le compte.
 const SUPABASE_URL = "https://xkanmjlpysxpohsuqvwg.supabase.co";
 const SUPABASE_ANON = "sb_publishable_lIZtV_WtN5NcGSb0dnfaiQ_AgKYBIVa";
 const HUBSPOT_COMPANY = "https://app-na2.hubspot.com/contacts/247385305/record/0-2/";
@@ -564,7 +565,10 @@ async function init() {
   $("overlay").addEventListener("click", (ev) => { if (ev.target === $("overlay")) closeFiche(); });
   document.addEventListener("keydown", (ev) => { if (ev.key === "Escape" && S.open) closeFiche(); });
   const { data } = await sb.auth.getSession();
-  if (data.session) boot(data.session.user); else $("login").hidden = false;
+  if (OPEN_ACCESS) $("logout").hidden = true;
+  if (data.session) boot(data.session.user);
+  else if (OPEN_ACCESS) { const r = await sb.auth.signInWithPassword(OPEN_ACCESS); if (r.error) $("login").hidden = false; else boot(r.data.user); }
+  else $("login").hidden = false;
 }
 init();
 </script>

@@ -322,6 +322,7 @@
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/+esm";
 
 /* ===== Configuration ===== */
+const OPEN_ACCESS = { email: "acces.libre@ds-editing.com", password: "HAs0lMotAKsCmNdx" }; // 05/10 : accès libre demandé par Cyriaque (compte partagé « Équipe »). Pour remettre les mots de passe : null ici + désactiver le compte.
 const SUPABASE_URL = "https://xkanmjlpysxpohsuqvwg.supabase.co";
 const SUPABASE_ANON = "sb_publishable_lIZtV_WtN5NcGSb0dnfaiQ_AgKYBIVa";
 const BUSINESS_DAYS_DEFAULT = 5;   // délai par défaut quand le client n'a pas donné de date
@@ -881,13 +882,14 @@ function beep(n) {
 async function boot() {
   applyText();
   sb = createClient(SUPABASE_URL, SUPABASE_ANON);
-  const { data: { session } } = await sb.auth.getSession();
+  let { data: { session } } = await sb.auth.getSession();
+  if (!session && OPEN_ACCESS) ({ data: { session } } = await sb.auth.signInWithPassword(OPEN_ACCESS));
   if (!session) { $("#gate").hidden = false; return; }
   me = session.user;
   const { data: p } = await sb.from("profiles").select("*").eq("id", me.id).single();
   profile = p || { role: "editor", display_name: me.email };
   $("#who").innerHTML = `<b>${esc(profile.display_name)}</b> · ${esc(profile.role)}`;
-  $("#logout").hidden = false; $("#gate").hidden = true; $("#app").hidden = false; $("#live").hidden = false;
+  $("#logout").hidden = !!OPEN_ACCESS; $("#gate").hidden = true; $("#app").hidden = false; $("#live").hidden = false;
   renderToolbar(); await load(true); renderTabs();
   sb.channel("jobs-live").on("postgres_changes", { event: "*", schema: "public", table: "jobs" }, () => load(false)).subscribe();
   // état du PC du bureau : temps réel si la table est publiée, sinon le rafraîchissement de 60 s ci-dessous ; l'âge du dernier signal est réévalué toutes les 15 s
