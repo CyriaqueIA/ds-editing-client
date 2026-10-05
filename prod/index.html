@@ -110,6 +110,27 @@
     .done .hint{margin-bottom:6px}
     .back{margin:28px 0 0;text-align:center;font-size:14px;color:var(--taupe)}
     .back a{color:var(--cream);text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1px}
+    /* liens Frame.io (un par vidéo terminée) et révisions */
+    .links{margin-top:14px;padding-top:14px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:8px}
+    .lrow{display:flex;align-items:center;gap:8px}
+    .lrow .n{flex:none;width:26px;font-size:12px;font-weight:600;color:var(--c);font-variant-numeric:tabular-nums}
+    .lrow .in{padding:10px 12px;font-size:14px}
+    .rev-card{--c:#7FA3CF}
+    .rev{padding:14px;background:var(--surface);border:1px solid var(--line);border-radius:16px;margin-top:10px}
+    .rev-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+    .x{width:34px;height:34px;border-radius:10px;border:1px solid var(--line-strong);background:rgba(255,255,255,.04);color:var(--cream);font-size:18px;line-height:1}
+    .rev-g{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    @media(max-width:420px){.rev-g{grid-template-columns:1fr}}
+    .fl{display:block;margin:10px 0 6px;font-size:12px;color:var(--taupe)}
+    .rev-g .fl{margin-top:0}
+    select.in{-webkit-appearance:none;appearance:none;color-scheme:dark;padding:10px 12px;font-size:14px;background-image:linear-gradient(45deg,transparent 50%,#9AA3AD 50%),linear-gradient(135deg,#9AA3AD 50%,transparent 50%);background-position:calc(100% - 16px) 52%,calc(100% - 11px) 52%;background-size:5px 5px;background-repeat:no-repeat;padding-right:28px}
+    select.in option{background:#161A1F}
+    .rev .in{padding:10px 12px;font-size:14px}
+    .chips{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+    .chips button{height:38px;padding:0 14px;border-radius:999px;border:1px solid var(--line-strong);background:rgba(255,255,255,.04);color:var(--cream);font-size:13px;font-weight:600}
+    .chips button.on{background:rgba(255,255,255,.9);color:#0A0B0D;border-color:transparent}
+    .chips .min{width:74px;text-align:center}
+    .chips.bad button,.chips.bad .min{border-color:var(--err)}
     footer{padding:24px 16px;text-align:center}
     @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
   </style>
@@ -151,6 +172,12 @@
     <div class="sec"><span class="mono" data-t="produced"></span><span class="mono" id="sum" aria-live="polite"></span></div>
     <div class="notice" id="notice" hidden></div>
     <div id="cats"></div>
+    <div class="sec"><span class="mono" data-t="revTitle"></span><span class="mono" id="revSum"></span></div>
+    <div class="card rev-card">
+      <p class="hint" data-t="revHint"></p>
+      <div id="revs"></div>
+      <button class="ghost wide" id="revAdd" type="button" data-t="revAdd"></button>
+    </div>
     <div class="card">
       <label for="details" data-t="details"></label>
       <textarea id="details" class="in ta" rows="4" data-p="detailsPh"></textarea>
@@ -188,6 +215,15 @@
     fr: { sub: "Équipe montage", title: "Rapport du jour", who: "Qui es-tu ?", notMe: "Ce n'est pas moi", produced: "Produit aujourd'hui", done: "Terminés", progressA: "En cours", progressB: "avancement de l'élément en cours", details: "Détail de ma journée", detailsPh: "Ex : Reels client X (3 hooks), intro podcast Y, corrections sur…", comment: "Commentaire", optional: "(optionnel)", commentPh: "Blocages, remarques, besoins…", save: "Enregistrer ma journée", back: "Retour au site", saved: "Enregistré !", edit: "Modifier", el1: "élément", elN: "éléments", inProg: "en cours", loading: "Chargement…", loadFail: "Impossible de charger la liste. Vérifie ta connexion puis réessaie.", retry: "Réessayer", already: "Déjà enregistré à {t}, tu peux corriger.", draft: "Brouillon restauré (pas encore enregistré).", empty: "Rien saisi : ajoute au moins un élément terminé, un avancement ou le détail de ta journée.", badDate: "Date refusée : 14 jours en arrière maximum.", badEditor: "Monteur inconnu. Choisis à nouveau ton nom.", needLink: "Ouvre ton lien personnel pour remplir ton rapport. Demande-le à ton responsable.", fail: "Enregistrement impossible pour l'instant. Ton brouillon est conservé sur cet appareil, réessaie dans un instant.", saving: "Enregistrement…", changeDate: "Changer de date", today: "Aujourd'hui", otherDay: "Tu saisis le rapport d'un autre jour.", dateLabel: "Date du rapport", footer: "DS Editing · Équipe montage", minus: "Retirer", plus: "Ajouter", count: "Nombre terminés", slider: "Avancement de l'élément en cours" },
     en: { sub: "Editing team", title: "Today's report", who: "Who are you?", notMe: "Not me", produced: "Produced today", done: "Done", progressA: "In progress", progressB: "progress of the current item", details: "My day in detail", detailsPh: "E.g. Reels for client X (3 hooks), podcast intro Y, fixes on…", comment: "Comment", optional: "(optional)", commentPh: "Blockers, remarks, needs…", save: "Save my day", back: "Back to the site", saved: "Saved!", edit: "Edit", el1: "item", elN: "items", inProg: "in progress", loading: "Loading…", loadFail: "The list can't be loaded. Check your connection and try again.", retry: "Try again", already: "Already saved at {t}, you can still edit it.", draft: "Draft restored (not saved yet).", empty: "Nothing entered: add at least one finished item, some progress or your day's details.", badDate: "Date refused: 14 days back at most.", badEditor: "Unknown editor. Pick your name again.", needLink: "Open your personal link to fill in your report. Ask your manager for it.", fail: "Can't save right now. Your draft is kept on this device, try again in a moment.", saving: "Saving…", changeDate: "Change date", today: "Today", otherDay: "You're filling in the report for another day.", dateLabel: "Report date", footer: "DS Editing · Editing team", minus: "Remove one", plus: "Add one", count: "Number done", slider: "Progress of the current item" },
   };
+  // révisions + liens Frame.io (03/10)
+  const T2 = {
+    id: { links: "Tautan Frame.io", linkPh: "Tempel tautan Frame.io video ini", revTitle: "Revisi", revHint: "Koreksi setelah feedback (klien atau internal). Satu baris per revisi.", revAdd: "+ Tambah revisi", revN: "Revisi", revCat: "Jenis video", revClient: "Klien", revPick: "Pilih…", revOther: "Klien lain…", revOtherPh: "Nama klien", revTime: "Waktu yang dipakai", min: "mnt", revLink: "Tautan Frame.io", del: "Hapus", r1: "revisi", rN: "revisi", needLinks: "Tempel satu tautan Frame.io untuk setiap video selesai.", badLink: "Tautan tidak valid: harus https:// dari frame.io atau f.io.", dupLink: "Tautan yang sama dipakai dua kali.", badRev: "Revisi belum lengkap: jenis, klien, waktu (1–240 mnt) dan tautan Frame.io." },
+    fr: { links: "Liens Frame.io", linkPh: "Colle le lien Frame.io de cette vidéo", revTitle: "Révisions", revHint: "Corrections après un retour (client ou interne). Une ligne par révision.", revAdd: "+ Ajouter une révision", revN: "Révision", revCat: "Type de vidéo", revClient: "Client", revPick: "Choisir…", revOther: "Autre client…", revOtherPh: "Nom du client", revTime: "Temps passé", min: "min", revLink: "Lien Frame.io", del: "Supprimer", r1: "révision", rN: "révisions", needLinks: "Colle un lien Frame.io pour chaque vidéo terminée.", badLink: "Lien non valide : il doit commencer par https:// et venir de frame.io ou f.io.", dupLink: "Le même lien est utilisé deux fois.", badRev: "Révision incomplète : type, client, temps (1 à 240 min) et lien Frame.io." },
+    en: { links: "Frame.io links", linkPh: "Paste this video's Frame.io link", revTitle: "Revisions", revHint: "Fixes after feedback (client or internal). One line per revision.", revAdd: "+ Add a revision", revN: "Revision", revCat: "Video type", revClient: "Client", revPick: "Choose…", revOther: "Other client…", revOtherPh: "Client name", revTime: "Time spent", min: "min", revLink: "Frame.io link", del: "Delete", r1: "revision", rN: "revisions", needLinks: "Paste one Frame.io link for each finished video.", badLink: "Invalid link: it must start with https:// and come from frame.io or f.io.", dupLink: "The same link is used twice.", badRev: "Incomplete revision: type, client, time (1–240 min) and Frame.io link." },
+  };
+  for (const l of LANGS) Object.assign(T[l], T2[l]);
+  const LINK_RE = /^https:\/\/([a-z0-9-]+\.)*(frame\.io|f\.io)\/[^\s<>"]+$/i;
+  const linkOk = (u) => u.length <= 500 && LINK_RE.test(u);
   const ICONS = {
     reel: '<svg viewBox="0 0 24 24"><path d="M4 9h16v10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M4 9l1.5-4h13L20 9"/><path d="M8.5 5 7 9M13 5l-1.5 4M17.5 5 16 9"/></svg>',
     intro: '<svg viewBox="0 0 24 24"><path d="M11 3l1.9 4.9L17.8 9.8l-4.9 1.9L11 16.6l-1.9-4.9L4.2 9.8l4.9-1.9z"/><path d="M18.5 14l.9 2.3 2.3.9-2.3.9-.9 2.3-.9-2.3-2.3-.9 2.3-.9z"/></svg>',
@@ -210,7 +246,7 @@
   function avStyle(name) { let h = 0; for (const ch of name) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return AV[h % AV.length]; }
   const iconFor = (key) => ICONS[String(key).split("_")[0]] || ICONS.other;
 
-  const state = { editors: [], cats: [], me: null, key: null, date: todayISO(), counts: {}, server: null, draftUsed: false, last: null, token: 0 };
+  const state = { editors: [], cats: [], clients: [], me: null, key: null, date: todayISO(), counts: {}, links: {}, revs: [], server: null, draftUsed: false, last: null, token: 0 };
   const ui = {};
   let sbp = null; // promesse mise en cache : un seul client même si deux appels partent en parallèle
   function client() { if (!sbp) sbp = import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/+esm").then(({ createClient }) => createClient(SB_URL, SB_KEY, { auth: { persistSession: false, autoRefreshToken: false } })); return sbp; }
@@ -218,8 +254,10 @@
 
   // ---------- textes
   function totals() { let el = 0, ip = 0; for (const c of state.cats) { const v = state.counts[c.key] || { done: 0, progress: 0 }; el += v.done; if (v.progress > 0) ip++; } return { el, ip }; }
-  function sumText(el, ip) { const t = T[lang]; return `${el} ${el === 1 ? t.el1 : t.elN} · ${ip} ${t.inProg}`; }
-  function renderSummary() { const { el, ip } = totals(); $("#sum").textContent = sumText(el, ip); }
+  function sumText(el, ip, rv) { const t = T[lang]; return `${el} ${el === 1 ? t.el1 : t.elN} · ${ip} ${t.inProg}` + (rv ? ` · ${rv} ${rv === 1 ? t.r1 : t.rN}` : ""); }
+  const revMinutes = () => state.revs.reduce((a, r) => a + (toInt(r.minutes) || 0), 0);
+  function fmtMin(m) { const h = Math.floor(m / 60), r = m % 60; return h ? `${h} h${r ? " " + String(r).padStart(2, "0") : ""}` : `${m} ${T[lang].min}`; }
+  function renderSummary() { const { el, ip } = totals(); $("#sum").textContent = sumText(el, ip, state.revs.length); $("#revSum").textContent = state.revs.length ? `${state.revs.length} · ${fmtMin(revMinutes())}` : ""; }
   function renderNotice() {
     const t = T[lang], parts = [];
     if (state.server && state.server.updated_at) parts.push(t.already.replace("{t}", fmtTime(state.server.updated_at)));
@@ -228,7 +266,7 @@
   }
   function renderDone() {
     if (!state.last) return; const t = T[lang];
-    $("#doneSum").textContent = sumText(state.last.elements || 0, state.last.in_progress || 0);
+    $("#doneSum").textContent = sumText(state.last.elements || 0, state.last.in_progress || 0, state.last.rev_count || 0);
     $("#doneMeta").textContent = `${state.me ? state.me.name : ""} · ${fmtDate(state.date)}`;
   }
   function render() {
@@ -237,8 +275,8 @@
     $$("[data-p]").forEach((el) => { el.placeholder = t[el.dataset.p] || ""; });
     $$("#seg button").forEach((b) => b.classList.toggle("on", b.dataset.l === lang));
     $("#dateText").textContent = fmtDate(state.date);
-    for (const c of state.cats) { const u = ui[c.key]; if (!u) continue; u.name.textContent = c[lang] || c.fr; u.minus.setAttribute("aria-label", t.minus); u.plus.setAttribute("aria-label", t.plus); u.input.setAttribute("aria-label", t.count); u.range.setAttribute("aria-label", t.slider); }
-    renderSummary(); renderNotice(); renderDone();
+    for (const c of state.cats) { const u = ui[c.key]; if (!u) continue; u.name.textContent = c[lang] || c.fr; u.minus.setAttribute("aria-label", t.minus); u.plus.setAttribute("aria-label", t.plus); u.input.setAttribute("aria-label", t.count); u.range.setAttribute("aria-label", t.slider); renderLinks(c.key); }
+    renderRevs(); renderSummary(); renderNotice(); renderDone();
   }
   $$("#seg button").forEach((b) => b.addEventListener("click", () => { lang = b.dataset.l; store.set("ds_lang", lang); render(); }));
 
@@ -282,7 +320,7 @@
   $("#notMe").addEventListener("click", () => {
     state.me = null; state.key = null; state.server = null; state.draftUsed = false; store.del("ds_prod_editor"); store.del("ds_prod_key");
     $("#who").hidden = false; $("#me").hidden = true; $("#report").hidden = true; $("#done").hidden = true;
-    applyValues({ counts: {}, details: "", comment: "" }); renderNotice(); window.scrollTo({ top: 0 });
+    applyValues({ counts: {}, links: {}, revisions: [], details: "", comment: "" }); renderNotice(); window.scrollTo({ top: 0 });
   });
 
   // ---------- catégories
@@ -291,8 +329,9 @@
     for (const c of state.cats) {
       state.counts[c.key] = { done: 0, progress: 0 };
       const card = document.createElement("div"); card.className = "card cat"; card.dataset.key = c.key; card.style.setProperty("--c", c.color || "#DCE3EA");
-      card.innerHTML = `<div class="cat-top"><div class="ico">${iconFor(c.key)}</div><div class="cat-name"><strong data-cat-name></strong><div class="cat-sub"><span class="tag">${c.tag || ""}</span><span class="mono" data-t="done"></span></div></div><div class="ctr"><button type="button" class="minus">−</button><input type="text" inputmode="numeric" pattern="[0-9]*" value="0" autocomplete="off"/><button type="button" class="plus">+</button></div></div><div class="cat-prog"><div class="cat-prog-l"><span class="lbl"><b data-t="progressA"></b> · <span data-t="progressB"></span></span><span class="pct">0%</span></div><input type="range" class="rg" min="0" max="100" step="5" value="0" style="--p:0%"/></div>`;
-      const u = { name: card.querySelector("[data-cat-name]"), minus: card.querySelector(".minus"), plus: card.querySelector(".plus"), input: card.querySelector(".ctr input"), range: card.querySelector(".rg"), pct: card.querySelector(".pct") };
+      card.innerHTML = `<div class="cat-top"><div class="ico">${iconFor(c.key)}</div><div class="cat-name"><strong data-cat-name></strong><div class="cat-sub"><span class="tag">${c.tag || ""}</span><span class="mono" data-t="done"></span></div></div><div class="ctr"><button type="button" class="minus">−</button><input type="text" inputmode="numeric" pattern="[0-9]*" value="0" autocomplete="off"/><button type="button" class="plus">+</button></div></div><div class="cat-prog"><div class="cat-prog-l"><span class="lbl"><b data-t="progressA"></b> · <span data-t="progressB"></span></span><span class="pct">0%</span></div><input type="range" class="rg" min="0" max="100" step="5" value="0" style="--p:0%"/></div><div class="links" hidden></div>`;
+      state.links[c.key] = [];
+      const u = { name: card.querySelector("[data-cat-name]"), minus: card.querySelector(".minus"), plus: card.querySelector(".plus"), input: card.querySelector(".ctr input"), range: card.querySelector(".rg"), pct: card.querySelector(".pct"), links: card.querySelector(".links") };
       ui[c.key] = u;
       u.minus.addEventListener("click", () => setDone(c.key, state.counts[c.key].done - 1));
       u.plus.addEventListener("click", () => setDone(c.key, state.counts[c.key].done + 1));
@@ -306,15 +345,73 @@
   function setDone(key, n, typing) {
     n = clamp(n, 0, 500); state.counts[key].done = n; const u = ui[key];
     if (!typing) u.input.value = n; u.minus.disabled = n === 0;
-    renderSummary(); scheduleDraft();
+    renderLinks(key); renderSummary(); scheduleDraft();
   }
+  // un champ de lien Frame.io par vidéo terminée (les valeurs restent en mémoire si le compteur redescend puis remonte)
+  function renderLinks(key) {
+    const u = ui[key]; if (!u) return; const n = state.counts[key].done, arr = state.links[key] || (state.links[key] = []), t = T[lang];
+    u.links.hidden = n === 0;
+    const rows = u.links.querySelectorAll(".lrow");
+    if (!rows.length && n) { const h = document.createElement("span"); h.className = "lbl"; u.links.appendChild(h); }
+    const head = u.links.querySelector(".lbl"); if (head) head.innerHTML = `<b>${t.links}</b>`;
+    for (let i = rows.length; i < n; i++) {
+      const row = document.createElement("div"); row.className = "lrow";
+      row.innerHTML = `<span class="n">${i + 1}</span><input class="in" type="url" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false"/>`;
+      const inp = row.querySelector("input"); inp.value = arr[i] || "";
+      inp.addEventListener("input", () => { arr[i] = inp.value.trim(); inp.classList.remove("bad"); scheduleDraft(); });
+      u.links.appendChild(row);
+    }
+    u.links.querySelectorAll(".lrow").forEach((row, i) => { if (i >= n) row.remove(); else row.querySelector("input").placeholder = t.linkPh; });
+  }
+
+  // ---------- révisions : une ligne par révision (type, client, temps, lien)
+  const OTHER = "__other";
+  function renderRevs() {
+    const box = $("#revs"), t = T[lang]; if (!box) return; box.innerHTML = "";
+    state.revs.forEach((r, i) => {
+      const el = document.createElement("div"); el.className = "rev";
+      const catOpts = `<option value="">${t.revPick}</option>` + state.cats.map((c) => `<option value="${c.key}">${(c[lang] || c.fr).replace(/</g, "&lt;")}</option>`).join("");
+      const cliOpts = `<option value="">${t.revPick}</option>` + state.clients.map((s) => `<option value="${s.id}">${String(s.name).replace(/</g, "&lt;")}</option>`).join("") + `<option value="${OTHER}">${t.revOther}</option>`;
+      el.innerHTML = `<div class="rev-h"><span class="mono">${t.revN} ${i + 1}</span><button type="button" class="x" aria-label="${t.del}">×</button></div>
+        <div class="rev-g"><div><span class="fl">${t.revCat}</span><select class="in" data-f="cat">${catOpts}</select></div><div><span class="fl">${t.revClient}</span><select class="in" data-f="cli">${cliOpts}</select></div></div>
+        <input class="in" data-f="other" maxlength="80" placeholder="${t.revOtherPh}" style="margin-top:8px" hidden/>
+        <span class="fl">${t.revTime}</span><div class="chips">${[15, 30, 45, 60].map((m) => `<button type="button" data-m="${m}">${m} ${t.min}</button>`).join("")}<input class="in min" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" placeholder="${t.min}"/></div>
+        <span class="fl">${t.revLink}</span><input class="in" data-f="url" type="url" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="https://f.io/…"/>`;
+      const cat = el.querySelector('[data-f="cat"]'), cli = el.querySelector('[data-f="cli"]'), other = el.querySelector('[data-f="other"]'), url = el.querySelector('[data-f="url"]'), chips = el.querySelector(".chips"), min = chips.querySelector(".min");
+      cat.value = r.cat || ""; url.value = r.url || "";
+      const isOther = !r.studio_id && !!r.client; cli.value = r.studio_id || (isOther || r.other ? OTHER : ""); other.hidden = cli.value !== OTHER; other.value = r.client || "";
+      const paint = () => { const m = toInt(r.minutes); chips.querySelectorAll("[data-m]").forEach((b) => b.classList.toggle("on", Number(b.dataset.m) === m)); if (document.activeElement !== min) min.value = m && ![15, 30, 45, 60].includes(m) ? m : ""; };
+      paint();
+      const changed = () => { renderSummary(); scheduleDraft(); };
+      cat.addEventListener("change", () => { r.cat = cat.value; cat.classList.remove("bad"); changed(); });
+      cli.addEventListener("change", () => { cli.classList.remove("bad"); if (cli.value === OTHER) { r.studio_id = ""; r.other = true; other.hidden = false; other.focus(); } else { r.studio_id = cli.value; r.other = false; r.client = ""; other.hidden = true; } changed(); });
+      other.addEventListener("input", () => { r.client = other.value; other.classList.remove("bad"); changed(); });
+      chips.querySelectorAll("[data-m]").forEach((b) => b.addEventListener("click", () => { r.minutes = Number(b.dataset.m); chips.classList.remove("bad"); min.value = ""; paint(); changed(); }));
+      min.addEventListener("input", () => { r.minutes = clamp(toInt(min.value), 0, 999); chips.classList.remove("bad"); paint(); changed(); });
+      url.addEventListener("input", () => { r.url = url.value.trim(); url.classList.remove("bad"); changed(); });
+      el.querySelector(".x").addEventListener("click", () => { state.revs.splice(i, 1); renderRevs(); changed(); });
+      box.appendChild(el);
+    });
+  }
+  $("#revAdd").addEventListener("click", () => {
+    const last = state.revs[state.revs.length - 1];
+    state.revs.push({ cat: last ? last.cat : "", studio_id: last ? last.studio_id : "", client: last && last.other ? last.client : "", other: !!(last && last.other), minutes: 0, url: "" });
+    renderRevs(); renderSummary(); scheduleDraft();
+    const rows = $("#revs").querySelectorAll(".rev"); const lastRow = rows[rows.length - 1]; if (lastRow) lastRow.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  });
   function setProg(key, p) {
     p = clamp(p, 0, 100); state.counts[key].progress = p; const u = ui[key];
     u.range.value = p; u.range.style.setProperty("--p", p + "%"); u.pct.textContent = p + "%";
     renderSummary(); scheduleDraft();
   }
   function applyValues(v) {
-    for (const c of state.cats) { const x = (v.counts || {})[c.key] || {}; setDone(c.key, toInt(x.done)); setProg(c.key, toInt(x.progress)); }
+    for (const c of state.cats) {
+      const x = (v.counts || {})[c.key] || {}, l = (v.links || {})[c.key];
+      state.links[c.key] = Array.isArray(l) ? l.map((s) => String(s || "")) : []; if (ui[c.key]) ui[c.key].links.innerHTML = "";
+      setDone(c.key, toInt(x.done)); setProg(c.key, toInt(x.progress));
+    }
+    state.revs = (Array.isArray(v.revisions) ? v.revisions : []).map((r) => ({ cat: r.cat || "", studio_id: r.studio_id || "", client: r.studio_id ? "" : (r.client || ""), other: !r.studio_id && (!!r.client || !!r.other), minutes: toInt(r.minutes), url: r.url || "" }));
+    renderRevs(); renderSummary();
     $("#details").value = v.details || ""; $("#comment").value = v.comment || "";
     clearTimeout(draftTimer); // ne pas réécrire un brouillon à partir d'un pré-remplissage
   }
@@ -323,14 +420,14 @@
   let draftTimer = null;
   const draftKey = () => `ds_prod_draft:${state.me.id}:${state.date}`;
   function scheduleDraft() { if (!state.me) return; clearTimeout(draftTimer); draftTimer = setTimeout(saveDraft, 300); }
-  function saveDraft() { if (!state.me) return; store.set(draftKey(), JSON.stringify({ counts: state.counts, details: $("#details").value, comment: $("#comment").value, at: Date.now() })); }
+  function saveDraft() { if (!state.me) return; store.set(draftKey(), JSON.stringify({ counts: state.counts, links: state.links, revisions: state.revs, details: $("#details").value, comment: $("#comment").value, at: Date.now() })); }
   function readDraft() { try { const raw = store.get(draftKey()); return raw ? JSON.parse(raw) : null; } catch { return null; } }
   $("#details").addEventListener("input", () => { $("#details").classList.remove("bad"); scheduleDraft(); }); $("#comment").addEventListener("input", scheduleDraft);
 
   // ---------- rapport déjà saisi ce jour → pré-remplir
   async function loadReport() {
     const token = ++state.token; state.server = null; state.draftUsed = false;
-    applyValues({ counts: {}, details: "", comment: "" }); $("#msg").textContent = ""; $("#msg").className = "msg";
+    applyValues({ counts: {}, links: {}, revisions: [], details: "", comment: "" }); $("#msg").textContent = ""; $("#msg").className = "msg";
     $("#notice").hidden = false; $("#notice").textContent = T[lang].loading;
     let server = null;
     try { server = await rpc("prod_get_report", { p_key: state.key, p_date: state.date }); } catch { server = null; }
@@ -348,16 +445,40 @@
     msg.className = "msg"; msg.textContent = "";
     if (!state.me) return;
     const { el, ip } = totals(); const details = $("#details").value.trim(), comment = $("#comment").value.trim();
-    if (!el && !ip && !details) { msg.textContent = t.empty; msg.className = "msg err"; $("#details").classList.add("bad"); $("#details").focus(); return; }
-    $("#details").classList.remove("bad"); btn.disabled = true; msg.textContent = t.saving;
+    if (!el && !ip && !details && !state.revs.length) { msg.textContent = t.empty; msg.className = "msg err"; $("#details").classList.add("bad"); $("#details").focus(); return; }
+    $("#details").classList.remove("bad");
+    // liens Frame.io : un par vidéo terminée, valides, jamais deux fois le même ; révisions complètes
+    const links = {}, seen = new Set(); let err = null, first = null;
+    const fail = (key, node) => { if (!err) { err = key; first = node; } if (node) node.classList.add("bad"); };
+    for (const c of state.cats) {
+      const n = state.counts[c.key].done; if (!n) continue;
+      const inputs = ui[c.key].links.querySelectorAll(".lrow input"); links[c.key] = [];
+      for (let i = 0; i < n; i++) {
+        const u = String(state.links[c.key][i] || "").trim(); links[c.key].push(u);
+        if (!u) fail("needLinks", inputs[i]); else if (!linkOk(u)) fail("badLink", inputs[i]); else if (seen.has(u.toLowerCase())) fail("dupLink", inputs[i]); else seen.add(u.toLowerCase());
+      }
+    }
+    const revisions = [];
+    $("#revs").querySelectorAll(".rev").forEach((row, i) => {
+      const r = state.revs[i], m = toInt(r.minutes), u = String(r.url || "").trim(), client = String(r.client || "").trim();
+      if (!r.cat) fail("badRev", row.querySelector('[data-f="cat"]'));
+      if (!r.studio_id && !client) fail("badRev", r.other ? row.querySelector('[data-f="other"]') : row.querySelector('[data-f="cli"]'));
+      if (m < 1 || m > 240) fail("badRev", row.querySelector(".chips"));
+      const ui2 = row.querySelector('[data-f="url"]');
+      if (!u) fail("badRev", ui2); else if (!linkOk(u)) fail("badLink", ui2); else if (seen.has(u.toLowerCase())) fail("dupLink", ui2); else seen.add(u.toLowerCase());
+      revisions.push({ cat: r.cat, studio_id: r.studio_id || null, client: r.studio_id ? null : client, minutes: m, url: u });
+    });
+    if (err) { msg.textContent = t[err]; msg.className = "msg err"; if (first) { first.scrollIntoView({ block: "center", behavior: "smooth" }); if (first.focus) first.focus({ preventScroll: true }); } return; }
+    btn.disabled = true; msg.textContent = t.saving;
     try {
-      const res = await rpc("prod_submit", { p_key: state.key, p_date: state.date, p_counts: state.counts, p_details: details, p_comment: comment, p_lang: lang });
+      const res = await rpc("prod_submit", { p_key: state.key, p_date: state.date, p_counts: state.counts, p_details: details, p_comment: comment, p_lang: lang, p_links: links, p_revisions: revisions });
       clearTimeout(draftTimer); store.del(draftKey());
       state.server = { updated_at: new Date().toISOString() }; state.draftUsed = false; state.last = res || { elements: el, in_progress: ip };
       msg.textContent = ""; showDone();
     } catch (err) {
       const m = String((err && err.message) || "");
-      msg.textContent = /bad_date/.test(m) ? t.badDate : /bad_editor|bad_key/.test(m) ? t.badEditor : /\bempty\b/.test(m) ? t.empty : t.fail;
+      msg.textContent = /bad_date/.test(m) ? t.badDate : /bad_editor|bad_key/.test(m) ? t.badEditor : /\bempty\b/.test(m) ? t.empty
+        : /need_links/.test(m) ? t.needLinks : /bad_link/.test(m) ? t.badLink : /dup_link/.test(m) ? t.dupLink : /bad_revision/.test(m) ? t.badRev : t.fail;
       msg.className = "msg err";
     } finally { btn.disabled = false; if (msg.textContent === t.saving) msg.textContent = ""; }
   }
@@ -369,8 +490,8 @@
   async function init() {
     render(); $("#loadErr").hidden = true; $("#editors").innerHTML = `<div class="loading">${T[lang].loading}</div>`;
     try {
-      const [eds, cats] = await Promise.all([rpc("prod_editors"), rpc("prod_categories_public")]);
-      state.editors = Array.isArray(eds) ? eds : []; state.cats = Array.isArray(cats) ? cats : [];
+      const [eds, cats, clis] = await Promise.all([rpc("prod_editors"), rpc("prod_categories_public"), rpc("prod_clients").catch(() => [])]);
+      state.editors = Array.isArray(eds) ? eds : []; state.cats = Array.isArray(cats) ? cats : []; state.clients = Array.isArray(clis) ? clis : [];
       buildCats(); renderEditors(); render();
       const key = (params.get("e") || "").trim() || store.get("ds_prod_key");
       if (key) {

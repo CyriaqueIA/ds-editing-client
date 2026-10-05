@@ -71,7 +71,7 @@
     .toolbar .spacer{flex:1}
 
     /* ---- cartes ---- */
-    .stats{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px}
+    .stats{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:14px}
     .stat{position:relative;overflow:hidden;background:var(--glass);border:1px solid var(--line);border-radius:22px;padding:14px 18px 34px;-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
     .stat.main{border-color:rgba(220,230,240,.32)}
     .stat .v{font-family:'Geist',system-ui,sans-serif;font-weight:600;font-size:34px;line-height:1;letter-spacing:-.035em;font-variant-numeric:tabular-nums;margin-top:8px}
@@ -165,7 +165,7 @@
     .tog.on{color:var(--ok);border-color:rgba(70,211,105,.4);background:rgba(70,211,105,.12)}
     .tog:disabled{cursor:default}
     .scale{display:flex;flex-direction:column;gap:6px}
-    .srow{display:grid;grid-template-columns:1fr 96px;gap:8px;align-items:center}
+    .srow{display:grid;grid-template-columns:1fr 96px 96px;gap:8px;align-items:center}
     .srow .lab{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:9px 12px;font-size:14px;min-width:0}
     .srow .lab i{width:9px;height:9px;border-radius:50%;flex:none}
     .srow .lab span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -183,6 +183,13 @@
     .gate .btn{width:100%;height:46px;margin-top:4px;font-size:14px}
     .gate .msg{font-size:13px;color:var(--err);min-height:18px;margin-top:8px}
 
+    @media (max-width:1300px){.stats{grid-template-columns:repeat(3,1fr)}}
+    .lk{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--accent2,#B9C9DA);text-decoration:underline;text-underline-offset:3px;word-break:break-all}
+    .lkl{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:6px}
+    .revl{display:flex;flex-direction:column;gap:6px;margin-top:6px}
+    .revl div{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+    .srow.h{font-size:11px;color:var(--taupe);letter-spacing:.06em;text-transform:uppercase}
+    .srow.h span:not(:first-child){text-align:center}
     @media (max-width:1100px){.two{grid-template-columns:1fr}.set2{grid-template-columns:1fr}}
     @media (max-width:900px){.stats{grid-template-columns:repeat(2,1fr)}.stat{min-height:118px}.stat .v{font-size:30px}}
     @media (max-width:700px){
@@ -193,7 +200,7 @@
       .dates{width:100%}.dates input[type="date"].in{flex:1;min-width:0}
       .donut{grid-template-columns:1fr}.donut .chart{height:190px}
       .chart{height:260px}
-      .addrow{grid-template-columns:1fr}.srow{grid-template-columns:1fr 84px}
+      .addrow{grid-template-columns:1fr}.srow{grid-template-columns:1fr 70px 70px}
     }
     @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
   </style>
@@ -275,6 +282,13 @@ const T = {
     set: { team: "Tim", editors: "Editor", namePh: "Nama lengkap", photoPh: "URL foto (opsional)", add: "Tambah", on: "Aktif", off: "Nonaktif", photo: "Foto", saved: "tersimpan", scale: "Skala poin", scaleT: "Poin per unit", note: "Skor yang sudah tersimpan tetap memakai skala poin yang berlaku saat laporan dibuat.", save: "Simpan skala poin", ro: "Hanya baca: pakai « Masuk admin » di kanan atas untuk mengubah.", dup: "Nama ini sudah ada.", link: "Tautan", linkT: "Salin tautan pribadi laporan harian", copied: "tautan disalin", renew: "Ganti tautan {n}? Tautan lama tidak akan berfungsi lagi.", renewT: "Tautan baru (yang lama diputus)", bad: "Nilai yang diharapkan: angka positif." } },
 };
 
+// révisions + liens Frame.io (03/10)
+const T2 = {
+  fr: { rv: { stat: "Révisions", sub: (m) => `${m} de retouche`, clients: "Clients", clientsT: "Révisions par client", client: "Client", count: "Révisions", time: "Temps", pts: "Points", per: "moy. / révision", label: "Révisions", links: "Liens Frame.io", none: "Aucune révision sur la période." }, set2: { prod: "Création", rev: "Révision", note2: "Révision : points par correction (le temps passé est noté à part, sans effet sur les points)." } },
+  en: { rv: { stat: "Revisions", sub: (m) => `${m} of fixes`, clients: "Clients", clientsT: "Revisions by client", client: "Client", count: "Revisions", time: "Time", pts: "Points", per: "avg / revision", label: "Revisions", links: "Frame.io links", none: "No revision over the period." }, set2: { prod: "New", rev: "Revision", note2: "Revision: points per fix (time spent is logged separately and doesn't change the points)." } },
+  id: { rv: { stat: "Revisi", sub: (m) => `${m} koreksi`, clients: "Klien", clientsT: "Revisi per klien", client: "Klien", count: "Revisi", time: "Waktu", pts: "Poin", per: "rata-rata / revisi", label: "Revisi", links: "Tautan Frame.io", none: "Tidak ada revisi pada periode ini." }, set2: { prod: "Baru", rev: "Revisi", note2: "Revisi: poin per koreksi (waktu dicatat terpisah, tidak mengubah poin)." } },
+};
+for (const l of Object.keys(T)) Object.assign(T[l], T2[l]);
 const $ = (s) => document.querySelector(s);
 const params = new URLSearchParams(location.search);
 const store = { get: (k) => { try { return localStorage.getItem(k); } catch { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch {} } };
@@ -302,6 +316,12 @@ const avatar = (e, sm) => `<span class="av ${sm ? "sm" : ""}" style="background:
 const catLabel = (c) => (lang === "en" ? c.label_en : lang === "id" ? c.label_id : c.label_fr) || c.label_fr || c.key;
 const group = (key) => String(key).split("_")[0];
 const rate = (r, c) => { const v = r.rates && r.rates[c.key]; return Number(v == null ? c.points : v) || 0; };
+const REV = { key: "__rev", color: "#B9C9DA", label_fr: "Révisions", label_en: "Revisions", label_id: "Revisi" };
+const catsAll = () => [...cats, REV];
+const revsOf = (r) => (Array.isArray(r.revisions) ? r.revisions : []);
+const linksOf = (r) => { const out = []; const l = r.links || {}; for (const c of cats) for (const u of (Array.isArray(l[c.key]) ? l[c.key] : [])) out.push({ c, u }); return out; };
+const safeUrl = (u) => (/^https:\/\/([a-z0-9-]+\.)*(frame\.io|f\.io)\//i.test(String(u || "")) ? String(u) : "");
+const fmtMin = (m) => { m = Math.round(Number(m) || 0); const h = Math.floor(m / 60), r = m % 60; return h ? `${h} h${r ? " " + pad(r) : ""}` : `${m} min`; };
 const edKey = (r) => r.editor_id || ("name:" + r.editor_name);
 const edInfo = (r) => { const e = r.editor_id ? editors.find((x) => x.id === r.editor_id) : null; return { id: r.editor_id, name: (e && e.name) || r.editor_name || "?", avatar_url: e ? e.avatar_url : null }; };
 const ICONS = { chev: `<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`,
@@ -330,11 +350,11 @@ const inPeriod = () => reports.filter((r) => r.report_date >= period.from && r.r
 /* ===== agrégats ===== */
 function agg(list) {
   const days = new Map(), byCat = new Map(), eds = new Map(), cell = new Map();
-  let points = 0, elements = 0;
+  let points = 0, elements = 0, revs = 0, revMin = 0, revPts = 0; const clients = new Map();
   for (const r of list) {
     const p = Number(r.points) || 0, el = Number(r.elements) || 0; points += p; elements += el;
-    const d = days.get(r.report_date) || { points: 0, elements: 0, n: 0 }; d.points += p; d.elements += el; d.n++; days.set(r.report_date, d);
-    const k = edKey(r); const e = eds.get(k) || { key: k, ...edInfo(r), points: 0, elements: 0, days: new Set(), cats: new Map(), groups: {}, last: null };
+    const d = days.get(r.report_date) || { points: 0, elements: 0, n: 0, revs: 0 }; d.points += p; d.elements += el; d.n++; d.revs += Number(r.rev_count) || revsOf(r).length; days.set(r.report_date, d);
+    const k = edKey(r); const e = eds.get(k) || { key: k, ...edInfo(r), points: 0, elements: 0, days: new Set(), cats: new Map(), groups: {}, last: null, revs: 0, revMin: 0 };
     e.points += p; e.elements += el; e.days.add(r.report_date);
     if (!e.last || r.report_date > e.last.report_date || (r.report_date === e.last.report_date && String(r.updated_at) > String(e.last.updated_at))) e.last = r;
     for (const c of cats) {
@@ -344,12 +364,19 @@ function agg(list) {
       const eb = e.cats.get(c.key) || { points: 0, done: 0 }; eb.points += cp; eb.done += done; e.cats.set(c.key, eb);
       const g = group(c.key); e.groups[g] = (e.groups[g] || 0) + done;
     }
+    const rv = revsOf(r), rp = Number(r.rev_points) || 0, rc = Number(r.rev_count) || rv.length, rm = Number(r.rev_minutes) || 0;
+    if (rc) {
+      revs += rc; revMin += rm; revPts += rp; e.revs += rc; e.revMin += rm;
+      const b = byCat.get(REV.key) || { points: 0, done: 0 }; b.points += rp; b.done += rc; byCat.set(REV.key, b);
+      const eb = e.cats.get(REV.key) || { points: 0, done: 0 }; eb.points += rp; eb.done += rc; e.cats.set(REV.key, eb);
+      for (const x of rv) { const ck2 = x.studio_id || ("x:" + String(x.client || "?").trim().toLowerCase()); const cl = clients.get(ck2) || { name: x.client || "?", n: 0, min: 0, pts: 0, eds: new Set() }; cl.n++; cl.min += Number(x.minutes) || 0; cl.pts += Number(x.pts) || 0; cl.eds.add(edInfo(r).name); clients.set(ck2, cl); }
+    }
     eds.set(k, e);
     const ck = r.report_date + "|" + k; cell.set(ck, (cell.get(ck) || 0) + p);
   }
   const sortedEds = [...eds.values()].sort((a, b) => b.points - a.points || a.name.localeCompare(b.name));
   const sortedDays = [...days.keys()].sort();
-  return { points, elements, n: list.length, days, sortedDays, byCat, eds: sortedEds, cell };
+  return { points, elements, n: list.length, days, sortedDays, byCat, eds: sortedEds, cell, revs, revMin, revPts, clients: [...clients.values()].sort((a, b) => b.n - a.n || b.min - a.min) };
 }
 
 /* ===== rendu : cadre ===== */
@@ -394,13 +421,14 @@ function renderOverview() {
   const avg = A.sortedDays.length ? A.points / A.sortedDays.length : 0;
   const stat = (cls, k, v, unit, sub, sp) => `<div class="stat ${cls}"><div class="mono">${k}</div><div class="v">${v}${unit ? `<small>${unit}</small>` : ""}</div><div class="sub">${sub}</div>${sp || ""}</div>`;
   const head = (k, title, extra) => `<div class="ph"><div><div class="mono">${k}</div><h2>${title}</h2></div>${extra || ""}</div>`;
-  const catsSorted = cats.filter((c) => A.byCat.has(c.key)).sort((a, b) => A.byCat.get(b.key).points - A.byCat.get(a.key).points);
+  const catsSorted = catsAll().filter((c) => A.byCat.has(c.key)).sort((a, b) => A.byCat.get(b.key).points - A.byCat.get(a.key).points);
   $("#v-overview").innerHTML = `<div class="stats" id="stats">
       ${stat("main", S.points, nf(A.points), C.pts, S.perDecl(nf(A.n ? A.points / A.n : 0, 2)), spark(dayVals((d) => d.points), "#DCE3EA"))}
       ${stat("", S.elements, nf(A.elements, 0), "", S.elementsSub, spark(dayVals((d) => d.elements), "#7FB0E0"))}
       ${stat("", S.avg, nf(avg), C.pts, S.avgSub)}
       ${stat("", S.decl, nf(A.n, 0), "", S.declSub, spark(dayVals((d) => d.n), "#46D369"))}
       ${stat("", S.active, nf(A.eds.length, 0), "", S.activeSub)}
+      ${stat("", t("rv.stat"), nf(A.revs, 0), "", t("rv.sub")(fmtMin(A.revMin)), spark(dayVals((d) => d.revs || 0), "#B9C9DA"))}
     </div>
     <div class="panel">${head(C.evo, C.evoT)}${A.n ? `<div class="chart" style="height:320px"><canvas id="cEvo"></canvas></div>` : `<div class="empty">${C.empty}</div>`}</div>
     <div class="two">
@@ -408,7 +436,8 @@ function renderOverview() {
         <div class="dlg">${catsSorted.map((c) => `<div><i style="background:${esc(c.color)}"></i><span>${esc(catLabel(c))}</span><em><b>${nf(A.byCat.get(c.key).points)}</b> ${C.pts} · ${nf(A.byCat.get(c.key).done, 0)}</em></div>`).join("")}</div></div>` : `<div class="empty">${C.empty}</div>`}</div>
       <div class="panel">${head(C.cmp, C.cmpT)}${A.n ? `<div class="chart" style="height:${Math.max(220, 90 + 36 * A.eds.length)}px"><canvas id="cCmp"></canvas></div>` : `<div class="empty">${C.empty}</div>`}</div>
     </div>
-    <div class="panel">${head(C.detail, C.detailT)}${A.n ? renderGrid(A) : `<div class="empty">${C.empty}</div>`}</div>`;
+    <div class="panel">${head(C.detail, C.detailT)}${A.n ? renderGrid(A) : `<div class="empty">${C.empty}</div>`}</div>
+    <div class="panel">${head(t("rv.clients"), t("rv.clientsT"))}${renderClients(A)}</div>`;
   if (!A.n) return;
   if (typeof Chart === "undefined") { document.querySelectorAll("#v-overview .chart").forEach((el) => { el.innerHTML = `<div class="empty">${C.noChart}</div>`; }); return; }
   Chart.defaults.color = "#9AA3AD"; Chart.defaults.font.family = "'Geist', system-ui, sans-serif"; Chart.defaults.font.size = 12;
@@ -429,9 +458,15 @@ function renderOverview() {
   charts.dist = new Chart($("#cDist").getContext("2d"), { type: "doughnut", data: { labels: catsSorted.map(catLabel), datasets: [{ data: catsSorted.map((c) => A.byCat.get(c.key).points), backgroundColor: catsSorted.map((c) => c.color), borderColor: "#0F1114", borderWidth: 2, hoverOffset: 4 }] },
     options: { maintainAspectRatio: false, cutout: "72%", plugins: { legend: { display: false }, tooltip: { ...tip, callbacks: { label: (x) => ` ${x.label} · ${nf(x.parsed)} ${C.pts}` } } } } });
   // 3. comparaison : barres empilées horizontales par monteur
-  charts.cmp = new Chart($("#cCmp").getContext("2d"), { type: "bar", data: { labels: A.eds.map((e) => e.name), datasets: cats.filter((c) => A.byCat.has(c.key)).map((c) => ({ label: catLabel(c), data: A.eds.map((e) => (e.cats.get(c.key) || { points: 0 }).points), backgroundColor: c.color, borderRadius: 3, barThickness: 18 })) },
+  charts.cmp = new Chart($("#cCmp").getContext("2d"), { type: "bar", data: { labels: A.eds.map((e) => e.name), datasets: catsAll().filter((c) => A.byCat.has(c.key)).map((c) => ({ label: catLabel(c), data: A.eds.map((e) => (e.cats.get(c.key) || { points: 0 }).points), backgroundColor: c.color, borderRadius: 3, barThickness: 18 })) },
     options: { maintainAspectRatio: false, indexAxis: "y", plugins: { legend: { position: "bottom", labels: { usePointStyle: true, pointStyle: "circle", boxWidth: 6, boxHeight: 6, padding: 14 } }, tooltip: { ...tip, callbacks: { label: (x) => ` ${x.dataset.label} · ${nf(x.parsed.x)} ${C.pts}` } } },
       scales: { x: { stacked: true, beginAtZero: true, grid, ticks: { maxTicksLimit: 6 } }, y: { stacked: true, grid: { display: false }, ticks: { color: "#F5F5F1", font: { weight: 500 } } } } } });
+}
+function renderClients(A) {
+  const V = t("rv"); if (!A.clients.length) return `<div class="empty">${V.none}</div>`;
+  return `<div class="scroll"><table class="grid"><thead><tr><th class="d">${V.client}</th><th>${V.count}</th><th>${V.time}</th><th>${V.per}</th><th>${V.pts}</th><th>${t("tabs.editors")}</th></tr></thead><tbody>`
+    + A.clients.map((c) => `<tr><td class="d">${esc(c.name)}</td><td class="c">${nf(c.n, 0)}</td><td class="c">${fmtMin(c.min)}</td><td>${fmtMin(c.min / c.n)}</td><td>${nf(c.pts)}</td><td>${esc([...c.eds].join(", "))}</td></tr>`).join("")
+    + `<tr class="t"><td class="d">${t("charts.total")}</td><td>${nf(A.revs, 0)}</td><td>${fmtMin(A.revMin)}</td><td>${fmtMin(A.revs ? A.revMin / A.revs : 0)}</td><td>${nf(A.revPts)}</td><td></td></tr></tbody></table></div>`;
 }
 function renderGrid(A) {
   const C = t("charts"), days = [...A.sortedDays].reverse(), eds = A.eds;
@@ -455,11 +490,11 @@ function renderEditors() {
   if (!A.eds.length) { $("#v-editors").innerHTML = `<div class="panel"><div class="empty">${C.empty}</div></div>`; return; }
   $("#v-editors").innerHTML = `<div class="cards">` + A.eds.map((e, i) => {
     const pct = leader ? Math.round((e.points / leader) * 100) : 0, nd = e.days.size;
-    const segs = cats.filter((c) => e.cats.has(c.key)).map((c) => `<i style="width:${((e.cats.get(c.key).points / (e.points || 1)) * 100).toFixed(1)}%;background:${esc(c.color)}"></i>`).join("");
+    const segs = catsAll().filter((c) => e.cats.has(c.key)).map((c) => `<i style="width:${((e.cats.get(c.key).points / (e.points || 1)) * 100).toFixed(1)}%;background:${esc(c.color)}"></i>`).join("");
     return `<div class="card" data-editor="${esc(e.key)}"><div class="top2">${avatar(e)}<div><div class="nm">${esc(e.name)}</div><div class="meta">${E.days(nd)} · ${nf(nd ? e.points / nd : 0)} ${E.perDay}</div></div><span class="rank ${i === 0 ? "first" : ""}">#${i + 1}</span></div>
       <div class="kv"><div><div class="mono">${E.points}</div><div class="v">${nf(e.points)}</div></div><div><div class="mono">${E.elements}</div><div class="v">${nf(e.elements, 0)}</div></div></div>
       <div><div class="vs"><span>${E.vs}</span><span>${pct}%</span></div><div class="bar"><div class="fill" style="width:${pct}%">${segs}</div></div></div>
-      <div class="pills">${["reel", "intro", "podcast"].map((g) => `<span class="tag">${E.groups[g]} <b>${nf(e.groups[g] || 0, 0)}</b></span>`).join("")}</div>
+      <div class="pills">${["reel", "intro", "podcast"].map((g) => `<span class="tag">${E.groups[g]} <b>${nf(e.groups[g] || 0, 0)}</b></span>`).join("")}${e.revs ? `<span class="tag">${t("rv.label")} <b>${nf(e.revs, 0)}</b> · ${fmtMin(e.revMin)}</span>` : ""}</div>
       <div class="last">${E.last} · ${lastEntry(e.last)}</div></div>`;
   }).join("") + `</div>`;
 }
@@ -472,9 +507,14 @@ function renderReports() {
     const e = edInfo(r), counts = r.counts || {};
     const done = cats.filter((c) => Number(counts[c.key] && counts[c.key].done) > 0).map((c) => `<span class="tag">${esc(catLabel(c))} <b>×${nf(counts[c.key].done, 0)}</b></span>`).join("");
     const prog = cats.filter((c) => Number(counts[c.key] && counts[c.key].progress) > 0).map((c) => `<span class="tag prog" style="color:${esc(c.color)};background:${esc(c.color)}1f" title="${R.progress}">${ICONS.loop} ${esc(catLabel(c))} <b>${nf(counts[c.key].progress, 0)}%</b></span>`).join("");
+    const rv = revsOf(r), lk = linksOf(r), byKey = Object.fromEntries(cats.map((c) => [c.key, c]));
+    const revPill = rv.length ? `<span class="tag" style="border-color:#B9C9DA">${t("rv.label")} <b>×${rv.length}</b> · ${fmtMin(r.rev_minutes || rv.reduce((a, x) => a + (Number(x.minutes) || 0), 0))}</span>` : "";
+    const a = (u, txt) => safeUrl(u) ? `<a class="lk" href="${esc(safeUrl(u))}" target="_blank" rel="noopener noreferrer">${txt}</a>` : `<span>${esc(txt)}</span>`;
+    const linksBlock = lk.length ? `<div><div class="mono">${t("rv.links")}</div><div class="lkl">${lk.map((x, i) => a(x.u, `${esc(catLabel(x.c))} ${lk.slice(0, i + 1).filter((y) => y.c.key === x.c.key).length}`)).join("")}</div></div>` : "";
+    const revBlock = rv.length ? `<div><div class="mono">${t("rv.label")}</div><div class="revl">${rv.map((x) => `<div><span class="tag">${esc(byKey[x.cat] ? catLabel(byKey[x.cat]) : x.cat)}</span><b>${esc(x.client || "?")}</b><span>${fmtMin(x.minutes)}</span><span class="mono">${nf(x.pts)} ${t("charts.pts")}</span>${a(x.url, "Frame.io ↗")}</div>`).join("")}</div></div>` : "";
     const block = (k, v) => v ? `<div><div class="mono">${k}</div><p class="txt">${esc(v)}</p></div>` : "";
     return `<div class="rep ${openIds.has(r.id) ? "open" : ""}" data-rep="${r.id}"><button type="button" class="head" aria-expanded="${openIds.has(r.id)}">${avatar(e, true)}<div><div class="nm">${esc(e.name)}</div><div class="dt">${fmtDay(r.report_date)}</div></div><span class="pts">${nf(r.points)}<small>${t("charts.pts")}</small></span>${ICONS.chev}</button>
-      <div class="body"><div class="pills">${done}${prog}${r.lang ? `<span class="lang">${esc(r.lang)}</span>` : ""}</div>${block(R.details, r.details)}${block(R.comment, r.comment)}
+      <div class="body"><div class="pills">${done}${prog}${revPill}${r.lang ? `<span class="lang">${esc(r.lang)}</span>` : ""}</div>${linksBlock}${revBlock}${block(R.details, r.details)}${block(R.comment, r.comment)}
       ${canEditReports() ? `<div class="act"><button type="button" class="btn sm" data-del="${r.id}">${ICONS.trash}${R.del}</button></div>` : ""}</div></div>`;
   }).join("") + `</div>`;
   $("#v-reports").querySelectorAll(".rep .head").forEach((h) => h.addEventListener("click", () => { const el = h.parentElement, id = el.dataset.rep; el.classList.toggle("open"); el.classList.contains("open") ? openIds.add(id) : openIds.delete(id); h.setAttribute("aria-expanded", el.classList.contains("open")); }));
@@ -496,14 +536,14 @@ function renderSettings() {
       ${edKeys[e.id] ? `<span class="lk2"><button type="button" class="btn sm" data-link="${e.id}" title="${S.linkT}">${S.link}</button><button type="button" class="btn sm" data-renew="${e.id}" title="${S.renewT}">↻</button></span>` : ""}
       <div class="photo"><input class="in" placeholder="${S.photoPh}" value="${esc(e.avatar_url || "")}" data-url="${e.id}" ${admin ? "" : "readonly"}/></div></div>`;
   const sorted = editors.slice().sort((a, b) => (a.sort ?? 100) - (b.sort ?? 100) || a.name.localeCompare(b.name));
-  const srow = (c) => `<div class="srow"><div class="lab"><i style="background:${esc(c.color)}"></i><span>${esc(catLabel(c))}</span><span class="tag lt" style="flex:none">${esc(c.lang_tag || "")}</span></div><input class="in" type="number" min="0" step="0.1" inputmode="decimal" value="${Number(c.points)}" data-pts="${esc(c.key)}" ${admin ? "" : "readonly"}/></div>`;
+  const srow = (c) => `<div class="srow"><div class="lab"><i style="background:${esc(c.color)}"></i><span>${esc(catLabel(c))}</span><span class="tag lt" style="flex:none">${esc(c.lang_tag || "")}</span></div><input class="in" type="number" min="0" step="0.1" inputmode="decimal" value="${Number(c.points)}" data-pts="${esc(c.key)}" ${admin ? "" : "readonly"}/><input class="in" type="number" min="0" step="0.1" inputmode="decimal" value="${Number(c.rev_points || 0)}" data-rev="${esc(c.key)}" ${admin ? "" : "readonly"}/></div>`;
   $("#v-settings").innerHTML = `<div class="set2">
     <div class="panel"><div class="ph"><div><div class="mono">${S.team}</div><h2>${S.editors}</h2></div></div>
       ${admin ? `<div class="addrow"><input class="in" id="edName" placeholder="${S.namePh}" maxlength="60"/><input class="in" id="edPhoto" placeholder="${S.photoPh}"/><button type="button" class="btn primary" id="edAdd">${S.add}</button></div>` : `<p class="note">${S.ro}</p>`}
       <div class="edrows" id="edRows">${sorted.map(row).join("")}</div><div class="msg" id="edMsg" role="status"></div></div>
     <div class="panel"><div class="ph"><div><div class="mono">${S.scale}</div><h2>${S.scaleT}</h2></div></div>
-      <div class="scale" id="scale">${cats.slice().sort((a, b) => a.sort - b.sort).map(srow).join("")}</div>
-      <p class="note">${S.note}</p>
+      <div class="scale" id="scale"><div class="srow h"><span></span><span>${t("set2.prod")}</span><span>${t("set2.rev")}</span></div>${cats.slice().sort((a, b) => a.sort - b.sort).map(srow).join("")}</div>
+      <p class="note">${S.note} ${t("set2.note2")}</p>
       ${admin ? `<div class="act2"><button type="button" class="btn primary" id="scaleSave">${S.save}</button><span class="msg" id="scaleMsg" role="status"></span></div>` : `<p class="note">${S.ro}</p>`}</div></div>`;
   if (!admin) return;
   const flash = (sel, txt, bad) => { const m = $(sel); if (!m) return; m.classList.toggle("err", !!bad); m.textContent = txt; if (!bad) setTimeout(() => { if (m.textContent === txt) m.textContent = ""; }, 2500); };
@@ -540,13 +580,14 @@ function renderSettings() {
   $("#edRows").querySelectorAll("[data-toggle]").forEach((b) => b.addEventListener("click", async () => { const e = editors.find((x) => x.id === b.dataset.toggle); if (!e) return; b.disabled = true; if (await patch(e.id, { active: e.active === false })) { renderSettings(); flash("#edMsg", "✓ " + S.saved); } else b.disabled = false; }));
   $("#scaleSave").addEventListener("click", async () => {
     const changes = [];
-    for (const inp of $("#scale").querySelectorAll("[data-pts]")) {
+    for (const inp of $("#scale").querySelectorAll("[data-pts],[data-rev]")) {
       const v = Number(String(inp.value).replace(",", ".")); inp.classList.toggle("bad", !(v >= 0 && isFinite(v)));
       if (!(v >= 0 && isFinite(v))) { flash("#scaleMsg", S.bad, true); return; }
-      const c = cats.find((x) => x.key === inp.dataset.pts); if (c && Number(c.points) !== v) changes.push({ key: c.key, points: v });
+      const field = inp.dataset.pts ? "points" : "rev_points", c = cats.find((x) => x.key === (inp.dataset.pts || inp.dataset.rev));
+      if (c && Number(c[field] || 0) !== v) { const ex = changes.find((x) => x.key === c.key); if (ex) ex[field] = v; else changes.push({ key: c.key, [field]: v }); }
     }
     $("#scaleSave").disabled = true;
-    for (const ch of changes) { const { error } = await sb.from("prod_categories").update({ points: ch.points, updated_at: new Date().toISOString() }).eq("key", ch.key); if (error) { flash("#scaleMsg", error.message, true); $("#scaleSave").disabled = false; return; } }
+    for (const ch of changes) { const { error } = await sb.from("prod_categories").update({ ...ch, key: undefined, updated_at: new Date().toISOString() }).eq("key", ch.key); if (error) { flash("#scaleMsg", error.message, true); $("#scaleSave").disabled = false; return; } }
     await loadCats(); $("#scaleSave").disabled = false; renderSettings(); flash("#scaleMsg", "✓ " + S.saved);
   });
 }
@@ -557,10 +598,13 @@ function exportCsv() {
   const q = (s) => { s = String(s ?? ""); if (/^[=+\-@\t\r]/.test(s)) s = "'" + s; /* pas de formule exécutée par Excel */ return /[;"\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
   const dec = (x, d) => Number(x || 0).toFixed(d).replace(".", ",");
   const byKey = Object.fromEntries(cats.map((c) => [c.key, c]));
-  const head = ["Date", "Monteur", ...CSV_KEYS.map((k) => (byKey[k] || { label_fr: k }).label_fr), "Score", "En cours", "Détails", "Commentaire"];
+  const head = ["Date", "Monteur", ...CSV_KEYS.map((k) => (byKey[k] || { label_fr: k }).label_fr), "Score", "En cours", "Détails", "Commentaire", "Révisions", "Temps révisions (min)", "Points révisions", "Détail révisions", "Liens Frame.io"];
   const rows = list.map((r) => { const c = r.counts || {};
     const prog = cats.filter((x) => Number(c[x.key] && c[x.key].progress) > 0).map((x) => `${x.label_fr} ${Number(c[x.key].progress)}%`).join(" | ");
-    return [r.report_date, edInfo(r).name, ...CSV_KEYS.map((k) => String(Number(c[k] && c[k].done) || 0)), dec(r.points, 1), prog, r.details || "", r.comment || ""].map(q).join(";"); });
+    return [r.report_date, edInfo(r).name, ...CSV_KEYS.map((k) => String(Number(c[k] && c[k].done) || 0)), dec(r.points, 1), prog, r.details || "", r.comment || "",
+      String(Number(r.rev_count) || revsOf(r).length), String(Number(r.rev_minutes) || 0), dec(r.rev_points, 1),
+      revsOf(r).map((x) => `${(byKey[x.cat] || { label_fr: x.cat }).label_fr} · ${x.client || "?"} · ${x.minutes} min · ${x.url}`).join(" | "),
+      linksOf(r).map((x) => `${x.c.label_fr} : ${x.u}`).join(" | ")].map(q).join(";"); });
   const blob = new Blob(["﻿" + [head.join(";"), ...rows].join("\r\n") + "\r\n"], { type: "text/csv;charset=utf-8" });
   const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `production_${period.from}_${period.to}.csv`; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
 }
