@@ -124,6 +124,13 @@
     .st.auto{cursor:default;border-color:rgba(70,211,105,.5)}
     .st.auto.on{border-color:var(--ok)}
     .st[aria-disabled="true"]{cursor:not-allowed;opacity:.6}
+    .st.lk{cursor:default}
+    /* retour d'enregistrement (✓ Enregistré / erreur) à côté d'un champ ; .warn = consigne permanente */
+    .fb{display:block;font-size:11px;font-weight:500;margin-top:3px;line-height:1.35}
+    .fb:empty{display:none}.fb.ok{color:var(--ok)}.fb.err{color:var(--err)}.fb.warn{color:var(--warn)}
+    .steps .fb{flex-basis:100%;margin:0}
+    .qc .btn{height:32px;padding:0 12px;font-size:12px}
+    .job{cursor:pointer}.job .detail{cursor:auto}body.tv .job{cursor:default}
     .qc{display:flex;flex-direction:column;gap:5px}
     .qc select{padding:6px 8px;font-size:12px}
     .qc.pending select{color:var(--warn);border-color:rgba(245,196,0,.35)}
@@ -322,9 +329,9 @@
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/+esm";
 
 /* ===== Configuration ===== */
-const OPEN_ACCESS = { email: "acces.libre@ds-editing.com", password: "HAs0lMotAKsCmNdx" }; // 05/10 : accès libre demandé par Cyriaque (compte partagé « Équipe »). Pour remettre les mots de passe : null ici + désactiver le compte.
 const SUPABASE_URL = "https://xkanmjlpysxpohsuqvwg.supabase.co";
 const SUPABASE_ANON = "sb_publishable_lIZtV_WtN5NcGSb0dnfaiQ_AgKYBIVa";
+const OPEN_ACCESS = { email: "acces.libre@ds-editing.com", password: "HAs0lMotAKsCmNdx" }; // 05/10 : accès libre demandé par Cyriaque (compte partagé « Équipe »). Pour remettre les mots de passe : null ici + désactiver le compte.
 const BUSINESS_DAYS_DEFAULT = 5;   // délai par défaut quand le client n'a pas donné de date
 
 const T = {
@@ -344,6 +351,8 @@ const T = {
       destHint: "Non modifiable ici : changer de dossier ne déplace pas les rushes déjà téléchargés et fausserait leurs chemins. À faire avec l'équipe technique, sur le PC du bureau.", saved: "enregistré", bad: (a, b) => `Valeur attendue : entre ${a} et ${b}`, missing: "Réglages introuvables : l'agent du PC du bureau n'est pas encore configuré." },
     steps: { dl: "Fichiers", start: "Commencé", half: "50 %", done: "Livré" }, qc: { pending: "Qualité : en attente", ok: "Qualité : OK", revisions: "Qualité : à revoir" },
     wanted: "Date souhaitée", noDate: "sans date", late: "EN RETARD", team: "équipe", delivered: "livré", unassigned: "À attribuer", noEditor: "Aucun monteur", brief: "Brief", files: "Fichiers", frame: "frame.io", empty: "Aucune commande dans cette vue.", received: "Reçu", frameioPh: "Lien frame.io de livraison", noteQc: "Note qualité", notes: "Notes internes", deliveryDate: "Livraison fixée par l'équipe", rushes: "Rushes", email: "E-mail client", contact: "Contact",
+    needFrame: "Colle d'abord le lien frame.io de livraison : « Livré » reste bloqué sans lui.", locked: "Étape déjà cochée : seule la qualité ou un admin peut la corriger.", redeliver: "Relivrer", redeliverTip: "Corrige le lien frame.io si besoin, puis relivre pour un nouveau contrôle qualité.", redelivered: "✓ Relivré, la qualité est prévenue", round: (n) => `${n}e passage`, savedOk: "✓ Enregistré",
+    errs: { FRAMEIO_REQUIS: "Lien frame.io manquant ou invalide (il doit commencer par https://).", ETAPE_VERROUILLEE: "Étape déjà cochée : seule la qualité ou un admin peut la corriger.", QC_OK_VERROUILLE: "Qualité déjà validée : le lien frame.io ne peut plus être modifié (voir avec l'équipe qualité).", REFUSE: "Action refusée pour ton profil.", CHAMP_INTERDIT: "Modification non autorisée pour ton profil." },
     tabs: { prod: "Production", tarifs: "Tarifs", factures: "Factures", rdv: "Rendez-vous" }, amountL: "Montant", amountMiss: "Prix manquant dans la grille :", override: "Montant forcé", recalc: "Recalculer", invoiced: "Facturé", sunday: "facturé dimanche",
     keys: { podcast_standard: "Épisode podcast · Standard", podcast_premium: "Épisode podcast · Premium", vsl_standard: "VSL · Standard", vsl_premium: "VSL · Premium", reel_standard: "Reel standard", reel_premium: "Reel premium", intro: "Intro", miniature: "Miniature", trailer: "Trailer", cta: "CTA réseaux sociaux", extra_30min: "Supplément 30 min" },
     tarifsHint: "Prix unitaires par client, dans sa devise. Vide = pas encore fixé : la commande validée attend un prix avant d'être facturée.", clientSel: "Client", saved: "enregistré", recalcAll: "Recalculer les commandes validées", space: "Espace client", billing: "Facturation", billingName: "Raison sociale", billingAddress: "Adresse (une ligne par ligne)", billingEmail: "E-mail de facturation", attention: "À l'attention de", currency: "Devise", tvaL: "TVA",
@@ -370,6 +379,8 @@ const T = {
       destHint: "Not editable here: changing the folder does not move footage already downloaded and would break its paths. To be done with the tech team, on the office PC.", saved: "saved", bad: (a, b) => `Expected value: between ${a} and ${b}`, missing: "Settings not found: the office PC agent is not configured yet." },
     steps: { dl: "Files", start: "Started", half: "50%", done: "Delivered" }, qc: { pending: "QC: pending", ok: "QC: OK", revisions: "QC: revisions" },
     wanted: "Requested date", noDate: "no date", late: "LATE", team: "team", delivered: "delivered", unassigned: "Unassigned", noEditor: "No editor", brief: "Brief", files: "Files", frame: "frame.io", empty: "No order in this view.", received: "Received", frameioPh: "frame.io delivery link", noteQc: "QC note", notes: "Internal notes", deliveryDate: "Delivery set by the team", rushes: "Footage", email: "Client email", contact: "Contact",
+    needFrame: "Paste the frame.io delivery link first: “Delivered” stays blocked without it.", locked: "Step already ticked: only QC or an admin can fix it.", redeliver: "Redeliver", redeliverTip: "Fix the frame.io link if needed, then redeliver for a new quality check.", redelivered: "✓ Redelivered, QC has been notified", round: (n) => `${n}${[11, 12, 13].includes(n % 100) ? "th" : ({ 1: "st", 2: "nd", 3: "rd" })[n % 10] || "th"} pass`, savedOk: "✓ Saved",
+    errs: { FRAMEIO_REQUIS: "frame.io link missing or invalid (it must start with https://).", ETAPE_VERROUILLEE: "Step already ticked: only QC or an admin can fix it.", QC_OK_VERROUILLE: "QC already approved: the frame.io link can no longer be changed (ask the QC team).", REFUSE: "Action refused for your profile.", CHAMP_INTERDIT: "Change not allowed for your profile." },
     tabs: { prod: "Production", tarifs: "Pricing", factures: "Invoices", rdv: "Appointments" }, amountL: "Amount", amountMiss: "Missing price in the grid:", override: "Forced amount", recalc: "Recalculate", invoiced: "Invoiced", sunday: "invoiced Sunday",
     keys: { podcast_standard: "Podcast episode · Standard", podcast_premium: "Podcast episode · Premium", vsl_standard: "VSL · Standard", vsl_premium: "VSL · Premium", reel_standard: "Standard reel", reel_premium: "Premium reel", intro: "Intro", miniature: "Thumbnail", trailer: "Trailer", cta: "Social CTA", extra_30min: "Extra 30 min" },
     tarifsHint: "Unit prices per client, in their currency. Empty = not set yet: the approved order waits for a price before being invoiced.", clientSel: "Client", saved: "saved", recalcAll: "Recalculate approved orders", space: "Client space", billing: "Billing", billingName: "Legal name", billingAddress: "Address (one line per line)", billingEmail: "Billing email", attention: "Attention", currency: "Currency", tvaL: "VAT",
@@ -390,8 +401,8 @@ let me = null, profile = null, myEditor = null, jobs = [], editors = [], filter 
 let tab = params.get("tab") || "prod", studios = [], grids = [], invoicesAll = [], extras = [], tarifStudio = "", bookingSettings = null, bookingsAll = [];
 const money = (x, cur) => x == null ? "—" : (cur === "USD" ? "$" + Number(x).toLocaleString("en-US", { minimumFractionDigits: 2 }) : Number(x).toLocaleString("fr-FR", { minimumFractionDigits: 2 }) + " €");
 
-const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const safeUrl = (u) => /^https?:\/\//i.test(String(u || "").trim()) ? esc(String(u).trim()) : "#"; // seuls les liens http(s) deviennent cliquables
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const loc = () => (lang === "fr" ? "fr-FR" : "en-GB");
 const fmtD = (d) => d ? new Date(d).toLocaleDateString(loc(), { weekday: "short", day: "2-digit", month: "short" }) : "—";
 const fmtDT = (d) => d ? new Date(d).toLocaleString(loc(), { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" }) : "—";
@@ -404,6 +415,9 @@ const remaining = (j) => target(j) - Date.now();
 const isLate = (j) => !isDone(j) && remaining(j) < 0;
 const cls = (j) => isDone(j) ? "done" : remaining(j) < 0 ? "r" : remaining(j) < 2 * 86400000 ? "o" : "g";
 const isAdmin = () => profile && ["admin", "dispatcher", "qc"].includes(profile.role);
+const isEditor = () => !!profile && profile.role === "editor";
+const FRAME_OK = (u) => /^https?:\/\//i.test(String(u || "").trim());
+const normFrame = (u) => { const v = String(u || "").trim(); return v && !FRAME_OK(v) ? "https://" + v.replace(/^\/+/, "") : v; };   // « f.io/abc » collé sans https : on complète (la base n'accepte que http(s))
 const canEdit = (j) => profile && (isAdmin() || (profile.role === "editor" && myEditor && (j.editor_ids || []).includes(myEditor.id)));
 function countdown(ms, done) {
   if (done) return "✓ " + t("delivered");
@@ -419,7 +433,17 @@ const avatar = (e, sm) => `<span class="av ${sm ? "sm" : ""}" style="background:
 /* ===== PC du bureau : agent qui télécharge les rushes (tables agent_status / agent_settings, colonnes files_* et download_* de jobs) ===== */
 const DL_MAX = 6, PC_LATE_MIN = 12, PC_OFF_MIN = 30, DISK_ALERT_DEFAULT = 85, FLASH_MS = 3800;
 let agent = null, agentSettings = null, agentOk = false, alertsHtml = null;
-const openIds = new Set(), hadFiles = new Map(), flashUntil = new Map(), notes = new Map();
+const openIds = new Set(), hadFiles = new Map(), flashUntil = new Map(), notes = new Map(), hadRound = new Map(), fbMap = new Map();
+// retour d'enregistrement : clé « id:champ » ; le message survit au re-rendu du tableau (fbHtml le relit), puis s'efface
+const fbHtml = (id, f) => { const x = fbMap.get(id + ":" + f); const on = x && x.until > Date.now(); return `<span class="fb${on ? (x.ok ? " ok" : " err") : ""}" data-fb="${id}:${f}" role="status">${on ? esc(x.msg) : ""}</span>`; };
+function setFb(id, f, ok, msg, ms) {
+  const k = id + ":" + f, paint = (el, on) => { if (el) { el.className = "fb" + (on ? (ok ? " ok" : " err") : ""); el.textContent = on ? msg : ""; } };
+  fbMap.set(k, { ok, msg, until: Date.now() + ms }); document.querySelectorAll(`[data-fb="${k}"]`).forEach((el) => paint(el, true));
+  setTimeout(() => { const x = fbMap.get(k); if (x && x.until <= Date.now()) { fbMap.delete(k); document.querySelectorAll(`[data-fb="${k}"]`).forEach((el) => paint(el, false)); } }, ms + 30);
+}
+const errText = (e) => { const m = String((e && e.message) || e || ""), E = t("errs"), k = Object.keys(E).find((x) => m.startsWith(x)); return k ? E[k] : m; };
+// « Livré » / « Relivrer » sans lien : on ouvre le détail, on met le curseur dans le champ frame.io et on dit pourquoi
+function needFrame(id, inp) { const row = document.querySelector(`.job[data-id="${id}"]`); if (row) row.classList.add("open"); openIds.add(id); setFb(id, "step", false, t("needFrame"), 7000); if (inp) inp.focus(); }
 function fmtBytes(n) {
   if (n == null || n === "" || !isFinite(Number(n))) return "—";
   const u = lang === "fr" ? ["o", "Ko", "Mo", "Go", "To"] : ["B", "KB", "MB", "GB", "TB"];
@@ -617,14 +641,17 @@ function visible() {
     if (filter === "all" && isDone(j) && Date.now() - new Date(j.qc_at || j.delivered_at).getTime() > 7 * 86400000) return false;
     if (q && !`${j.token} ${j.client_name} ${j.project} ${(j.editor_names || []).join(" ")} ${j.work_to_do || ""}`.toLowerCase().includes(q)) return false;
     return true;
-  }).sort((a, b) => (isDone(a) - isDone(b)) || (target(a) - target(b)));
+  }).sort((a, b) => (isDone(a) - isDone(b)) || (filter === "qc" ? ((b.qc_round > 0) - (a.qc_round > 0)) || (new Date(b.redelivered_at || 0) - new Date(a.redelivered_at || 0)) : 0) || (target(a) - target(b)));
 }
 function renderBoard() {
   const list = visible(); const st = t("steps"); const qc = t("qc"); const now = Date.now();
   paintReady();
   if (!list.length) { $("#board").innerHTML = `<div class="empty">${t("empty")}</div>`; return; }
   $("#board").innerHTML = list.map((j) => {
-    const c = cls(j); const ed = canEdit(j); const dis = ed ? "" : 'aria-disabled="true"';
+    const c = cls(j); const ed = canEdit(j);
+    // étape : inactive sans droit ; verrouillée (déjà cochée) pour le monteur ; « Livré » bloqué tant qu'il n'y a pas de lien frame.io
+    const sAttr = (k) => !ed ? 'aria-disabled="true"' : (isEditor() && j[k]) ? `title="${esc(t("locked"))}"` : (k === "delivered_at" && !j.delivered_at && !FRAME_OK(j.frameio_url)) ? `aria-disabled="true" data-nf="1" title="${esc(t("needFrame"))}"` : "";
+    const sLk = (k) => ed && isEditor() && j[k] ? " lk" : "";
     const eds = (j.editor_ids || []).map((id) => editors.find((e) => e.id === id)).filter(Boolean);
     const edCell = eds.length
       ? `<div class="row">${eds.map((e) => avatar(e, true)).join("")}</div><div class="names">${eds.map((e) => esc(e.name)).join(", ")}</div>`
@@ -637,22 +664,23 @@ function renderBoard() {
       <div class="due ${c}"><div class="k">${t("wanted")}</div><div class="dt">${j.requested_deadline ? fmtD(j.requested_deadline) : (j.delivery_date ? fmtD(j.delivery_date) : fmtD(target(j)) + " *")}</div><div class="cd" data-cd="${j.id}">${countdown(remaining(j), isDone(j))}</div>${teamDate}</div>
       <div class="steps">
         <span class="st auto ${j.files_downloaded_at ? "on" : ""}" title="${j.download_error ? esc(j.download_error) : ""}">${j.files_downloaded_at ? "✓" : j.download_error ? "!" : "…"} ${st.dl}</span>
-        <span class="st ${j.started_at ? "on" : ""}" data-step="started_at" data-id="${j.id}" ${dis}>${j.started_at ? "✓" : "○"} ${st.start}</span>
-        <span class="st ${j.half_at ? "on" : ""}" data-step="half_at" data-id="${j.id}" ${dis}>${j.half_at ? "✓" : "○"} ${st.half}</span>
-        <span class="st ${j.delivered_at ? "on" : ""}" data-step="delivered_at" data-id="${j.id}" ${dis}>${j.delivered_at ? "✓" : "○"} ${st.done}</span>
+        <span class="st ${j.started_at ? "on" : ""}${sLk("started_at")}" data-step="started_at" data-id="${j.id}" ${sAttr("started_at")}>${j.started_at ? "✓" : "○"} ${st.start}</span>
+        <span class="st ${j.half_at ? "on" : ""}${sLk("half_at")}" data-step="half_at" data-id="${j.id}" ${sAttr("half_at")}>${j.half_at ? "✓" : "○"} ${st.half}</span>
+        <span class="st ${j.delivered_at ? "on" : ""}${sLk("delivered_at")}" data-step="delivered_at" data-id="${j.id}" ${sAttr("delivered_at")}>${j.delivered_at ? "✓" : "○"} ${st.done}</span>
         ${dlLine(j)}
+        ${fbHtml(j.id, "step")}
       </div>
-      <div class="qc ${j.qc_status}">${isAdmin() ? `<select class="in" data-act="qc" data-id="${j.id}">${["pending", "ok", "revisions"].map((k) => `<option value="${k}" ${k === j.qc_status ? "selected" : ""}>${qc[k]}</option>`).join("")}</select>` : `<span class="badge ${j.qc_status === "ok" ? "ok" : j.qc_status === "revisions" ? "err" : ""}">${qc[j.qc_status]}</span>`}</div>
+      <div class="qc ${j.qc_status}">${isAdmin() ? `<select class="in" data-act="qc" data-id="${j.id}">${["pending", "ok", "revisions"].map((k) => `<option value="${k}" ${k === j.qc_status ? "selected" : ""}>${qc[k]}</option>`).join("")}</select>` : `<span class="badge ${j.qc_status === "ok" ? "ok" : j.qc_status === "revisions" ? "err" : ""}">${qc[j.qc_status]}</span>`}${isAdmin() && j.qc_status === "pending" && j.qc_round > 0 ? `<span class="badge warn rnd" data-round="${j.qc_round}">${t("round")(j.qc_round + 1)}</span>` : ""}${isEditor() && ed && j.qc_status === "revisions" ? `<button type="button" class="btn" data-redeliver="${j.id}" title="${esc(t("redeliverTip"))}">${t("redeliver")}</button>` : ""}${fbHtml(j.id, "qc")}</div>
       <div class="links">${j.brief_url ? `<a href="${safeUrl(j.brief_url)}" target="_blank" rel="noopener">${t("brief")}</a>` : ""}${j.folder_url ? `<a href="${safeUrl(j.folder_url)}" target="_blank" rel="noopener">${t("files")}</a>` : ""}${j.frameio_url ? `<a href="${safeUrl(j.frameio_url)}" target="_blank" rel="noopener">${t("frame")}</a>` : ""}</div>
       <button type="button" class="more" data-more="${j.id}">⋯</button>
       <div class="detail">
         ${filesBlock(j)}
         <div><b>${t("rushes")}</b><div class="lk">${(j.rushes_links || []).map((u) => `<a href="${safeUrl(u)}" target="_blank" rel="noopener">${esc(u)}</a>`).join("\n") || "—"}</div></div>
-        <div><b>${t("contact")}</b>${esc(j.contact || "—")}<br/><b style="margin-top:8px">${t("email")}</b>${esc(j.email || "—")}${j.description ? `<br/><b style="margin-top:8px">Brief</b><span style="white-space:pre-wrap">${esc(j.description)}</span>` : ""}</div>
+        <div>${isAdmin() ? `<b>${t("contact")}</b>${esc(j.contact || "—")}<br/><b style="margin-top:8px">${t("email")}</b>${esc(j.email || "—")}` : ""}${j.description ? `${isAdmin() ? "<br/>" : ""}<b style="margin-top:8px">Brief</b><span style="white-space:pre-wrap">${esc(j.description)}</span>` : ""}</div>
         <div>
-          <b>${t("frame")}</b><input class="in" data-field="frameio_url" data-id="${j.id}" value="${esc(j.frameio_url || "")}" placeholder="${t("frameioPh")}" ${ed ? "" : "disabled"}/>
-          ${isAdmin() ? `<b style="margin-top:8px">${t("deliveryDate")}</b><input class="in" type="date" data-field="delivery_date" data-id="${j.id}" value="${j.delivery_date || ""}"/><b style="margin-top:8px">${t("noteQc")}</b><input class="in" data-field="qc_note" data-id="${j.id}" value="${esc(j.qc_note || "")}"/>` : (j.qc_note ? `<b style="margin-top:8px">${t("noteQc")}</b>${esc(j.qc_note)}` : "")}
-          <b style="margin-top:8px">${t("notes")}</b><input class="in" data-field="notes" data-id="${j.id}" value="${esc(j.notes || "")}" ${ed ? "" : "disabled"}/>
+          <b>${t("frame")}</b><input class="in" data-field="frameio_url" data-id="${j.id}" value="${esc(j.frameio_url || "")}" placeholder="${t("frameioPh")}" ${ed && !(isEditor() && j.qc_status === "ok") ? "" : "disabled"} ${isEditor() && j.qc_status === "ok" ? `title="${esc(t("errs").QC_OK_VERROUILLE)}"` : ""}/>${fbHtml(j.id, "frameio_url")}${ed && !j.delivered_at && !FRAME_OK(j.frameio_url) ? `<span class="fb warn">${t("needFrame")}</span>` : ""}
+          ${isAdmin() ? `<b style="margin-top:8px">${t("deliveryDate")}</b><input class="in" type="date" data-field="delivery_date" data-id="${j.id}" value="${j.delivery_date || ""}"/>${fbHtml(j.id, "delivery_date")}<b style="margin-top:8px">${t("noteQc")}</b><input class="in" data-field="qc_note" data-id="${j.id}" value="${esc(j.qc_note || "")}"/>${fbHtml(j.id, "qc_note")}` : (j.qc_note ? `<b style="margin-top:8px">${t("noteQc")}</b>${esc(j.qc_note)}` : "")}
+          <b style="margin-top:8px">${t("notes")}</b><input class="in" data-field="notes" data-id="${j.id}" value="${esc(j.notes || "")}" ${ed ? "" : "disabled"}/>${fbHtml(j.id, "notes")}
           ${isAdmin() ? amountBlock(j) : ""}
         </div>
       </div>
@@ -668,7 +696,7 @@ function amountBlock(j) {
     <span class="big">${money(j.amount, cur)}</span>
     ${(j.pricing_missing || []).length && j.amount == null ? `<span class="miss">${t("amountMiss")} ${j.pricing_missing.map((k) => t("keys")[k] || k).join(", ")}</span>` : ""}
     ${inv ? `<span class="badge ok">${t("invoiced")} ${esc(inv.number)}</span>` : (j.qc_status === "ok" && j.amount != null ? `<span class="badge">${t("sunday")}</span>` : "")}
-    <input class="in" style="width:120px" type="number" step="0.01" placeholder="${t("override")}" data-field="amount_override" data-id="${j.id}" value="${j.amount_override ?? ""}" ${inv ? "disabled" : ""}/>
+    <input class="in" style="width:120px" type="number" step="0.01" placeholder="${t("override")}" data-field="amount_override" data-id="${j.id}" value="${j.amount_override ?? ""}" ${inv ? "disabled" : ""}/>${fbHtml(j.id, "amount_override")}
     ${inv ? "" : `<button type="button" class="btn ghost" data-recalc="${j.id}">${t("recalc")}</button>`}
   </div>${(j.lines || []).length ? `<div style="font-size:12px;color:var(--taupe);margin-top:4px">${j.lines.map((l) => `${esc(l.label)} × ${l.qty} → ${money(l.amount, cur)}`).join(" · ")}</div>` : ""}`;
 }
@@ -687,19 +715,34 @@ function wireBoard() {
     if (!ok) { notes.delete(id); if (b.isConnected) b.disabled = false; return; }
     setTimeout(() => { const m = document.querySelector(`[data-fxmsg="${id}"]`); if (m && (notes.get(id) || 0) <= Date.now()) m.textContent = ""; }, 8100);
   }));
+  B.querySelectorAll("[data-redeliver]").forEach((b) => b.addEventListener("click", async () => {
+    const j = jobs.find((x) => x.id === b.dataset.redeliver); if (!j) return;
+    const inp = B.querySelector(`[data-field="frameio_url"][data-id="${j.id}"]`), frame = normFrame((inp && inp.value) || j.frameio_url);
+    if (!FRAME_OK(frame)) { needFrame(j.id, inp); return; }
+    b.disabled = true;
+    const patch = { qc_status: "pending" }; if (frame !== String(j.frameio_url || "")) patch.frameio_url = frame;   // lien corrigé + relivraison en un seul envoi
+    if (!(await update(j.id, patch, false, "step", t("redelivered"))) && b.isConnected) b.disabled = false;
+  }));
   B.querySelectorAll("[data-step]").forEach((el) => el.addEventListener("click", async () => {
-    if (el.getAttribute("aria-disabled") === "true") return;
-    const j = jobs.find((x) => x.id === el.dataset.id); const k = el.dataset.step; const val = j[k] ? null : new Date().toISOString();
+    const j = jobs.find((x) => x.id === el.dataset.id); const k = el.dataset.step;
+    if (el.classList.contains("lk")) { setFb(j.id, "step", false, t("locked"), 5000); return; }   // monteur : étape déjà cochée
+    if (el.getAttribute("aria-disabled") === "true" && !el.dataset.nf) return;
+    const inp = B.querySelector(`[data-field="frameio_url"][data-id="${j.id}"]`), frame = normFrame((inp && inp.value) || j.frameio_url);
+    const val = j[k] ? null : new Date().toISOString();
     const patch = { [k]: val };
+    if (k === "delivered_at" && val) {
+      if (!FRAME_OK(frame)) { needFrame(j.id, inp); return; }                                   // « Livré » exige un lien (la base aussi)
+      if (frame !== String(j.frameio_url || "")) patch.frameio_url = frame;
+    }
     if (k === "delivered_at" && val && !j.started_at) patch.started_at = val;
     if (k === "delivered_at" && !val) patch.qc_status = "pending";
-    await update(j.id, patch);
+    await update(j.id, patch, false, "step");
   }));
-  B.querySelectorAll("[data-act='qc']").forEach((s) => s.addEventListener("change", async () => { await update(s.dataset.id, { qc_status: s.value, qc_at: s.value === "pending" ? null : new Date().toISOString(), qc_owner: s.value === "pending" ? null : profile.display_name }); }));
+  B.querySelectorAll("[data-act='qc']").forEach((s) => s.addEventListener("change", async () => { await update(s.dataset.id, { qc_status: s.value, qc_at: s.value === "pending" ? null : new Date().toISOString(), qc_owner: s.value === "pending" ? null : profile.display_name }, false, "qc"); }));
   B.querySelectorAll("[data-field]").forEach((i) => i.addEventListener("change", async () => {
     let v = i.value.trim() || null;
-    if (v && i.dataset.field === "frameio_url" && !/^https?:\/\//i.test(v)) v = "https://" + v.replace(/^\/+/, ""); // « f.io/abc » collé sans https : on complète (la base n'accepte que des liens http(s))
-    await update(i.dataset.id, { [i.dataset.field]: v });
+    if (v && i.dataset.field === "frameio_url") v = normFrame(v);
+    await update(i.dataset.id, { [i.dataset.field]: v }, false, i.dataset.field);
   }));
   if (isAdmin()) B.querySelectorAll("[data-eds]").forEach((el) => el.addEventListener("click", (ev) => { ev.stopPropagation(); openPop(el); }));
 }
@@ -716,9 +759,28 @@ function openPop(cell) {
 }
 function closePop() { document.querySelectorAll(".pop").forEach((p) => p.remove()); }
 document.addEventListener("click", closePop);
-async function update(id, patch, keepPop) {
-  const { error } = await sb.from("jobs").update(patch).eq("id", id);
-  if (error) { alert((lang === "fr" ? "Modification refusée : " : "Update refused: ") + error.message); return false; }
+// clic n'importe où sur la ligne = ouvre / ferme le détail (sauf boutons, menus, liens, champs, étapes, choix des monteurs, détail lui-même)
+$("#board").addEventListener("click", (ev) => {
+  if (tv) return;
+  const row = ev.target.closest(".job"); if (!row || ev.target.closest("a,button,input,select,textarea,label,.st,.eds.can,.pop,.detail")) return;
+  if (String(window.getSelection ? window.getSelection() : "").length) return;   // sélection de texte en cours
+  const on = row.classList.toggle("open"); on ? openIds.add(row.dataset.id) : openIds.delete(row.dataset.id);
+});
+// monteur : écriture par la fonction job_editor_update (la politique d'écriture directe est retirée par supabase/lot_a_verrous.sql) ;
+// PGRST202 = fonction absente (SQL du lot A pas encore appliqué) -> ancien chemin, pour qu'aucun ordre de mise en ligne ne casse
+async function writeJob(id, patch) {
+  if (isEditor()) { const r = await sb.rpc("job_editor_update", { p_id: id, p_patch: patch }); if (!(r.error && r.error.code === "PGRST202")) return r; }
+  return sb.from("jobs").update(patch).eq("id", id);
+}
+// fb = clé du retour visible (✓ Enregistré / erreur à côté du champ) ; « step » : on n'affiche que les erreurs et le message ok demandé
+async function update(id, patch, keepPop, fb, okMsg) {
+  const { error } = await writeJob(id, patch);
+  if (error) {
+    const msg = errText(error);
+    if (!fb) { alert((lang === "fr" ? "Modification refusée : " : "Update refused: ") + msg); return false; }
+    setFb(id, fb, false, msg, 7000); await load(false, keepPop); return false;   // on relit : le champ reprend la vraie valeur de la base
+  }
+  if (fb && (okMsg || fb !== "step")) setFb(id, fb, true, okMsg || t("savedOk"), 2000);
   await load(false, keepPop); return true;
 }
 // chrono : mise à jour chaque seconde, sans re-rendu
@@ -856,9 +918,14 @@ async function saveRdv() {
 }
 
 /* ===== données ===== */
+// monteur : lecture par jobs_visible() (contact et e-mail du client masqués par la base) ; PGRST202 = SQL du lot A pas encore appliqué -> table directe
+async function fetchJobs() {
+  if (isEditor()) { const r = await sb.rpc("jobs_visible").order("created_at", { ascending: false }).limit(400); if (!(r.error && r.error.code === "PGRST202")) return r; }
+  return sb.from("jobs").select("*").order("created_at", { ascending: false }).limit(400);
+}
 async function load(first, keepPop) {
   const [{ data: rows, error }, { data: eds }] = await Promise.all([
-    sb.from("jobs").select("*").order("created_at", { ascending: false }).limit(400),
+    fetchJobs(),
     sb.from("editors").select("id,name,avatar_url,profile_id,active,sort").order("sort"),
     loadAdmin(), loadAgent(),
   ]);
@@ -868,8 +935,11 @@ async function load(first, keepPop) {
     // fichiers arrivés pendant que la page est ouverte : bip à deux notes + la ligne clignote
     const ready = (rows || []).filter((j) => j.files_downloaded_at && hadFiles.get(j.id) === false);
     if (ready.length) { ready.forEach((j) => flashUntil.set(j.id, Date.now() + FLASH_MS)); beepReady(fresh.length ? Math.min(fresh.length, 3) * .25 + .2 : 0); }
+    // relivraison (le monteur a corrigé après « à revoir ») : même bip, la ligne clignote ; réservé admin / dispatcher / qc
+    const again = isAdmin() ? (rows || []).filter((j) => (j.qc_round || 0) > (hadRound.has(j.id) ? hadRound.get(j.id) : Infinity)) : [];
+    if (again.length) { again.forEach((j) => flashUntil.set(j.id, Date.now() + FLASH_MS)); beepReady(fresh.length || ready.length ? 1.2 : 0); }
   }
-  jobs = rows || []; editors = eds || []; jobs.forEach((j) => { known.add(j.id); hadFiles.set(j.id, !!j.files_downloaded_at); });
+  jobs = rows || []; editors = eds || []; jobs.forEach((j) => { known.add(j.id); hadFiles.set(j.id, !!j.files_downloaded_at); hadRound.set(j.id, j.qc_round || 0); });
   myEditor = editors.find((e) => e.profile_id === me.id) || null;
   if (first && !params.has("editor") && myEditor && profile.role === "editor") edFilter = myEditor.id;
   const openCell = keepPop && document.querySelector(".pop") ? document.querySelector(".pop").parentElement.querySelector("[data-eds]")?.dataset.eds : null;
@@ -894,7 +964,8 @@ async function boot() {
   sb.channel("jobs-live").on("postgres_changes", { event: "*", schema: "public", table: "jobs" }, () => load(false)).subscribe();
   // état du PC du bureau : temps réel si la table est publiée, sinon le rafraîchissement de 60 s ci-dessous ; l'âge du dernier signal est réévalué toutes les 15 s
   sb.channel("agent-live").on("postgres_changes", { event: "*", schema: "public", table: "agent_status" }, () => refreshAgent()).subscribe();
-  setInterval(() => load(false), 60000);
+  // monteurs : plus de temps réel sur `jobs` (lecture par jobs_visible) -> relecture toutes les 20 s ; on ne repeint pas pendant une saisie
+  setInterval(() => { const a = document.activeElement; if (a && /^(INPUT|SELECT|TEXTAREA)$/.test(a.tagName) && a.closest("#board")) return; load(false); }, isEditor() ? 20000 : 60000);
   setInterval(() => { renderPc(); renderAlerts(); paintDl(); }, 15000);
 }
 $("#loginBtn").addEventListener("click", async () => {
