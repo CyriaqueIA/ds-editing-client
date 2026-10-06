@@ -347,6 +347,28 @@
     .gate .btn{width:100%;height:46px;margin-top:4px;font-size:14px}
     .gate .msg{font-size:13px;color:var(--err);min-height:18px;margin-top:8px}
     @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+    /* lot D : bouton Admin, boîte « Code », onglet Équipe */
+    body.tv #admBtn,body.tv #admOff{display:none}
+    #admBtn[disabled]{opacity:.45;cursor:not-allowed}
+    .admmodal{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(5,6,7,.72);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+    .admmodal[hidden]{display:none}
+    .admbox{width:min(340px,100%);display:flex;flex-direction:column;gap:12px;background:var(--surface);border:1px solid var(--line-strong);border-radius:22px;padding:22px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+    .admbox h2{margin:0;font-size:18px;font-weight:600;letter-spacing:-.02em}
+    .admbox .in{width:100%;text-align:center;letter-spacing:.4em;font-size:18px}
+    .admmsg{min-height:18px;font-size:12px;color:var(--taupe)}
+    .admmsg.bad{color:var(--err)}
+    .admact{display:flex;justify-content:flex-end;gap:8px}
+    .eqtop{margin:0 0 12px;font-size:13px;color:var(--taupe)}
+    .eqtop b{color:var(--cream);font-weight:600}
+    .eqwrap{overflow-x:auto}
+    table.eq th.g{text-align:center;border-bottom:0;padding-bottom:0}
+    table.eq td.n,table.eq th.n{text-align:right;white-space:nowrap}
+    table.eq td.err{color:var(--err);font-weight:600}
+    table.eq td.warn{color:var(--warn);font-weight:600}
+    table.eq tr.sub td{color:var(--taupe)}
+    table.eq tr.tot td{font-weight:600;border-top:1px solid var(--line-strong)}
+    table.eq td.rk{width:34px;color:var(--taupe)}
+    .eqnote{margin:12px 0 0;padding-left:18px;font-size:11px;line-height:1.5;color:var(--taupe)}
   </style>
 </head>
 <body>
@@ -362,6 +384,8 @@
     <button class="btn ghost" id="langBtn" type="button">EN</button>
     <button class="btn ghost" id="tvBtn" type="button" data-t="tv"></button>
     <a class="btn ghost" id="prodBtn" href="../prod-admin/">Production du jour</a>
+    <button class="btn ghost" id="admBtn" type="button" data-t="admBtn" hidden></button>
+    <button class="btn ghost" id="admOff" type="button" data-t="admOff" hidden></button>
     <button class="btn ghost" id="logout" type="button" data-t="logout" hidden></button>
   </div>
 </div></header>
@@ -392,6 +416,15 @@
   </div>
 </main>
 
+<div class="admmodal" id="admModal" hidden role="dialog" aria-modal="true" aria-labelledby="admT">
+  <div class="admbox">
+    <h2 id="admT" data-t="admTitle"></h2>
+    <input class="in" id="admCode" type="password" inputmode="numeric" autocomplete="off" maxlength="16"/>
+    <div class="admmsg" id="admMsg" aria-live="polite"></div>
+    <div class="admact"><button class="btn ghost" id="admCancel" type="button" data-t="admCancel"></button><button class="btn" id="admGo" type="button" data-t="admGo"></button></div>
+  </div>
+</div>
+
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/+esm";
 
@@ -402,7 +435,7 @@ const OPEN_ACCESS = { email: "acces.libre@ds-editing.com", password: "HAs0lMotAK
 const BUSINESS_DAYS_DEFAULT = 5;   // délai par défaut quand le client n'a pas donné de date
 
 const T = {
-  fr: { sub: "Production", live: "En direct", tv: "Mode télé", logout: "Déconnexion", leave: "Quitter", login: "Espace équipe", loginSub: "Connecte-toi avec ton e-mail DS Editing.", loginBtn: "Entrer",
+  fr: { admBtn: "Admin", admOff: "Verrouiller", admTitle: "Code admin", admGo: "Valider", admCancel: "Annuler", sub: "Production", live: "En direct", tv: "Mode télé", logout: "Déconnexion", leave: "Quitter", login: "Espace équipe", loginSub: "Connecte-toi avec ton e-mail DS Editing.", loginBtn: "Entrer",
     all: "Tous", tasks: (n) => `${n} tâche${n > 1 ? "s" : ""}`, stats: ["Reçues aujourd'hui", "En cours", "En retard", "À contrôler", "Livrées cette semaine"],
     filters: { all: "Tout", na: "À attribuer", ready: "Fichiers prêts, à démarrer", late: "En retard", qc: "À contrôler", asm: "À assembler", done: "Livrées" }, search: "Rechercher…",
     dl: { waiting: "En attente", running: "Téléchargement en cours", ready: "Fichiers prêts", error: "Erreur", abandon: "Abandonné", access: "Accès demandé au client", purged: "Nettoyé",
@@ -426,7 +459,11 @@ const T = {
     needFrame: "Colle d'abord le lien frame.io de livraison : « Livré » reste bloqué sans lui.", locked: "Étape déjà cochée : seule la qualité ou un admin peut la corriger.", redeliver: "Relivrer", redeliverTip: "Corrige le lien frame.io si besoin, puis relivre pour un nouveau contrôle qualité.", redelivered: "✓ Relivré, la qualité est prévenue", round: (n) => `${n}e passage`, savedOk: "✓ Enregistré",
     lk: { editor: "Monteur", dispatcher: "Dispatch", qc: "Qualité", badT: "Lien invalide ou coupé", badP: "Ce lien ne fonctionne plus. Demande-en un nouveau à l'équipe DS Editing.", tooT: "Trop d'essais", tooP: "Réessaie dans quelques minutes.", downT: "Service indisponible", downP: "Impossible de joindre le serveur. Vérifie ta connexion puis réessaie.", byeT: "Lien retiré de cet appareil", byeP: "Rouvre ton lien personnel pour revenir à tes commandes.", retry: "Réessayer", offT: "Accès désactivé", offP: "Ton accès est désactivé pour le moment. Reviens plus tard ou demande à l'équipe DS Editing.", who: (n) => `Connecté avec le lien de ${n}`, queue: (n) => `À attribuer · ${n}`, others: "Autres commandes", brief: "Brief", refs: "Références", logos: "Logos" },
     errs: { FRAMEIO_REQUIS: "Lien frame.io manquant ou invalide (il doit commencer par https://).", ETAPE_VERROUILLEE: "Étape déjà cochée : seule la qualité ou un admin peut la corriger.", QC_OK_VERROUILLE: "Qualité déjà validée : le lien frame.io ne peut plus être modifié (voir avec l'équipe qualité).", REFUSE: "Action refusée pour ton profil.", CHAMP_INTERDIT: "Modification non autorisée pour ton profil.", LIEN_INVALIDE: "Ce lien ne fonctionne plus : demande-en un nouveau.", TROP_D_ESSAIS: "Trop d'essais : réessaie dans quelques minutes.", REOUVERTURE_REFUSEE: "On ne rouvre l'assemblage qu'après un « à revoir » de la qualité.", LIVRAISON_FIGEE: "Commande livrée : après un « à revoir », rouvre d'abord l'assemblage avant de rouvrir une partie.", PARTIE_DEJA_COMMENCEE: "Impossible : une étape est déjà cochée ou un lien déjà posé sur cette commande.", COMMANDE_TERMINEE: "Impossible : la commande est terminée (qualité OK).", PAS_UNE_PARTIE_UNIQUE: "Cette commande est déjà coupée en parties.", PAS_DEUX_PARTIES: "Cette commande n'est pas coupée en Intro / Corps.", ACTION_INCONNUE: "Action inconnue.", JOB_A_PARTIES: "Cette commande est découpée en parties : coche l'étape dans la partie concernée.", PARTIES_NON_LIVREES: "Toutes les parties doivent être livrées avant de livrer la commande.", MONTEUR_INCONNU: "Monteur inconnu.", MONTEUR_DESACTIVE: "Ton accès est désactivé pour le moment." },
-    tabs: { prod: "Production", tarifs: "Tarifs", factures: "Factures", rdv: "Rendez-vous" }, amountL: "Montant", amountMiss: "Prix manquant dans la grille :", override: "Montant forcé", recalc: "Recalculer", invoiced: "Facturé", sunday: "facturé dimanche",
+    tabs: { prod: "Production", equipe: "Équipe", tarifs: "Tarifs", factures: "Factures", rdv: "Rendez-vous" },
+    adm: { ph: "Code", who: "Vue admin", bad: (n) => `Code incorrect. Il reste ${n} essai${n > 1 ? "s" : ""}.`, locked: (m) => `Trop d'erreurs : réessaie dans ${m} min.`, lockedTip: (m) => `Bloqué sur cet appareil encore ${m} min`, nocrypto: "Ce navigateur ne peut pas vérifier le code (page non sécurisée ?)." },
+    eq: { title: "Statistiques d'équipe", lead: "Par monteur : livraisons, travail en cours, retards, délais et passages « à revoir ».", rank: "Rang", editor: "Monteur", deliv: "Livrées", open: "En cours", late: "En retard", delay: "Délai moyen", rev: "À revoir", d7: "7 j", d30: "30 j", top: "Qui a livré le plus", asmRow: "Assemblage (dispatch)", noneRow: "Sans monteur", total: "Total équipe", none: "—", cap: (n) => `Calculé sur les ${n} commandes les plus récentes chargées par le tableau (limite de lecture).`,
+      foot: ["Livrées : une commande à une partie = 1 livraison pour son monteur ; une commande à deux parties = 1 livraison par partie pour son monteur, et l'assemblage final pour le dispatch. La ligne « Sans monteur » reprend les commandes et parties sans attribution. Le total compte chaque commande une seule fois (une commande à deux monteurs compte pour chacun dans leurs lignes).", "En cours / En retard : l'état à l'instant (pas de période). En retard = commande pas encore livrée dont la date est dépassée : date souhaitée par le client d'abord, sinon date fixée par l'équipe, sinon 5 jours ouvrés après réception (comme le tableau de production).", "Délai moyen : de « fichiers prêts » (rushes téléchargés) à la livraison ; assemblage : de « parties livrées » à la livraison finale. Les commandes sans date « fichiers prêts » sont exclues de la moyenne.", "À revoir : passages qualité « à revoir » reçus (relivraisons + en attente), datés du dernier passage ; sur une commande à parties, comptés à l'assemblage."] },
+    amountL: "Montant", amountMiss: "Prix manquant dans la grille :", override: "Montant forcé", recalc: "Recalculer", invoiced: "Facturé", sunday: "facturé dimanche",
     keys: { podcast_standard: "Épisode podcast · Standard", podcast_premium: "Épisode podcast · Premium", vsl_standard: "VSL · Standard", vsl_premium: "VSL · Premium", reel_standard: "Reel standard", reel_premium: "Reel premium", intro: "Intro", miniature: "Miniature", trailer: "Trailer", cta: "CTA réseaux sociaux", extra_30min: "Supplément 30 min" },
     tarifsHint: "Prix unitaires par client, dans sa devise. Vide = pas encore fixé : la commande validée attend un prix avant d'être facturée.", clientSel: "Client", saved: "enregistré", recalcAll: "Recalculer les commandes validées", space: "Espace client", billing: "Facturation", billingName: "Raison sociale", billingAddress: "Adresse (une ligne par ligne)", billingEmail: "E-mail de facturation", attention: "À l'attention de", currency: "Devise", tvaL: "TVA",
     factHint: "Une facture par client et par semaine, générée le dimanche à 23 h 50 (Bali). Relance automatique 2 jours après l'envoi.", cols: ["N°", "Client", "Semaine", "Total", "Statut", "Envoyée", ""], markPaid: "Marquer payée", paid: "Payée", issued: "Émise", cancel: "Annuler", extrasTitle: "Lignes manuelles (facturées avec la prochaine facture)", label: "Libellé", qty: "Qté", unit: "Prix unitaire", offered: "Offert", add: "Ajouter", pending: "En attente de facturation", none: "Aucune", del: "Supprimer",
@@ -436,7 +473,7 @@ const T = {
       blocked: "Dates bloquées (une par ligne)", blockedHint: "2026-10-03 · 2026-12-24/2027-01-02 · 2026-10-06T14:00/2026-10-06T16:00 (heure de Paris)", save: "Enregistrer", saved: "enregistré", badRange: "Plage invalide : le début doit précéder la fin",
       listTitle: "Rendez-vous", upcoming: "À venir", past: "Passés", cols: ["Date (Paris)", "Nom", "Studio", "E-mail", "Téléphone", "Notes", "Statut", "E-mails"],
       status: { confirmed: "Confirmé", done: "Fait", cancelled: "Annulé", no_show: "Absent" }, none: "Aucun rendez-vous", confirm: "confirmation", reminder: "rappel", local: "chez vous", missing: "Réglages introuvables : appliquer supabase/bookings_v1.sql." } },
-  en: { sub: "Production", live: "Live", tv: "TV mode", logout: "Log out", leave: "Leave", login: "Team space", loginSub: "Sign in with your DS Editing email.", loginBtn: "Enter",
+  en: { admBtn: "Admin", admOff: "Lock", admTitle: "Admin code", admGo: "Enter", admCancel: "Cancel", sub: "Production", live: "Live", tv: "TV mode", logout: "Log out", leave: "Leave", login: "Team space", loginSub: "Sign in with your DS Editing email.", loginBtn: "Enter",
     all: "All", tasks: (n) => `${n} task${n > 1 ? "s" : ""}`, stats: ["Received today", "In progress", "Late", "To review", "Delivered this week"],
     filters: { all: "All", na: "To assign", ready: "Files ready, to start", late: "Late", qc: "To review", asm: "To assemble", done: "Delivered" }, search: "Search…",
     dl: { waiting: "Waiting", running: "Downloading", ready: "Files ready", error: "Error", abandon: "Gave up", access: "Access requested from client", purged: "Cleaned up",
@@ -460,7 +497,11 @@ const T = {
     needFrame: "Paste the frame.io delivery link first: “Delivered” stays blocked without it.", locked: "Step already ticked: only QC or an admin can fix it.", redeliver: "Redeliver", redeliverTip: "Fix the frame.io link if needed, then redeliver for a new quality check.", redelivered: "✓ Redelivered, QC has been notified", round: (n) => `${n}${[11, 12, 13].includes(n % 100) ? "th" : ({ 1: "st", 2: "nd", 3: "rd" })[n % 10] || "th"} pass`, savedOk: "✓ Saved",
     lk: { editor: "Editor", dispatcher: "Dispatch", qc: "Quality", badT: "Invalid or disabled link", badP: "This link no longer works. Ask the DS Editing team for a new one.", tooT: "Too many attempts", tooP: "Try again in a few minutes.", downT: "Service unavailable", downP: "Cannot reach the server. Check your connection and try again.", byeT: "Link removed from this device", byeP: "Open your personal link again to get back to your orders.", retry: "Try again", offT: "Access disabled", offP: "Your access is disabled for now. Come back later or ask the DS Editing team.", who: (n) => `Signed in with ${n}'s link`, queue: (n) => `To assign · ${n}`, others: "Other orders", brief: "Brief", refs: "References", logos: "Logos" },
     errs: { FRAMEIO_REQUIS: "frame.io link missing or invalid (it must start with https://).", ETAPE_VERROUILLEE: "Step already ticked: only QC or an admin can fix it.", QC_OK_VERROUILLE: "QC already approved: the frame.io link can no longer be changed (ask the QC team).", REFUSE: "Action refused for your profile.", CHAMP_INTERDIT: "Change not allowed for your profile.", LIEN_INVALIDE: "This link no longer works: ask for a new one.", TROP_D_ESSAIS: "Too many attempts: try again in a few minutes.", REOUVERTURE_REFUSEE: "The assembly can only be reopened after a QC « needs changes ».", LIVRAISON_FIGEE: "Order delivered: after a « needs changes », reopen the assembly first before reopening a part.", PARTIE_DEJA_COMMENCEE: "Not possible: a step is already ticked or a link already set on this order.", COMMANDE_TERMINEE: "Not possible: the order is finished (QC OK).", PAS_UNE_PARTIE_UNIQUE: "This order is already split into parts.", PAS_DEUX_PARTIES: "This order is not split into Intro / Body.", ACTION_INCONNUE: "Unknown action.", JOB_A_PARTIES: "This order is split into parts: tick the step in the relevant part.", PARTIES_NON_LIVREES: "All parts must be delivered before delivering the order.", MONTEUR_INCONNU: "Unknown editor.", MONTEUR_DESACTIVE: "Your access is disabled for now." },
-    tabs: { prod: "Production", tarifs: "Pricing", factures: "Invoices", rdv: "Appointments" }, amountL: "Amount", amountMiss: "Missing price in the grid:", override: "Forced amount", recalc: "Recalculate", invoiced: "Invoiced", sunday: "invoiced Sunday",
+    tabs: { prod: "Production", equipe: "Team", tarifs: "Pricing", factures: "Invoices", rdv: "Appointments" },
+    adm: { ph: "Code", who: "Admin view", bad: (n) => `Wrong code. ${n} attempt${n > 1 ? "s" : ""} left.`, locked: (m) => `Too many errors: try again in ${m} min.`, lockedTip: (m) => `Locked on this device for ${m} more min`, nocrypto: "This browser cannot check the code (insecure page?)." },
+    eq: { title: "Team statistics", lead: "Per editor: deliveries, work in progress, late orders, turnaround and « needs changes » rounds.", rank: "Rank", editor: "Editor", deliv: "Delivered", open: "In progress", late: "Late", delay: "Average turnaround", rev: "Needs changes", d7: "7 d", d30: "30 d", top: "Most delivered", asmRow: "Assembly (dispatch)", noneRow: "No editor", total: "Team total", none: "—", cap: (n) => `Computed on the ${n} most recent orders loaded by the board (read limit).`,
+      foot: ["Delivered: a single-part order = 1 delivery for its editor; a two-part order = 1 delivery per part for its editor, and the final assembly for dispatch. The « No editor » row gathers orders and parts with no assignment. The total counts each order once (an order with two editors counts for each in their own rows).", "In progress / Late: the state right now (no period). Late = order not delivered yet whose date has passed: the client's requested date first, otherwise the date set by the team, otherwise 5 business days after receipt (same rule as the production board).", "Average turnaround: from « files ready » (footage downloaded) to delivery; assembly: from « parts delivered » to the final delivery. Orders without a « files ready » date are left out of the average.", "Needs changes: QC « needs changes » rounds received (redeliveries + pending), dated by the latest round; on a multi-part order they are counted at assembly."] },
+    amountL: "Amount", amountMiss: "Missing price in the grid:", override: "Forced amount", recalc: "Recalculate", invoiced: "Invoiced", sunday: "invoiced Sunday",
     keys: { podcast_standard: "Podcast episode · Standard", podcast_premium: "Podcast episode · Premium", vsl_standard: "VSL · Standard", vsl_premium: "VSL · Premium", reel_standard: "Standard reel", reel_premium: "Premium reel", intro: "Intro", miniature: "Thumbnail", trailer: "Trailer", cta: "Social CTA", extra_30min: "Extra 30 min" },
     tarifsHint: "Unit prices per client, in their currency. Empty = not set yet: the approved order waits for a price before being invoiced.", clientSel: "Client", saved: "saved", recalcAll: "Recalculate approved orders", space: "Client space", billing: "Billing", billingName: "Legal name", billingAddress: "Address (one line per line)", billingEmail: "Billing email", attention: "Attention", currency: "Currency", tvaL: "VAT",
     factHint: "One invoice per client per week, generated Sunday 11:50 pm (Bali). Automatic reminder 2 days after sending.", cols: ["No.", "Client", "Week", "Total", "Status", "Sent", ""], markPaid: "Mark paid", paid: "Paid", issued: "Issued", cancel: "Cancel", extrasTitle: "Manual lines (billed with the next invoice)", label: "Label", qty: "Qty", unit: "Unit price", offered: "Complimentary", add: "Add", pending: "Waiting for invoicing", none: "None", del: "Delete",
@@ -486,7 +527,31 @@ const money = (x, cur) => x == null ? "—" : (cur === "USD" ? "$" + Number(x).t
    Mode télé (?tv=1) sans « k » : on ignore le code gardé et on reste sur l'accès libre. « Quitter » efface le code de l'appareil. */
 const KEY_STORE = "ds_team_key";
 const ls = { get(k) { try { return localStorage.getItem(k); } catch { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch {} }, del(k) { try { localStorage.removeItem(k); } catch {} } };
-const LINK = params.has("k") ? (params.get("k") || "").trim() : (params.get("tv") === "1" || params.get("bye") ? null : ls.get(KEY_STORE));
+/* ===== lot D : code « Admin » =====
+   Depuis une vue lien (monteur / dispatch / qualité), le bouton « Admin » demande un code ; s'il est bon, la page repart SANS lien, sur la session de l'accès libre
+   déjà présente dans le fichier (vue admin complète : prix, Tarifs / Factures / Rendez-vous, Équipe). « Quitter l'admin » revient à la vue du lien (le code du lien reste sur l'appareil).
+   Le code n'est pas écrit en clair : on compare un hachage SHA-256 (crypto.subtle). LIMITE ASSUMÉE : ce n'est PAS une barrière de sécurité. Le hachage et le sel sont dans la page,
+   un code à 4 chiffres se retrouve en une seconde, et l'adresse sans « ?k= » ouvre déjà la vue admin (accès libre voulu). 5 erreurs : bouton grisé 10 min, mémoire locale à l'appareil (effaçable).
+   La vue admin reste ouverte 12 h sur l'appareil (elle est partagée avec /prod-admin/). Un lien personnel rouvert (?k=) ou « Quitter » sort de la vue admin. Mode télé (?tv=1) : jamais de vue admin ni de bouton. */
+const ADM = { hash: "e3fc599703d1e7fbd29e600607a955e175c08158b52ba93f027d5944434682aa", salt: "ds-editing/admin/v1:", until: "ds_admin_until", fails: "ds_admin_fails", lock: "ds_admin_lock", ttl: 12 * 3600e3, max: 5, lockMs: 10 * 60e3 };
+const admNum = (k) => Number(ls.get(k)) || 0;
+const adminOn = () => admNum(ADM.until) > Date.now();
+const adminLockLeft = () => Math.max(0, admNum(ADM.lock) - Date.now());
+async function sha256hex(s) {
+  const c = globalThis.crypto; if (!c || !c.subtle) throw new Error("NO_SUBTLE");
+  return [...new Uint8Array(await c.subtle.digest("SHA-256", new TextEncoder().encode(s)))].map((x) => x.toString(16).padStart(2, "0")).join("");
+}
+async function adminTry(code) {
+  if (adminLockLeft() > 0) return { res: "locked" };
+  let h; try { h = await sha256hex(ADM.salt + String(code).trim()); } catch { return { res: "nocrypto" }; }
+  if (h === ADM.hash) { ls.set(ADM.until, String(Date.now() + ADM.ttl)); ls.del(ADM.fails); return { res: "ok" }; }
+  const n = admNum(ADM.fails) + 1;
+  if (n >= ADM.max) { ls.set(ADM.lock, String(Date.now() + ADM.lockMs)); ls.del(ADM.fails); return { res: "locked" }; }
+  ls.set(ADM.fails, String(n)); return { res: "bad", left: ADM.max - n };
+}
+if (params.has("k") || params.get("bye")) ls.del(ADM.until);   // lien personnel rouvert, ou « Quitter » : on sort de la vue admin
+const ADMIN_MODE = !params.has("k") && !params.get("bye") && params.get("tv") !== "1" && adminOn();
+const LINK = params.has("k") ? (params.get("k") || "").trim() : (params.get("tv") === "1" || params.get("bye") || ADMIN_MODE ? null : ls.get(KEY_STORE));
 const LINKED = LINK != null && !params.get("bye");
 if (LINKED) $("#logout").dataset.t = "leave";
 const safeUrl = (u) => /^https?:\/\//i.test(String(u || "").trim()) ? esc(String(u).trim()) : "#"; // seuls les liens http(s) deviennent cliquables
@@ -1064,13 +1129,73 @@ setInterval(() => { document.querySelectorAll("[data-cd]").forEach((el) => { con
 /* ===== onglets admin : Tarifs, Factures ===== */
 function renderTabs() {
   if (!isAdmin() || LINKED) return; $("#tabs").hidden = false;
-  $("#tabs").innerHTML = ["prod", "tarifs", "factures", "rdv"].map((k) => `<button type="button" class="tab ${tab === k ? "on" : ""}" data-tab="${k}">${t("tabs")[k]}</button>`).join("");
+  $("#tabs").innerHTML = ["prod", "equipe", "tarifs", "factures", "rdv"].map((k) => `<button type="button" class="tab ${tab === k ? "on" : ""}" data-tab="${k}">${t("tabs")[k]}</button>`).join("");
   $("#tabs").querySelectorAll("[data-tab]").forEach((b) => b.addEventListener("click", () => { tab = b.dataset.tab; const u = new URL(location.href); tab === "prod" ? u.searchParams.delete("tab") : u.searchParams.set("tab", tab); history.replaceState(null, "", u); renderTabs(); renderAdmin(); }));
   renderAdmin();
 }
 function renderAdmin() {
   const prod = tab === "prod"; ["#edbar", "#stats", "#toolbar", "#alerts", "#board"].forEach((s) => { $(s).style.display = prod ? "" : "none"; }); $("#admin").hidden = prod;
-  if (tab === "tarifs") renderTarifs(); else if (tab === "factures") renderFactures(); else if (tab === "rdv") renderRdv();
+  if (tab === "equipe") renderEquipe(); else if (tab === "tarifs") renderTarifs(); else if (tab === "factures") renderFactures(); else if (tab === "rdv") renderRdv();
+}
+/* ===== lot D : onglet Équipe (statistiques), vue admin seulement. Calcul côté navigateur sur les commandes (et parties) déjà chargées : aucune base touchée ===== */
+function teamStats(list, now) {
+  const DAY = 864e5, W = [7, 30], cut = { 7: now - 7 * DAY, 30: now - 30 * DAY };
+  const ts = (x) => { const v = x ? new Date(x).getTime() : NaN; return Number.isFinite(v) ? v : NaN; };
+  const mk = () => ({ del: { 7: 0, 30: 0 }, open: 0, late: 0, dsum: { 7: 0, 30: 0 }, dn: { 7: 0, 30: 0 }, rev: { 7: 0, 30: 0 } });
+  const byId = new Map(), asm = mk(), none = mk(), tot = mk();
+  const rowOf = (id) => { if (!byId.has(id)) byId.set(id, mk()); return byId.get(id); };
+  const targets = (ids) => (ids && ids.length) ? ids.map(rowOf) : [none];
+  const inW = (v, w) => v >= cut[w] && v <= now + 300000;
+  const deliver = (rs, end, start) => { for (const w of W) if (inW(end, w)) for (const r of rs) { r.del[w]++; if (start <= end) { r.dsum[w] += end - start; r.dn[w]++; } } };
+  for (const j of list) {
+    const done = isDone(j), end = ts(j.delivered_at), start = ts(j.files_downloaded_at), overdue = target(j) < now, multi = isMulti(j);
+    if (!multi) {
+      const rs = targets(j.editor_ids);
+      if (end) { deliver(rs, end, start); deliver([tot], end, start); }
+      else if (!done) for (const r of [...rs, tot]) { r.open++; if (overdue) r.late++; }
+    } else {
+      for (const p of partsOf(j)) {
+        const pe = ts(p.delivered_at), rs = targets(p.editor_ids);
+        if (pe) deliver(rs, pe, start);
+        else if (!done) for (const r of rs) { r.open++; if (overdue) r.late++; }
+      }
+      if (end) { deliver([asm], end, ts(j.parts_ready_at)); deliver([tot], end, start); }
+      else if (!done) { tot.open++; if (overdue) tot.late++; if (isAsm(j)) { asm.open++; if (overdue) asm.late++; } }
+    }
+    const nrev = (j.qc_round || 0) + (j.qc_status === "revisions" ? 1 : 0);
+    if (nrev > 0) {
+      const at = Math.max(...[ts(j.qc_at), ts(j.redelivered_at), ts(j.delivered_at)].filter((v) => !isNaN(v)));
+      for (const w of W) if (inW(at, w)) { for (const r of (multi ? [asm] : targets(j.editor_ids))) r.rev[w] += nrev; tot.rev[w] += nrev; }
+    }
+  }
+  return { byId, asm, none, tot, blank: mk };
+}
+function fmtDur(ms) {
+  const h = ms / 3600e3, nf = (v) => Number(v.toFixed(1)).toLocaleString(loc());
+  if (h < 1) return Math.max(1, Math.round(ms / 60000)) + " min";
+  return h < 48 ? nf(h) + " h" : nf(h / 24) + " " + (lang === "fr" ? "j" : "d");
+}
+function renderEquipe() {
+  const E = t("eq"), S = teamStats(jobs, Date.now());
+  const eds = editors.filter((e) => e.active !== false || S.byId.has(e.id)).map((e) => ({ id: e.id, name: e.name, s: S.byId.get(e.id) || S.blank() }));
+  eds.sort((a, b) => (b.s.del[30] - a.s.del[30]) || (b.s.del[7] - a.s.del[7]) || String(a.name).localeCompare(String(b.name)));
+  let rank = 0, prev = null; eds.forEach((e, i) => { const k = e.s.del[30] + "/" + e.s.del[7]; if (k !== prev) { rank = i + 1; prev = k; } e.rank = e.s.del[30] > 0 ? rank : 0; });
+  const topOf = (w) => { const m = Math.max(0, ...eds.map((e) => e.s.del[w])); return m ? `${eds.filter((e) => e.s.del[w] === m).map((e) => esc(e.name)).join(" · ")} (${m})` : E.none; };
+  const avg = (s, w) => s.dn[w] ? fmtDur(s.dsum[w] / s.dn[w]) : E.none;
+  const td = (c, v, k = "") => `<td class="n ${k}" data-c="${c}">${v}</td>`;
+  const row = (id, label, s, rk, cls) => `<tr class="${cls}" data-row="${id}"><td class="rk" data-c="rank">${rk || ""}</td><td data-c="name">${label}</td>${td("del7", s.del[7])}${td("del30", s.del[30])}${td("open", s.open)}${td("late", s.late, s.late ? "err" : "")}${td("dly7", avg(s, 7))}${td("dly30", avg(s, 30))}${td("rev7", s.rev[7], s.rev[7] ? "warn" : "")}${td("rev30", s.rev[30], s.rev[30] ? "warn" : "")}</tr>`;
+  const A = S.asm, N = S.none;
+  const rows = eds.map((e) => row(e.id, esc(e.name), e.s, e.rank, "")).join("")
+    + (N.open || N.del[30] || N.rev[30] ? row("none", E.noneRow, N, "", "sub") : "")
+    + (A.del[30] || A.open || A.rev[30] ? row("asm", E.asmRow, A, "", "sub") : "")
+    + row("tot", E.total, S.tot, "", "tot");
+  const th = (c, x = "") => `<th class="n ${x}">${c}</th>`;
+  $("#admin").innerHTML = `<div class="panel"><h3>${E.title}</h3><p class="eqtop">${E.lead}<br/><b>${E.top}</b> · ${E.d7} : ${topOf(7)} · ${E.d30} : ${topOf(30)}</p>
+    <div class="eqwrap"><table class="adm eq"><thead>
+      <tr><th rowspan="2">${E.rank}</th><th rowspan="2">${E.editor}</th><th class="g" colspan="2">${E.deliv}</th><th class="n" rowspan="2">${E.open}</th><th class="n" rowspan="2">${E.late}</th><th class="g" colspan="2">${E.delay}</th><th class="g" colspan="2">${E.rev}</th></tr>
+      <tr>${th(E.d7)}${th(E.d30)}${th(E.d7)}${th(E.d30)}${th(E.d7)}${th(E.d30)}</tr>
+    </thead><tbody>${rows}</tbody></table></div>
+    <ul class="eqnote">${jobs.length >= 400 ? `<li>${E.cap(jobs.length)}</li>` : ""}${E.foot.map((x) => `<li>${esc(x)}</li>`).join("")}</ul></div>`;
 }
 function renderTarifs() {
   if (!tarifStudio && studios.length) tarifStudio = studios[0].id;
@@ -1251,6 +1376,7 @@ async function load(first, keepPop, pre) {
   if (first && !params.has("editor") && myEditor && profile.role === "editor") edFilter = myEditor.id;
   const openCell = keepPop && document.querySelector(".pop") ? popRef : null;
   renderEditorBar(); renderStats(); renderBoard(); renderPc(); renderAlerts();
+  if (!LINKED && tab === "equipe") renderEquipe();
   if (openCell) { const cell = document.querySelector(`[data-${openCell[0]}="${openCell[1]}"]`); if (cell) (openCell[0] === "peds" ? openPartPop : openPop)(cell); }
 }
 function beep(n) {
@@ -1258,7 +1384,40 @@ function beep(n) {
 }
 const roleName = () => t("lk")[profile.role] || profile.role;
 // avec un lien, le bandeau dit clairement qui est connecté (un appareil qui a ouvert un lien le garde, même sur l'URL nue) ; « Quitter » est à côté
-const renderWho = () => { $("#who").innerHTML = LINKED ? `<b>${t("lk").who(esc(profile.display_name))}</b> · ${esc(roleName())}` : `<b>${esc(profile.display_name)}</b> · ${esc(profile.role)}`; };
+const renderWho = () => { $("#who").innerHTML = LINKED ? `<b>${t("lk").who(esc(profile.display_name))}</b> · ${esc(roleName())}` : ADMIN_MODE ? `<b>${t("adm").who}</b> · ${esc(profile.display_name)}` : `<b>${esc(profile.display_name)}</b> · ${esc(profile.role)}`; };
+/* ===== lot D : bouton Admin (vue lien), « Quitter l'admin » (vue admin), boîte « Code » ===== */
+let admTimer = 0, admWasLocked = false;
+function adminPaint() {
+  const b = $("#admBtn"), left = adminLockLeft();
+  b.disabled = left > 0; b.title = left > 0 ? t("adm").lockedTip(Math.ceil(left / 60000)) : "";
+  clearTimeout(admTimer);
+  if (left > 0) { admWasLocked = true; admTimer = setTimeout(adminPaint, left + 50); }
+  else if (admWasLocked) { admWasLocked = false; $("#admCode").disabled = false; $("#admGo").disabled = false; adminMsg(""); }   // le délai est passé : la boîte (si ouverte) redevient utilisable
+}
+function adminMsg(txt, bad) { const m = $("#admMsg"); m.textContent = txt || ""; m.classList.toggle("bad", !!bad); }
+function adminClose() { $("#admModal").hidden = true; adminMsg(""); $("#admCode").value = ""; }
+function adminOpen() {
+  if (adminLockLeft() > 0) { adminPaint(); return; }
+  $("#admCode").placeholder = t("adm").ph; $("#admCode").disabled = false; $("#admGo").disabled = false; adminMsg("");
+  $("#admModal").hidden = false; $("#admCode").focus();
+}
+async function adminSubmit() {
+  const code = $("#admCode").value.trim(); if (!code || $("#admGo").disabled) return;
+  $("#admGo").disabled = true;
+  const r = await adminTry(code), L = t("adm");
+  if (r.res === "ok") { const u = new URL(location.href); u.searchParams.delete("k"); location.replace(u.pathname + u.search); return; }   // la page repart en vue admin (session de l'accès libre)
+  $("#admCode").value = "";
+  if (r.res === "locked") { adminMsg(L.locked(Math.ceil(adminLockLeft() / 60000) || 1), true); $("#admCode").disabled = true; adminPaint(); return; }
+  adminMsg(r.res === "nocrypto" ? L.nocrypto : L.bad(r.left), true);
+  $("#admGo").disabled = false; $("#admCode").focus();
+}
+function adminInit() { if (LINKED) { $("#admBtn").hidden = false; adminPaint(); } else if (ADMIN_MODE) $("#admOff").hidden = false; }   // « Verrouiller » : dès que la vue admin est ouverte par code
+$("#admBtn").addEventListener("click", adminOpen);
+$("#admGo").addEventListener("click", adminSubmit);
+$("#admCode").addEventListener("keydown", (e) => { if (e.key === "Enter") adminSubmit(); else if (e.key === "Escape") adminClose(); });
+$("#admCancel").addEventListener("click", adminClose);
+$("#admModal").addEventListener("click", (e) => { if (e.target === e.currentTarget) adminClose(); });
+$("#admOff").addEventListener("click", () => { ls.del(ADM.until); location.replace(location.pathname); });
 async function bootLink() {
   // pas de session Supabase : le lien est la seule identité (appels anonymes à code), et on ne touche pas à la session de l'accès libre
   sb = createClient(SUPABASE_URL, SUPABASE_ANON, { auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false } });
@@ -1267,7 +1426,7 @@ async function bootLink() {
   if (params.has("k")) { ls.set(KEY_STORE, LINK); const u = new URL(location.href); u.searchParams.delete("k"); history.replaceState(null, "", u); }   // le code quitte la barre d'adresse
   document.body.classList.add("lk-" + r.role);
   tab = "prod"; if (!params.has("f")) filter = r.role === "qc" ? "qc" : "all";
-  renderWho(); $("#logout").hidden = false; $("#gate").hidden = true; $("#app").hidden = false; $("#live").hidden = false;
+  renderWho(); adminInit(); $("#logout").hidden = false; $("#gate").hidden = true; $("#app").hidden = false; $("#live").hidden = false;
   renderToolbar(); await load(true, false, r);
   // pas de temps réel avec un code : relecture toutes les 20 s (bip conservé) ; on ne repeint pas pendant une saisie
   setInterval(() => { const a = document.activeElement; if (a && /^(INPUT|SELECT|TEXTAREA)$/.test(a.tagName) && a.closest("#board")) return; load(false); }, 20000);
@@ -1277,6 +1436,7 @@ async function boot() {
   applyText();
   if (params.get("bye")) { linkScreen("bye"); return; }
   if (LINKED) { await bootLink(); return; }
+  adminInit();
   sb = createClient(SUPABASE_URL, SUPABASE_ANON);
   let { data: { session } } = await sb.auth.getSession();
   if (!session && OPEN_ACCESS) ({ data: { session } } = await sb.auth.signInWithPassword(OPEN_ACCESS));
@@ -1303,7 +1463,7 @@ $("#loginBtn").addEventListener("click", async () => {
 $("#password").addEventListener("keydown", (e) => { if (e.key === "Enter") $("#loginBtn").click(); });
 $("#logout").addEventListener("click", async () => { if (LINKED) { ls.del(KEY_STORE); location.replace(location.pathname + "?bye=1"); return; } await sb.auth.signOut(); location.reload(); });
 $("#lkRetry").addEventListener("click", () => location.reload());
-$("#langBtn").addEventListener("click", () => { lang = lang === "fr" ? "en" : "fr"; try { localStorage.setItem("ds_lang", lang); } catch {} applyText(); if (lkKind) linkScreen(lkKind); if (profile) { if (LINKED) renderWho(); renderEditorBar(); renderToolbar(); renderStats(); renderBoard(); renderTabs(); alertsHtml = null; renderPc(); renderAlerts(); } });
+$("#langBtn").addEventListener("click", () => { lang = lang === "fr" ? "en" : "fr"; try { localStorage.setItem("ds_lang", lang); } catch {} applyText(); if (lkKind) linkScreen(lkKind); if (profile) { renderWho(); renderEditorBar(); renderToolbar(); renderStats(); renderBoard(); renderTabs(); alertsHtml = null; renderPc(); renderAlerts(); } });
 $("#tvBtn").addEventListener("click", () => { tv = !tv; document.body.classList.toggle("tv", tv); closePc(); const u = new URL(location.href); tv ? u.searchParams.set("tv", "1") : u.searchParams.delete("tv"); history.replaceState(null, "", u); });
 boot();
 </script>

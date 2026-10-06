@@ -203,9 +203,81 @@
       .addrow{grid-template-columns:1fr}.srow{grid-template-columns:1fr 70px 70px}
     }
     @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+    /* lot D : rideau « code » (le contenu n'est ni affiché ni chargé avant le bon code) */
+    body.cur>header,body.cur>main{display:none!important}
+    .curtain{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;padding:16px;background:var(--bg)}
+    .curtain[hidden]{display:none}
+    .curbox{width:min(340px,100%);display:flex;flex-direction:column;gap:12px;align-items:stretch;background:var(--surface);border:1px solid var(--line-strong);border-radius:22px;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+    .curbox .lv-rec{align-self:flex-start;margin-bottom:6px}
+    .curbox h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-.02em}
+    .curbox p{margin:0;font-size:13px;color:var(--taupe)}
+    .curbox .in{width:100%;text-align:center;letter-spacing:.4em;font-size:18px}
+    .curmsg{min-height:18px;font-size:12px;color:var(--taupe)}
+    .curmsg.bad{color:var(--err)}
   </style>
 </head>
-<body>
+<body class="cur">
+<div class="curtain" id="curtain" role="dialog" aria-modal="true" aria-labelledby="curT">
+  <div class="curbox">
+    <span class="lv-rec"><i></i>DS<em>Editing</em></span>
+    <h1 id="curT"></h1>
+    <p id="curP"></p>
+    <input class="in" id="curCode" type="password" inputmode="numeric" autocomplete="off" maxlength="16"/>
+    <div class="curmsg" id="curMsg" aria-live="polite"></div>
+    <button class="btn primary" id="curGo" type="button"></button>
+  </div>
+</div>
+<script id="curtain-js">
+/* lot D : rideau « code admin » de /prod-admin/. Même mécanisme et même mémoire d'appareil que le bouton « Admin » du dashboard (mêmes clés ds_admin_*).
+   Bon code : le rideau tombe pour 12 h sur cet appareil, puis la page démarre. Rien n'est affiché ni chargé avant (boot() attend window.__dsCurtain).
+   LIMITE ASSUMÉE : ce n'est pas une barrière de sécurité (hachage + sel dans la page, 4 chiffres, et les statistiques sont lisibles sans connexion par la RPC publique de la base). */
+(function () {
+  var S = { hash: "e3fc599703d1e7fbd29e600607a955e175c08158b52ba93f027d5944434682aa", salt: "ds-editing/admin/v1:", until: "ds_admin_until", fails: "ds_admin_fails", lock: "ds_admin_lock", ttl: 12 * 3600e3, max: 5, lockMs: 10 * 60e3 };
+  var ls = { get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: function (k, v) { try { localStorage.setItem(k, v); } catch (e) {} }, del: function (k) { try { localStorage.removeItem(k); } catch (e) {} } };
+  var num = function (k) { return Number(ls.get(k)) || 0; };
+  var TX = {
+    fr: { t: "Code admin", p: "Statistiques de production : entre le code pour continuer.", go: "Valider", lock: "Verrouiller", ph: "Code", bad: function (n) { return "Code incorrect. Il reste " + n + " essai" + (n > 1 ? "s" : "") + "."; }, locked: function (m) { return "Trop d'erreurs : réessaie dans " + m + " min."; }, nocrypto: "Ce navigateur ne peut pas vérifier le code (page non sécurisée ?)." },
+    en: { t: "Admin code", p: "Production statistics: enter the code to continue.", go: "Enter", lock: "Lock", ph: "Code", bad: function (n) { return "Wrong code. " + n + " attempt" + (n > 1 ? "s" : "") + " left."; }, locked: function (m) { return "Too many errors: try again in " + m + " min."; }, nocrypto: "This browser cannot check the code (insecure page?)." },
+    id: { t: "Kode admin", p: "Statistik produksi: masukkan kode untuk melanjutkan.", go: "Masuk", lock: "Kunci", ph: "Kode", bad: function (n) { return "Kode salah. Sisa " + n + " percobaan."; }, locked: function (m) { return "Terlalu banyak kesalahan: coba lagi dalam " + m + " menit."; }, nocrypto: "Browser ini tidak dapat memeriksa kode (halaman tidak aman?)." }
+  };
+  var lang = new URLSearchParams(location.search).get("lang") || ls.get("ds_prod_lang") || ls.get("ds_lang") || "fr"; if (!TX[lang]) lang = "fr";
+  var L = TX[lang], $ = function (id) { return document.getElementById(id); };
+  var done; window.__dsCurtain = new Promise(function (r) { done = r; });
+  function release() {
+    var b = $("curLock"); if (b) { b.textContent = L.lock; b.hidden = false; b.addEventListener("click", function () { ls.del(S.until); location.reload(); }); }   // « Verrouiller » : efface la vue admin de l'appareil (dashboard compris)
+    document.body.classList.remove("cur"); var c = $("curtain"); if (c && c.parentNode) c.parentNode.removeChild(c); done(); }
+  if (num(S.until) > Date.now()) { release(); return; }
+  var timer = 0;
+  function sha(s) {
+    var c = window.crypto;
+    if (!c || !c.subtle || typeof TextEncoder === "undefined") return Promise.reject(new Error("NO_SUBTLE"));
+    return c.subtle.digest("SHA-256", new TextEncoder().encode(s)).then(function (b) { return Array.prototype.map.call(new Uint8Array(b), function (x) { return ("0" + x.toString(16)).slice(-2); }).join(""); });
+  }
+  function msg(x, bad) { var m = $("curMsg"); m.textContent = x || ""; m.className = "curmsg" + (bad ? " bad" : ""); }
+  function paint() {
+    var left = Math.max(0, num(S.lock) - Date.now()), on = left > 0;
+    $("curCode").disabled = on; $("curGo").disabled = on;
+    clearTimeout(timer);
+    if (on) { msg(L.locked(Math.ceil(left / 60000)), true); timer = setTimeout(function () { msg(""); paint(); }, left + 50); }
+  }
+  function submit() {
+    var code = $("curCode").value.trim(); if (!code || $("curGo").disabled) return;
+    if (Math.max(0, num(S.lock) - Date.now()) > 0) { paint(); return; }
+    $("curGo").disabled = true;
+    sha(S.salt + code).then(function (h) {
+      if (h === S.hash) { ls.set(S.until, String(Date.now() + S.ttl)); ls.del(S.fails); release(); return; }
+      var n = num(S.fails) + 1; $("curCode").value = "";
+      if (n >= S.max) { ls.set(S.lock, String(Date.now() + S.lockMs)); ls.del(S.fails); paint(); return; }
+      ls.set(S.fails, String(n)); msg(L.bad(S.max - n), true); $("curGo").disabled = false; $("curCode").focus();
+    }, function () { msg(L.nocrypto, true); $("curGo").disabled = false; });
+  }
+  $("curT").textContent = L.t; $("curP").textContent = L.p; $("curGo").textContent = L.go; $("curCode").placeholder = L.ph;
+  $("curGo").addEventListener("click", submit);
+  $("curCode").addEventListener("keydown", function (e) { if (e.key === "Enter") submit(); });
+  paint();
+  try { $("curCode").focus(); } catch (e) {}
+})();
+</script>
 <header><div class="hd">
   <a class="lv-rec" href="../team/dashboard.html"><i></i>DS<em>Editing</em></a>
   <div class="brand"><span class="mono" data-t="kicker"></span></div>
@@ -215,6 +287,7 @@
     <div class="seg" id="langSeg" role="group" aria-label="Langue"><button type="button" data-lang="id">Bahasa</button><button type="button" data-lang="fr">Français</button><button type="button" data-lang="en">English</button></div>
     <a class="btn" id="formBtn" href="../prod/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14 21 3"/></svg><span data-t="form"></span></a>
     <button class="btn ic" id="refreshBtn" type="button" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg></button>
+    <button class="btn" id="curLock" type="button" hidden></button>
     <button class="btn" id="logout" type="button" data-t="logout" hidden></button>
     <button class="btn" id="loginOpen" type="button" data-t="adminLogin" hidden></button>
   </div>
@@ -669,7 +742,7 @@ $("#langSeg").querySelectorAll("[data-lang]").forEach((b) => b.addEventListener(
   const u = new URL(location.href); u.searchParams.set("lang", lang); history.replaceState(null, "", u);
   applyText(); if (profile && !$("#app").hidden) { renderTabs(); renderToolbar(); render(); }
 }));
-boot();
+(window.__dsCurtain || Promise.resolve()).then(boot);   // lot D : rien ne démarre avant le bon code
 </script>
 </body>
 </html>
