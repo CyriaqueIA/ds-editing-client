@@ -276,6 +276,49 @@
     .detail .bf .links{margin-top:8px}
     body.lk-editor #edbar,body.lk-editor #stats,body.lk-editor .toolbar .search,body.lk-editor #tvBtn,body.lk-editor #prodBtn,body.lk-editor .edcell{display:none}
     @media (min-width:1181px){body.lk-editor .job{grid-template-columns:92px 1.3fr 200px 1.3fr 160px 150px 40px}}
+    /* ---- lot C : commande à parties (Intro / Corps) : sous-lignes par partie, panneau d'assemblage, état « À assembler » ---- */
+    .parts{grid-column:1/-1;display:flex;flex-direction:column;gap:2px;padding:8px 0 2px;border-top:1px dashed var(--line);margin-top:2px;cursor:default}
+    .pt{display:grid;grid-template-columns:84px minmax(140px,1fr) auto minmax(190px,1.2fr);gap:10px;align-items:center;padding:5px 0}
+    .pt .pl{font-weight:700;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--cream)}
+    .pt .pe{position:relative}
+    .pt .pe .eds{flex-direction:row;align-items:center;gap:8px}
+    .pt .pe .eds .row .av{--av:26px}
+    .pt .steps{flex-wrap:nowrap}
+    .pt .in{padding:7px 10px;font-size:12px}
+    .pt .pfb{grid-column:1/-1;margin:0}
+    .pt .pblk{grid-column:1/-1;margin:0}
+    .st.derived{cursor:default;opacity:.85}
+    .st.derived[aria-disabled="true"]{opacity:.85;cursor:default}
+    .asm{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:6px;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.03);font-size:13px;color:var(--taupe);cursor:default}
+    .asm b{color:var(--cream);font-weight:700;letter-spacing:.04em;text-transform:uppercase;font-size:12px}
+    .asm .in{flex:1 1 260px;min-width:200px}
+    .asm .btn{height:36px;font-size:13px}
+    .asm.on{border-color:rgba(127,176,224,.65);background:rgba(127,176,224,.14);color:var(--cream)}
+    .asm.on .btn[data-asm]{border-color:transparent;background:linear-gradient(180deg,#FFFFFF,#C9D0D7);color:#0A0B0D}
+    .asm.ok{border-color:rgba(70,211,105,.4);background:rgba(70,211,105,.1);color:var(--cream)}
+    .asm a{color:var(--accent2)}
+    .asmtag{display:inline-block;margin-left:6px;vertical-align:middle;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border-radius:999px;padding:2px 8px;color:#0A0B0D;background:var(--blue)}
+    .job.asm{border-left-color:var(--blue);background:linear-gradient(90deg,rgba(127,176,224,.2),rgba(127,176,224,0) 40%),var(--surface);box-shadow:0 0 0 1px rgba(127,176,224,.35)}
+    .chip.asm.has .n{background:rgba(127,176,224,.25);color:var(--blue)}
+    .asmbar{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+    .asmbar:empty{display:none}
+    .asmbar .alert{border-color:rgba(127,176,224,.5);border-left-color:var(--blue);background:rgba(127,176,224,.13);cursor:pointer}
+    .asmbar .alert .ic{background:var(--blue)}
+    .asmbar .alert b{color:var(--blue)}
+    .detail .pn{display:grid;gap:8px;margin-top:8px}
+    body.lk-editor .pt .pe,body.lk-editor .asmbar{display:none}
+    body.lk-editor .pt{grid-template-columns:84px auto minmax(190px,1fr)}
+    @media (max-width:1180px){.pt{grid-template-columns:84px 1fr;row-gap:6px}.pt .steps{flex-wrap:wrap}}
+    body.tv .parts{padding:10px 0 4px}
+    body.tv .pt{grid-template-columns:110px 1fr auto;font-size:15px}
+    body.tv .pt .pl{font-size:15px}
+    body.tv .pt .in,body.tv .pt .pfb:empty,body.tv .asm .in,body.tv .asm .btn{display:none}
+    body.tv .pt .st,body.tv .asm{font-size:14px}
+    body.tv .pt .pe .eds .row .av{--av:34px}
+    body.tv .asmtag{font-size:13px;padding:3px 10px}
+    .rsh{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:8px;cursor:default}
+    .rsh .btn{height:32px;font-size:12px}
+    body.tv .rsh,body.lk-editor .rsh{display:none}
     .lkscreen{max-width:420px}
     .lkscreen .btn{margin-top:8px}
     .hint{font-size:12px;color:var(--taupe);margin:0 0 12px}
@@ -343,6 +386,7 @@
     <div class="stats" id="stats"></div>
     <div class="toolbar" id="toolbar"></div>
     <div class="alerts" id="alerts" aria-live="polite"></div>
+    <div class="asmbar" id="asmbar" aria-live="polite"></div>
     <div class="board" id="board"></div>
     <div class="admin" id="admin" hidden></div>
   </div>
@@ -360,7 +404,7 @@ const BUSINESS_DAYS_DEFAULT = 5;   // délai par défaut quand le client n'a pas
 const T = {
   fr: { sub: "Production", live: "En direct", tv: "Mode télé", logout: "Déconnexion", leave: "Quitter", login: "Espace équipe", loginSub: "Connecte-toi avec ton e-mail DS Editing.", loginBtn: "Entrer",
     all: "Tous", tasks: (n) => `${n} tâche${n > 1 ? "s" : ""}`, stats: ["Reçues aujourd'hui", "En cours", "En retard", "À contrôler", "Livrées cette semaine"],
-    filters: { all: "Tout", na: "À attribuer", ready: "Fichiers prêts, à démarrer", late: "En retard", qc: "À contrôler", done: "Livrées" }, search: "Rechercher…",
+    filters: { all: "Tout", na: "À attribuer", ready: "Fichiers prêts, à démarrer", late: "En retard", qc: "À contrôler", asm: "À assembler", done: "Livrées" }, search: "Rechercher…",
     dl: { waiting: "En attente", running: "Téléchargement en cours", ready: "Fichiers prêts", error: "Erreur", abandon: "Abandonné", access: "Accès demandé au client", purged: "Nettoyé",
       tips: { waiting: "Le PC du bureau n'a pas encore commencé le téléchargement.", running: "Le PC du bureau télécharge les rushes.", ready: "Les rushes sont sur le PC du bureau.", access: "Le lien est privé : un e-mail a demandé au client d'ouvrir l'accès.", purged: "Le dossier a été supprimé du PC du bureau après la livraison." },
       nTry: (n, m) => `essai ${n}/${m}`, nFiles: (n) => `${n} fichier${n > 1 ? "s" : ""}`, nFailed: (n) => `${n} lien${n > 1 ? "s" : ""} en échec`, since: (d) => `depuis ${d}`, pcOn: (k) => `PC Bali occupé sur ${k}`, pcOff: "PC hors ligne", manual: "à télécharger à la main",
@@ -374,9 +418,14 @@ const T = {
       destHint: "Non modifiable ici : changer de dossier ne déplace pas les rushes déjà téléchargés et fausserait leurs chemins. À faire avec l'équipe technique, sur le PC du bureau.", saved: "enregistré", bad: (a, b) => `Valeur attendue : entre ${a} et ${b}`, missing: "Réglages introuvables : l'agent du PC du bureau n'est pas encore configuré." },
     steps: { dl: "Fichiers", start: "Commencé", half: "50 %", done: "Livré" }, qc: { pending: "Qualité : en attente", ok: "Qualité : OK", revisions: "Qualité : à revoir" },
     wanted: "Date souhaitée", noDate: "sans date", late: "EN RETARD", team: "équipe", delivered: "livré", unassigned: "À attribuer", noEditor: "Aucun monteur", brief: "Brief", files: "Fichiers", frame: "frame.io", empty: "Aucune commande dans cette vue.", received: "Reçu", frameioPh: "Lien frame.io de livraison", noteQc: "Note qualité", notes: "Notes internes", deliveryDate: "Livraison fixée par l'équipe", rushes: "Rushes", email: "E-mail client", contact: "Contact",
+    parts: { intro: "Intro", corps: "Corps", single: "Commande", partFrame: "Lien frame.io de cette partie (interne)", partNotes: "Notes · ",
+      asmTag: "À assembler", asmT: "À assembler", asmP: "Les deux parties sont livrées : colle-les ensemble, pose le lien frame.io FINAL, puis livre la commande.", finalPh: "Lien frame.io FINAL de la commande", finalBtn: "Livré (finale)", finalOk: "✓ Livré, la qualité est prévenue",
+      revisions: "À revoir : le dispatch relivre la finale ; corrige ta partie si on te le demande.",
+      split: "Couper en Intro / Corps", splitAsk: "Couper cette commande en Intro et Corps (un monteur par partie) ?", splitOk: "✓ Commande coupée en Intro / Corps", merge: "Fusionner en une seule partie", mergeAsk: "Fusionner Intro et Corps en une seule partie (les monteurs sont gardés) ?", mergeOk: "✓ Commande fusionnée en une seule partie",
+      finalDone: "Livré (finale)", reopen: "Rouvrir l'assemblage", wait: (a, b) => `Assemblage : ${a} / ${b} partie${b > 1 ? "s" : ""} livrée${b > 1 ? "s" : ""}`, bar: (n) => `${n} commande${n > 1 ? "s" : ""} à assembler`, derived: "Calculé d'après les parties : coche dans la partie.", noEd: "À attribuer", final: "Lien final" },
     needFrame: "Colle d'abord le lien frame.io de livraison : « Livré » reste bloqué sans lui.", locked: "Étape déjà cochée : seule la qualité ou un admin peut la corriger.", redeliver: "Relivrer", redeliverTip: "Corrige le lien frame.io si besoin, puis relivre pour un nouveau contrôle qualité.", redelivered: "✓ Relivré, la qualité est prévenue", round: (n) => `${n}e passage`, savedOk: "✓ Enregistré",
     lk: { editor: "Monteur", dispatcher: "Dispatch", qc: "Qualité", badT: "Lien invalide ou coupé", badP: "Ce lien ne fonctionne plus. Demande-en un nouveau à l'équipe DS Editing.", tooT: "Trop d'essais", tooP: "Réessaie dans quelques minutes.", downT: "Service indisponible", downP: "Impossible de joindre le serveur. Vérifie ta connexion puis réessaie.", byeT: "Lien retiré de cet appareil", byeP: "Rouvre ton lien personnel pour revenir à tes commandes.", retry: "Réessayer", offT: "Accès désactivé", offP: "Ton accès est désactivé pour le moment. Reviens plus tard ou demande à l'équipe DS Editing.", who: (n) => `Connecté avec le lien de ${n}`, queue: (n) => `À attribuer · ${n}`, others: "Autres commandes", brief: "Brief", refs: "Références", logos: "Logos" },
-    errs: { FRAMEIO_REQUIS: "Lien frame.io manquant ou invalide (il doit commencer par https://).", ETAPE_VERROUILLEE: "Étape déjà cochée : seule la qualité ou un admin peut la corriger.", QC_OK_VERROUILLE: "Qualité déjà validée : le lien frame.io ne peut plus être modifié (voir avec l'équipe qualité).", REFUSE: "Action refusée pour ton profil.", CHAMP_INTERDIT: "Modification non autorisée pour ton profil.", LIEN_INVALIDE: "Ce lien ne fonctionne plus : demande-en un nouveau.", TROP_D_ESSAIS: "Trop d'essais : réessaie dans quelques minutes.", MONTEUR_INCONNU: "Monteur inconnu.", MONTEUR_DESACTIVE: "Ton accès est désactivé pour le moment." },
+    errs: { FRAMEIO_REQUIS: "Lien frame.io manquant ou invalide (il doit commencer par https://).", ETAPE_VERROUILLEE: "Étape déjà cochée : seule la qualité ou un admin peut la corriger.", QC_OK_VERROUILLE: "Qualité déjà validée : le lien frame.io ne peut plus être modifié (voir avec l'équipe qualité).", REFUSE: "Action refusée pour ton profil.", CHAMP_INTERDIT: "Modification non autorisée pour ton profil.", LIEN_INVALIDE: "Ce lien ne fonctionne plus : demande-en un nouveau.", TROP_D_ESSAIS: "Trop d'essais : réessaie dans quelques minutes.", REOUVERTURE_REFUSEE: "On ne rouvre l'assemblage qu'après un « à revoir » de la qualité.", LIVRAISON_FIGEE: "Commande livrée : après un « à revoir », rouvre d'abord l'assemblage avant de rouvrir une partie.", PARTIE_DEJA_COMMENCEE: "Impossible : une étape est déjà cochée ou un lien déjà posé sur cette commande.", COMMANDE_TERMINEE: "Impossible : la commande est terminée (qualité OK).", PAS_UNE_PARTIE_UNIQUE: "Cette commande est déjà coupée en parties.", PAS_DEUX_PARTIES: "Cette commande n'est pas coupée en Intro / Corps.", ACTION_INCONNUE: "Action inconnue.", JOB_A_PARTIES: "Cette commande est découpée en parties : coche l'étape dans la partie concernée.", PARTIES_NON_LIVREES: "Toutes les parties doivent être livrées avant de livrer la commande.", MONTEUR_INCONNU: "Monteur inconnu.", MONTEUR_DESACTIVE: "Ton accès est désactivé pour le moment." },
     tabs: { prod: "Production", tarifs: "Tarifs", factures: "Factures", rdv: "Rendez-vous" }, amountL: "Montant", amountMiss: "Prix manquant dans la grille :", override: "Montant forcé", recalc: "Recalculer", invoiced: "Facturé", sunday: "facturé dimanche",
     keys: { podcast_standard: "Épisode podcast · Standard", podcast_premium: "Épisode podcast · Premium", vsl_standard: "VSL · Standard", vsl_premium: "VSL · Premium", reel_standard: "Reel standard", reel_premium: "Reel premium", intro: "Intro", miniature: "Miniature", trailer: "Trailer", cta: "CTA réseaux sociaux", extra_30min: "Supplément 30 min" },
     tarifsHint: "Prix unitaires par client, dans sa devise. Vide = pas encore fixé : la commande validée attend un prix avant d'être facturée.", clientSel: "Client", saved: "enregistré", recalcAll: "Recalculer les commandes validées", space: "Espace client", billing: "Facturation", billingName: "Raison sociale", billingAddress: "Adresse (une ligne par ligne)", billingEmail: "E-mail de facturation", attention: "À l'attention de", currency: "Devise", tvaL: "TVA",
@@ -389,7 +438,7 @@ const T = {
       status: { confirmed: "Confirmé", done: "Fait", cancelled: "Annulé", no_show: "Absent" }, none: "Aucun rendez-vous", confirm: "confirmation", reminder: "rappel", local: "chez vous", missing: "Réglages introuvables : appliquer supabase/bookings_v1.sql." } },
   en: { sub: "Production", live: "Live", tv: "TV mode", logout: "Log out", leave: "Leave", login: "Team space", loginSub: "Sign in with your DS Editing email.", loginBtn: "Enter",
     all: "All", tasks: (n) => `${n} task${n > 1 ? "s" : ""}`, stats: ["Received today", "In progress", "Late", "To review", "Delivered this week"],
-    filters: { all: "All", na: "To assign", ready: "Files ready, to start", late: "Late", qc: "To review", done: "Delivered" }, search: "Search…",
+    filters: { all: "All", na: "To assign", ready: "Files ready, to start", late: "Late", qc: "To review", asm: "To assemble", done: "Delivered" }, search: "Search…",
     dl: { waiting: "Waiting", running: "Downloading", ready: "Files ready", error: "Error", abandon: "Gave up", access: "Access requested from client", purged: "Cleaned up",
       tips: { waiting: "The office PC has not started the download yet.", running: "The office PC is downloading the footage.", ready: "The footage is on the office PC.", access: "The link is private: an email asked the client to open access.", purged: "The folder was removed from the office PC after delivery." },
       nTry: (n, m) => `attempt ${n}/${m}`, nFiles: (n) => `${n} file${n > 1 ? "s" : ""}`, nFailed: (n) => `${n} failed link${n > 1 ? "s" : ""}`, since: (d) => `since ${d}`, pcOn: (k) => `Bali PC busy on ${k}`, pcOff: "PC offline", manual: "download by hand",
@@ -403,9 +452,14 @@ const T = {
       destHint: "Not editable here: changing the folder does not move footage already downloaded and would break its paths. To be done with the tech team, on the office PC.", saved: "saved", bad: (a, b) => `Expected value: between ${a} and ${b}`, missing: "Settings not found: the office PC agent is not configured yet." },
     steps: { dl: "Files", start: "Started", half: "50%", done: "Delivered" }, qc: { pending: "QC: pending", ok: "QC: OK", revisions: "QC: revisions" },
     wanted: "Requested date", noDate: "no date", late: "LATE", team: "team", delivered: "delivered", unassigned: "Unassigned", noEditor: "No editor", brief: "Brief", files: "Files", frame: "frame.io", empty: "No order in this view.", received: "Received", frameioPh: "frame.io delivery link", noteQc: "QC note", notes: "Internal notes", deliveryDate: "Delivery set by the team", rushes: "Footage", email: "Client email", contact: "Contact",
+    parts: { intro: "Intro", corps: "Body", single: "Order", partFrame: "frame.io link of this part (internal)", partNotes: "Notes · ",
+      asmTag: "To assemble", asmT: "To assemble", asmP: "Both parts are delivered: put them together, paste the FINAL frame.io link, then deliver the order.", finalPh: "FINAL frame.io link of the order", finalBtn: "Delivered (final)", finalOk: "✓ Delivered, QC has been notified",
+      revisions: "Needs changes: dispatch redelivers the final; fix your part if you are asked to.",
+      split: "Split into Intro / Body", splitAsk: "Split this order into Intro and Body (one editor per part)?", splitOk: "✓ Order split into Intro / Body", merge: "Merge into a single part", mergeAsk: "Merge Intro and Body into a single part (editors are kept)?", mergeOk: "✓ Order merged into a single part",
+      finalDone: "Delivered (final)", reopen: "Reopen assembly", wait: (a, b) => `Assembly: ${a} / ${b} part${b > 1 ? "s" : ""} delivered`, bar: (n) => `${n} order${n > 1 ? "s" : ""} to assemble`, derived: "Computed from the parts: tick it in the part.", noEd: "Unassigned", final: "Final link" },
     needFrame: "Paste the frame.io delivery link first: “Delivered” stays blocked without it.", locked: "Step already ticked: only QC or an admin can fix it.", redeliver: "Redeliver", redeliverTip: "Fix the frame.io link if needed, then redeliver for a new quality check.", redelivered: "✓ Redelivered, QC has been notified", round: (n) => `${n}${[11, 12, 13].includes(n % 100) ? "th" : ({ 1: "st", 2: "nd", 3: "rd" })[n % 10] || "th"} pass`, savedOk: "✓ Saved",
     lk: { editor: "Editor", dispatcher: "Dispatch", qc: "Quality", badT: "Invalid or disabled link", badP: "This link no longer works. Ask the DS Editing team for a new one.", tooT: "Too many attempts", tooP: "Try again in a few minutes.", downT: "Service unavailable", downP: "Cannot reach the server. Check your connection and try again.", byeT: "Link removed from this device", byeP: "Open your personal link again to get back to your orders.", retry: "Try again", offT: "Access disabled", offP: "Your access is disabled for now. Come back later or ask the DS Editing team.", who: (n) => `Signed in with ${n}'s link`, queue: (n) => `To assign · ${n}`, others: "Other orders", brief: "Brief", refs: "References", logos: "Logos" },
-    errs: { FRAMEIO_REQUIS: "frame.io link missing or invalid (it must start with https://).", ETAPE_VERROUILLEE: "Step already ticked: only QC or an admin can fix it.", QC_OK_VERROUILLE: "QC already approved: the frame.io link can no longer be changed (ask the QC team).", REFUSE: "Action refused for your profile.", CHAMP_INTERDIT: "Change not allowed for your profile.", LIEN_INVALIDE: "This link no longer works: ask for a new one.", TROP_D_ESSAIS: "Too many attempts: try again in a few minutes.", MONTEUR_INCONNU: "Unknown editor.", MONTEUR_DESACTIVE: "Your access is disabled for now." },
+    errs: { FRAMEIO_REQUIS: "frame.io link missing or invalid (it must start with https://).", ETAPE_VERROUILLEE: "Step already ticked: only QC or an admin can fix it.", QC_OK_VERROUILLE: "QC already approved: the frame.io link can no longer be changed (ask the QC team).", REFUSE: "Action refused for your profile.", CHAMP_INTERDIT: "Change not allowed for your profile.", LIEN_INVALIDE: "This link no longer works: ask for a new one.", TROP_D_ESSAIS: "Too many attempts: try again in a few minutes.", REOUVERTURE_REFUSEE: "The assembly can only be reopened after a QC « needs changes ».", LIVRAISON_FIGEE: "Order delivered: after a « needs changes », reopen the assembly first before reopening a part.", PARTIE_DEJA_COMMENCEE: "Not possible: a step is already ticked or a link already set on this order.", COMMANDE_TERMINEE: "Not possible: the order is finished (QC OK).", PAS_UNE_PARTIE_UNIQUE: "This order is already split into parts.", PAS_DEUX_PARTIES: "This order is not split into Intro / Body.", ACTION_INCONNUE: "Unknown action.", JOB_A_PARTIES: "This order is split into parts: tick the step in the relevant part.", PARTIES_NON_LIVREES: "All parts must be delivered before delivering the order.", MONTEUR_INCONNU: "Unknown editor.", MONTEUR_DESACTIVE: "Your access is disabled for now." },
     tabs: { prod: "Production", tarifs: "Pricing", factures: "Invoices", rdv: "Appointments" }, amountL: "Amount", amountMiss: "Missing price in the grid:", override: "Forced amount", recalc: "Recalculate", invoiced: "Invoiced", sunday: "invoiced Sunday",
     keys: { podcast_standard: "Podcast episode · Standard", podcast_premium: "Podcast episode · Premium", vsl_standard: "VSL · Standard", vsl_premium: "VSL · Premium", reel_standard: "Standard reel", reel_premium: "Premium reel", intro: "Intro", miniature: "Thumbnail", trailer: "Trailer", cta: "Social CTA", extra_30min: "Extra 30 min" },
     tarifsHint: "Unit prices per client, in their currency. Empty = not set yet: the approved order waits for a price before being invoiced.", clientSel: "Client", saved: "saved", recalcAll: "Recalculate approved orders", space: "Client space", billing: "Billing", billingName: "Legal name", billingAddress: "Address (one line per line)", billingEmail: "Billing email", attention: "Attention", currency: "Currency", tvaL: "VAT",
@@ -445,7 +499,15 @@ const endOfDay = (d) => { const x = new Date(d); x.setHours(23, 59, 59, 0); retu
 // cible du chrono : date souhaitée par le client, sinon date fixée par l'équipe, sinon +5 j ouvrés
 function target(j) { if (j.requested_deadline) return endOfDay(j.requested_deadline + "T12:00:00"); if (j.delivery_date) return endOfDay(j.delivery_date + "T12:00:00"); return endOfDay(addBusinessDays(j.created_at, BUSINESS_DAYS_DEFAULT)); }
 const isDone = (j) => j.qc_status === "ok";
-const isUnassigned = (j) => !isDone(j) && !(j.editor_ids || []).length;
+// ---- lot C : commande à parties (Intro / Corps). parts_n vient de la base ; parts = toutes les parties (dispatch, qualité) ou SEULEMENT les siennes (monteur).
+const partsOf = (j) => j.parts || [];
+const isMulti = (j) => (j.parts_n || 1) > 1 && partsOf(j).length > 0;
+const isAsm = (j) => isMulti(j) && !!j.parts_ready_at && !j.delivered_at && !isDone(j);   // « À assembler » : toutes les parties livrées, commande pas encore livrée
+const isUnassigned = (j) => !isDone(j) && (isMulti(j) ? partsOf(j).some((p) => !(p.editor_ids || []).length) : !(j.editor_ids || []).length);
+// étapes vues par l'utilisateur : un monteur sur une commande à parties voit l'avancement de SES parties ; les autres, celui de la commande
+const sv = (j) => isMulti(j) && isEditor() ? { started: partsOf(j).some((p) => p.started_at), delivered: partsOf(j).every((p) => p.delivered_at) } : { started: !!j.started_at, delivered: !!j.delivered_at };
+const partName = (p) => (t("parts")[p.part_key] || p.label || "");
+const canEditPart = (p) => profile && (isAdmin() || (profile.role === "editor" && myEditor && (p.editor_ids || []).includes(myEditor.id)));
 const remaining = (j) => target(j) - Date.now();
 const isLate = (j) => !isDone(j) && remaining(j) < 0;
 const cls = (j) => isDone(j) ? "done" : remaining(j) < 0 ? "r" : remaining(j) < 2 * 86400000 ? "o" : "g";
@@ -469,7 +531,7 @@ const avatar = (e, sm) => `<span class="av ${sm ? "sm" : ""}" style="background:
 /* ===== PC du bureau : agent qui télécharge les rushes (tables agent_status / agent_settings, colonnes files_* et download_* de jobs) ===== */
 const DL_MAX = 6, PC_LATE_MIN = 12, PC_OFF_MIN = 30, DISK_ALERT_DEFAULT = 85, FLASH_MS = 3800;
 let agent = null, agentSettings = null, agentOk = false, alertsHtml = null;
-const openIds = new Set(), hadFiles = new Map(), flashUntil = new Map(), notes = new Map(), hadRound = new Map(), fbMap = new Map();
+const openIds = new Set(), hadFiles = new Map(), flashUntil = new Map(), notes = new Map(), hadRound = new Map(), hadAsm = new Map(), fbMap = new Map();
 // retour d'enregistrement : clé « id:champ » ; le message survit au re-rendu du tableau (fbHtml le relit), puis s'efface
 const fbHtml = (id, f) => { const x = fbMap.get(id + ":" + f); const on = x && x.until > Date.now(); return `<span class="fb${on ? (x.ok ? " ok" : " err") : ""}" data-fb="${id}:${f}" role="status">${on ? esc(x.msg) : ""}</span>`; };
 function setFb(id, f, ok, msg, ms) {
@@ -497,7 +559,7 @@ const pcAge = () => agent && agent.last_seen_at ? Math.max(0, Date.now() - new D
 const pcState = () => { const a = pcAge() / 60000; return a < PC_LATE_MIN ? "ok" : a <= PC_OFF_MIN ? "warn" : "err"; };
 const diskPct = () => agent && Number(agent.disk_total) > 0 && agent.disk_free != null ? Math.min(100, Math.max(0, (1 - Number(agent.disk_free) / Number(agent.disk_total)) * 100)) : null;
 const diskLimit = () => { const v = Number(agentSettings && agentSettings.disk_alert_pct); return v > 0 && v <= 100 ? v : DISK_ALERT_DEFAULT; };
-const isReadyToStart = (j) => !!j.files_downloaded_at && !j.files_purged_at && !j.started_at && !j.delivered_at && !isDone(j);
+const isReadyToStart = (j) => !!j.files_downloaded_at && !j.files_purged_at && !isDone(j) && (isMulti(j) && isEditor() ? partsOf(j).some((p) => !p.started_at) : !j.started_at && !j.delivered_at);
 // état du téléchargement d'une commande : purged · ready · running · abandon · access · error · waiting
 // « en cours » = téléchargement démarré, fichiers pas encore là ; si le PC est en ligne et occupé sur une AUTRE commande, celle-ci est en file d'attente
 function dlInfo(j) {
@@ -556,6 +618,7 @@ async function copyText(s) {
 function paintDl() { document.querySelectorAll("#board [data-dl]").forEach((el) => { const j = jobs.find((x) => x.id === el.dataset.dl); if (j) el.outerHTML = dlLine(j); }); }
 function paintReady() {
   const el = $("#readyN"); if (el) { const n = byEditor(jobs).filter(isReadyToStart).length; el.textContent = n; el.closest(".chip").classList.toggle("has", n > 0); }
+  const am = $("#asmN"); if (am) { const n = byEditor(jobs).filter(isAsm).length; am.textContent = n; am.closest(".chip").classList.toggle("has", n > 0); }
   const na = $("#naN"); if (na) { const n = byEditor(jobs).filter(isUnassigned).length; na.textContent = n; na.closest(".chip").classList.toggle("has", n > 0); }
 }
 function renderPc() {
@@ -658,16 +721,16 @@ function renderStats() {
   const L = byEditor(jobs); const today = new Date().toDateString(); const weekAgo = Date.now() - 7 * 86400000;
   const s = [
     ["", L.filter((j) => new Date(j.created_at).toDateString() === today).length],
-    ["amber", L.filter((j) => j.started_at && !j.delivered_at).length],
+    ["amber", L.filter((j) => sv(j).started && !sv(j).delivered).length],
     ["err", L.filter(isLate).length],
-    ["warn", L.filter((j) => j.delivered_at && j.qc_status === "pending").length],
+    ["warn", L.filter((j) => sv(j).delivered && j.qc_status === "pending").length],
     ["ok", L.filter((j) => isDone(j) && new Date(j.qc_at || j.delivered_at).getTime() > weekAgo).length],
   ];
   $("#stats").innerHTML = s.map(([c, v], i) => `<div class="stat ${c}"><div class="mono">${t("stats")[i]}</div><div class="v">${v}</div></div>`).join("");
 }
 function renderToolbar() {
   const f = t("filters");
-  $("#toolbar").innerHTML = Object.keys(f).filter((k) => k !== "na" || isDispatch()).map((k) => `<button type="button" class="chip${k === "na" ? " na" : ""} ${filter === k ? "on" : ""}" data-f="${k}">${f[k]}${k === "ready" ? ` <span class="n" id="readyN">0</span>` : ""}${k === "na" ? ` <span class="n" id="naN">0</span>` : ""}</button>`).join("") + `<input class="in search" id="search" placeholder="${t("search")}" value="${esc(q)}"/>`;
+  $("#toolbar").innerHTML = Object.keys(f).filter((k) => (k !== "na" || isDispatch()) && (k !== "asm" || isAdmin())).map((k) => `<button type="button" class="chip${k === "na" ? " na" : ""}${k === "asm" ? " asm" : ""} ${filter === k ? "on" : ""}" data-f="${k}">${f[k]}${k === "ready" ? ` <span class="n" id="readyN">0</span>` : ""}${k === "na" ? ` <span class="n" id="naN">0</span>` : ""}${k === "asm" ? ` <span class="n" id="asmN">0</span>` : ""}</button>`).join("") + `<input class="in search" id="search" placeholder="${t("search")}" value="${esc(q)}"/>`;
   $("#toolbar").querySelectorAll("[data-f]").forEach((b) => b.addEventListener("click", () => { filter = b.dataset.f; renderToolbar(); renderBoard(); }));
   $("#search").addEventListener("input", (e) => { q = e.target.value.toLowerCase(); renderBoard(); });
   paintReady();
@@ -677,20 +740,22 @@ function visible() {
     if (filter === "na" && !isUnassigned(j)) return false;
     if (filter === "ready" && !isReadyToStart(j)) return false;
     if (filter === "late" && !isLate(j)) return false;
-    if (filter === "qc" && !(j.delivered_at && j.qc_status === "pending")) return false;
+    if (filter === "qc" && !(sv(j).delivered && j.qc_status === "pending")) return false;
+    if (filter === "asm" && !isAsm(j)) return false;
     if (filter === "done" && !isDone(j)) return false;
     if (filter === "all" && isDone(j) && Date.now() - new Date(j.qc_at || j.delivered_at).getTime() > 7 * 86400000) return false;
     if (q && !`${j.token} ${j.client_name} ${j.project} ${(j.editor_names || []).join(" ")} ${j.work_to_do || ""}`.toLowerCase().includes(q)) return false;
     return true;
-  }).sort((a, b) => (isDone(a) - isDone(b)) || (isDispatch() ? isUnassigned(b) - isUnassigned(a) : 0) || (filter === "qc" ? ((b.qc_round > 0) - (a.qc_round > 0)) || (new Date(b.redelivered_at || 0) - new Date(a.redelivered_at || 0)) : 0) || (target(a) - target(b)));
+  }).sort((a, b) => (isDone(a) - isDone(b)) || (isDispatch() ? isUnassigned(b) - isUnassigned(a) : 0) || (isAdmin() ? isAsm(b) - isAsm(a) : 0) || (filter === "qc" ? ((b.qc_round > 0) - (a.qc_round > 0)) || (new Date(b.redelivered_at || 0) - new Date(a.redelivered_at || 0)) : 0) || (target(a) - target(b)));
 }
 function renderBoard() {
   const list = visible(); const st = t("steps"); const qc = t("qc"); const now = Date.now();
+  renderAsmBar();
   paintReady();
   if (!list.length) { $("#board").innerHTML = `<div class="empty">${t("empty")}</div>`; return; }
   const naN = isDispatch() ? list.filter(isUnassigned).length : 0; let naShown = false, otherShown = false;
   $("#board").innerHTML = list.map((j) => {
-    const c = cls(j); const ed = canEdit(j);
+    const c = cls(j); const ed = canEdit(j); const multi = isMulti(j);
     // dispatch : les commandes non attribuées passent en tête sous un titre « À attribuer »
     const na = isDispatch() && isUnassigned(j); let head = "";
     if (naN) { if (na && !naShown) { naShown = true; head = `<div class="sect na">${t("lk").queue(naN)}</div>`; } else if (!na && naShown && !otherShown) { otherShown = true; head = `<div class="sect">${t("lk").others}</div>`; } }
@@ -700,32 +765,34 @@ function renderBoard() {
     const eds = (j.editor_ids || []).map((id) => editors.find((e) => e.id === id)).filter(Boolean);
     const edCell = eds.length
       ? `<div class="row">${eds.map((e) => avatar(e, true)).join("")}</div><div class="names">${eds.map((e) => esc(e.name)).join(", ")}</div>`
-      : `<div class="none">${isAdmin() ? "+ " + t("unassigned") : t("noEditor")}</div>`;
+      : `<div class="none">${isAdmin() && !multi ? "+ " + t("unassigned") : multi ? t("parts").noEd : t("noEditor")}</div>`;
     const teamDate = j.delivery_date && j.delivery_date !== j.requested_deadline ? `<div class="team">${t("team")} : ${fmtD(j.delivery_date)}</div>` : "";
-    return head + `<div class="job ${c}${na ? " na" : ""}${openIds.has(j.id) ? " open" : ""}${(flashUntil.get(j.id) || 0) > now ? " flash" : ""}" data-id="${j.id}">
+    return head + `<div class="job ${c}${na ? " na" : ""}${isAsm(j) && isAdmin() ? " asm" : ""}${openIds.has(j.id) ? " open" : ""}${(flashUntil.get(j.id) || 0) > now ? " flash" : ""}" data-id="${j.id}">
       <div class="tok">${esc(j.token)}<small>${t("received")} ${fmtDT(j.created_at)}</small></div>
-      <div class="c"><b>${esc(j.client_name)}</b><em>${esc(j.project)}</em><span>${esc(j.work_to_do || "")}</span></div>
-      <div class="edcell"><div class="eds ${isAdmin() ? "can" : ""}" data-eds="${j.id}">${edCell}</div></div>
+      <div class="c"><b>${esc(j.client_name)}${isAsm(j) && isAdmin() ? `<span class="asmtag">${t("parts").asmTag}</span>` : ""}</b><em>${esc(j.project)}</em><span>${esc(j.work_to_do || "")}</span></div>
+      <div class="edcell"><div class="eds ${isAdmin() && !multi ? "can" : ""}" data-eds="${j.id}">${edCell}</div></div>
       <div class="due ${c}"><div class="k">${t("wanted")}</div><div class="dt">${j.requested_deadline ? fmtD(j.requested_deadline) : (j.delivery_date ? fmtD(j.delivery_date) : fmtD(target(j)) + " *")}</div><div class="cd" data-cd="${j.id}">${countdown(remaining(j), isDone(j))}</div>${teamDate}</div>
       <div class="steps">
         <span class="st auto ${j.files_downloaded_at ? "on" : ""}" title="${j.download_error ? esc(j.download_error) : ""}">${j.files_downloaded_at ? "✓" : j.download_error ? "!" : "…"} ${st.dl}</span>
-        <span class="st ${j.started_at ? "on" : ""}${sLk("started_at")}" data-step="started_at" data-id="${j.id}" ${sAttr("started_at")}>${j.started_at ? "✓" : "○"} ${st.start}</span>
-        <span class="st ${j.half_at ? "on" : ""}${sLk("half_at")}" data-step="half_at" data-id="${j.id}" ${sAttr("half_at")}>${j.half_at ? "✓" : "○"} ${st.half}</span>
-        <span class="st ${j.delivered_at ? "on" : ""}${sLk("delivered_at")}" data-step="delivered_at" data-id="${j.id}" ${sAttr("delivered_at")}>${j.delivered_at ? "✓" : "○"} ${st.done}</span>
+        ${multi ? derivedPills(j, st) : `<span class="st ${j.started_at ? "on" : ""}${sLk("started_at")}" data-step="started_at" data-id="${j.id}" ${sAttr("started_at")}>${j.started_at ? "✓" : "○"} ${st.start}</span>`}
+        ${multi ? "" : `<span class="st ${j.half_at ? "on" : ""}${sLk("half_at")}" data-step="half_at" data-id="${j.id}" ${sAttr("half_at")}>${j.half_at ? "✓" : "○"} ${st.half}</span>`}
+        ${multi ? "" : `<span class="st ${j.delivered_at ? "on" : ""}${sLk("delivered_at")}" data-step="delivered_at" data-id="${j.id}" ${sAttr("delivered_at")}>${j.delivered_at ? "✓" : "○"} ${st.done}</span>`}
         ${dlLine(j)}
         ${fbHtml(j.id, "step")}
       </div>
-      <div class="qc ${j.qc_status}">${isAdmin() ? `<select class="in" data-act="qc" data-id="${j.id}">${["pending", "ok", "revisions"].map((k) => `<option value="${k}" ${k === j.qc_status ? "selected" : ""}>${qc[k]}</option>`).join("")}</select>` : `<span class="badge ${j.qc_status === "ok" ? "ok" : j.qc_status === "revisions" ? "err" : ""}">${qc[j.qc_status]}</span>`}${isAdmin() && j.qc_status === "pending" && j.qc_round > 0 ? `<span class="badge warn rnd" data-round="${j.qc_round}">${t("round")(j.qc_round + 1)}</span>` : ""}${isEditor() && ed && j.qc_status === "revisions" ? `<button type="button" class="btn" data-redeliver="${j.id}" title="${esc(t("redeliverTip"))}">${t("redeliver")}</button>` : ""}${fbHtml(j.id, "qc")}</div>
+      <div class="qc ${j.qc_status}">${isAdmin() ? `<select class="in" data-act="qc" data-id="${j.id}">${["pending", "ok", "revisions"].map((k) => `<option value="${k}" ${k === j.qc_status ? "selected" : ""}>${qc[k]}</option>`).join("")}</select>` : `<span class="badge ${j.qc_status === "ok" ? "ok" : j.qc_status === "revisions" ? "err" : ""}">${qc[j.qc_status]}</span>`}${isAdmin() && j.qc_status === "pending" && j.qc_round > 0 ? `<span class="badge warn rnd" data-round="${j.qc_round}">${t("round")(j.qc_round + 1)}</span>` : ""}${isEditor() && ed && !multi && j.qc_status === "revisions" ? `<button type="button" class="btn" data-redeliver="${j.id}" title="${esc(t("redeliverTip"))}">${t("redeliver")}</button>` : ""}${fbHtml(j.id, "qc")}</div>
       <div class="links">${j.brief_url ? `<a href="${safeUrl(j.brief_url)}" target="_blank" rel="noopener">${t("brief")}</a>` : ""}${j.folder_url ? `<a href="${safeUrl(j.folder_url)}" target="_blank" rel="noopener">${t("files")}</a>` : ""}${j.frameio_url ? `<a href="${safeUrl(j.frameio_url)}" target="_blank" rel="noopener">${t("frame")}</a>` : ""}</div>
       <button type="button" class="more" data-more="${j.id}">⋯</button>
+      ${multi ? partsBlock(j) : ""}
       <div class="detail">
         ${isEditor() && LINKED ? briefBlock(j) : ""}${filesBlock(j)}
         <div><b>${t("rushes")}</b><div class="lk">${(j.rushes_links || []).map((u) => `<a href="${safeUrl(u)}" target="_blank" rel="noopener">${esc(u)}</a>`).join("\n") || "—"}</div></div>
         <div${isEditor() && LINKED ? " hidden" : ""}>${isAdmin() ? `<b>${t("contact")}</b>${esc(j.contact || "—")}<br/><b style="margin-top:8px">${t("email")}</b>${esc(j.email || "—")}` : ""}${j.description ? `${isAdmin() ? "<br/>" : ""}<b style="margin-top:8px">Brief</b><span style="white-space:pre-wrap">${esc(j.description)}</span>` : ""}</div>
         <div>
-          <b>${t("frame")}</b><input class="in" data-field="frameio_url" data-id="${j.id}" value="${esc(j.frameio_url || "")}" placeholder="${t("frameioPh")}" ${ed && !(isEditor() && j.qc_status === "ok") ? "" : "disabled"} ${isEditor() && j.qc_status === "ok" ? `title="${esc(t("errs").QC_OK_VERROUILLE)}"` : ""}/>${fbHtml(j.id, "frameio_url")}${ed && !j.delivered_at && !FRAME_OK(j.frameio_url) ? `<span class="fb warn">${t("needFrame")}</span>` : ""}
+          ${multi ? "" : `<b>${t("frame")}</b><input class="in" data-field="frameio_url" data-id="${j.id}" value="${esc(j.frameio_url || "")}" placeholder="${t("frameioPh")}" ${ed && !(isEditor() && j.qc_status === "ok") ? "" : "disabled"} ${isEditor() && j.qc_status === "ok" ? `title="${esc(t("errs").QC_OK_VERROUILLE)}"` : ""}/>${fbHtml(j.id, "frameio_url")}${ed && !j.delivered_at && !FRAME_OK(j.frameio_url) ? `<span class="fb warn">${t("needFrame")}</span>` : ""}`}
           ${isAdmin() ? `<b style="margin-top:8px">${t("deliveryDate")}</b><input class="in" type="date" data-field="delivery_date" data-id="${j.id}" value="${j.delivery_date || ""}"/>${fbHtml(j.id, "delivery_date")}<b style="margin-top:8px">${t("noteQc")}</b><input class="in" data-field="qc_note" data-id="${j.id}" value="${esc(j.qc_note || "")}"/>${fbHtml(j.id, "qc_note")}` : (j.qc_note ? `<b style="margin-top:8px">${t("noteQc")}</b>${esc(j.qc_note)}` : "")}
-          <b style="margin-top:8px">${t("notes")}</b><input class="in" data-field="notes" data-id="${j.id}" value="${esc(j.notes || "")}" ${ed ? "" : "disabled"}/>${fbHtml(j.id, "notes")}
+          ${multi && isEditor() ? "" : `<b style="margin-top:8px">${t("notes")}</b><input class="in" data-field="notes" data-id="${j.id}" value="${esc(j.notes || "")}" ${ed && !(multi && isEditor()) ? "" : "disabled"}/>${fbHtml(j.id, "notes")}`}
+          ${multi ? partNotes(j) : reshapeBlock(j)}
           ${isAdmin() && !LINKED ? amountBlock(j) : ""}
         </div>
       </div>
@@ -794,10 +861,11 @@ function wireBoard() {
     if (v && i.dataset.field === "frameio_url") v = normFrame(v);
     await update(i.dataset.id, { [i.dataset.field]: v }, false, i.dataset.field);
   }));
-  if (isAdmin()) B.querySelectorAll("[data-eds]").forEach((el) => el.addEventListener("click", (ev) => { ev.stopPropagation(); openPop(el); }));
+  wirePartActions(B);
+  if (isAdmin()) B.querySelectorAll("[data-eds].can").forEach((el) => el.addEventListener("click", (ev) => { ev.stopPropagation(); openPop(el); }));
 }
 function openPop(cell) {
-  closePop(); const j = jobs.find((x) => x.id === cell.dataset.eds); const sel = new Set(j.editor_ids || []);
+  closePop(); popRef = ["eds", cell.dataset.eds]; const j = jobs.find((x) => x.id === cell.dataset.eds); const sel = new Set(j.editor_ids || []);
   const pop = document.createElement("div"); pop.className = "pop";
   pop.innerHTML = editors.filter((e) => e.active !== false).map((e) => `<label><input type="checkbox" value="${e.id}" ${sel.has(e.id) ? "checked" : ""}/>${avatar(e, true)} ${esc(e.name)}${isDispatch() ? `<span class="ld">${t("tasks")(jobs.filter((x) => open(x) && (x.editor_ids || []).includes(e.id)).length)}</span>` : ""}</label>`).join("");
   pop.addEventListener("click", (ev) => ev.stopPropagation());
@@ -809,6 +877,158 @@ function openPop(cell) {
 }
 function closePop() { document.querySelectorAll(".pop").forEach((p) => p.remove()); }
 document.addEventListener("click", closePop);
+
+/* ===== lot C : commande à parties (Intro / Corps) =====
+   Une commande avec une intro se découpe en parties : chacune a son monteur, ses 3 crans et son lien frame.io INTERNE (le client ne les voit jamais).
+   Quand toutes les parties sont livrées, la commande est « À assembler » : le dispatch pose le lien FINAL et livre la commande (une seule qualité, sur la finale).
+   Les étapes de la commande (commencé, 50 %, livré) restent affichées pour le dispatch / la qualité, calculées par la base d'après les parties.
+   Un monteur ne reçoit que SES parties ; sans parties (SQL du lot C pas encore appliqué) tout fonctionne comme avant. */
+let popRef = null;
+function attachParts(rows, list) {
+  const m = new Map(); (list || []).forEach((p) => { if (!m.has(p.job_id)) m.set(p.job_id, []); m.get(p.job_id).push(p); });
+  (rows || []).forEach((j) => { j.parts = (m.get(j.id) || []).sort((a, b) => a.sort - b.sort); });
+}
+async function fetchParts(rows) {
+  try {
+    if (isEditor()) { const r = await sb.rpc("parts_visible"); return r.error ? [] : (r.data || []); }   // monteur avec compte : ses parties seulement
+    const ids = (rows || []).filter((j) => (j.parts_n || 1) > 1).map((j) => j.id), out = [];            // seules les commandes à plusieurs parties ont besoin de leurs parties
+    for (let i = 0; i < ids.length; i += 60) { const r = await sb.from("job_parts").select("*").in("job_id", ids.slice(i, i + 60)).order("sort"); if (r.error) return []; out.push(...(r.data || [])); }   // PGRST205 = SQL du lot C pas appliqué
+    return out;
+  } catch { return []; }
+}
+const edCellHtml = (ids) => {
+  const eds = (ids || []).map((id) => editors.find((e) => e.id === id)).filter(Boolean);
+  return eds.length ? `<div class="row">${eds.map((e) => avatar(e, true)).join("")}</div><div class="names">${eds.map((e) => esc(e.name)).join(", ")}</div>` : "";
+};
+// étapes de la commande, calculées d'après les parties : en lecture seule (on coche dans la partie) ; un monteur n'en voit pas (il a ses sous-lignes)
+function derivedPills(j, st) {
+  if (isEditor()) return "";
+  const pill = (on, label) => `<span class="st derived ${on ? "on" : ""}" aria-disabled="true" title="${esc(t("parts").derived)}">${on ? "✓" : "○"} ${label}</span>`;
+  return pill(j.started_at, st.start) + pill(j.half_at, st.half) + pill(j.delivered_at, st.done);
+}
+function partsBlock(j) {
+  const L = t("parts"), st = t("steps"), ps = partsOf(j);
+  const rows = ps.map((p) => {
+    const mine = canEditPart(p), lockedQc = isEditor() && j.qc_status === "ok";
+    // monteur : étape cochée = figée ; Livré sans lien = bloqué. Intro et Corps sont indépendants (montés en parallèle). Dispatch / qualité : peuvent tout corriger.
+    const attr = (k) => !mine ? 'aria-disabled="true"' : (isEditor() && p[k]) ? `title="${esc(t("locked"))}"` : (k === "delivered_at" && !p.delivered_at && !FRAME_OK(p.frameio_url)) ? `aria-disabled="true" data-nf="1" title="${esc(t("needFrame"))}"` : "";
+    const lk = (k) => mine && isEditor() && p[k] ? " lk" : "";
+    const pill = (k, label) => `<span class="st ${p[k] ? "on" : ""}${lk(k)}" data-pstep="${k}" data-pid="${p.id}" data-id="${j.id}" ${attr(k)}>${p[k] ? "✓" : "○"} ${label}</span>`;
+    const none = `<div class="none">${isAdmin() ? "+ " + L.noEd : t("noEditor")}</div>`;
+    return `<div class="pt" data-part="${p.id}">
+      <div class="pl">${esc(partName(p))}</div>
+      <div class="pe"><div class="eds ${isAdmin() ? "can" : ""}" data-peds="${p.id}" data-id="${j.id}">${edCellHtml(p.editor_ids) || none}</div></div>
+      <div class="steps">${pill("started_at", st.start)}${pill("half_at", st.half)}${pill("delivered_at", st.done)}</div>
+      <input class="in" data-pfield="frameio_url" data-pid="${p.id}" data-id="${j.id}" value="${esc(p.frameio_url || "")}" placeholder="${esc(L.partFrame)}" ${mine && !lockedQc ? "" : "disabled"} ${lockedQc ? `title="${esc(t("errs").QC_OK_VERROUILLE)}"` : ""}/>
+      <div class="pfb">${fbHtml(p.id, "step")}${fbHtml(p.id, "frameio_url")}</div>
+    </div>`;
+  }).join("");
+  let asm = "";
+  if (isAdmin()) {   // assemblage : réservé dispatch / qualité (jamais montré à un monteur)
+    const done = ps.filter((p) => p.delivered_at).length;
+    if (j.delivered_at) asm = `<div class="asm ok"><b>✓ ${L.finalDone}</b><span>${fmtDT(j.delivered_at)}</span>${j.frameio_url ? `<a href="${safeUrl(j.frameio_url)}" target="_blank" rel="noopener">${L.final}</a>` : ""}${j.qc_status === "revisions" ? `<button type="button" class="btn ghost" data-asm-reopen="${j.id}">${L.reopen}</button>` : ""}${fbHtml(j.id, "asm")}</div>`;
+    else if (j.parts_ready_at) asm = `<div class="asm on"><b>${L.asmT}</b><span>${L.asmP}</span><input class="in" data-asmlink="${j.id}" value="${esc(j.frameio_url || "")}" placeholder="${esc(L.finalPh)}"/><button type="button" class="btn" data-asm="${j.id}">${L.finalBtn}</button>${fbHtml(j.id, "asm")}</div>`;
+    else asm = `<div class="asm"><span>${L.wait(done, ps.length)}</span>${fbHtml(j.id, "asm")}</div>`;
+  }
+  const rev = isEditor() && j.qc_status === "revisions" ? `<div class="pblk"><span class="fb warn">${esc(L.revisions)}${j.qc_note ? " « " + esc(j.qc_note) + " »" : ""}</span></div>` : "";
+  return `<div class="parts">${rows}${rev}${asm}${reshapeBlock(j)}</div>`;
+}
+// couper / fusionner à la main : dispatch, qualité, admin (jamais un monteur), commande pas terminée ; la base refuse si une étape est déjà cochée (message clair)
+const canReshape = (j) => isAdmin() && !isDone(j) && (isMulti(j) ? partsOf(j).length === 2 : j.parts_n === 1);   // parts_n = 1 : le SQL du lot C est là
+function reshapeBlock(j) {
+  if (!canReshape(j)) return "";
+  const L = t("parts"), multi = isMulti(j);
+  return `<div class="rsh"><button type="button" class="btn ghost" data-reshape="${multi ? "merge" : "split"}" data-id="${j.id}">${multi ? L.merge : L.split}</button>${fbHtml(j.id, "reshape")}</div>`;
+}
+const askOk = (m) => { try { return window.confirm(m) !== false; } catch { return true; } };
+async function reshapeJob(id, action) {
+  if (LINKED) {
+    const r = await sb.rpc("team_parts_action", { p_key: LINK, p_job: id, p_action: action });
+    if (!r.error && r.data && r.data.error) { linkProblem(r.data.error); return { error: { message: r.data.error } }; }
+    return r;
+  }
+  return sb.rpc("job_parts_action", { p_job: id, p_action: action });
+}
+function partNotes(j) {
+  const L = t("parts");
+  return `<div class="pn">${partsOf(j).map((p) => `<div><b>${L.partNotes}${esc(partName(p))}</b><input class="in" data-pfield="notes" data-pid="${p.id}" data-id="${j.id}" value="${esc(p.notes || "")}" ${canEditPart(p) ? "" : "disabled"}/>${fbHtml(p.id, "notes")}</div>`).join("")}</div>`;
+}
+// bandeau « N commandes à assembler » (dispatch / qualité) : un clic = le filtre « À assembler »
+function renderAsmBar() {
+  const el = $("#asmbar"); if (!el) return;
+  const L = isAdmin() ? byEditor(jobs).filter(isAsm) : [];
+  if (!L.length) { el.innerHTML = ""; return; }
+  el.innerHTML = `<div class="alert" data-asmgo="1" role="button" tabindex="0"><span class="ic">i</span><div><b>${t("parts").bar(L.length)}</b><span class="tx">${L.map((j) => esc(j.client_name + " · " + j.project)).join(" — ")}</span></div></div>`;
+  el.querySelector("[data-asmgo]").addEventListener("click", () => { filter = "asm"; renderToolbar(); renderBoard(); });
+}
+// écriture d'une partie : avec un lien, team_part_update (la base applique les verrous du rôle du lien) ; sinon job_part_update
+async function writePart(pid, patch) {
+  if (LINKED) {
+    const r = await sb.rpc("team_part_update", { p_key: LINK, p_part: pid, p_patch: patch });
+    if (!r.error && r.data && r.data.error) { linkProblem(r.data.error); return { error: { message: r.data.error } }; }
+    return r;
+  }
+  return sb.rpc("job_part_update", { p_part: pid, p_patch: patch });
+}
+async function updatePart(j, p, patch, fb, okMsg, keepPop) {
+  const { error } = await writePart(p.id, patch);
+  if (error) { setFb(p.id, fb, false, errText(error), 7000); await load(false, keepPop); return false; }   // on relit : le champ reprend la vraie valeur de la base
+  if (okMsg || fb !== "step") setFb(p.id, fb, true, okMsg || t("savedOk"), 2000);
+  await load(false, keepPop); return true;
+}
+function needFramePart(jobId, pid, inp) { const row = document.querySelector(`.job[data-id="${jobId}"]`); if (row) row.classList.add("open"); openIds.add(jobId); setFb(pid, "step", false, t("needFrame"), 7000); if (inp) inp.focus(); }
+function openPartPop(cell) {
+  closePop(); popRef = ["peds", cell.dataset.peds];
+  const j = jobs.find((x) => x.id === cell.dataset.id); const p = j && partsOf(j).find((x) => x.id === cell.dataset.peds); if (!p) return;
+  const sel = new Set(p.editor_ids || []);
+  const pop = document.createElement("div"); pop.className = "pop";
+  pop.innerHTML = editors.filter((e) => e.active !== false).map((e) => `<label><input type="checkbox" value="${e.id}" ${sel.has(e.id) ? "checked" : ""}/>${avatar(e, true)} ${esc(e.name)}</label>`).join("");
+  pop.addEventListener("click", (ev) => ev.stopPropagation());
+  pop.addEventListener("change", async () => { await updatePart(j, p, { editor_ids: [...pop.querySelectorAll("input:checked")].map((i) => i.value) }, "step", null, true); });   // la base écrit les noms
+  cell.parentElement.appendChild(pop);
+}
+function wirePartActions(B) {
+  B.querySelectorAll("[data-pstep]").forEach((el) => el.addEventListener("click", async () => {
+    const j = jobs.find((x) => x.id === el.dataset.id); const p = j && partsOf(j).find((x) => x.id === el.dataset.pid); const k = el.dataset.pstep; if (!p) return;
+    if (el.classList.contains("lk")) { setFb(p.id, "step", false, t("locked"), 5000); return; }               // monteur : étape déjà cochée
+    if (el.getAttribute("aria-disabled") === "true" && !el.dataset.nf) return;
+    const inp = B.querySelector(`[data-pfield="frameio_url"][data-pid="${p.id}"]`), frame = normFrame((inp && inp.value) || p.frameio_url);
+    const val = p[k] ? null : new Date().toISOString(); const patch = { [k]: val };
+    if (k === "delivered_at" && val) {
+      if (!FRAME_OK(frame)) { needFramePart(j.id, p.id, inp); return; }                                       // « Livré » exige le lien de la partie (la base aussi)
+      if (frame !== String(p.frameio_url || "")) patch.frameio_url = frame;
+      if (!p.started_at) patch.started_at = val;
+    }
+    await updatePart(j, p, patch, "step");
+  }));
+  B.querySelectorAll("[data-pfield]").forEach((i) => i.addEventListener("change", async () => {
+    const j = jobs.find((x) => x.id === i.dataset.id); const p = j && partsOf(j).find((x) => x.id === i.dataset.pid); if (!p) return;
+    let v = i.value.trim() || null; if (v && i.dataset.pfield === "frameio_url") v = normFrame(v);
+    await updatePart(j, p, { [i.dataset.pfield]: v }, i.dataset.pfield);
+  }));
+  if (isAdmin()) B.querySelectorAll("[data-peds].can").forEach((el) => el.addEventListener("click", (ev) => { ev.stopPropagation(); openPartPop(el); }));
+  B.querySelectorAll("[data-asmlink]").forEach((i) => i.addEventListener("change", async () => {   // le lien final se garde dès qu'il est collé
+    const v = normFrame(i.value.trim()) || null; await update(i.dataset.asmlink, { frameio_url: v }, false, "asm");
+  }));
+  B.querySelectorAll("[data-asm]").forEach((b) => b.addEventListener("click", async () => {   // « Livré (finale) » : lien final + livraison de la commande, qualité prévenue par le moteur
+    const j = jobs.find((x) => x.id === b.dataset.asm); if (!j) return;
+    const inp = B.querySelector(`[data-asmlink="${j.id}"]`), frame = normFrame((inp && inp.value) || j.frameio_url);
+    if (!FRAME_OK(frame)) { setFb(j.id, "asm", false, t("needFrame"), 7000); if (inp) inp.focus(); return; }
+    b.disabled = true;
+    const patch = { delivered_at: new Date().toISOString() }; if (frame !== String(j.frameio_url || "")) patch.frameio_url = frame;
+    if (!(await update(j.id, patch, false, "asm", t("parts").finalOk)) && b.isConnected) b.disabled = false;
+  }));
+  B.querySelectorAll("[data-reshape]").forEach((b) => b.addEventListener("click", async () => {   // couper / fusionner : confirmation en une ligne, puis la base décide
+    const L = t("parts"), act = b.dataset.reshape, id = b.dataset.id;
+    if (!askOk(act === "split" ? L.splitAsk : L.mergeAsk)) return;
+    b.disabled = true; const r = await reshapeJob(id, act);
+    if (r.error) { setFb(id, "reshape", false, errText(r.error), 7000); if (b.isConnected) b.disabled = false; return; }
+    setFb(id, "reshape", true, act === "split" ? L.splitOk : L.mergeOk, 2500); await load(false);
+  }));
+  B.querySelectorAll("[data-asm-reopen]").forEach((b) => b.addEventListener("click", async () => {   // rouvrir l'assemblage (« à revoir ») : la commande n'est plus livrée, qualité remise en attente
+    b.disabled = true; if (!(await update(b.dataset.asmReopen, { delivered_at: null, qc_status: "pending" }, false, "asm")) && b.isConnected) b.disabled = false;
+  }));
+}
 // clic n'importe où sur la ligne = ouvre / ferme le détail (sauf boutons, menus, liens, champs, étapes, choix des monteurs, détail lui-même)
 $("#board").addEventListener("click", (ev) => {
   if (tv) return;
@@ -1012,7 +1232,7 @@ async function load(first, keepPop, pre) {
       loadAdmin(), loadAgent(),
     ]);
     if (error) { console.error(error); return; }
-    rows = rr; eds = ee;
+    rows = rr; eds = ee; attachParts(rows, await fetchParts(rows));
   }
   if (!first) {
     const fresh = (rows || []).filter((j) => !known.has(j.id)); if (fresh.length) beep(fresh.length);
@@ -1021,15 +1241,17 @@ async function load(first, keepPop, pre) {
     if (ready.length) { ready.forEach((j) => flashUntil.set(j.id, Date.now() + FLASH_MS)); beepReady(fresh.length ? Math.min(fresh.length, 3) * .25 + .2 : 0); }
     // relivraison (le monteur a corrigé après « à revoir ») : même bip, la ligne clignote ; réservé admin / dispatcher / qc
     const again = isAdmin() ? (rows || []).filter((j) => (j.qc_round || 0) > (hadRound.has(j.id) ? hadRound.get(j.id) : Infinity)) : [];
+    const asmNew = isAdmin() ? (rows || []).filter((j) => isAsm(j) && hadAsm.get(j.id) === false) : [];   // une commande vient de passer « À assembler » : même bip, la ligne clignote
+    if (asmNew.length) { asmNew.forEach((j) => flashUntil.set(j.id, Date.now() + FLASH_MS)); beepReady(fresh.length || ready.length ? 1.2 : 0); }
     if (again.length) { again.forEach((j) => flashUntil.set(j.id, Date.now() + FLASH_MS)); beepReady(fresh.length || ready.length ? 1.2 : 0); }
   }
-  jobs = rows || []; editors = eds || []; jobs.forEach((j) => { known.add(j.id); hadFiles.set(j.id, !!j.files_downloaded_at); hadRound.set(j.id, j.qc_round || 0); });
+  jobs = rows || []; editors = eds || []; jobs.forEach((j) => { known.add(j.id); hadFiles.set(j.id, !!j.files_downloaded_at); hadRound.set(j.id, j.qc_round || 0); hadAsm.set(j.id, isAsm(j)); });
   if (!LINKED) myEditor = editors.find((e) => e.profile_id === me.id) || null;
   if (LINKED && isEditor()) edFilter = "";   // la liste est déjà limitée à ses commandes
   if (first && !params.has("editor") && myEditor && profile.role === "editor") edFilter = myEditor.id;
-  const openCell = keepPop && document.querySelector(".pop") ? document.querySelector(".pop").parentElement.querySelector("[data-eds]")?.dataset.eds : null;
+  const openCell = keepPop && document.querySelector(".pop") ? popRef : null;
   renderEditorBar(); renderStats(); renderBoard(); renderPc(); renderAlerts();
-  if (openCell) { const cell = document.querySelector(`[data-eds="${openCell}"]`); if (cell) openPop(cell); }
+  if (openCell) { const cell = document.querySelector(`[data-${openCell[0]}="${openCell[1]}"]`); if (cell) (openCell[0] === "peds" ? openPartPop : openPop)(cell); }
 }
 function beep(n) {
   try { const ctx = new (window.AudioContext || window.webkitAudioContext)(); for (let i = 0; i < Math.min(n, 3); i++) { const o = ctx.createOscillator(), g = ctx.createGain(); o.connect(g); g.connect(ctx.destination); o.frequency.value = 880; g.gain.value = .08; o.start(ctx.currentTime + i * .25); o.stop(ctx.currentTime + i * .25 + .15); } } catch {}
