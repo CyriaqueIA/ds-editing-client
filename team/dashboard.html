@@ -4,6 +4,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <meta name="robots" content="noindex,nofollow"/>
+  <meta name="referrer" content="no-referrer"/>
   <meta name="theme-color" content="#050607"/>
   <title>DS Editing — Production</title>
   <link rel="icon" type="image/png" href="../assets/logo.png"/>
@@ -260,6 +261,23 @@
     .job.flash{animation:filesReady 1.2s ease-in-out 3}
     @media (prefers-reduced-motion:reduce){.job.flash{box-shadow:0 0 0 2px rgba(70,211,105,.6)}}
     .in[readonly]{color:var(--taupe);cursor:default}
+    /* ---- accès par lien personnel (lot B) : dispatch = file « À attribuer » ; monteur = interface épurée, brief en premier ---- */
+    .sect{display:flex;align-items:center;gap:10px;margin:14px 0 2px;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--taupe)}
+    .sect:first-child{margin-top:0}
+    .sect.na{color:var(--warn);font-size:14px}
+    .sect.na::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--warn);box-shadow:0 0 12px var(--warn)}
+    .job.na{border-left-color:var(--warn);background:linear-gradient(90deg,rgba(245,196,0,.16),rgba(245,196,0,0) 38%),var(--surface);box-shadow:0 0 0 1px rgba(245,196,0,.3)}
+    .job.na .eds .none{border-style:solid;border-color:var(--warn);color:var(--warn);font-weight:600}
+    .chip.na.has .n{background:rgba(245,196,0,.2);color:var(--warn)}
+    .pop .ld{margin-left:auto;padding-left:6px;color:var(--taupe);font-size:11px;font-variant-numeric:tabular-nums;white-space:nowrap}
+    .detail .bf{grid-column:1/-1;background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:12px 14px;color:var(--cream)}
+    .detail .bf .tx{display:block;white-space:pre-wrap;font-size:14px;line-height:1.5;word-break:break-word}
+    .detail .bf .wk2{display:block;font-weight:600;margin-bottom:6px}
+    .detail .bf .links{margin-top:8px}
+    body.lk-editor #edbar,body.lk-editor #stats,body.lk-editor .toolbar .search,body.lk-editor #tvBtn,body.lk-editor #prodBtn,body.lk-editor .edcell{display:none}
+    @media (min-width:1181px){body.lk-editor .job{grid-template-columns:92px 1.3fr 200px 1.3fr 160px 150px 40px}}
+    .lkscreen{max-width:420px}
+    .lkscreen .btn{margin-top:8px}
     .hint{font-size:12px;color:var(--taupe);margin:0 0 12px}
     @media (max-width:700px){.pcw{position:static}.pcpop{left:12px;right:12px;width:auto;margin-top:6px}.dl .dlp{border-radius:12px}}
     /* mode télé */
@@ -306,6 +324,11 @@
 </div></header>
 
 <main>
+  <div class="gate lkscreen" id="lkGate" hidden>
+    <h1 class="display" id="lkT"></h1>
+    <p id="lkP"></p>
+    <button class="btn" id="lkRetry" type="button" hidden></button>
+  </div>
   <div class="gate" id="gate" hidden>
     <h1 class="display" data-t="login"></h1>
     <p data-t="loginSub"></p>
@@ -335,9 +358,9 @@ const OPEN_ACCESS = { email: "acces.libre@ds-editing.com", password: "HAs0lMotAK
 const BUSINESS_DAYS_DEFAULT = 5;   // délai par défaut quand le client n'a pas donné de date
 
 const T = {
-  fr: { sub: "Production", live: "En direct", tv: "Mode télé", logout: "Déconnexion", login: "Espace équipe", loginSub: "Connecte-toi avec ton e-mail DS Editing.", loginBtn: "Entrer",
+  fr: { sub: "Production", live: "En direct", tv: "Mode télé", logout: "Déconnexion", leave: "Quitter", login: "Espace équipe", loginSub: "Connecte-toi avec ton e-mail DS Editing.", loginBtn: "Entrer",
     all: "Tous", tasks: (n) => `${n} tâche${n > 1 ? "s" : ""}`, stats: ["Reçues aujourd'hui", "En cours", "En retard", "À contrôler", "Livrées cette semaine"],
-    filters: { all: "Tout", ready: "Fichiers prêts, à démarrer", late: "En retard", qc: "À contrôler", done: "Livrées" }, search: "Rechercher…",
+    filters: { all: "Tout", na: "À attribuer", ready: "Fichiers prêts, à démarrer", late: "En retard", qc: "À contrôler", done: "Livrées" }, search: "Rechercher…",
     dl: { waiting: "En attente", running: "Téléchargement en cours", ready: "Fichiers prêts", error: "Erreur", abandon: "Abandonné", access: "Accès demandé au client", purged: "Nettoyé",
       tips: { waiting: "Le PC du bureau n'a pas encore commencé le téléchargement.", running: "Le PC du bureau télécharge les rushes.", ready: "Les rushes sont sur le PC du bureau.", access: "Le lien est privé : un e-mail a demandé au client d'ouvrir l'accès.", purged: "Le dossier a été supprimé du PC du bureau après la livraison." },
       nTry: (n, m) => `essai ${n}/${m}`, nFiles: (n) => `${n} fichier${n > 1 ? "s" : ""}`, nFailed: (n) => `${n} lien${n > 1 ? "s" : ""} en échec`, since: (d) => `depuis ${d}`, pcOn: (k) => `PC Bali occupé sur ${k}`, pcOff: "PC hors ligne", manual: "à télécharger à la main",
@@ -352,7 +375,8 @@ const T = {
     steps: { dl: "Fichiers", start: "Commencé", half: "50 %", done: "Livré" }, qc: { pending: "Qualité : en attente", ok: "Qualité : OK", revisions: "Qualité : à revoir" },
     wanted: "Date souhaitée", noDate: "sans date", late: "EN RETARD", team: "équipe", delivered: "livré", unassigned: "À attribuer", noEditor: "Aucun monteur", brief: "Brief", files: "Fichiers", frame: "frame.io", empty: "Aucune commande dans cette vue.", received: "Reçu", frameioPh: "Lien frame.io de livraison", noteQc: "Note qualité", notes: "Notes internes", deliveryDate: "Livraison fixée par l'équipe", rushes: "Rushes", email: "E-mail client", contact: "Contact",
     needFrame: "Colle d'abord le lien frame.io de livraison : « Livré » reste bloqué sans lui.", locked: "Étape déjà cochée : seule la qualité ou un admin peut la corriger.", redeliver: "Relivrer", redeliverTip: "Corrige le lien frame.io si besoin, puis relivre pour un nouveau contrôle qualité.", redelivered: "✓ Relivré, la qualité est prévenue", round: (n) => `${n}e passage`, savedOk: "✓ Enregistré",
-    errs: { FRAMEIO_REQUIS: "Lien frame.io manquant ou invalide (il doit commencer par https://).", ETAPE_VERROUILLEE: "Étape déjà cochée : seule la qualité ou un admin peut la corriger.", QC_OK_VERROUILLE: "Qualité déjà validée : le lien frame.io ne peut plus être modifié (voir avec l'équipe qualité).", REFUSE: "Action refusée pour ton profil.", CHAMP_INTERDIT: "Modification non autorisée pour ton profil." },
+    lk: { editor: "Monteur", dispatcher: "Dispatch", qc: "Qualité", badT: "Lien invalide ou coupé", badP: "Ce lien ne fonctionne plus. Demande-en un nouveau à l'équipe DS Editing.", tooT: "Trop d'essais", tooP: "Réessaie dans quelques minutes.", downT: "Service indisponible", downP: "Impossible de joindre le serveur. Vérifie ta connexion puis réessaie.", byeT: "Lien retiré de cet appareil", byeP: "Rouvre ton lien personnel pour revenir à tes commandes.", retry: "Réessayer", offT: "Accès désactivé", offP: "Ton accès est désactivé pour le moment. Reviens plus tard ou demande à l'équipe DS Editing.", who: (n) => `Connecté avec le lien de ${n}`, queue: (n) => `À attribuer · ${n}`, others: "Autres commandes", brief: "Brief", refs: "Références", logos: "Logos" },
+    errs: { FRAMEIO_REQUIS: "Lien frame.io manquant ou invalide (il doit commencer par https://).", ETAPE_VERROUILLEE: "Étape déjà cochée : seule la qualité ou un admin peut la corriger.", QC_OK_VERROUILLE: "Qualité déjà validée : le lien frame.io ne peut plus être modifié (voir avec l'équipe qualité).", REFUSE: "Action refusée pour ton profil.", CHAMP_INTERDIT: "Modification non autorisée pour ton profil.", LIEN_INVALIDE: "Ce lien ne fonctionne plus : demande-en un nouveau.", TROP_D_ESSAIS: "Trop d'essais : réessaie dans quelques minutes.", MONTEUR_INCONNU: "Monteur inconnu.", MONTEUR_DESACTIVE: "Ton accès est désactivé pour le moment." },
     tabs: { prod: "Production", tarifs: "Tarifs", factures: "Factures", rdv: "Rendez-vous" }, amountL: "Montant", amountMiss: "Prix manquant dans la grille :", override: "Montant forcé", recalc: "Recalculer", invoiced: "Facturé", sunday: "facturé dimanche",
     keys: { podcast_standard: "Épisode podcast · Standard", podcast_premium: "Épisode podcast · Premium", vsl_standard: "VSL · Standard", vsl_premium: "VSL · Premium", reel_standard: "Reel standard", reel_premium: "Reel premium", intro: "Intro", miniature: "Miniature", trailer: "Trailer", cta: "CTA réseaux sociaux", extra_30min: "Supplément 30 min" },
     tarifsHint: "Prix unitaires par client, dans sa devise. Vide = pas encore fixé : la commande validée attend un prix avant d'être facturée.", clientSel: "Client", saved: "enregistré", recalcAll: "Recalculer les commandes validées", space: "Espace client", billing: "Facturation", billingName: "Raison sociale", billingAddress: "Adresse (une ligne par ligne)", billingEmail: "E-mail de facturation", attention: "À l'attention de", currency: "Devise", tvaL: "TVA",
@@ -363,9 +387,9 @@ const T = {
       blocked: "Dates bloquées (une par ligne)", blockedHint: "2026-10-03 · 2026-12-24/2027-01-02 · 2026-10-06T14:00/2026-10-06T16:00 (heure de Paris)", save: "Enregistrer", saved: "enregistré", badRange: "Plage invalide : le début doit précéder la fin",
       listTitle: "Rendez-vous", upcoming: "À venir", past: "Passés", cols: ["Date (Paris)", "Nom", "Studio", "E-mail", "Téléphone", "Notes", "Statut", "E-mails"],
       status: { confirmed: "Confirmé", done: "Fait", cancelled: "Annulé", no_show: "Absent" }, none: "Aucun rendez-vous", confirm: "confirmation", reminder: "rappel", local: "chez vous", missing: "Réglages introuvables : appliquer supabase/bookings_v1.sql." } },
-  en: { sub: "Production", live: "Live", tv: "TV mode", logout: "Log out", login: "Team space", loginSub: "Sign in with your DS Editing email.", loginBtn: "Enter",
+  en: { sub: "Production", live: "Live", tv: "TV mode", logout: "Log out", leave: "Leave", login: "Team space", loginSub: "Sign in with your DS Editing email.", loginBtn: "Enter",
     all: "All", tasks: (n) => `${n} task${n > 1 ? "s" : ""}`, stats: ["Received today", "In progress", "Late", "To review", "Delivered this week"],
-    filters: { all: "All", ready: "Files ready, to start", late: "Late", qc: "To review", done: "Delivered" }, search: "Search…",
+    filters: { all: "All", na: "To assign", ready: "Files ready, to start", late: "Late", qc: "To review", done: "Delivered" }, search: "Search…",
     dl: { waiting: "Waiting", running: "Downloading", ready: "Files ready", error: "Error", abandon: "Gave up", access: "Access requested from client", purged: "Cleaned up",
       tips: { waiting: "The office PC has not started the download yet.", running: "The office PC is downloading the footage.", ready: "The footage is on the office PC.", access: "The link is private: an email asked the client to open access.", purged: "The folder was removed from the office PC after delivery." },
       nTry: (n, m) => `attempt ${n}/${m}`, nFiles: (n) => `${n} file${n > 1 ? "s" : ""}`, nFailed: (n) => `${n} failed link${n > 1 ? "s" : ""}`, since: (d) => `since ${d}`, pcOn: (k) => `Bali PC busy on ${k}`, pcOff: "PC offline", manual: "download by hand",
@@ -380,7 +404,8 @@ const T = {
     steps: { dl: "Files", start: "Started", half: "50%", done: "Delivered" }, qc: { pending: "QC: pending", ok: "QC: OK", revisions: "QC: revisions" },
     wanted: "Requested date", noDate: "no date", late: "LATE", team: "team", delivered: "delivered", unassigned: "Unassigned", noEditor: "No editor", brief: "Brief", files: "Files", frame: "frame.io", empty: "No order in this view.", received: "Received", frameioPh: "frame.io delivery link", noteQc: "QC note", notes: "Internal notes", deliveryDate: "Delivery set by the team", rushes: "Footage", email: "Client email", contact: "Contact",
     needFrame: "Paste the frame.io delivery link first: “Delivered” stays blocked without it.", locked: "Step already ticked: only QC or an admin can fix it.", redeliver: "Redeliver", redeliverTip: "Fix the frame.io link if needed, then redeliver for a new quality check.", redelivered: "✓ Redelivered, QC has been notified", round: (n) => `${n}${[11, 12, 13].includes(n % 100) ? "th" : ({ 1: "st", 2: "nd", 3: "rd" })[n % 10] || "th"} pass`, savedOk: "✓ Saved",
-    errs: { FRAMEIO_REQUIS: "frame.io link missing or invalid (it must start with https://).", ETAPE_VERROUILLEE: "Step already ticked: only QC or an admin can fix it.", QC_OK_VERROUILLE: "QC already approved: the frame.io link can no longer be changed (ask the QC team).", REFUSE: "Action refused for your profile.", CHAMP_INTERDIT: "Change not allowed for your profile." },
+    lk: { editor: "Editor", dispatcher: "Dispatch", qc: "Quality", badT: "Invalid or disabled link", badP: "This link no longer works. Ask the DS Editing team for a new one.", tooT: "Too many attempts", tooP: "Try again in a few minutes.", downT: "Service unavailable", downP: "Cannot reach the server. Check your connection and try again.", byeT: "Link removed from this device", byeP: "Open your personal link again to get back to your orders.", retry: "Try again", offT: "Access disabled", offP: "Your access is disabled for now. Come back later or ask the DS Editing team.", who: (n) => `Signed in with ${n}'s link`, queue: (n) => `To assign · ${n}`, others: "Other orders", brief: "Brief", refs: "References", logos: "Logos" },
+    errs: { FRAMEIO_REQUIS: "frame.io link missing or invalid (it must start with https://).", ETAPE_VERROUILLEE: "Step already ticked: only QC or an admin can fix it.", QC_OK_VERROUILLE: "QC already approved: the frame.io link can no longer be changed (ask the QC team).", REFUSE: "Action refused for your profile.", CHAMP_INTERDIT: "Change not allowed for your profile.", LIEN_INVALIDE: "This link no longer works: ask for a new one.", TROP_D_ESSAIS: "Too many attempts: try again in a few minutes.", MONTEUR_INCONNU: "Unknown editor.", MONTEUR_DESACTIVE: "Your access is disabled for now." },
     tabs: { prod: "Production", tarifs: "Pricing", factures: "Invoices", rdv: "Appointments" }, amountL: "Amount", amountMiss: "Missing price in the grid:", override: "Forced amount", recalc: "Recalculate", invoiced: "Invoiced", sunday: "invoiced Sunday",
     keys: { podcast_standard: "Podcast episode · Standard", podcast_premium: "Podcast episode · Premium", vsl_standard: "VSL · Standard", vsl_premium: "VSL · Premium", reel_standard: "Standard reel", reel_premium: "Premium reel", intro: "Intro", miniature: "Thumbnail", trailer: "Trailer", cta: "Social CTA", extra_30min: "Extra 30 min" },
     tarifsHint: "Unit prices per client, in their currency. Empty = not set yet: the approved order waits for a price before being invoiced.", clientSel: "Client", saved: "saved", recalcAll: "Recalculate approved orders", space: "Client space", billing: "Billing", billingName: "Legal name", billingAddress: "Address (one line per line)", billingEmail: "Billing email", attention: "Attention", currency: "Currency", tvaL: "VAT",
@@ -401,6 +426,15 @@ let me = null, profile = null, myEditor = null, jobs = [], editors = [], filter 
 let tab = params.get("tab") || "prod", studios = [], grids = [], invoicesAll = [], extras = [], tarifStudio = "", bookingSettings = null, bookingsAll = [];
 const money = (x, cur) => x == null ? "—" : (cur === "USD" ? "$" + Number(x).toLocaleString("en-US", { minimumFractionDigits: 2 }) : Number(x).toLocaleString("fr-FR", { minimumFractionDigits: 2 }) + " €");
 
+/* ===== Accès par lien personnel (lot B) : ?k=<code> =====
+   Le code fixe le rôle (monteur / dispatch / qualité) côté base et remplace l'accès libre ; sans « k » : comportement inchangé.
+   Il est gardé dans le stockage local (le favori marche) et retiré de la barre d'adresse après la 1re connexion réussie.
+   Mode télé (?tv=1) sans « k » : on ignore le code gardé et on reste sur l'accès libre. « Quitter » efface le code de l'appareil. */
+const KEY_STORE = "ds_team_key";
+const ls = { get(k) { try { return localStorage.getItem(k); } catch { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch {} }, del(k) { try { localStorage.removeItem(k); } catch {} } };
+const LINK = params.has("k") ? (params.get("k") || "").trim() : (params.get("tv") === "1" || params.get("bye") ? null : ls.get(KEY_STORE));
+const LINKED = LINK != null && !params.get("bye");
+if (LINKED) $("#logout").dataset.t = "leave";
 const safeUrl = (u) => /^https?:\/\//i.test(String(u || "").trim()) ? esc(String(u).trim()) : "#"; // seuls les liens http(s) deviennent cliquables
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const loc = () => (lang === "fr" ? "fr-FR" : "en-GB");
@@ -411,11 +445,13 @@ const endOfDay = (d) => { const x = new Date(d); x.setHours(23, 59, 59, 0); retu
 // cible du chrono : date souhaitée par le client, sinon date fixée par l'équipe, sinon +5 j ouvrés
 function target(j) { if (j.requested_deadline) return endOfDay(j.requested_deadline + "T12:00:00"); if (j.delivery_date) return endOfDay(j.delivery_date + "T12:00:00"); return endOfDay(addBusinessDays(j.created_at, BUSINESS_DAYS_DEFAULT)); }
 const isDone = (j) => j.qc_status === "ok";
+const isUnassigned = (j) => !isDone(j) && !(j.editor_ids || []).length;
 const remaining = (j) => target(j) - Date.now();
 const isLate = (j) => !isDone(j) && remaining(j) < 0;
 const cls = (j) => isDone(j) ? "done" : remaining(j) < 0 ? "r" : remaining(j) < 2 * 86400000 ? "o" : "g";
 const isAdmin = () => profile && ["admin", "dispatcher", "qc"].includes(profile.role);
 const isEditor = () => !!profile && profile.role === "editor";
+const isDispatch = () => LINKED && !!profile && profile.role === "dispatcher";
 const FRAME_OK = (u) => /^https?:\/\//i.test(String(u || "").trim());
 const normFrame = (u) => { const v = String(u || "").trim(); return v && !FRAME_OK(v) ? "https://" + v.replace(/^\/+/, "") : v; };   // « f.io/abc » collé sans https : on complète (la base n'accepte que http(s))
 const canEdit = (j) => profile && (isAdmin() || (profile.role === "editor" && myEditor && (j.editor_ids || []).includes(myEditor.id)));
@@ -518,7 +554,10 @@ async function copyText(s) {
 }
 // la ligne « téléchargement » dépend aussi de l'état du PC : on la repeint sans toucher au reste (champs en cours de saisie)
 function paintDl() { document.querySelectorAll("#board [data-dl]").forEach((el) => { const j = jobs.find((x) => x.id === el.dataset.dl); if (j) el.outerHTML = dlLine(j); }); }
-function paintReady() { const el = $("#readyN"); if (!el) return; const n = byEditor(jobs).filter(isReadyToStart).length; el.textContent = n; el.closest(".chip").classList.toggle("has", n > 0); }
+function paintReady() {
+  const el = $("#readyN"); if (el) { const n = byEditor(jobs).filter(isReadyToStart).length; el.textContent = n; el.closest(".chip").classList.toggle("has", n > 0); }
+  const na = $("#naN"); if (na) { const n = byEditor(jobs).filter(isUnassigned).length; na.textContent = n; na.closest(".chip").classList.toggle("has", n > 0); }
+}
 function renderPc() {
   const w = $("#pcw"); w.hidden = !profile || !agentOk; if (w.hidden) return;
   const P = t("pc"), st = pcState(), age = pcAge(), seen = isFinite(age);
@@ -579,6 +618,7 @@ function wireAgentPanel() {
   }));
 }
 async function loadAgent() {
+  if (LINKED) return;   // lien : l'état du PC arrive avec team_jobs (dispatch / qualité seulement)
   try {
     const [a, s] = await Promise.all([sb.from("agent_status").select("*").eq("id", 1), profile ? sb.from("agent_settings").select("dest_root,cleanup_days,disk_alert_pct").eq("id", 1) : null]); // lisible par toute l'équipe (orders_v1d.sql) ; la modification reste réservée à l'admin
     agentOk = !a.error; if (agentOk) agent = (Array.isArray(a.data) ? a.data[0] : a.data) || null;
@@ -627,13 +667,14 @@ function renderStats() {
 }
 function renderToolbar() {
   const f = t("filters");
-  $("#toolbar").innerHTML = Object.keys(f).map((k) => `<button type="button" class="chip ${filter === k ? "on" : ""}" data-f="${k}">${f[k]}${k === "ready" ? ` <span class="n" id="readyN">0</span>` : ""}</button>`).join("") + `<input class="in search" id="search" placeholder="${t("search")}" value="${esc(q)}"/>`;
+  $("#toolbar").innerHTML = Object.keys(f).filter((k) => k !== "na" || isDispatch()).map((k) => `<button type="button" class="chip${k === "na" ? " na" : ""} ${filter === k ? "on" : ""}" data-f="${k}">${f[k]}${k === "ready" ? ` <span class="n" id="readyN">0</span>` : ""}${k === "na" ? ` <span class="n" id="naN">0</span>` : ""}</button>`).join("") + `<input class="in search" id="search" placeholder="${t("search")}" value="${esc(q)}"/>`;
   $("#toolbar").querySelectorAll("[data-f]").forEach((b) => b.addEventListener("click", () => { filter = b.dataset.f; renderToolbar(); renderBoard(); }));
   $("#search").addEventListener("input", (e) => { q = e.target.value.toLowerCase(); renderBoard(); });
   paintReady();
 }
 function visible() {
   return byEditor(jobs).filter((j) => {
+    if (filter === "na" && !isUnassigned(j)) return false;
     if (filter === "ready" && !isReadyToStart(j)) return false;
     if (filter === "late" && !isLate(j)) return false;
     if (filter === "qc" && !(j.delivered_at && j.qc_status === "pending")) return false;
@@ -641,14 +682,18 @@ function visible() {
     if (filter === "all" && isDone(j) && Date.now() - new Date(j.qc_at || j.delivered_at).getTime() > 7 * 86400000) return false;
     if (q && !`${j.token} ${j.client_name} ${j.project} ${(j.editor_names || []).join(" ")} ${j.work_to_do || ""}`.toLowerCase().includes(q)) return false;
     return true;
-  }).sort((a, b) => (isDone(a) - isDone(b)) || (filter === "qc" ? ((b.qc_round > 0) - (a.qc_round > 0)) || (new Date(b.redelivered_at || 0) - new Date(a.redelivered_at || 0)) : 0) || (target(a) - target(b)));
+  }).sort((a, b) => (isDone(a) - isDone(b)) || (isDispatch() ? isUnassigned(b) - isUnassigned(a) : 0) || (filter === "qc" ? ((b.qc_round > 0) - (a.qc_round > 0)) || (new Date(b.redelivered_at || 0) - new Date(a.redelivered_at || 0)) : 0) || (target(a) - target(b)));
 }
 function renderBoard() {
   const list = visible(); const st = t("steps"); const qc = t("qc"); const now = Date.now();
   paintReady();
   if (!list.length) { $("#board").innerHTML = `<div class="empty">${t("empty")}</div>`; return; }
+  const naN = isDispatch() ? list.filter(isUnassigned).length : 0; let naShown = false, otherShown = false;
   $("#board").innerHTML = list.map((j) => {
     const c = cls(j); const ed = canEdit(j);
+    // dispatch : les commandes non attribuées passent en tête sous un titre « À attribuer »
+    const na = isDispatch() && isUnassigned(j); let head = "";
+    if (naN) { if (na && !naShown) { naShown = true; head = `<div class="sect na">${t("lk").queue(naN)}</div>`; } else if (!na && naShown && !otherShown) { otherShown = true; head = `<div class="sect">${t("lk").others}</div>`; } }
     // étape : inactive sans droit ; verrouillée (déjà cochée) pour le monteur ; « Livré » bloqué tant qu'il n'y a pas de lien frame.io
     const sAttr = (k) => !ed ? 'aria-disabled="true"' : (isEditor() && j[k]) ? `title="${esc(t("locked"))}"` : (k === "delivered_at" && !j.delivered_at && !FRAME_OK(j.frameio_url)) ? `aria-disabled="true" data-nf="1" title="${esc(t("needFrame"))}"` : "";
     const sLk = (k) => ed && isEditor() && j[k] ? " lk" : "";
@@ -657,7 +702,7 @@ function renderBoard() {
       ? `<div class="row">${eds.map((e) => avatar(e, true)).join("")}</div><div class="names">${eds.map((e) => esc(e.name)).join(", ")}</div>`
       : `<div class="none">${isAdmin() ? "+ " + t("unassigned") : t("noEditor")}</div>`;
     const teamDate = j.delivery_date && j.delivery_date !== j.requested_deadline ? `<div class="team">${t("team")} : ${fmtD(j.delivery_date)}</div>` : "";
-    return `<div class="job ${c}${openIds.has(j.id) ? " open" : ""}${(flashUntil.get(j.id) || 0) > now ? " flash" : ""}" data-id="${j.id}">
+    return head + `<div class="job ${c}${na ? " na" : ""}${openIds.has(j.id) ? " open" : ""}${(flashUntil.get(j.id) || 0) > now ? " flash" : ""}" data-id="${j.id}">
       <div class="tok">${esc(j.token)}<small>${t("received")} ${fmtDT(j.created_at)}</small></div>
       <div class="c"><b>${esc(j.client_name)}</b><em>${esc(j.project)}</em><span>${esc(j.work_to_do || "")}</span></div>
       <div class="edcell"><div class="eds ${isAdmin() ? "can" : ""}" data-eds="${j.id}">${edCell}</div></div>
@@ -674,20 +719,25 @@ function renderBoard() {
       <div class="links">${j.brief_url ? `<a href="${safeUrl(j.brief_url)}" target="_blank" rel="noopener">${t("brief")}</a>` : ""}${j.folder_url ? `<a href="${safeUrl(j.folder_url)}" target="_blank" rel="noopener">${t("files")}</a>` : ""}${j.frameio_url ? `<a href="${safeUrl(j.frameio_url)}" target="_blank" rel="noopener">${t("frame")}</a>` : ""}</div>
       <button type="button" class="more" data-more="${j.id}">⋯</button>
       <div class="detail">
-        ${filesBlock(j)}
+        ${isEditor() && LINKED ? briefBlock(j) : ""}${filesBlock(j)}
         <div><b>${t("rushes")}</b><div class="lk">${(j.rushes_links || []).map((u) => `<a href="${safeUrl(u)}" target="_blank" rel="noopener">${esc(u)}</a>`).join("\n") || "—"}</div></div>
-        <div>${isAdmin() ? `<b>${t("contact")}</b>${esc(j.contact || "—")}<br/><b style="margin-top:8px">${t("email")}</b>${esc(j.email || "—")}` : ""}${j.description ? `${isAdmin() ? "<br/>" : ""}<b style="margin-top:8px">Brief</b><span style="white-space:pre-wrap">${esc(j.description)}</span>` : ""}</div>
+        <div${isEditor() && LINKED ? " hidden" : ""}>${isAdmin() ? `<b>${t("contact")}</b>${esc(j.contact || "—")}<br/><b style="margin-top:8px">${t("email")}</b>${esc(j.email || "—")}` : ""}${j.description ? `${isAdmin() ? "<br/>" : ""}<b style="margin-top:8px">Brief</b><span style="white-space:pre-wrap">${esc(j.description)}</span>` : ""}</div>
         <div>
           <b>${t("frame")}</b><input class="in" data-field="frameio_url" data-id="${j.id}" value="${esc(j.frameio_url || "")}" placeholder="${t("frameioPh")}" ${ed && !(isEditor() && j.qc_status === "ok") ? "" : "disabled"} ${isEditor() && j.qc_status === "ok" ? `title="${esc(t("errs").QC_OK_VERROUILLE)}"` : ""}/>${fbHtml(j.id, "frameio_url")}${ed && !j.delivered_at && !FRAME_OK(j.frameio_url) ? `<span class="fb warn">${t("needFrame")}</span>` : ""}
           ${isAdmin() ? `<b style="margin-top:8px">${t("deliveryDate")}</b><input class="in" type="date" data-field="delivery_date" data-id="${j.id}" value="${j.delivery_date || ""}"/>${fbHtml(j.id, "delivery_date")}<b style="margin-top:8px">${t("noteQc")}</b><input class="in" data-field="qc_note" data-id="${j.id}" value="${esc(j.qc_note || "")}"/>${fbHtml(j.id, "qc_note")}` : (j.qc_note ? `<b style="margin-top:8px">${t("noteQc")}</b>${esc(j.qc_note)}` : "")}
           <b style="margin-top:8px">${t("notes")}</b><input class="in" data-field="notes" data-id="${j.id}" value="${esc(j.notes || "")}" ${ed ? "" : "disabled"}/>${fbHtml(j.id, "notes")}
-          ${isAdmin() ? amountBlock(j) : ""}
+          ${isAdmin() && !LINKED ? amountBlock(j) : ""}
         </div>
       </div>
     </div>`;
   }).join("");
   wireBoard();
   flashUntil.forEach((until, id) => { setTimeout(() => { if ((flashUntil.get(id) || 0) <= Date.now()) { flashUntil.delete(id); const el = document.querySelector(`.job[data-id="${id}"]`); if (el) el.classList.remove("flash"); } }, Math.max(0, until - Date.now()) + 20); });
+}
+// monteur (lien) : le brief d'abord, en grand ; contact et montants ne sont de toute façon jamais envoyés par la base
+function briefBlock(j) {
+  const L = t("lk"), link = (u) => `<a href="${safeUrl(u)}" target="_blank" rel="noopener noreferrer">${esc(u)}</a>`, refs = (j.references_links || []).filter(Boolean);
+  return `<div class="bf"><b>${L.brief}</b>${j.work_to_do ? `<span class="wk2">${esc(j.work_to_do)}</span>` : ""}<span class="tx">${esc(j.description || "—")}</span>${j.brief_url ? `<div class="links"><a href="${safeUrl(j.brief_url)}" target="_blank" rel="noopener noreferrer">${t("brief")}</a></div>` : ""}${refs.length ? `<div class="links"><b>${L.refs}</b>${refs.map(link).join("")}</div>` : ""}${j.logos ? `<div style="margin-top:8px"><b>${L.logos}</b><span class="tx">${esc(j.logos)}</span></div>` : ""}</div>`;
 }
 function amountBlock(j) {
   const s = studios.find((x) => x.id === j.studio_id); const cur = s ? s.currency : "EUR";
@@ -738,7 +788,7 @@ function wireBoard() {
     if (k === "delivered_at" && !val) patch.qc_status = "pending";
     await update(j.id, patch, false, "step");
   }));
-  B.querySelectorAll("[data-act='qc']").forEach((s) => s.addEventListener("change", async () => { await update(s.dataset.id, { qc_status: s.value, qc_at: s.value === "pending" ? null : new Date().toISOString(), qc_owner: s.value === "pending" ? null : profile.display_name }, false, "qc"); }));
+  B.querySelectorAll("[data-act='qc']").forEach((s) => s.addEventListener("change", async () => { await update(s.dataset.id, LINKED ? { qc_status: s.value } : { qc_status: s.value, qc_at: s.value === "pending" ? null : new Date().toISOString(), qc_owner: s.value === "pending" ? null : profile.display_name }, false, "qc"); }));
   B.querySelectorAll("[data-field]").forEach((i) => i.addEventListener("change", async () => {
     let v = i.value.trim() || null;
     if (v && i.dataset.field === "frameio_url") v = normFrame(v);
@@ -749,11 +799,11 @@ function wireBoard() {
 function openPop(cell) {
   closePop(); const j = jobs.find((x) => x.id === cell.dataset.eds); const sel = new Set(j.editor_ids || []);
   const pop = document.createElement("div"); pop.className = "pop";
-  pop.innerHTML = editors.filter((e) => e.active !== false).map((e) => `<label><input type="checkbox" value="${e.id}" ${sel.has(e.id) ? "checked" : ""}/>${avatar(e, true)} ${esc(e.name)}</label>`).join("");
+  pop.innerHTML = editors.filter((e) => e.active !== false).map((e) => `<label><input type="checkbox" value="${e.id}" ${sel.has(e.id) ? "checked" : ""}/>${avatar(e, true)} ${esc(e.name)}${isDispatch() ? `<span class="ld">${t("tasks")(jobs.filter((x) => open(x) && (x.editor_ids || []).includes(e.id)).length)}</span>` : ""}</label>`).join("");
   pop.addEventListener("click", (ev) => ev.stopPropagation());
   pop.addEventListener("change", async () => {
     const ids = [...pop.querySelectorAll("input:checked")].map((i) => i.value); const names = ids.map((id) => editors.find((e) => e.id === id)?.name).filter(Boolean);
-    await update(j.id, { editor_ids: ids, editor_names: names }, true);
+    await update(j.id, LINKED ? { editor_ids: ids } : { editor_ids: ids, editor_names: names }, true);   // lien : la base écrit les noms
   });
   cell.parentElement.appendChild(pop);
 }
@@ -769,6 +819,11 @@ $("#board").addEventListener("click", (ev) => {
 // monteur : écriture par la fonction job_editor_update (la politique d'écriture directe est retirée par supabase/lot_a_verrous.sql) ;
 // PGRST202 = fonction absente (SQL du lot A pas encore appliqué) -> ancien chemin, pour qu'aucun ordre de mise en ligne ne casse
 async function writeJob(id, patch) {
+  if (LINKED) {   // lien personnel : fonction team_update (la base applique les verrous du rôle du lien)
+    const r = await sb.rpc("team_update", { p_key: LINK, p_id: id, p_patch: patch });
+    if (!r.error && r.data && r.data.error) { linkProblem(r.data.error); return { error: { message: r.data.error } }; }
+    return r;
+  }
   if (isEditor()) { const r = await sb.rpc("job_editor_update", { p_id: id, p_patch: patch }); if (!(r.error && r.error.code === "PGRST202")) return r; }
   return sb.from("jobs").update(patch).eq("id", id);
 }
@@ -788,7 +843,7 @@ setInterval(() => { document.querySelectorAll("[data-cd]").forEach((el) => { con
 
 /* ===== onglets admin : Tarifs, Factures ===== */
 function renderTabs() {
-  if (!isAdmin()) return; $("#tabs").hidden = false;
+  if (!isAdmin() || LINKED) return; $("#tabs").hidden = false;
   $("#tabs").innerHTML = ["prod", "tarifs", "factures", "rdv"].map((k) => `<button type="button" class="tab ${tab === k ? "on" : ""}" data-tab="${k}">${t("tabs")[k]}</button>`).join("");
   $("#tabs").querySelectorAll("[data-tab]").forEach((b) => b.addEventListener("click", () => { tab = b.dataset.tab; const u = new URL(location.href); tab === "prod" ? u.searchParams.delete("tab") : u.searchParams.set("tab", tab); history.replaceState(null, "", u); renderTabs(); renderAdmin(); }));
   renderAdmin();
@@ -843,7 +898,7 @@ function renderFactures() {
   $("#xAdd").addEventListener("click", async () => { const label = $("#xLabel").value.trim(), price = Number($("#xPrice").value); if (!label || !(price >= 0)) return; const { error } = await sb.from("extra_lines").insert({ studio_id: $("#xStudio").value, label, qty: Number($("#xQty").value) || 1, unit_price: price, offered: $("#xOff").checked, created_by: profile.display_name }); if (error) alert(error.message); await loadAdmin(); renderFactures(); });
 }
 async function loadAdmin() {
-  if (!isAdmin()) return;
+  if (!isAdmin() || LINKED) return;
   const [a, b, c, d, e, f] = await Promise.all([sb.from("studios").select("*").order("name"), sb.from("price_grids").select("*"), sb.from("invoices").select("*").order("period_end", { ascending: false }).limit(300), sb.from("extra_lines").select("*").order("created_at", { ascending: false }).limit(200),
     sb.from("booking_settings").select("*").eq("id", 1), sb.from("bookings").select("*").order("starts_at", { ascending: false }).limit(400)]);
   studios = a.data || []; grids = b.data || []; invoicesAll = c.data || []; extras = d.data || [];
@@ -923,13 +978,42 @@ async function fetchJobs() {
   if (isEditor()) { const r = await sb.rpc("jobs_visible").order("created_at", { ascending: false }).limit(400); if (!(r.error && r.error.code === "PGRST202")) return r; }
   return sb.from("jobs").select("*").order("created_at", { ascending: false }).limit(400);
 }
-async function load(first, keepPop) {
-  const [{ data: rows, error }, { data: eds }] = await Promise.all([
-    fetchJobs(),
-    sb.from("editors").select("id,name,avatar_url,profile_id,active,sort").order("sort"),
-    loadAdmin(), loadAgent(),
-  ]);
-  if (error) { console.error(error); return; }
+// lien personnel : une seule fonction renvoie tout ce que ce lien a le droit de voir (supabase/lot_b_liens.sql)
+let lkKind = "", linkDead = false;
+function linkScreen(kind) {
+  const L = t("lk"); lkKind = kind;
+  $("#app").hidden = true; $("#gate").hidden = true; $("#live").hidden = true; $("#pcw").hidden = true;
+  $("#lkGate").hidden = false; $("#lkT").textContent = L[kind + "T"]; $("#lkP").textContent = L[kind + "P"];
+  const b = $("#lkRetry"); b.hidden = !(kind === "down" || kind === "too" || kind === "off"); b.textContent = L.retry;
+}
+function linkProblem(code) {
+  if (code === "LIEN_INVALIDE") { ls.del(KEY_STORE); linkDead = true; linkScreen("bad"); }   // lien coupé : on n'insiste pas (chaque essai faux compte côté base)
+  else if (code === "TROP_D_ESSAIS") linkScreen("too");
+  else if (code === "MONTEUR_DESACTIVE") linkScreen("off");   // fiche désactivée : le code gardé reste sur l'appareil (le lien revit à la réactivation)
+}
+async function teamLoad() {
+  if (linkDead) return null;
+  let r; try { r = await sb.rpc("team_jobs", { p_key: LINK }); } catch (e) { r = { error: e }; }
+  if (r.error || !r.data) { console.warn(r.error); if (!profile) linkScreen("down"); return null; }
+  if (r.data.error) { linkProblem(r.data.error); return null; }
+  if (lkKind === "too" || lkKind === "off") { lkKind = ""; $("#lkGate").hidden = true; $("#app").hidden = false; $("#live").hidden = false; }
+  return r.data;
+}
+async function load(first, keepPop, pre) {
+  let rows, eds;
+  if (LINKED) {
+    const r = pre || await teamLoad(); if (!r) return;
+    rows = r.jobs; eds = r.editors; myEditor = r.editor || null; agentOk = "agent" in r; agent = r.agent || null; agentSettings = r.agent_settings || null;
+    if (isEditor()) rows.forEach((j) => { if (!known.has(j.id)) openIds.add(j.id); });   // monteur : le détail (brief d'abord) s'ouvre tout seul sur une nouvelle commande
+  } else {
+    const [{ data: rr, error }, { data: ee }] = await Promise.all([
+      fetchJobs(),
+      sb.from("editors").select("id,name,avatar_url,profile_id,active,sort").order("sort"),
+      loadAdmin(), loadAgent(),
+    ]);
+    if (error) { console.error(error); return; }
+    rows = rr; eds = ee;
+  }
   if (!first) {
     const fresh = (rows || []).filter((j) => !known.has(j.id)); if (fresh.length) beep(fresh.length);
     // fichiers arrivés pendant que la page est ouverte : bip à deux notes + la ligne clignote
@@ -940,7 +1024,8 @@ async function load(first, keepPop) {
     if (again.length) { again.forEach((j) => flashUntil.set(j.id, Date.now() + FLASH_MS)); beepReady(fresh.length || ready.length ? 1.2 : 0); }
   }
   jobs = rows || []; editors = eds || []; jobs.forEach((j) => { known.add(j.id); hadFiles.set(j.id, !!j.files_downloaded_at); hadRound.set(j.id, j.qc_round || 0); });
-  myEditor = editors.find((e) => e.profile_id === me.id) || null;
+  if (!LINKED) myEditor = editors.find((e) => e.profile_id === me.id) || null;
+  if (LINKED && isEditor()) edFilter = "";   // la liste est déjà limitée à ses commandes
   if (first && !params.has("editor") && myEditor && profile.role === "editor") edFilter = myEditor.id;
   const openCell = keepPop && document.querySelector(".pop") ? document.querySelector(".pop").parentElement.querySelector("[data-eds]")?.dataset.eds : null;
   renderEditorBar(); renderStats(); renderBoard(); renderPc(); renderAlerts();
@@ -949,8 +1034,27 @@ async function load(first, keepPop) {
 function beep(n) {
   try { const ctx = new (window.AudioContext || window.webkitAudioContext)(); for (let i = 0; i < Math.min(n, 3); i++) { const o = ctx.createOscillator(), g = ctx.createGain(); o.connect(g); g.connect(ctx.destination); o.frequency.value = 880; g.gain.value = .08; o.start(ctx.currentTime + i * .25); o.stop(ctx.currentTime + i * .25 + .15); } } catch {}
 }
+const roleName = () => t("lk")[profile.role] || profile.role;
+// avec un lien, le bandeau dit clairement qui est connecté (un appareil qui a ouvert un lien le garde, même sur l'URL nue) ; « Quitter » est à côté
+const renderWho = () => { $("#who").innerHTML = LINKED ? `<b>${t("lk").who(esc(profile.display_name))}</b> · ${esc(roleName())}` : `<b>${esc(profile.display_name)}</b> · ${esc(profile.role)}`; };
+async function bootLink() {
+  // pas de session Supabase : le lien est la seule identité (appels anonymes à code), et on ne touche pas à la session de l'accès libre
+  sb = createClient(SUPABASE_URL, SUPABASE_ANON, { auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false } });
+  const r = await teamLoad(); if (!r) return;
+  me = { id: "link" }; profile = { role: r.role, display_name: String(r.label).split(" · ")[0] };   // « Putu · dispatch » -> « Putu »
+  if (params.has("k")) { ls.set(KEY_STORE, LINK); const u = new URL(location.href); u.searchParams.delete("k"); history.replaceState(null, "", u); }   // le code quitte la barre d'adresse
+  document.body.classList.add("lk-" + r.role);
+  tab = "prod"; if (!params.has("f")) filter = r.role === "qc" ? "qc" : "all";
+  renderWho(); $("#logout").hidden = false; $("#gate").hidden = true; $("#app").hidden = false; $("#live").hidden = false;
+  renderToolbar(); await load(true, false, r);
+  // pas de temps réel avec un code : relecture toutes les 20 s (bip conservé) ; on ne repeint pas pendant une saisie
+  setInterval(() => { const a = document.activeElement; if (a && /^(INPUT|SELECT|TEXTAREA)$/.test(a.tagName) && a.closest("#board")) return; load(false); }, 20000);
+  setInterval(() => { renderPc(); renderAlerts(); paintDl(); }, 15000);
+}
 async function boot() {
   applyText();
+  if (params.get("bye")) { linkScreen("bye"); return; }
+  if (LINKED) { await bootLink(); return; }
   sb = createClient(SUPABASE_URL, SUPABASE_ANON);
   let { data: { session } } = await sb.auth.getSession();
   if (!session && OPEN_ACCESS) ({ data: { session } } = await sb.auth.signInWithPassword(OPEN_ACCESS));
@@ -958,7 +1062,7 @@ async function boot() {
   me = session.user;
   const { data: p } = await sb.from("profiles").select("*").eq("id", me.id).single();
   profile = p || { role: "editor", display_name: me.email };
-  $("#who").innerHTML = `<b>${esc(profile.display_name)}</b> · ${esc(profile.role)}`;
+  renderWho();
   $("#logout").hidden = !!OPEN_ACCESS; $("#gate").hidden = true; $("#app").hidden = false; $("#live").hidden = false;
   renderToolbar(); await load(true); renderTabs();
   sb.channel("jobs-live").on("postgres_changes", { event: "*", schema: "public", table: "jobs" }, () => load(false)).subscribe();
@@ -975,8 +1079,9 @@ $("#loginBtn").addEventListener("click", async () => {
   location.reload();
 });
 $("#password").addEventListener("keydown", (e) => { if (e.key === "Enter") $("#loginBtn").click(); });
-$("#logout").addEventListener("click", async () => { await sb.auth.signOut(); location.reload(); });
-$("#langBtn").addEventListener("click", () => { lang = lang === "fr" ? "en" : "fr"; try { localStorage.setItem("ds_lang", lang); } catch {} applyText(); if (profile) { renderEditorBar(); renderToolbar(); renderStats(); renderBoard(); renderTabs(); alertsHtml = null; renderPc(); renderAlerts(); } });
+$("#logout").addEventListener("click", async () => { if (LINKED) { ls.del(KEY_STORE); location.replace(location.pathname + "?bye=1"); return; } await sb.auth.signOut(); location.reload(); });
+$("#lkRetry").addEventListener("click", () => location.reload());
+$("#langBtn").addEventListener("click", () => { lang = lang === "fr" ? "en" : "fr"; try { localStorage.setItem("ds_lang", lang); } catch {} applyText(); if (lkKind) linkScreen(lkKind); if (profile) { if (LINKED) renderWho(); renderEditorBar(); renderToolbar(); renderStats(); renderBoard(); renderTabs(); alertsHtml = null; renderPc(); renderAlerts(); } });
 $("#tvBtn").addEventListener("click", () => { tv = !tv; document.body.classList.toggle("tv", tv); closePc(); const u = new URL(location.href); tv ? u.searchParams.set("tv", "1") : u.searchParams.delete("tv"); history.replaceState(null, "", u); });
 boot();
 </script>
