@@ -27,8 +27,8 @@
     .btn:hover{border-color:rgba(220,230,240,.35);background:rgba(255,255,255,.08)}
     .btn.ghost{background:rgba(255,255,255,.06);color:#fff;border:1px solid rgba(255,255,255,.16)}
     .btn.ghost:hover{color:#fff;border-color:rgba(220,230,240,.35);background:rgba(255,255,255,.08)}
-    #loginBtn,#recalcAll,#xAdd,#rdvSave{border-color:transparent;background:linear-gradient(180deg,#FFFFFF,#C9D0D7);color:#0A0B0D;box-shadow:inset 0 1px 0 #fff,0 8px 30px rgba(180,200,225,.18);-webkit-backdrop-filter:none;backdrop-filter:none}
-    #loginBtn:hover,#recalcAll:hover,#xAdd:hover,#rdvSave:hover{background:linear-gradient(180deg,#fff,#E4E8EC);border-color:transparent}
+    #loginBtn,#recalcAll,#xAdd,#rdvSave,#rcAvSave,#rcNotesSave{border-color:transparent;background:linear-gradient(180deg,#FFFFFF,#C9D0D7);color:#0A0B0D;box-shadow:inset 0 1px 0 #fff,0 8px 30px rgba(180,200,225,.18);-webkit-backdrop-filter:none;backdrop-filter:none}
+    #loginBtn:hover,#recalcAll:hover,#xAdd:hover,#rdvSave:hover,#rcAvSave:hover,#rcNotesSave:hover{background:linear-gradient(180deg,#fff,#E4E8EC);border-color:transparent}
     .btn:disabled,.btn[disabled]{opacity:.45;cursor:default}
     .btn:focus-visible,.chip:focus-visible,.tab:focus-visible,.ed:focus-visible,.st:focus-visible,.more:focus-visible{outline:2px solid rgba(220,227,234,.6);outline-offset:2px}
     .in,select.in{background:rgba(255,255,255,.04);color:var(--cream);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:13px;outline:none;width:100%;transition:border-color .2s,box-shadow .2s}
@@ -40,7 +40,7 @@
     input[type="checkbox"]{accent-color:var(--amber)}
 
     header{position:sticky;top:0;z-index:20;background:rgba(8,9,11,.62);-webkit-backdrop-filter:blur(22px) saturate(1.4);backdrop-filter:blur(22px) saturate(1.4);border-bottom:1px solid var(--line)}
-    .hd{display:flex;align-items:center;gap:14px;padding:12px 20px}
+    .hd{display:flex;align-items:center;flex-wrap:wrap;gap:8px 14px;padding:12px 20px}   /* wrap : avec 5 onglets l'en-tête dépasse 1280 px sinon */
     .hd .brand{display:flex;flex-direction:column;justify-content:center;line-height:1.1;min-height:22px;padding-left:12px;border-left:1px solid var(--line)}
     .hd .brand b{display:none} /* le nom est déjà porté par le logo « ● Rec » */
     .hd .right{margin-left:auto;display:flex;align-items:center;gap:10px}
@@ -51,7 +51,7 @@
     .clock{font-family:'Geist',system-ui,sans-serif;font-size:13px;color:var(--taupe);font-variant-numeric:tabular-nums}
     .who{font-size:13px;color:var(--taupe)}
     .who b{color:var(--cream);font-weight:500}
-    .live{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--taupe)}
+    .live{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--taupe)}
     .live i{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 10px var(--ok)}
 
     main{padding:18px 20px 60px}
@@ -148,8 +148,8 @@
     @media (max-width:700px){.hd{flex-wrap:wrap;gap:8px 10px}.hd .right{flex-wrap:wrap;justify-content:flex-end}.tabs{margin-left:0}.due .dt{font-size:18px}}
 
     /* onglets admin */
-    .tabs{display:flex;gap:4px;margin-left:18px}
-    .tab{background:none;border:1px solid transparent;color:var(--taupe);border-radius:999px;padding:8px 14px;font-size:13px;font-weight:500;cursor:pointer;transition:border-color .2s,background .2s,color .2s}
+    .tabs{display:flex;flex-wrap:wrap;gap:2px;margin-left:10px}
+    .tab{background:none;border:1px solid transparent;color:var(--taupe);border-radius:999px;padding:8px 12px;font-size:13px;font-weight:500;white-space:nowrap;cursor:pointer;transition:border-color .2s,background .2s,color .2s}
     .tab:hover{color:var(--cream)}
     .tab.on{color:#fff;border-color:rgba(220,230,240,.5);background:var(--amber-soft)}
     .admin{display:grid;gap:14px}
@@ -182,6 +182,41 @@
     table.adm .st-sel.cancelled,table.adm .st-sel.no_show{color:var(--err);border-color:rgba(240,138,130,.5);background:rgba(240,138,130,.12)}
     table.adm .st-sel.done{color:var(--blue);border-color:rgba(127,176,224,.4);background:rgba(127,176,224,.12)}
     @media (max-width:700px){.wk{grid-template-columns:1fr}}
+    /* onglet Recrutement : liste triée par note, fiche candidat, entretiens, grilles */
+    .admin>.rcp,.admin>.rc-fiche{min-width:0}   /* sans ça, sur mobile, le tableau élargit le panneau au-delà de l'écran */
+    .rc-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+    .rc-bar select.in{width:auto;min-width:170px;padding:8px 12px}
+    .rc-scroll{overflow-x:auto}
+    table.adm tr[data-rc-row]{cursor:pointer;transition:background .15s}
+    table.adm tr[data-rc-row]:hover{background:rgba(255,255,255,.03)}
+    table.adm tr[data-rc-row].on{background:var(--amber-soft)}
+    .rc-score{font-size:20px;font-weight:600;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+    .rc-score small{font-size:11px;font-weight:500;color:var(--taupe);letter-spacing:0}
+    .rc-score.none{color:var(--taupe)}
+    .rc-sub{display:block;font-size:12px;color:var(--taupe);font-weight:400}
+    table.adm .st-sel.hired{color:var(--ok);border-color:rgba(70,211,105,.4);background:rgba(70,211,105,.12)}
+    table.adm .st-sel.rejected{color:var(--err);border-color:rgba(240,138,130,.5);background:rgba(240,138,130,.12)}
+    table.adm .st-sel.interview_booked,table.adm .st-sel.interview_done,table.adm .st-sel.invited{color:var(--blue);border-color:rgba(127,176,224,.4);background:rgba(127,176,224,.12)}
+    .rc-fiche{display:grid;gap:16px}
+    .rc-fh{display:flex;align-items:flex-start;gap:12px 18px;flex-wrap:wrap;justify-content:space-between}
+    .rc-fh h3{margin:0;font-size:22px;letter-spacing:-.03em}
+    .rc-cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
+    .rc-kv{display:grid;grid-template-columns:120px minmax(0,1fr);gap:6px 12px;font-size:13px;align-items:baseline}
+    .rc-kv em{font-style:normal;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--taupe)}
+    .rc-kv span{min-width:0;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+    .rc-kv a{color:var(--accent2)}
+    .rc-fiche h4{margin:0 0 8px;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--taupe)}
+    .rc-fiche textarea.in{min-height:96px;resize:vertical}
+    .rc-fiche .ro{white-space:pre-wrap;font-size:13px;color:var(--taupe);background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:12px;padding:10px 12px;max-height:200px;overflow:auto}
+    .rc-ev{font-size:12px;color:var(--taupe);max-width:340px;overflow-wrap:anywhere}
+    .rc-acts{display:flex;align-items:center;gap:8px 10px;flex-wrap:wrap}
+    .rc-acts .btn{height:34px;padding:0 14px;font-size:12px}
+    .rc-acts select.in{width:auto;padding:7px 10px;font-size:12px}
+    .rc-grid{display:flex;gap:6px;flex-wrap:wrap}
+    .rc-grid span{font-size:12px;border:1px solid var(--line);border-radius:999px;padding:3px 10px;color:var(--cream);font-variant-numeric:tabular-nums}
+    .rc-wk{display:grid;grid-template-columns:110px minmax(0,1fr);gap:8px 14px;align-items:center;padding:7px 0;border-bottom:1px solid var(--line);font-size:13px}
+    .rc-wk:last-child{border-bottom:0}
+    @media (max-width:700px){.rc-wk,.rc-kv{grid-template-columns:1fr}.rc-fiche .rc-cols{grid-template-columns:1fr}}
     /* ---- PC du bureau : état du téléchargement sur la ligne ---- */
     .dl{flex-basis:100%;min-width:0;display:flex;align-items:center;gap:4px 8px;flex-wrap:wrap;font-size:11px;line-height:1.35;color:var(--taupe);font-variant-numeric:tabular-nums}
     .dl .dlp{display:inline-flex;align-items:center;gap:6px;max-width:100%;border:1px solid var(--line);border-radius:999px;padding:3px 9px;font-weight:600;color:var(--taupe)}
@@ -459,7 +494,7 @@ const T = {
     needFrame: "Colle d'abord le lien frame.io de livraison : « Livré » reste bloqué sans lui.", locked: "Étape déjà cochée : seule la qualité ou un admin peut la corriger.", redeliver: "Relivrer", redeliverTip: "Corrige le lien frame.io si besoin, puis relivre pour un nouveau contrôle qualité.", redelivered: "✓ Relivré, la qualité est prévenue", round: (n) => `${n}e passage`, savedOk: "✓ Enregistré",
     lk: { editor: "Monteur", dispatcher: "Dispatch", qc: "Qualité", badT: "Lien invalide ou coupé", badP: "Ce lien ne fonctionne plus. Demande-en un nouveau à l'équipe DS Editing.", tooT: "Trop d'essais", tooP: "Réessaie dans quelques minutes.", downT: "Service indisponible", downP: "Impossible de joindre le serveur. Vérifie ta connexion puis réessaie.", byeT: "Lien retiré de cet appareil", byeP: "Rouvre ton lien personnel pour revenir à tes commandes.", retry: "Réessayer", offT: "Accès désactivé", offP: "Ton accès est désactivé pour le moment. Reviens plus tard ou demande à l'équipe DS Editing.", who: (n) => `Connecté avec le lien de ${n}`, queue: (n) => `À attribuer · ${n}`, others: "Autres commandes", brief: "Brief", refs: "Références", logos: "Logos" },
     errs: { FRAMEIO_REQUIS: "Lien frame.io manquant ou invalide (il doit commencer par https://).", ETAPE_VERROUILLEE: "Étape déjà cochée : seule la qualité ou un admin peut la corriger.", QC_OK_VERROUILLE: "Qualité déjà validée : le lien frame.io ne peut plus être modifié (voir avec l'équipe qualité).", REFUSE: "Action refusée pour ton profil.", CHAMP_INTERDIT: "Modification non autorisée pour ton profil.", LIEN_INVALIDE: "Ce lien ne fonctionne plus : demande-en un nouveau.", TROP_D_ESSAIS: "Trop d'essais : réessaie dans quelques minutes.", REOUVERTURE_REFUSEE: "On ne rouvre l'assemblage qu'après un « à revoir » de la qualité.", LIVRAISON_FIGEE: "Commande livrée : après un « à revoir », rouvre d'abord l'assemblage avant de rouvrir une partie.", PARTIE_DEJA_COMMENCEE: "Impossible : une étape est déjà cochée ou un lien déjà posé sur cette commande.", COMMANDE_TERMINEE: "Impossible : la commande est terminée (qualité OK).", PAS_UNE_PARTIE_UNIQUE: "Cette commande est déjà coupée en parties.", PAS_DEUX_PARTIES: "Cette commande n'est pas coupée en Intro / Corps.", ACTION_INCONNUE: "Action inconnue.", JOB_A_PARTIES: "Cette commande est découpée en parties : coche l'étape dans la partie concernée.", PARTIES_NON_LIVREES: "Toutes les parties doivent être livrées avant de livrer la commande.", MONTEUR_INCONNU: "Monteur inconnu.", MONTEUR_DESACTIVE: "Ton accès est désactivé pour le moment." },
-    tabs: { prod: "Production", equipe: "Équipe", tarifs: "Tarifs", factures: "Factures", rdv: "Rendez-vous" },
+    tabs: { prod: "Production", equipe: "Équipe", tarifs: "Tarifs", factures: "Factures", rdv: "Rendez-vous", recrut: "Recrutement" },
     adm: { ph: "Code", who: "Vue admin", bad: (n) => `Code incorrect. Il reste ${n} essai${n > 1 ? "s" : ""}.`, locked: (m) => `Trop d'erreurs : réessaie dans ${m} min.`, lockedTip: (m) => `Bloqué sur cet appareil encore ${m} min`, nocrypto: "Ce navigateur ne peut pas vérifier le code (page non sécurisée ?)." },
     eq: { title: "Statistiques d'équipe", lead: "Par monteur : livraisons, travail en cours, retards, délais et passages « à revoir ».", rank: "Rang", editor: "Monteur", deliv: "Livrées", open: "En cours", late: "En retard", delay: "Délai moyen", rev: "À revoir", d7: "7 j", d30: "30 j", top: "Qui a livré le plus", asmRow: "Assemblage (dispatch)", noneRow: "Sans monteur", total: "Total équipe", none: "—", cap: (n) => `Calculé sur les ${n} commandes les plus récentes chargées par le tableau (limite de lecture).`,
       foot: ["Livrées : une commande à une partie = 1 livraison pour son monteur ; une commande à deux parties = 1 livraison par partie pour son monteur, et l'assemblage final pour le dispatch. La ligne « Sans monteur » reprend les commandes et parties sans attribution. Le total compte chaque commande une seule fois (une commande à deux monteurs compte pour chacun dans leurs lignes).", "En cours / En retard : l'état à l'instant (pas de période). En retard = commande pas encore livrée dont la date est dépassée : date souhaitée par le client d'abord, sinon date fixée par l'équipe, sinon 5 jours ouvrés après réception (comme le tableau de production).", "Délai moyen : de « fichiers prêts » (rushes téléchargés) à la livraison ; assemblage : de « parties livrées » à la livraison finale. Les commandes sans date « fichiers prêts » sont exclues de la moyenne.", "À revoir : passages qualité « à revoir » reçus (relivraisons + en attente), datés du dernier passage ; sur une commande à parties, comptés à l'assemblage."] },
@@ -472,7 +507,22 @@ const T = {
       slot: "Durée d'un créneau (min)", lead: "Délai minimal avant un créneau (h)", horizon: "Réservable jusqu'à (jours)", tz: "Fuseau des plages", meet: "Lien Google Meet permanent", meetHint: "vide : « le lien vous sera envoyé avant l'appel »", host: "Qui appelle", notify: "E-mails à prévenir (séparés par une virgule)",
       blocked: "Dates bloquées (une par ligne)", blockedHint: "2026-10-03 · 2026-12-24/2027-01-02 · 2026-10-06T14:00/2026-10-06T16:00 (heure de Paris)", save: "Enregistrer", saved: "enregistré", badRange: "Plage invalide : le début doit précéder la fin",
       listTitle: "Rendez-vous", upcoming: "À venir", past: "Passés", cols: ["Date (Paris)", "Nom", "Studio", "E-mail", "Téléphone", "Notes", "Statut", "E-mails"],
-      status: { confirmed: "Confirmé", done: "Fait", cancelled: "Annulé", no_show: "Absent" }, none: "Aucun rendez-vous", confirm: "confirmation", reminder: "rappel", local: "chez vous", missing: "Réglages introuvables : appliquer supabase/bookings_v1.sql." } },
+      status: { confirmed: "Confirmé", done: "Fait", cancelled: "Annulé", no_show: "Absent" }, none: "Aucun rendez-vous", confirm: "confirmation", reminder: "rappel", local: "chez vous", missing: "Réglages introuvables : appliquer supabase/bookings_v1.sql." },
+    rc: { listTitle: "Candidats", hint: "Triés par note de candidature. Rien n'est envoyé d'ici : on copie le lien d'invitation et on l'envoie à la main, après validation de Cyriaque.",
+      allRoles: "Tous les postes", allStatus: "Tous les statuts", roles: { video_editor: "Video Editor", accountant_hr: "Accountant & HR Admin" },
+      status: { new: "Nouveau", scored: "Noté", test_sent: "Test envoyé", test_received: "Test reçu", invited: "Invité", interview_booked: "Entretien réservé", interview_done: "Entretien fait", editing_test: "Test montage", hired: "Embauché", rejected: "Refusé" },
+      cols: ["Candidature", "Test", "Candidat", "Poste", "Ville", "Statut", "Entretien (Bali)"], none: "Aucun candidat dans cette vue.", noScore: "—", openHint: "Ouvrir la fiche", close: "Fermer",
+      contact: "Contact", phone: "Téléphone / WhatsApp", city: "Ville", source: "Source", profile: "Profil ou CV", portfolio: "Portfolio", created: "Arrivé le", invitedAt: "Invité le", testSentAt: "Test envoyé le", testReceivedAt: "Test reçu le",
+      appScore: "Note de candidature", testScore: "Note du test écrit", grid: (n) => n ? `grille v${n}` : "grille non précisée", breakdownApp: "Détail de la candidature", breakdownTest: "Détail du test écrit", noBreakdown: "Pas encore de détail.",
+      cCrit: "Critère", cPts: "Points", cProof: "Preuve", screening: "Réponses de présélection", noScreening: "Aucune réponse enregistrée.", juryNotes: "Notes du jury", agentNotes: "Notes de l'agent (lecture seule)", saveNotes: "Enregistrer les notes", saved: "enregistré",
+      statusL: "Statut", copyInvite: "Copier le lien d'invitation", copied: "Lien copié", copyFail: "Copie impossible : sélectionner le lien à la main", inviteConfirm: "Le statut passera à « Invité » et le lien deviendra actif. Aucun message n'est envoyé : tu colles le lien dans ton message. Continuer ?", inviteOff: "Lien inactif à ce stade du parcours", linkLabel: "Lien",
+      regen: "Nouveau lien", regenConfirm: "L'ancien lien cessera de fonctionner. Continuer ?", rejectConfirm: "Marquer ce candidat « Refusé » ? Son créneau d'entretien sera libéré.", hireConfirm: "Marquer ce candidat « Embauché » ?",
+      interview: "Entretien", noInterview: "Pas de créneau réservé.", juror: "Juré", unassigned: "À attribuer", changes: (n) => `${n} modification${n > 1 ? "s" : ""}`,
+      ivTitle: "Entretiens à venir", ivPast: "Entretiens passés et annulés", ivCols: ["Date (Bali)", "Candidat", "Poste", "Juré", "Statut", "Contact"], ivNone: "Aucun entretien.", bk: { confirmed: "Confirmé", done: "Fait", cancelled: "Annulé", no_show: "Absent" },
+      avTitle: "Disponibilités des entretiens", avHint: "Réglages propres au recrutement, séparés du calendrier des rendez-vous sales. Heures de début des créneaux (séparées par une virgule), en heure de Bali. Jour vide = fermé.",
+      slot: "Durée d'un entretien (min)", lead: "Délai minimal avant un créneau (h)", horizon: "Réservable jusqu'à (jours)", maxChanges: "Modifications permises par candidat", tz: "Fuseau des heures", blocked: "Jours bloqués par le jury (un par ligne)",
+      blockedHint: "2026-10-12 · 2026-12-24/2027-01-02 · 2026-10-14T13:00/2026-10-14T16:00 (heure de Bali)", save: "Enregistrer", badTime: "Heure invalide (format 13:00)", badBlock: "Date bloquée invalide (date inexistante, heure hors 00:00-23:59, ou début après la fin)", gridsTitle: "Grilles de notation (historique)", gridsHint: "Une ligne par version : on ajoute, on n'écrase jamais.",
+      version: "Version", date: "Date", reason: "Motif", weights: "Pondérations", noGrid: "Aucune grille enregistrée.", missing: "Tables introuvables : appliquer supabase/recruitment_v1.sql." } },
   en: { admBtn: "Admin", admOff: "Lock", admTitle: "Admin code", admGo: "Enter", admCancel: "Cancel", sub: "Production", live: "Live", tv: "TV mode", logout: "Log out", leave: "Leave", login: "Team space", loginSub: "Sign in with your DS Editing email.", loginBtn: "Enter",
     all: "All", tasks: (n) => `${n} task${n > 1 ? "s" : ""}`, stats: ["Received today", "In progress", "Late", "To review", "Delivered this week"],
     filters: { all: "All", na: "To assign", ready: "Files ready, to start", late: "Late", qc: "To review", asm: "To assemble", done: "Delivered" }, search: "Search…",
@@ -497,7 +547,7 @@ const T = {
     needFrame: "Paste the frame.io delivery link first: “Delivered” stays blocked without it.", locked: "Step already ticked: only QC or an admin can fix it.", redeliver: "Redeliver", redeliverTip: "Fix the frame.io link if needed, then redeliver for a new quality check.", redelivered: "✓ Redelivered, QC has been notified", round: (n) => `${n}${[11, 12, 13].includes(n % 100) ? "th" : ({ 1: "st", 2: "nd", 3: "rd" })[n % 10] || "th"} pass`, savedOk: "✓ Saved",
     lk: { editor: "Editor", dispatcher: "Dispatch", qc: "Quality", badT: "Invalid or disabled link", badP: "This link no longer works. Ask the DS Editing team for a new one.", tooT: "Too many attempts", tooP: "Try again in a few minutes.", downT: "Service unavailable", downP: "Cannot reach the server. Check your connection and try again.", byeT: "Link removed from this device", byeP: "Open your personal link again to get back to your orders.", retry: "Try again", offT: "Access disabled", offP: "Your access is disabled for now. Come back later or ask the DS Editing team.", who: (n) => `Signed in with ${n}'s link`, queue: (n) => `To assign · ${n}`, others: "Other orders", brief: "Brief", refs: "References", logos: "Logos" },
     errs: { FRAMEIO_REQUIS: "frame.io link missing or invalid (it must start with https://).", ETAPE_VERROUILLEE: "Step already ticked: only QC or an admin can fix it.", QC_OK_VERROUILLE: "QC already approved: the frame.io link can no longer be changed (ask the QC team).", REFUSE: "Action refused for your profile.", CHAMP_INTERDIT: "Change not allowed for your profile.", LIEN_INVALIDE: "This link no longer works: ask for a new one.", TROP_D_ESSAIS: "Too many attempts: try again in a few minutes.", REOUVERTURE_REFUSEE: "The assembly can only be reopened after a QC « needs changes ».", LIVRAISON_FIGEE: "Order delivered: after a « needs changes », reopen the assembly first before reopening a part.", PARTIE_DEJA_COMMENCEE: "Not possible: a step is already ticked or a link already set on this order.", COMMANDE_TERMINEE: "Not possible: the order is finished (QC OK).", PAS_UNE_PARTIE_UNIQUE: "This order is already split into parts.", PAS_DEUX_PARTIES: "This order is not split into Intro / Body.", ACTION_INCONNUE: "Unknown action.", JOB_A_PARTIES: "This order is split into parts: tick the step in the relevant part.", PARTIES_NON_LIVREES: "All parts must be delivered before delivering the order.", MONTEUR_INCONNU: "Unknown editor.", MONTEUR_DESACTIVE: "Your access is disabled for now." },
-    tabs: { prod: "Production", equipe: "Team", tarifs: "Pricing", factures: "Invoices", rdv: "Appointments" },
+    tabs: { prod: "Production", equipe: "Team", tarifs: "Pricing", factures: "Invoices", rdv: "Appointments", recrut: "Recruitment" },
     adm: { ph: "Code", who: "Admin view", bad: (n) => `Wrong code. ${n} attempt${n > 1 ? "s" : ""} left.`, locked: (m) => `Too many errors: try again in ${m} min.`, lockedTip: (m) => `Locked on this device for ${m} more min`, nocrypto: "This browser cannot check the code (insecure page?)." },
     eq: { title: "Team statistics", lead: "Per editor: deliveries, work in progress, late orders, turnaround and « needs changes » rounds.", rank: "Rank", editor: "Editor", deliv: "Delivered", open: "In progress", late: "Late", delay: "Average turnaround", rev: "Needs changes", d7: "7 d", d30: "30 d", top: "Most delivered", asmRow: "Assembly (dispatch)", noneRow: "No editor", total: "Team total", none: "—", cap: (n) => `Computed on the ${n} most recent orders loaded by the board (read limit).`,
       foot: ["Delivered: a single-part order = 1 delivery for its editor; a two-part order = 1 delivery per part for its editor, and the final assembly for dispatch. The « No editor » row gathers orders and parts with no assignment. The total counts each order once (an order with two editors counts for each in their own rows).", "In progress / Late: the state right now (no period). Late = order not delivered yet whose date has passed: the client's requested date first, otherwise the date set by the team, otherwise 5 business days after receipt (same rule as the production board).", "Average turnaround: from « files ready » (footage downloaded) to delivery; assembly: from « parts delivered » to the final delivery. Orders without a « files ready » date are left out of the average.", "Needs changes: QC « needs changes » rounds received (redeliveries + pending), dated by the latest round; on a multi-part order they are counted at assembly."] },
@@ -510,7 +560,22 @@ const T = {
       slot: "Slot length (min)", lead: "Minimum notice before a slot (h)", horizon: "Bookable up to (days)", tz: "Time zone of the ranges", meet: "Permanent Google Meet link", meetHint: "empty: “the link will be sent before the call”", host: "Who calls", notify: "Emails to notify (comma separated)",
       blocked: "Blocked dates (one per line)", blockedHint: "2026-10-03 · 2026-12-24/2027-01-02 · 2026-10-06T14:00/2026-10-06T16:00 (Paris time)", save: "Save", saved: "saved", badRange: "Invalid range: start must be before end",
       listTitle: "Appointments", upcoming: "Upcoming", past: "Past", cols: ["Date (Paris)", "Name", "Studio", "Email", "Phone", "Notes", "Status", "Emails"],
-      status: { confirmed: "Confirmed", done: "Done", cancelled: "Cancelled", no_show: "No-show" }, none: "No appointment", confirm: "confirmation", reminder: "reminder", local: "your time", missing: "Settings not found: apply supabase/bookings_v1.sql." } },
+      status: { confirmed: "Confirmed", done: "Done", cancelled: "Cancelled", no_show: "No-show" }, none: "No appointment", confirm: "confirmation", reminder: "reminder", local: "your time", missing: "Settings not found: apply supabase/bookings_v1.sql." },
+    rc: { listTitle: "Candidates", hint: "Sorted by application score. Nothing is sent from here: copy the invitation link and send it by hand, once Cyriaque has approved.",
+      allRoles: "All roles", allStatus: "All statuses", roles: { video_editor: "Video Editor", accountant_hr: "Accountant & HR Admin" },
+      status: { new: "New", scored: "Scored", test_sent: "Test sent", test_received: "Test received", invited: "Invited", interview_booked: "Interview booked", interview_done: "Interview done", editing_test: "Editing test", hired: "Hired", rejected: "Rejected" },
+      cols: ["Application", "Test", "Candidate", "Role", "City", "Status", "Interview (Bali)"], none: "No candidate in this view.", noScore: "—", openHint: "Open the file", close: "Close",
+      contact: "Contact", phone: "Phone / WhatsApp", city: "City", source: "Source", profile: "Profile or CV", portfolio: "Portfolio", created: "Received", invitedAt: "Invited", testSentAt: "Test sent", testReceivedAt: "Test received",
+      appScore: "Application score", testScore: "Written test score", grid: (n) => n ? `grid v${n}` : "grid not specified", breakdownApp: "Application breakdown", breakdownTest: "Written test breakdown", noBreakdown: "No breakdown yet.",
+      cCrit: "Criterion", cPts: "Points", cProof: "Evidence", screening: "Screening answers", noScreening: "No answer recorded.", juryNotes: "Jury notes", agentNotes: "Agent notes (read-only)", saveNotes: "Save notes", saved: "saved",
+      statusL: "Status", copyInvite: "Copy invitation link", copied: "Link copied", copyFail: "Copy failed: select the link by hand", inviteConfirm: "The status will change to “Invited” and the link becomes active. No message is sent: you paste the link into your own message. Continue?", inviteOff: "Link inactive at this stage", linkLabel: "Link",
+      regen: "New link", regenConfirm: "The old link will stop working. Continue?", rejectConfirm: "Mark this candidate “Rejected”? Their interview slot will be released.", hireConfirm: "Mark this candidate “Hired”?",
+      interview: "Interview", noInterview: "No slot booked.", juror: "Juror", unassigned: "To assign", changes: (n) => `${n} change${n > 1 ? "s" : ""}`,
+      ivTitle: "Upcoming interviews", ivPast: "Past and cancelled interviews", ivCols: ["Date (Bali)", "Candidate", "Role", "Juror", "Status", "Contact"], ivNone: "No interview.", bk: { confirmed: "Confirmed", done: "Done", cancelled: "Cancelled", no_show: "No-show" },
+      avTitle: "Interview availability", avHint: "Recruitment-only settings, separate from the sales appointment calendar. Slot start times (comma separated), Bali time. Empty day = closed.",
+      slot: "Interview length (min)", lead: "Minimum notice before a slot (h)", horizon: "Bookable up to (days)", maxChanges: "Changes allowed per candidate", tz: "Time zone of the times", blocked: "Days blocked by the jury (one per line)",
+      blockedHint: "2026-10-12 · 2026-12-24/2027-01-02 · 2026-10-14T13:00/2026-10-14T16:00 (Bali time)", save: "Save", badTime: "Invalid time (format 13:00)", badBlock: "Invalid blocked date (date does not exist, time outside 00:00-23:59, or start after end)", gridsTitle: "Scoring grids (history)", gridsHint: "One row per version: we add, never overwrite.",
+      version: "Version", date: "Date", reason: "Reason", weights: "Weights", noGrid: "No grid recorded.", missing: "Tables not found: apply supabase/recruitment_v1.sql." } },
 };
 const $ = (s) => document.querySelector(s);
 const params = new URLSearchParams(location.search);
@@ -518,7 +583,7 @@ let lang = params.get("lang") || (() => { try { return localStorage.getItem("ds_
 const t = (k) => T[lang][k];
 let tv = params.get("tv") === "1"; document.body.classList.toggle("tv", tv);
 let me = null, profile = null, myEditor = null, jobs = [], editors = [], filter = params.get("f") || "all", edFilter = params.get("editor") || "", q = "", known = new Set(), sb = null;
-let tab = params.get("tab") || "prod", studios = [], grids = [], invoicesAll = [], extras = [], tarifStudio = "", bookingSettings = null, bookingsAll = [];
+let tab = params.get("tab") || "prod", studios = [], grids = [], invoicesAll = [], extras = [], tarifStudio = "", bookingSettings = null, bookingsAll = [], candidatesAll = [], interviewsAll = [], interviewSettings = null, scoringGrids = [], recruitOk = false;
 const money = (x, cur) => x == null ? "—" : (cur === "USD" ? "$" + Number(x).toLocaleString("en-US", { minimumFractionDigits: 2 }) : Number(x).toLocaleString("fr-FR", { minimumFractionDigits: 2 }) + " €");
 
 /* ===== Accès par lien personnel (lot B) : ?k=<code> =====
@@ -1129,13 +1194,13 @@ setInterval(() => { document.querySelectorAll("[data-cd]").forEach((el) => { con
 /* ===== onglets admin : Tarifs, Factures ===== */
 function renderTabs() {
   if (!isAdmin() || LINKED) return; $("#tabs").hidden = false;
-  $("#tabs").innerHTML = ["prod", "equipe", "tarifs", "factures", "rdv"].map((k) => `<button type="button" class="tab ${tab === k ? "on" : ""}" data-tab="${k}">${t("tabs")[k]}</button>`).join("");
+  $("#tabs").innerHTML = ["prod", "equipe", "tarifs", "factures", "rdv", "recrut"].map((k) => `<button type="button" class="tab ${tab === k ? "on" : ""}" data-tab="${k}">${t("tabs")[k]}</button>`).join("");
   $("#tabs").querySelectorAll("[data-tab]").forEach((b) => b.addEventListener("click", () => { tab = b.dataset.tab; const u = new URL(location.href); tab === "prod" ? u.searchParams.delete("tab") : u.searchParams.set("tab", tab); history.replaceState(null, "", u); renderTabs(); renderAdmin(); }));
   renderAdmin();
 }
 function renderAdmin() {
   const prod = tab === "prod"; ["#edbar", "#stats", "#toolbar", "#alerts", "#board"].forEach((s) => { $(s).style.display = prod ? "" : "none"; }); $("#admin").hidden = prod;
-  if (tab === "equipe") renderEquipe(); else if (tab === "tarifs") renderTarifs(); else if (tab === "factures") renderFactures(); else if (tab === "rdv") renderRdv();
+  if (tab === "equipe") renderEquipe(); else if (tab === "tarifs") renderTarifs(); else if (tab === "factures") renderFactures(); else if (tab === "rdv") renderRdv(); else if (tab === "recrut") renderRecruit();
 }
 /* ===== lot D : onglet Équipe (statistiques), vue admin seulement. Calcul côté navigateur sur les commandes (et parties) déjà chargées : aucune base touchée ===== */
 function teamStats(list, now) {
@@ -1244,10 +1309,14 @@ function renderFactures() {
 }
 async function loadAdmin() {
   if (!isAdmin() || LINKED) return;
-  const [a, b, c, d, e, f] = await Promise.all([sb.from("studios").select("*").order("name"), sb.from("price_grids").select("*"), sb.from("invoices").select("*").order("period_end", { ascending: false }).limit(300), sb.from("extra_lines").select("*").order("created_at", { ascending: false }).limit(200),
-    sb.from("booking_settings").select("*").eq("id", 1), sb.from("bookings").select("*").order("starts_at", { ascending: false }).limit(400)]);
+  const [a, b, c, d, e, f, g, h, m, n] = await Promise.all([sb.from("studios").select("*").order("name"), sb.from("price_grids").select("*"), sb.from("invoices").select("*").order("period_end", { ascending: false }).limit(300), sb.from("extra_lines").select("*").order("created_at", { ascending: false }).limit(200),
+    sb.from("booking_settings").select("*").eq("id", 1), sb.from("bookings").select("*").order("starts_at", { ascending: false }).limit(400),
+    sb.from("candidates").select("*").order("application_score", { ascending: false, nullsFirst: false }).limit(500), sb.from("interview_bookings").select("*").order("starts_at", { ascending: false }).limit(400),
+    sb.from("interview_settings").select("*").eq("id", 1), sb.from("scoring_grids").select("*").order("created_at", { ascending: false }).limit(60)]);
   studios = a.data || []; grids = b.data || []; invoicesAll = c.data || []; extras = d.data || [];
   bookingSettings = Array.isArray(e.data) ? (e.data[0] || null) : (e.data || null); bookingsAll = f.data || [];
+  recruitOk = !g.error && !h.error && !m.error;   // false tant que supabase/recruitment_v1.sql n'est pas appliqué : l'onglet l'indique, rien d'autre ne bouge
+  candidatesAll = g.data || []; interviewsAll = h.data || []; interviewSettings = Array.isArray(m.data) ? (m.data[0] || null) : (m.data || null); scoringGrids = n.data || [];
 }
 
 /* ===== onglet Rendez-vous : disponibilités du calendrier de l'accueil + liste des appels réservés ===== */
@@ -1315,6 +1384,180 @@ async function saveRdv() {
   const { error } = await sb.from("booking_settings").update(patch).eq("id", 1);
   if (error) { msg.style.color = "var(--err)"; msg.textContent = error.message; return; }
   msg.textContent = "✓ " + R.saved; await loadAdmin(); renderRdv(); $("#rdvMsg").textContent = "✓ " + R.saved; setTimeout(() => { const m = $("#rdvMsg"); if (m) m.textContent = ""; }, 2000);
+}
+
+/* ===== onglet Recrutement : candidats Jobstreet, entretiens sur place, grilles de notation (supabase/recruitment_v1.sql) ===== */
+/* Aucun message n'est envoyé d'ici : le bouton copie le lien d'invitation, l'envoi reste manuel après validation de Cyriaque. */
+const RC_STATUS = ["new", "scored", "test_sent", "test_received", "invited", "interview_booked", "interview_done", "editing_test", "hired", "rejected"];
+const RC_BK = ["confirmed", "done", "cancelled", "no_show"], RC_JURORS = ["Sajid", "Rania", "Putu"];
+const rcF = { role: "", status: "" };
+let rcOpenId = null;
+const rcTz = () => (interviewSettings && interviewSettings.timezone) || "Asia/Makassar";
+const rcPretty = (k) => String(k).replace(/_/g, " ");
+const rcInviteUrl = (c) => new URL("../entretien/?t=" + encodeURIComponent(c.invite_token), location.href).href;
+const rcCanInvite = (c) => RC_STATUS.indexOf(c.status) < RC_STATUS.indexOf("invited");
+const rcLinkLive = (c) => c.status === "invited" || c.status === "interview_booked";
+const rcBooking = (c) => interviewsAll.find((b) => b.candidate_id === c.id && b.status === "confirmed") || null;
+const rcHref = (u, label) => u ? `<a href="${esc(/^https?:\/\//i.test(u) ? u : "https://" + u)}" target="_blank" rel="noopener">${esc(label || u)}</a>` : "—";
+const rcDate = (d) => d ? new Date(d).toLocaleDateString(loc(), { day: "2-digit", month: "short", year: "numeric" }) : "—";
+const rcOptions = (list, cur, label) => list.map((k) => `<option value="${k}" ${k === cur ? "selected" : ""}>${esc(label(k))}</option>`).join("");
+function rcTable(obj, weights) {
+  const R = t("rc"), rows = Object.entries(obj || {});
+  const pts = (k, v) => (v && typeof v === "object" && v.max != null ? v.max : weights ? weights[k] : null) ?? 0;   // jsonb ne garde pas l'ordre : plus gros critère d'abord, sinon ordre naturel (q1, q2, ... q10)
+  rows.sort((a, b) => weights ? pts(b[0], b[1]) - pts(a[0], a[1]) || a[0].localeCompare(b[0]) : a[0].localeCompare(b[0], undefined, { numeric: true }));
+  if (!rows.length) return `<p class="hint" style="margin:0">${R.noBreakdown}</p>`;
+  return `<table class="adm"><thead><tr><th>${R.cCrit}</th><th>${R.cPts}</th><th>${R.cProof}</th></tr></thead><tbody>${rows.map(([k, v]) => {
+    const o = v && typeof v === "object" ? v : { score: v }, max = o.max ?? (weights ? weights[k] : null);
+    return `<tr><td>${esc(rcPretty(k))}</td><td>${esc(o.score ?? "—")}${max != null ? ` / ${esc(max)}` : ""}</td><td class="rc-ev">${esc(o.evidence ?? o.note ?? o.proof ?? "")}</td></tr>`;
+  }).join("")}</tbody></table>`;
+}
+function rcFiche(c) {
+  const R = t("rc"), tz = rcTz(), bk = rcBooking(c), grid = scoringGrids.find((g) => g.job_role === c.job_role && g.version === c.application_grid_version);
+  const live = rcLinkLive(c), can = rcCanInvite(c);
+  const scr = (v) => v == null ? "—" : `${v} / 100`;
+  const kv = (k, v) => `<em>${k}</em><span>${v}</span>`;
+  const screening = Object.entries(c.screening || {}).map(([k, v]) => kv(esc(rcPretty(k)), esc(v && typeof v === "object" ? JSON.stringify(v) : v))).join("");
+  return `<div class="panel rc-fiche" id="rcFiche">
+    <div class="rc-fh"><div><h3>${esc(c.name)}</h3><span class="rc-sub">${esc(R.roles[c.job_role] || c.job_role)} · ${esc(c.city || "—")}</span></div>
+      <div class="rc-acts"><select class="in st-sel ${esc(c.status)}" data-rc-status="${c.id}" aria-label="${R.statusL}">${rcOptions(RC_STATUS, c.status, (k) => R.status[k])}</select><button type="button" class="btn ghost" id="rcClose">${R.close}</button></div></div>
+    <div class="rc-cols">
+      <div><h4>${R.contact}</h4><div class="rc-kv">
+        ${kv("E-mail", `<a href="mailto:${esc(c.email)}">${esc(c.email)}</a>`)}${kv(R.phone, esc(c.phone || "—"))}${kv(R.profile, rcHref(c.profile_url))}${kv(R.portfolio, rcHref(c.portfolio_url))}${kv(R.source, esc(c.source || "—"))}
+        ${kv(R.created, rcDate(c.created_at))}${kv(R.testSentAt, rcDate(c.test_sent_at))}${kv(R.testReceivedAt, rcDate(c.test_received_at))}${kv(R.invitedAt, rcDate(c.invited_at))}</div></div>
+      <div><h4>${R.interview}</h4>${bk ? `<div class="rc-kv">${kv(R.date, fmtIn(bk.starts_at, tz))}${kv(R.juror, `<select class="in st-sel" data-rc-juror="${bk.id}"><option value="">${R.unassigned}</option>${rcOptions(RC_JURORS, bk.juror, (k) => k)}</select>`)}${kv(R.statusL, `<select class="in st-sel ${esc(bk.status)}" data-rc-bk="${bk.id}">${rcOptions(RC_BK, bk.status, (k) => R.bk[k])}</select>`)}${bk.changes_count ? kv("", esc(R.changes(bk.changes_count))) : ""}</div>` : `<p class="hint" style="margin:0 0 10px">${R.noInterview}</p>`}
+        <div class="rc-acts" style="margin-top:10px"><button type="button" class="btn" id="rcCopy" ${live || can ? "" : "disabled"} ${live || can ? "" : `title="${esc(R.inviteOff)}"`}>${R.copyInvite}</button><button type="button" class="btn ghost" id="rcRegen">${R.regen}</button><span id="rcMsg" role="status" style="font-size:12px;color:var(--ok)"></span></div>
+        ${live ? `<input class="in" id="rcLink" readonly aria-label="${R.linkLabel}" style="margin-top:8px;font-size:12px" value="${esc(rcInviteUrl(c))}"/>` : ""}</div>
+    </div>
+    <div class="rc-cols">
+      <div><h4>${R.breakdownApp} · ${scr(c.application_score)} · ${esc(R.grid(c.application_grid_version))}</h4>${rcTable(c.application_breakdown, grid && grid.weights)}</div>
+      <div><h4>${R.breakdownTest} · ${scr(c.test_score)}</h4>${rcTable(c.test_breakdown, null)}</div>
+    </div>
+    <div class="rc-cols">
+      <div><h4>${R.screening}</h4>${screening ? `<div class="rc-kv">${screening}</div>` : `<p class="hint" style="margin:0">${R.noScreening}</p>`}</div>
+      <div><h4>${R.juryNotes}</h4><textarea class="in" id="rcNotes" rows="4">${esc(c.jury_notes || "")}</textarea>
+        <div class="rc-acts" style="margin-top:8px"><button type="button" class="btn" id="rcNotesSave">${R.saveNotes}</button><span id="rcNotesMsg" style="font-size:12px;color:var(--ok)"></span></div>
+        ${c.agent_notes ? `<h4 style="margin-top:14px">${R.agentNotes}</h4><div class="ro">${esc(c.agent_notes)}</div>` : ""}</div>
+    </div></div>`;
+}
+function renderRecruit() {
+  const R = t("rc"), tz = rcTz(), D = t("rdv").days;
+  if (!recruitOk || !interviewSettings) { $("#admin").innerHTML = `<div class="panel rcp"><p style="color:var(--err);margin:0">${R.missing}</p></div>`; return; }
+  const open = candidatesAll.find((c) => c.id === rcOpenId) || null; if (!open) rcOpenId = null;
+  const list = candidatesAll.filter((c) => (!rcF.role || c.job_role === rcF.role) && (!rcF.status || c.status === rcF.status))
+    .sort((x, y) => (y.application_score ?? -1) - (x.application_score ?? -1) || new Date(y.created_at) - new Date(x.created_at));
+  const chips = [["", R.allRoles], ...Object.entries(R.roles)].map(([k, l]) => `<button type="button" class="chip ${rcF.role === k ? "on" : ""}" data-rc-role="${k}">${esc(l)}</button>`).join("");
+  const score = (v) => v == null ? `<span class="rc-score none">${R.noScore}</span>` : `<span class="rc-score">${v}<small>/100</small></span>`;
+  const row = (c) => { const bk = rcBooking(c); return `<tr data-rc-row="${c.id}" class="${c.id === rcOpenId ? "on" : ""}" title="${esc(R.openHint)}"><td>${score(c.application_score)}</td><td>${score(c.test_score)}</td>
+    <td><b>${esc(c.name)}</b><span class="rc-sub">${esc(c.email)}</span></td><td>${esc(R.roles[c.job_role] || c.job_role)}</td><td>${esc(c.city || "—")}</td>
+    <td><select class="in st-sel ${esc(c.status)}" data-rc-status="${c.id}">${rcOptions(RC_STATUS, c.status, (k) => R.status[k])}</select></td><td class="rdv-when">${bk ? fmtIn(bk.starts_at, tz) : "—"}</td></tr>`; };
+  const now = Date.now(), up = interviewsAll.filter((b) => b.status === "confirmed" && new Date(b.starts_at).getTime() >= now).sort((x, y) => new Date(x.starts_at) - new Date(y.starts_at)), past = interviewsAll.filter((b) => !up.includes(b));
+  const ivRow = (b, old) => { const c = candidatesAll.find((x) => x.id === b.candidate_id) || {};
+    return `<tr class="${old ? "rdv-past" : ""}"><td class="rdv-when">${fmtIn(b.starts_at, tz)}${localTz && localTz !== tz ? `<small>${fmtIn(b.starts_at, localTz)} · ${t("rdv").local}</small>` : ""}</td>
+    <td><a href="#" data-rc-open="${esc(c.id || "")}"><b>${esc(c.name || "—")}</b></a></td><td>${esc(R.roles[c.job_role] || c.job_role || "—")}</td>
+    <td><select class="in st-sel" data-rc-juror="${b.id}"><option value="">${R.unassigned}</option>${rcOptions(RC_JURORS, b.juror, (k) => k)}</select></td>
+    <td><select class="in st-sel ${esc(b.status)}" data-rc-bk="${b.id}">${rcOptions(RC_BK, b.status, (k) => R.bk[k])}</select></td>
+    <td style="font-size:12px">${c.email ? `<a href="mailto:${esc(c.email)}">${esc(c.email)}</a>` : "—"}<br/>${esc(c.phone || "")}</td></tr>`; };
+  const ivTable = (l, old) => `<div class="rc-scroll"><table class="adm"><thead><tr>${R.ivCols.map((x) => `<th>${x}</th>`).join("")}</tr></thead><tbody>${l.map((b) => ivRow(b, old)).join("") || `<tr><td colspan="6" style="color:var(--taupe)">${R.ivNone}</td></tr>`}</tbody></table></div>`;
+  const s = interviewSettings, wk = (s.weekly || {});
+  const blockedTxt = (Array.isArray(s.blocked) ? s.blocked : []).map((b) => typeof b === "string" ? b : (b && b.from && b.to ? `${b.from}/${b.to}` : "")).filter(Boolean).join("\n");
+  const grids = Object.keys(R.roles).map((role) => { const gs = scoringGrids.filter((g) => g.job_role === role).sort((x, y) => y.version - x.version);
+    return `<h4 class="mono" style="margin:12px 0 6px">${esc(R.roles[role])}</h4>` + (gs.length ? `<div class="rc-scroll"><table class="adm"><thead><tr><th>${R.version}</th><th>${R.date}</th><th>${R.reason}</th><th>${R.weights}</th></tr></thead><tbody>${gs.map((g) =>
+      `<tr><td>v${g.version}</td><td class="rdv-when">${rcDate(g.created_at)}</td><td>${esc(g.reason)}</td><td><div class="rc-grid">${Object.entries(g.weights || {}).map(([k, v]) => `<span>${esc(rcPretty(k))} ${esc(v)}</span>`).join("")}</div></td></tr>`).join("")}</tbody></table></div>` : `<p class="hint" style="margin:0">${R.noGrid}</p>`); }).join("");
+  $("#admin").innerHTML = `${open ? rcFiche(open) : ""}
+    <div class="panel rcp"><h3>${R.listTitle} (${list.length})</h3><p class="hint">${R.hint}</p>
+      <div class="rc-bar">${chips}<select class="in" id="rcStatusF" aria-label="${R.statusL}"><option value="">${R.allStatus}</option>${rcOptions(RC_STATUS, rcF.status, (k) => R.status[k])}</select></div>
+      <div class="rc-scroll"><table class="adm"><thead><tr>${R.cols.map((x) => `<th>${x}</th>`).join("")}</tr></thead><tbody>${list.map(row).join("") || `<tr><td colspan="7" style="color:var(--taupe)">${R.none}</td></tr>`}</tbody></table></div></div>
+    <div class="panel rcp"><h3>${R.ivTitle} (${up.length})</h3>${ivTable(up, false)}</div>
+    <div class="panel rcp"><h3>${R.avTitle}</h3><p class="hint">${R.avHint}</p>
+      <div>${DAYS.map((day) => `<div class="rc-wk"><b>${D[day]}</b><input class="in" data-rcwk="${day}" placeholder="13:00, 14:00, 15:00" value="${esc((wk[day] || []).join(", "))}"/></div>`).join("")}</div>
+      <div class="grid" style="margin-top:16px">
+        <label>${R.slot}<input class="in" type="number" min="15" max="180" step="5" id="rcSlot" value="${s.slot_minutes ?? 45}"/></label>
+        <label>${R.lead}<input class="in" type="number" min="0" max="240" id="rcLead" value="${s.lead_hours ?? 24}"/></label>
+        <label>${R.horizon}<input class="in" type="number" min="1" max="120" id="rcHorizon" value="${s.horizon_days ?? 21}"/></label>
+        <label>${R.maxChanges}<input class="in" type="number" min="0" max="10" id="rcMaxCh" value="${s.max_changes ?? 3}"/></label>
+        <label>${R.tz}<input class="in" id="rcTz" value="${esc(tz)}"/></label>
+        <label style="grid-column:1/-1">${R.blocked} <span style="opacity:.7">— ${R.blockedHint}</span><textarea class="in" rows="3" id="rcBlocked">${esc(blockedTxt)}</textarea></label>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;margin-top:14px"><button type="button" class="btn" id="rcAvSave">${R.save}</button><span id="rcAvMsg" style="font-size:12px;color:var(--ok)"></span></div></div>
+    <div class="panel rcp"><h3>${R.ivPast} (${past.length})</h3>${ivTable(past, true)}</div>
+    <div class="panel rcp"><h3>${R.gridsTitle}</h3><p class="hint">${R.gridsHint}</p>${grids}</div>`;
+  wireRecruit();
+}
+function wireRecruit() {
+  const A = $("#admin"), R = t("rc"), cand = () => candidatesAll.find((c) => c.id === rcOpenId);
+  const openFiche = (id) => { rcOpenId = id; renderRecruit(); const f = $("#rcFiche"); if (f) f.scrollIntoView({ behavior: "smooth", block: "start" }); };
+  A.querySelectorAll("[data-rc-role]").forEach((b) => b.addEventListener("click", () => { rcF.role = b.dataset.rcRole; renderRecruit(); }));
+  const sf = $("#rcStatusF"); if (sf) sf.addEventListener("change", () => { rcF.status = sf.value; renderRecruit(); });
+  A.querySelectorAll("tr[data-rc-row]").forEach((tr) => tr.addEventListener("click", (e) => { if (e.target.closest("select,a,button,input")) return; openFiche(tr.dataset.rcRow); }));
+  A.querySelectorAll("[data-rc-open]").forEach((a) => a.addEventListener("click", (e) => { e.preventDefault(); if (a.dataset.rcOpen) openFiche(a.dataset.rcOpen); }));
+  A.querySelectorAll("[data-rc-status]").forEach((sel) => sel.addEventListener("change", async () => {
+    const c = candidatesAll.find((x) => x.id === sel.dataset.rcStatus); if (!c) return;
+    if ((sel.value === "rejected" && !confirm(R.rejectConfirm)) || (sel.value === "hired" && !confirm(R.hireConfirm))) { sel.value = c.status; return; }
+    const { error } = await sb.from("candidates").update({ status: sel.value }).eq("id", c.id);
+    if (error) { alert(error.message); sel.value = c.status; return; } await loadAdmin(); renderRecruit();
+  }));
+  A.querySelectorAll("[data-rc-juror]").forEach((sel) => sel.addEventListener("change", async () => {
+    const { error } = await sb.from("interview_bookings").update({ juror: sel.value || null }).eq("id", sel.dataset.rcJuror);
+    if (error) { alert(error.message); return; } await loadAdmin(); renderRecruit();
+  }));
+  A.querySelectorAll("[data-rc-bk]").forEach((sel) => sel.addEventListener("change", async () => {
+    const { error } = await sb.from("interview_bookings").update({ status: sel.value }).eq("id", sel.dataset.rcBk);
+    if (error) { alert(error.message); return; } await loadAdmin(); renderRecruit();   // le statut du candidat suit (déclencheur SQL)
+  }));
+  const close = $("#rcClose"); if (close) close.addEventListener("click", () => { rcOpenId = null; renderRecruit(); });
+  const ln = $("#rcLink"); if (ln) ln.addEventListener("focus", () => ln.select());
+  const nb = $("#rcNotesSave"); if (nb) nb.addEventListener("click", async () => {
+    const c = cand(); if (!c) return; const { error } = await sb.from("candidates").update({ jury_notes: $("#rcNotes").value.trim() || null }).eq("id", c.id);
+    if (error) { $("#rcNotesMsg").style.color = "var(--err)"; $("#rcNotesMsg").textContent = error.message; return; }
+    await loadAdmin(); renderRecruit(); const m = $("#rcNotesMsg"); if (m) { m.textContent = "✓ " + R.saved; setTimeout(() => { const x = $("#rcNotesMsg"); if (x) x.textContent = ""; }, 2000); }
+  });
+  const cp = $("#rcCopy"); if (cp) cp.addEventListener("click", async () => {
+    const c = cand(); if (!c) return;
+    if (rcCanInvite(c)) {
+      if (!confirm(R.inviteConfirm)) return;
+      const { error } = await sb.from("candidates").update({ status: "invited" }).eq("id", c.id);
+      if (error) { alert(error.message); return; }
+    }
+    const ok = await copyText(rcInviteUrl(c)); await loadAdmin(); renderRecruit();
+    const m = $("#rcMsg"); if (m) { m.style.color = ok ? "var(--ok)" : "var(--err)"; m.textContent = ok ? "✓ " + R.copied : R.copyFail; }
+  });
+  const rg = $("#rcRegen"); if (rg) rg.addEventListener("click", async () => {
+    const c = cand(); if (!c || !confirm(R.regenConfirm)) return;
+    const { error } = await sb.from("candidates").update({ invite_token: crypto.randomUUID().replace(/-/g, "") }).eq("id", c.id);
+    if (error) { alert(error.message); return; } await loadAdmin(); renderRecruit();
+  });
+  const sv = $("#rcAvSave"); if (sv) sv.addEventListener("click", saveRecruitAv);
+}
+async function saveRecruitAv() {
+  const R = t("rc"), D = t("rdv").days, msg = $("#rcAvMsg"); msg.style.color = "var(--ok)"; msg.textContent = "";
+  const weekly = {};
+  for (const day of DAYS) {
+    const times = [];
+    for (const x of $(`[data-rcwk="${day}"]`).value.split(/[,;\s]+/).map((v) => v.trim()).filter(Boolean)) {
+      const m = /^(\d{1,2}):(\d{2})$/.exec(x);
+      if (!m || +m[1] > 23 || +m[2] > 59) { msg.style.color = "var(--err)"; msg.textContent = `${R.badTime} (${D[day]} : ${x})`; return; }
+      times.push(String(+m[1]).padStart(2, "0") + ":" + m[2]);
+    }
+    weekly[day] = [...new Set(times)].sort();
+  }
+  // Vraies dates seulement (2026-02-30 ou 2026-10-14T25:00 sont refusées ici ; le SQL ignore de toute façon une ligne fautive).
+  const realDate = (s) => { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s); if (!m) return false; const d = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3])); return d.getUTCFullYear() === +m[1] && d.getUTCMonth() === +m[2] - 1 && d.getUTCDate() === +m[3]; };
+  const realDT = (s) => { const m = /^(\d{4}-\d{2}-\d{2})T(\d{2}):(\d{2})$/.exec(s); return !!m && realDate(m[1]) && +m[2] <= 23 && +m[3] <= 59; };
+  const blocked = [];
+  for (const l of $("#rcBlocked").value.split("\n").map((x) => x.trim()).filter(Boolean)) {
+    const bad = () => { msg.style.color = "var(--err)"; msg.textContent = `${R.badBlock} : ${l}`; return null; };
+    let m;
+    if (realDate(l)) blocked.push(l);
+    else if ((m = /^(\d{4}-\d{2}-\d{2})\/(\d{4}-\d{2}-\d{2})$/.exec(l)) && realDate(m[1]) && realDate(m[2]) && m[1] <= m[2]) blocked.push(l);
+    else if ((m = /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2})\/(\d{4}-\d{2}-\d{2}T\d{2}:\d{2})$/.exec(l)) && realDT(m[1]) && realDT(m[2]) && m[1] < m[2]) blocked.push({ from: m[1], to: m[2] });
+    else return bad();
+  }
+  const num = (id, d, lo, hi) => { const v = $(id).value; return v === "" || isNaN(Number(v)) ? d : Math.max(lo, Math.min(hi, Number(v))); };
+  const patch = { weekly, blocked, slot_minutes: num("#rcSlot", 45, 15, 180), lead_hours: num("#rcLead", 24, 0, 240), horizon_days: num("#rcHorizon", 21, 1, 120), max_changes: num("#rcMaxCh", 3, 0, 10), timezone: $("#rcTz").value.trim() || "Asia/Makassar" };
+  try { new Intl.DateTimeFormat("en-US", { timeZone: patch.timezone }); } catch { msg.style.color = "var(--err)"; msg.textContent = `${R.tz} : ${patch.timezone} ?`; return; }
+  const { error } = await sb.from("interview_settings").update(patch).eq("id", 1);
+  if (error) { msg.style.color = "var(--err)"; msg.textContent = error.message; return; }
+  await loadAdmin(); renderRecruit(); const m = $("#rcAvMsg"); if (m) { m.textContent = "✓ " + R.saved; setTimeout(() => { const x = $("#rcAvMsg"); if (x) x.textContent = ""; }, 2000); }
 }
 
 /* ===== données ===== */

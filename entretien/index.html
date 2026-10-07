@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta name="robots" content="noindex,nofollow"/>
+  <meta name="theme-color" content="#050607"/>
+  <title>DS Editing — Book your interview</title>
+  <link rel="icon" type="image/png" href="../assets/logo.png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--bg:#050607;--surface:#0F1114;--surface-2:#161A1F;--line:rgba(255,255,255,.09);--line-strong:rgba(255,255,255,.22);--cream:#F5F5F1;--taupe:#9AA3AD;--amber:#DCE3EA;--amber-soft:rgba(220,227,234,.12);--ok:#46D369;--err:#F08A82;--warn:#F5C400;--accent2:#B9C9DA;--chrome:linear-gradient(180deg,#FFFFFF 0%,#E3E7EC 38%,#9BA4AE 72%,#D6DBE0 100%);--chrome2:linear-gradient(95deg,#B9C9DA 0%,#7FA3CF 45%,#E6ECF2 100%);--glass:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));color-scheme:dark}
+    *{box-sizing:border-box}
+    [hidden]{display:none!important}
+    html,body{margin:0;background:var(--bg);color:var(--cream);font-family:'Geist',system-ui,sans-serif;font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+    body{min-height:100vh;display:flex;flex-direction:column;background:radial-gradient(1200px 700px at 85% -5%,rgba(125,155,195,.16),transparent 60%),radial-gradient(900px 600px at -10% 40%,rgba(160,170,185,.08),transparent 60%),#050607;background-attachment:fixed}
+    a{color:inherit}
+    button{font:inherit}
+    .mono{font-family:'Geist',system-ui,sans-serif;font-weight:600;font-size:11px;letter-spacing:.06em;text-transform:uppercase;font-variant-numeric:tabular-nums;color:var(--taupe)}
+    .display{font-family:'Geist',system-ui,sans-serif;font-weight:600;letter-spacing:-.035em;text-transform:none;line-height:1.02;padding-bottom:.08em;background:var(--chrome);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .display em,.display .ac{font-style:normal;background:var(--chrome2);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .lv-rec{display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:22px;letter-spacing:-.04em;line-height:1;color:var(--cream);white-space:nowrap}
+    .lv-rec i{width:9px;height:9px;border-radius:50%;background:var(--amber);box-shadow:0 0 12px var(--amber);animation:blink 1.6s infinite;margin-right:2px}
+    .lv-rec em{font-style:normal;font-size:11px;font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:var(--taupe);margin-left:2px}
+    @keyframes blink{50%{opacity:.2}}
+    header{position:sticky;top:0;z-index:10;background:rgba(8,9,11,.62);-webkit-backdrop-filter:blur(22px) saturate(1.4);backdrop-filter:blur(22px) saturate(1.4);border-bottom:1px solid var(--line)}
+    .hd{max-width:760px;margin:0 auto;padding:14px 16px;display:flex;align-items:center;gap:12px}
+    .hd .brand{padding-left:12px;border-left:1px solid var(--line)}
+    main{flex:1;width:100%;max-width:760px;margin:0 auto;padding:36px 16px 80px}
+    h1{font-size:clamp(34px,6vw,54px);margin:14px 0 8px}
+    .lead{margin:0 0 22px;color:var(--taupe);line-height:1.55}
+    .card{background:var(--glass);border:1px solid var(--line);border-radius:22px;padding:24px;margin-top:18px;-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+    .btn{border:1px solid transparent;border-radius:999px;height:50px;padding:0 24px;font-size:15px;font-weight:600;letter-spacing:-.01em;cursor:pointer;background:linear-gradient(180deg,#FFFFFF,#C9D0D7);color:#0A0B0D;box-shadow:inset 0 1px 0 #fff,0 8px 30px rgba(180,200,225,.18);display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;text-decoration:none;transition:background .2s,border-color .2s}
+    .btn:hover{background:linear-gradient(180deg,#fff,#E4E8EC)}
+    .btn.ghost{background:rgba(255,255,255,.06);color:#fff;border-color:rgba(255,255,255,.16);box-shadow:none;-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)}
+    .btn.ghost:hover{border-color:rgba(220,230,240,.35);background:rgba(255,255,255,.08)}
+    .btn:disabled,.btn[disabled]{opacity:.45;cursor:default}
+    .btn:focus-visible,.day:focus-visible,.slot:focus-visible{outline:2px solid rgba(220,227,234,.6);outline-offset:2px}
+    .actions{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:16px}
+    /* infos pratiques */
+    .facts{display:grid;gap:14px;margin:0;padding:0;list-style:none}
+    .facts li{display:grid;grid-template-columns:96px minmax(0,1fr);gap:12px;align-items:start}
+    .facts .k{padding-top:2px}
+    .facts b{font-weight:600}
+    .facts small{display:block;color:var(--taupe);font-size:13px;margin-top:2px}
+    .facts a{color:var(--accent2)}
+    @media (max-width:560px){.facts li{grid-template-columns:1fr;gap:2px}}
+    /* choix du jour / créneau */
+    h2{margin:0 0 12px;font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--taupe)}
+    h2 b{color:var(--cream);letter-spacing:0;text-transform:none;font-size:15px}
+    .days{display:flex;gap:6px;overflow-x:auto;padding:2px 2px 8px;scrollbar-width:thin;scroll-snap-type:x proximity}
+    .day{flex:none;width:62px;padding:9px 0 8px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.03);color:var(--cream);text-align:center;cursor:pointer;transition:border-color .15s,background .15s;scroll-snap-align:start}
+    .day small{display:block;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--taupe)}
+    .day b{display:block;font-size:22px;font-weight:600;letter-spacing:-.03em;line-height:1.1;margin:2px 0;font-variant-numeric:tabular-nums}
+    .day:hover{border-color:rgba(220,230,240,.35)}
+    .day.on{border-color:rgba(220,230,240,.5);background:var(--amber-soft)}
+    .day:disabled{opacity:.32;cursor:default;border-color:var(--line)}
+    .slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;margin-top:8px}
+    .slot{min-height:52px;border-radius:999px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.04);color:var(--cream);font-size:15px;font-weight:600;letter-spacing:-.01em;cursor:pointer;transition:border-color .15s,background .15s;font-variant-numeric:tabular-nums;line-height:1.15;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6px 10px}
+    .slot small{font-size:10px;font-weight:500;color:var(--taupe)}
+    .slot:hover{border-color:rgba(220,230,240,.5);background:var(--amber-soft)}
+    .slot.on{border-color:rgba(220,230,240,.6);background:rgba(255,255,255,.88);color:#0A0B0D}
+    .slot.on small{color:#3b4148}
+    .slot.cur{border-style:dashed}
+    .note{margin-top:14px;font-size:12px;color:var(--taupe)}
+    .note b{color:var(--cream);font-weight:500}
+    .empty{padding:26px 10px;text-align:center;color:var(--taupe);border:1px dashed var(--line);border-radius:14px}
+    .notice{margin:0 0 14px;padding:10px 14px;border-radius:12px;font-size:13px;border:1px solid rgba(245,196,0,.4);background:rgba(245,196,0,.1)}
+    .err{margin:0;padding:12px 16px;border-radius:14px;border:1px solid rgba(240,138,130,.5);background:rgba(240,138,130,.12);color:var(--cream)}
+    .confirm{margin-top:16px;display:flex;align-items:center;gap:12px 16px;flex-wrap:wrap;padding:14px 16px;border-radius:14px;border:1px solid rgba(220,230,240,.35);background:rgba(220,227,234,.08)}
+    .confirm .w{flex:1 1 220px;font-weight:600;letter-spacing:-.01em}
+    .confirm .w small{display:block;font-weight:400;color:var(--taupe);font-size:12px}
+    /* confirmation */
+    .done{text-align:center;padding:6px 0 0}
+    .check{width:64px;height:64px;border-radius:50%;background:rgba(70,211,105,.14);border:1px solid rgba(70,211,105,.45);display:flex;align-items:center;justify-content:center;margin:0 auto 12px}
+    .check svg{width:30px;height:30px;stroke:var(--ok);stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
+    .done h2.display{font-size:clamp(28px,5vw,38px);text-transform:none;letter-spacing:-.035em;margin:0 0 8px;color:transparent;font-weight:600}
+    .when{font-size:19px;font-weight:600;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+    .when small{display:block;font-size:13px;font-weight:400;color:var(--taupe);margin-top:4px}
+    .done .actions{justify-content:center}
+    .spin{width:28px;height:28px;border-radius:50%;border:2px solid rgba(255,255,255,.14);border-top-color:var(--amber);animation:spin .8s linear infinite;margin:40px auto 14px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .center{text-align:center;color:var(--taupe)}
+    footer{padding:18px;text-align:center}
+    @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+  </style>
+</head>
+<body>
+<header><div class="hd"><span class="lv-rec"><i></i>DS<em>Editing</em></span><span class="mono brand">Careers</span></div></header>
+<main>
+  <div class="mono" id="kicker">Interview</div>
+  <h1 class="display" id="title">Book your <em>interview</em></h1>
+  <p class="lead" id="lead"></p>
+  <div id="app" aria-live="polite"><div class="spin"></div><div class="center">Loading available times…</div></div>
+</main>
+<footer class="mono">DS Editing · Bali</footer>
+
+<script type="module">
+/* ============================================================
+   Réservation d'entretien (recrutement) — page publique en anglais, ouverte par le lien personnel ?t=<jeton>.
+   Données : Supabase, RPC anonymes interview_availability / book_interview (supabase/recruitment_v1.sql).
+   Aucune table n'est lue en direct, aucun message n'est envoyé d'ici. Entretien sur place à CoNest (pas de visio).
+   ============================================================ */
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+const SUPABASE_URL = "https://xkanmjlpysxpohsuqvwg.supabase.co";
+const SUPABASE_ANON = "sb_publishable_lIZtV_WtN5NcGSb0dnfaiQ_AgKYBIVa";   // clé publique : les règles sont dans les RPC + RLS
+
+const ADDRESS = "CoNest coworking, Gang Moonkey, Jl. Raya Padonan, Tibubeneng, Kuta Utara, Badung, Bali 80361";
+const MAPS_NAME = "CoNest - Coworking Space & Café";
+const MAPS_URL = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(MAPS_NAME);
+const BRING = {
+  video_editor: "Your CV, your laptop and a portfolio of your work.",
+  accountant_hr: "Your CV and a copy of your degree.",
+};
+const ERR = {
+  bad_token: "This link is not valid. Please check that you copied the whole link from our email, or reply to that email and we will help you.",
+  not_invited: "Booking is not open for this link. If you think this is a mistake, please reply to our email.",
+  offline: "The booking page is not responding right now. Please try again in a few minutes, or write to contact@ds-editing.com.",
+};
+
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const token = (new URLSearchParams(location.search).get("t") || "").trim();
+const visitorTz = (() => { try { return Intl.DateTimeFormat().resolvedOptions().timeZone || ""; } catch { return ""; } })();
+let TZ = "Asia/Makassar";   // fuseau des créneaux (renvoyé par la base)
+
+/* ---------- fuseaux horaires (sans bibliothèque, même méthode que js/ds-booking.js) ---------- */
+const fmtCache = {};
+function partsIn(ms, tz) {
+  const f = fmtCache[tz] || (fmtCache[tz] = new Intl.DateTimeFormat("en-US", { timeZone: tz, hourCycle: "h23", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit", weekday: "short" }));
+  const o = {}; f.formatToParts(new Date(ms)).forEach((p) => { o[p.type] = p.value; });
+  return { y: +o.year, m: +o.month, d: +o.day, hh: (+o.hour) % 24, mm: +o.minute, ss: +o.second, dow: String(o.weekday).slice(0, 3).toLowerCase() };
+}
+const tzOffset = (ms, tz) => { const p = partsIn(ms, tz); return (Date.UTC(p.y, p.m - 1, p.d, p.hh, p.mm, p.ss) - ms) / 60000; };
+function zonedToUtc(y, m, d, hh, mm, tz) { const g = Date.UTC(y, m - 1, d, hh, mm), o1 = tzOffset(g, tz); let r = g - o1 * 60000; const o2 = tzOffset(r, tz); if (o2 !== o1) r = g - o2 * 60000; return r; }
+const pad = (n) => (n < 10 ? "0" : "") + n;
+const dayKey = (p) => p.y + "-" + pad(p.m) + "-" + pad(p.d);
+const hm = (s) => { const a = String(s || "").split(":"); return (+a[0] || 0) * 60 + (+a[1] || 0); };
+const fmtTime = (ms, tz) => new Date(ms).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", timeZone: tz });
+const fmtDay = (ms, tz, o) => new Date(ms).toLocaleDateString("en-GB", { timeZone: tz, ...o });
+const longDay = (ms) => fmtDay(ms, TZ, { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+const differs = (ms) => !!visitorTz && visitorTz !== TZ && tzOffset(ms, visitorTz) !== tzOffset(ms, TZ);
+const localHint = (ms, short) => differs(ms) ? `<small>${esc(fmtTime(ms, visitorTz))} ${short ? "your time" : "in your time zone (" + esc(visitorTz.replace(/_/g, " ")) + ")"}</small>` : "";
+
+/* ---------- Supabase ---------- */
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON, { auth: { persistSession: false, autoRefreshToken: false } });
+async function rpc(name, args) { const { data, error } = await sb.rpc(name, args); if (error) throw error; return data; }
+const codeOf = (e) => { const m = String((e && e.message) || ""); const hit = ["bad_token", "not_invited", "slot_taken", "too_soon", "too_far", "outside_hours", "blocked", "bad_slot", "too_late_to_change", "too_many_changes", "not_configured"].find((c) => m.includes(c)); return hit || "offline"; };
+
+/* ---------- disponibilités → créneaux (heures de début listées par jour, voir interview_settings.weekly) ---------- */
+// Même règle que book_interview (SQL) : un blocage empêche tout créneau qui le CHEVAUCHE (début du créneau < fin du blocage ET fin du créneau > début du blocage).
+// Jour = 00:00 -> 00:00 du lendemain ; plage de jours = jusqu'à la fin du dernier jour. Une date inexistante (2026-02-30, T25:00) est ignorée, comme côté SQL.
+const realDate = (s) => { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s); if (!m) return false; const d = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3])); return d.getUTCFullYear() === +m[1] && d.getUTCMonth() === +m[2] - 1 && d.getUTCDate() === +m[3]; };
+const realDT = (s) => { const m = /^(\d{4}-\d{2}-\d{2})[T ](\d{2}):(\d{2})$/.exec(s); return m && realDate(m[1]) && +m[2] <= 23 && +m[3] <= 59 ? m[1] + "T" + m[2] + ":" + m[3] : null; };
+// first/last = jour local du début et de la dernière minute du créneau ; start/end = "AAAA-MM-JJTHH:MM" local du début et de la fin du créneau
+function isBlocked(list, slot) {
+  for (const b of list) {
+    if (typeof b === "string") {
+      const s = b.trim();
+      if (realDate(s)) { if (s <= slot.last && s >= slot.first) return true; }
+      else if (/^\d{4}-\d{2}-\d{2}\/\d{4}-\d{2}-\d{2}$/.test(s)) { const a = s.slice(0, 10), z = s.slice(11); if (realDate(a) && realDate(z) && slot.first <= z && slot.last >= a) return true; }
+    } else if (b && typeof b.from === "string" && typeof b.to === "string") {
+      const from = realDT(b.from.trim()), to = realDT(b.to.trim());
+      if (from && to && slot.start < to && slot.end > from) return true;
+    }
+  }
+  return false;
+}
+function buildSlots(av) {
+  const slotMs = (+av.slot_minutes || 45) * 60000, now = av.now ? new Date(av.now).getTime() : Date.now();
+  const horizon = +av.horizon_days || 21, minStart = now + (+av.lead_hours || 0) * 3600000, maxStart = now + horizon * 86400000;
+  const taken = (av.taken || []).map((s) => new Date(s).getTime());
+  const blocked = Array.isArray(av.blocked) ? av.blocked : [], weekly = av.weekly || {}, out = [];
+  for (let i = 0; i <= horizon + 1; i++) {
+    const p = partsIn(now + i * 86400000, TZ), day = dayKey(p);
+    for (const start of weekly[p.dow] || []) {
+      const m = hm(start), ms = zonedToUtc(p.y, p.m, p.d, Math.floor(m / 60), m % 60, TZ);
+      if (ms < minStart || ms > maxStart) continue;
+      if (taken.some((t) => ms < t + slotMs && ms + slotMs > t)) continue;
+      const pe = partsIn(ms + slotMs, TZ);
+      if (isBlocked(blocked, { first: day, last: dayKey(partsIn(ms + slotMs - 60000, TZ)), start: day + "T" + pad(Math.floor(m / 60)) + ":" + pad(m % 60), end: dayKey(pe) + "T" + pad(pe.hh) + ":" + pad(pe.mm) })) continue;
+      out.push(ms);
+    }
+  }
+  return [...new Set(out)].sort((a, b) => a - b);
+}
+
+/* ---------- état ---------- */
+const S = { av: null, slots: [], byDay: {}, day: null, pick: null, booked: null, picking: false, notice: null, sending: false };
+const app = $("#app");
+
+function facts() {
+  const av = S.av, n = av.slot_minutes || 45, bring = BRING[av.job_role] || "Your CV.";
+  return `<ul class="facts">
+    <li><span class="k mono">Format</span><span><b>${n}-minute interview, in person</b><small>No video call: we meet at our office.</small></span></li>
+    <li><span class="k mono">Where</span><span><b>${esc(ADDRESS)}</b><small>On Google Maps: “${esc(MAPS_NAME)}” · <a href="${esc(MAPS_URL)}" target="_blank" rel="noopener">open the map</a></small></span></li>
+    <li><span class="k mono">Please bring</span><span><b>${esc(bring)}</b></span></li>
+  </ul>`;
+}
+const tzNote = () => `<div class="note">All times are <b>Bali time</b> (${esc(tzShort())}).</div>`;
+function tzShort() { try { const ps = new Intl.DateTimeFormat("en-GB", { timeZone: TZ, timeZoneName: "short" }).formatToParts(new Date()); const z = ps.find((p) => p.type === "timeZoneName"); return z ? z.value : TZ; } catch { return TZ; } }
+
+function paintHead() {
+  const av = S.av;
+  $("#kicker").textContent = av ? `Interview · ${av.slot_minutes} min · in person` : "Interview";
+  $("#lead").textContent = av ? `Hi${av.first_name ? " " + av.first_name : ""}, choose the time that suits you best. We will meet in person in Bali.` : "";
+}
+
+function render() {
+  paintHead();
+  if (!S.av) return;
+  if (S.booked && !S.picking) return renderDone();
+  renderSlots();
+}
+
+function renderSlots() {
+  const av = S.av; let html = "";
+  if (S.notice) html += `<div class="notice">${esc(S.notice)}</div>`;
+  const cur = av.mine ? new Date(av.mine.starts_at).getTime() : null;
+  html += `<div class="card">${facts()}</div><div class="card">`;
+  if (!S.slots.length) {
+    html += `<div class="empty">No time is available right now. Please reply to our email and we will find a slot with you.</div>`;
+  } else {
+    html += `<h2><b>Pick a day</b> · then a time</h2><div class="days" id="days">`;
+    const now = av.now ? new Date(av.now).getTime() : Date.now(), horizon = +av.horizon_days || 21, todayKey = dayKey(partsIn(now, TZ));
+    for (let i = 0; i <= horizon; i++) {
+      const ms = now + i * 86400000, k = dayKey(partsIn(ms, TZ)), has = !!S.byDay[k];
+      html += `<button type="button" class="day${k === S.day ? " on" : ""}" data-day="${k}"${has ? "" : " disabled"}><small>${esc(k === todayKey ? "today" : fmtDay(ms, TZ, { weekday: "short" }))}</small><b>${esc(fmtDay(ms, TZ, { day: "numeric" }))}</b><small>${esc(fmtDay(ms, TZ, { month: "short" }))}</small></button>`;
+    }
+    html += `</div>`;
+    const list = S.byDay[S.day] || [];
+    html += list.length
+      ? `<div class="slots">${list.map((ms) => `<button type="button" class="slot${S.pick === ms ? " on" : ""}${ms === cur ? " cur" : ""}" data-slot="${ms}">${esc(fmtTime(ms, TZ))}${ms === cur ? "<small>your current slot</small>" : localHint(ms, true)}</button>`).join("")}</div>`
+      : `<div class="empty" style="margin-top:8px">No time available on this day.</div>`;
+    html += tzNote();
+    if (S.pick) {
+      html += `<div class="confirm"><div class="w">${esc(longDay(S.pick))} · ${esc(fmtTime(S.pick, TZ))}<small>Bali time · ${av.slot_minutes} minutes</small></div><button type="button" class="btn" id="go"${S.sending ? " disabled" : ""}>${S.sending ? "Booking…" : av.mine ? "Move my interview here" : "Confirm this time"}</button></div>`;
+    }
+  }
+  if (av.mine) html += `<div class="actions"><button type="button" class="btn ghost" id="keep">Keep my current slot</button></div>`;
+  html += `</div>`;
+  app.innerHTML = html;
+  app.querySelectorAll("[data-day]").forEach((b) => b.addEventListener("click", () => { S.day = b.dataset.day; S.pick = null; S.notice = null; render(); }));
+  app.querySelectorAll("[data-slot]").forEach((b) => b.addEventListener("click", () => { S.pick = +b.dataset.slot; S.notice = null; render(); const g = $("#go"); if (g) g.scrollIntoView({ block: "nearest", behavior: "smooth" }); }));
+  const go = $("#go"); if (go) go.addEventListener("click", book);
+  const keep = $("#keep"); if (keep) keep.addEventListener("click", () => { S.picking = false; S.pick = null; S.notice = null; render(); });
+  const strip = $("#days"), on = strip && strip.querySelector(".on"); if (on) strip.scrollLeft = Math.max(0, on.offsetLeft - strip.offsetLeft - 8);
+}
+
+/* ---------- agenda : Google Agenda + .ics ---------- */
+const icsDate = (ms) => new Date(ms).toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+const icsEsc = (s) => String(s).replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\n/g, "\\n");
+const evTitle = "Interview at DS Editing";
+const evDesc = () => `In-person interview at DS Editing (${S.av.slot_minutes} min). Please bring: ${BRING[S.av.job_role] || "your CV."} Google Maps: "${MAPS_NAME}".`;
+const gcalUrl = (b) => "https://calendar.google.com/calendar/render?action=TEMPLATE&text=" + encodeURIComponent(evTitle) + "&dates=" + icsDate(b.starts) + "/" + icsDate(b.ends) + "&details=" + encodeURIComponent(evDesc()) + "&location=" + encodeURIComponent(ADDRESS);
+// UID stable par candidat (dérivé du jeton, sans le divulguer) : un déplacement met à jour le même rendez-vous dans l'agenda au lieu d'en créer un second.
+// SEQUENCE croissante + DTSTAMP récent : les agendas appliquent la mise à jour.
+async function icsUid() {
+  try { const h = await crypto.subtle.digest("SHA-256", new TextEncoder().encode("ds-editing-interview:" + token)); return "interview-" + [...new Uint8Array(h)].slice(0, 12).map((x) => x.toString(16).padStart(2, "0")).join(""); }
+  catch (e) { let h = 5381; for (const ch of "ds-editing-interview:" + token) h = ((h * 33) ^ ch.charCodeAt(0)) >>> 0; return "interview-" + h.toString(16); }
+}
+async function downloadIcs(b) {
+  const uid = await icsUid();
+  const txt = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//DS Editing//Interview//EN", "CALSCALE:GREGORIAN", "METHOD:PUBLISH", "BEGIN:VEVENT", "UID:" + uid + "@ds-editing.com", "SEQUENCE:" + Math.floor(Date.now() / 1000), "DTSTAMP:" + icsDate(Date.now()),
+    "DTSTART:" + icsDate(b.starts), "DTEND:" + icsDate(b.ends), "SUMMARY:" + icsEsc(evTitle), "DESCRIPTION:" + icsEsc(evDesc()), "LOCATION:" + icsEsc(ADDRESS), "END:VEVENT", "END:VCALENDAR"].join("\r\n");
+  const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([txt], { type: "text/calendar;charset=utf-8" })); a.download = "ds-editing-interview.ics"; document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+}
+
+function renderDone() {
+  const b = S.booked, mine = S.av.mine, canChange = mine && !mine.locked && mine.changes_left > 0;
+  let change = "";
+  if (canChange) change = `<button type="button" class="btn ghost" id="chg">Change my time</button>`;
+  const why = mine && mine.locked ? "Your interview is very soon: to change it, please reply to our email." : mine && mine.changes_left <= 0 ? "You have used all your changes: to move your interview, please reply to our email." : "";
+  app.innerHTML = `<div class="card done"><div class="check"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7"/></svg></div>
+    <h2 class="display">You’re booked!</h2>
+    <div class="when">${esc(longDay(b.starts))} · ${esc(fmtTime(b.starts, TZ))} – ${esc(fmtTime(b.ends, TZ))}<small>Bali time (${esc(tzShort())})</small>${localHint(b.starts)}</div>
+    <div class="actions"><a class="btn" href="${esc(gcalUrl(b))}" target="_blank" rel="noopener">Add to Google Calendar</a><button type="button" class="btn ghost" id="ics">Download .ics</button>${change}</div>
+    ${why ? `<p class="note">${esc(why)}</p>` : ""}</div>
+    <div class="card">${facts()}<p class="note" style="margin-top:14px">If you cannot come, reply to our email as soon as possible and we will find another time.</p></div>`;
+  $("#ics").addEventListener("click", () => downloadIcs(b));
+  const c = $("#chg"); if (c) c.addEventListener("click", () => { S.picking = true; S.pick = null; S.day = (S.slots.length && S.byDay[S.day]) ? S.day : Object.keys(S.byDay).sort()[0] || null; render(); });
+}
+
+/* ---------- actions ---------- */
+function applyAvailability(av) {
+  TZ = av.timezone || TZ; S.av = av; S.slots = buildSlots(av); S.byDay = {};
+  S.slots.forEach((ms) => { const k = dayKey(partsIn(ms, TZ)); (S.byDay[k] = S.byDay[k] || []).push(ms); });
+  if (!S.day || !S.byDay[S.day]) S.day = Object.keys(S.byDay).sort()[0] || null;
+  if (av.mine) { const s = new Date(av.mine.starts_at).getTime(); S.booked = { starts: s, ends: new Date(av.mine.ends_at).getTime() }; } else S.booked = null;
+}
+function showError(code) { app.innerHTML = `<p class="err">${esc(ERR[code] || ERR.offline)}</p>`; }
+async function load() {
+  if (token.length < 16) { showError("bad_token"); return; }
+  try { applyAvailability(await rpc("interview_availability", { p_token: token })); S.picking = false; render(); }
+  catch (e) { const c = codeOf(e); showError(c === "not_configured" ? "offline" : c); }
+}
+async function book() {
+  if (S.sending || !S.pick) return;
+  const picked = S.pick; S.sending = true; render();
+  try {
+    const res = await rpc("book_interview", { p_token: token, p_starts_at: new Date(picked).toISOString(), p_tz: visitorTz || TZ });
+    S.sending = false; S.pick = null; S.picking = false;
+    S.av = null; await load();
+    if (S.av && res && res.starts_at) S.booked = { starts: new Date(res.starts_at).getTime(), ends: new Date(res.ends_at).getTime() };
+    render();
+  } catch (e) {
+    S.sending = false; const c = codeOf(e), msg = {
+      slot_taken: "Someone just booked this time. Please pick another one.",
+      too_soon: "This time is no longer available. Please pick another one.", too_far: "This time is no longer available. Please pick another one.",
+      outside_hours: "This time is no longer available. Please pick another one.", blocked: "This time is no longer available. Please pick another one.", bad_slot: "This time is no longer available. Please pick another one.",
+      too_late_to_change: "Your interview is very soon, so it can no longer be moved here. Please reply to our email.",
+      too_many_changes: "You have used all your changes. Please reply to our email to move your interview.",
+    }[c];
+    if (!msg) { S.pick = null; showError(c); return; }
+    const keep = S.picking; await load(); S.picking = keep && !!(S.av && S.av.mine); S.notice = msg; S.pick = null; render();
+  }
+}
+load();
+</script>
+</body>
+</html>
