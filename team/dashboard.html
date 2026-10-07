@@ -614,9 +614,12 @@ async function adminTry(code) {
   if (n >= ADM.max) { ls.set(ADM.lock, String(Date.now() + ADM.lockMs)); ls.del(ADM.fails); return { res: "locked" }; }
   ls.set(ADM.fails, String(n)); return { res: "bad", left: ADM.max - n };
 }
+/* ?login=1 : connexion nominative (e-mail + mot de passe). On efface TOUT accès sans mot de passe gardé sur l'appareil (lien personnel, vue admin par code) avant de choisir le mode. */
+const FORCE_LOGIN = params.has("login");
+if (FORCE_LOGIN) { ls.del(KEY_STORE); ls.del(ADM.until); }
 if (params.has("k") || params.get("bye")) ls.del(ADM.until);   // lien personnel rouvert, ou « Quitter » : on sort de la vue admin
-const ADMIN_MODE = !params.has("k") && !params.get("bye") && params.get("tv") !== "1" && adminOn();
-const LINK = params.has("k") ? (params.get("k") || "").trim() : (params.get("tv") === "1" || params.get("bye") || ADMIN_MODE ? null : ls.get(KEY_STORE));
+const ADMIN_MODE = !FORCE_LOGIN && !params.has("k") && !params.get("bye") && params.get("tv") !== "1" && adminOn();
+const LINK = FORCE_LOGIN ? null : params.has("k") ? (params.get("k") || "").trim() : (params.get("tv") === "1" || params.get("bye") || ADMIN_MODE ? null : ls.get(KEY_STORE));
 const LINKED = LINK != null && !params.get("bye");
 if (LINKED) $("#logout").dataset.t = "leave";
 const safeUrl = (u) => /^https?:\/\//i.test(String(u || "").trim()) ? esc(String(u).trim()) : "#"; // seuls les liens http(s) deviennent cliquables
@@ -1707,7 +1710,7 @@ $("#loginBtn").addEventListener("click", async () => {
   location.reload();
 });
 $("#password").addEventListener("keydown", (e) => { if (e.key === "Enter") $("#loginBtn").click(); });
-$("#logout").addEventListener("click", async () => { if (LINKED) { ls.del(KEY_STORE); location.replace(location.pathname + "?bye=1"); return; } await sb.auth.signOut(); location.reload(); });
+$("#logout").addEventListener("click", async () => { ls.del(KEY_STORE); ls.del(ADM.until); if (LINKED) { location.replace(location.pathname + "?bye=1"); return; } await sb.auth.signOut(); location.reload(); });
 $("#lkRetry").addEventListener("click", () => location.reload());
 $("#langBtn").addEventListener("click", () => { lang = lang === "fr" ? "en" : "fr"; try { localStorage.setItem("ds_lang", lang); } catch {} applyText(); if (lkKind) linkScreen(lkKind); if (profile) { renderWho(); renderEditorBar(); renderToolbar(); renderStats(); renderBoard(); renderTabs(); alertsHtml = null; renderPc(); renderAlerts(); } });
 $("#tvBtn").addEventListener("click", () => { tv = !tv; document.body.classList.toggle("tv", tv); closePc(); const u = new URL(location.href); tv ? u.searchParams.set("tv", "1") : u.searchParams.delete("tv"); history.replaceState(null, "", u); });
