@@ -217,6 +217,23 @@
     .terms input{margin-top:3px;accent-color:var(--amber);width:16px;height:16px;flex:none}
     .terms a{color:var(--accent-blue);text-decoration:underline;text-underline-offset:2px}
 
+    /* « Autres prestations » : lignes construites depuis la grille du client (table offers × client_prices) */
+    .more{margin-top:22px;padding-top:18px;border-top:1px solid var(--line)}
+    .more h3{margin:0 0 4px;font-size:16px;font-weight:600}
+    .more .sub{margin:0 0 12px;color:var(--taupe);font-size:13px;line-height:1.5}
+    .ohead{display:flex;align-items:center;gap:8px;margin:0 0 8px;font-family:'Geist',system-ui,sans-serif;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--accent-blue)}
+    .ohead.sec{margin-top:14px;color:var(--taupe)}
+    .olist{display:flex;flex-direction:column;gap:8px}
+    .o{display:flex;align-items:center;gap:12px;flex-wrap:wrap;border:1px solid var(--line);border-radius:14px;background:var(--surface);padding:12px 14px;cursor:pointer;transition:border-color .2s,background .2s}
+    .o:hover{border-color:var(--line-strong)}
+    .o.on{border-color:rgba(220,230,240,.5);background:var(--amber-soft)}
+    .o .oname{flex:1;min-width:150px;font-size:15px;font-weight:500}
+    .o .oprice{font-family:'Geist',system-ui,sans-serif;font-weight:600;font-size:11px;letter-spacing:.04em;font-variant-numeric:tabular-nums;color:var(--taupe);border:1px solid var(--line);border-radius:999px;padding:4px 9px;white-space:nowrap;transition:background .2s,color .2s,border-color .2s}
+    .o.on .oprice{color:#0A0B0D;background:rgba(255,255,255,.85);border-color:transparent}
+    .o.pack{border-radius:18px;padding:16px;background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02)),var(--surface);border-color:rgba(220,230,240,.35)}
+    .o.pack .oname{font-size:18px;font-weight:600;letter-spacing:-.01em}
+    .o.pack.on{background:var(--amber-soft)}
+
     @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
   </style>
 </head>
@@ -251,6 +268,12 @@
       <p class="note" data-i="note.episode"></p>
       <label class="f" data-i="f.formats"></label>
       <div class="choices two" id="formats"></div>
+      <!-- Autres prestations : construites depuis la grille du client, aucune offre en dur. Vide = section masquée. -->
+      <div class="more" id="moreWrap" hidden>
+        <h3 data-i="x.more"></h3>
+        <p class="sub" data-i="x.moreSub"></p>
+        <div class="olist" id="moreOffers"></div>
+      </div>
     </section>
 
     <!-- 2. Formule -->
@@ -417,6 +440,7 @@ const I18N = {
     fmt:{single_cam:["Single cam 4K","Podcast ou interview, 1 caméra, full rush : review, dérush, color grading, audio mix"],multicam:["Multicam 4K","Cuts des rushes, changements de caméra, color grading, audio mix, logo, lower third"],facecam:["Face cam",""],bundle:["Bundle",""]},
     fclv:{simple:["Simple","Vidéo face caméra (YouTube) : montage + motion design léger"],dynamique:["Dynamique","Plus de coupes, plus de motion design"],signature:["Signature","Full motion design, niveau le plus élevé"]},
     bdlv:{standard:["Standard","1 épisode + 3 reels inclus"],premium:["Premium","1 épisode + 3 reels inclus"]},
+    "x.more":"Autres prestations","x.moreSub":"Tout ce qui a un prix chez vous et qui n'est pas au-dessus. Mettez une quantité, on l'ajoute à la commande.","x.pack":"Votre pack","x.unit":"À l'unité",
     "s2.title":"Votre formule","s2.hint":"Le niveau de finition de l'épisode uniquement. Les extras se choisissent à part.",
     formule:{standard:["Standard","Montage propre et rythmé, habillage simple, son mixé. Pas d'intro dédiée."],premium:["Premium","Standard + une ouverture percutante de 45 secondes montée depuis vos meilleurs moments, titres animés, sound design."]},
     "s3.title":"Les extras","s3.hint":"Facultatif. Ajoutez ce qui accompagne l'épisode.",
@@ -466,6 +490,7 @@ const I18N = {
     fmt:{single_cam:["Single-cam 4K","Podcast or interview, one camera, full rushes: review, cut, color grading, audio mix"],multicam:["Multicam 4K","Rush cuts, camera switching, color grading, audio mix, logo, lower thirds"],facecam:["Face cam",""],bundle:["Bundle",""]},
     fclv:{simple:["Simple","Talking-head video (YouTube): editing + light motion design"],dynamique:["Dynamic","More cuts, more motion design"],signature:["Signature","Full motion design, top tier"]},
     bdlv:{standard:["Standard","1 episode + 3 reels included"],premium:["Premium","1 episode + 3 reels included"]},
+    "x.more":"Other services","x.moreSub":"Everything priced in your grid that isn't above. Set a quantity and we add it to the order.","x.pack":"Your pack","x.unit":"Per item",
     "s2.title":"Your package","s2.hint":"The finish level of the episode only. Extras are chosen separately.",
     formule:{standard:["Standard","Clean, paced edit, simple graphics, mixed sound. No dedicated intro."],premium:["Premium","Standard + a punchy 45 s cold open cut from your strongest moments, motion titles, sound design."]},
     "s3.title":"Extras","s3.hint":"Optional. Add what goes with the episode.",
@@ -509,6 +534,7 @@ const FACECAMS = ["simple", "dynamique", "signature"];
 const BUNDLES = ["standard", "premium"];
 const bundleReelKey = () => (draft.bundle === "premium" ? "reel_signature" : "reel_basique");
 const minQty = (k) => (draft.bundle && bundleReelKey() === k ? 3 : 0); // 3 reels du niveau sont inclus dans le Bundle
+const maxQty = (k) => (LOCAL_QTY.has(k) ? 99 : MAX_MORE);              // cartes dédiées : 99 comme avant ; « Autres prestations » : 20
 // Clés de prix renvoyées par client_prices (RPC) : null = inconnu (appel échoué ou vide) → tout afficher comme avant
 let avail = null;
 const shown = (k) => !avail || avail.has(k);
@@ -525,6 +551,28 @@ function applyPromos(rows) {
     if (price > 0 && list > price && pct > 0) out[m[1]] = { price, list, pct: Math.round(pct), cur: String(r.currency || "").toUpperCase() }; // sinon : pas de promo affichée
   }
   promos = out; renderFormats();
+  if (!cur) { const withCur = Object.values(out).find((q) => q.cur); if (withCur) cur = withCur.cur; } // secours : devise lue sur une promo de bundle
+  renderMore();
+}
+/* ---------------- catalogue des offres (table `offers`, lecture publique) ----------------
+   Aucune offre n'est écrite en dur ici : toute offre active qui a un prix chez CE client et qui n'a pas
+   sa carte dédiée plus haut apparaît d'elle-même dans « Autres prestations ». Nouvelle offre en base = rien à retoucher. */
+const CARD_KEYS = new Set(["podcast_standard", "podcast_premium", "vsl_standard", "vsl_premium", "single_cam_4k", "multicam_4k", "facecam_simple", "facecam_dynamique", "facecam_signature", "bundle_standard", "bundle_premium", "reel_standard", "reel_premium", "miniature", "trailer", "cta"]);
+const LOCAL_QTY = new Set(["reel_basique", "reel_signature", "miniature", "trailer"]); // compteurs des cartes dédiées (clés propres à cette page)
+let catalog = [];     // offres actives lues en base : [{item_key, label_fr, label_en, family, sort}]
+let prices = {};      // prix de CE client : { item_key: unit_price } (client_prices)
+let cur = "";         // devise du studio : client_slug d'abord, client_bundle_promos en secours ; inconnue = nombre seul, jamais un mauvais symbole
+const MAX_MORE = 20;  // compteur de 0 à 20
+const offerLabel = (k) => { const o = catalog.find((x) => x.item_key === k); return (o && (lang === "fr" ? o.label_fr : o.label_en)) || k; };
+const moreOffers = () => catalog
+  .filter((o) => o && o.item_key && o.family !== "legacy" && !CARD_KEYS.has(o.item_key) && Number.isFinite(prices[o.item_key]))
+  .slice()
+  .sort((a, b) => ((a.family === "pack_client" ? 0 : 1) - (b.family === "pack_client" ? 0 : 1)) || (Number(a.sort ?? 9999) - Number(b.sort ?? 9999)) || String(a.item_key).localeCompare(String(b.item_key)));
+const moreQty = () => { const out = {}; for (const o of moreOffers()) { const n = draft.qty[o.item_key] || 0; if (n > 0) out[o.item_key] = n; } return out; };
+async function loadCatalog() {
+  const r = await fetch(`${SB_URL}/rest/v1/offers?select=item_key,label_fr,label_en,family,sort&active=is.true&order=sort`, { headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY } });
+  if (!r.ok) throw new Error("http_" + r.status);
+  return r.json();
 }
 const promoHtml = (bds) => { const rows = bds.filter((l) => promos[l]).map((l) => { const q = promos[l], cur = q.cur || String((studio && studio.currency) || "").toUpperCase(); return `<div class="row"><span class="lvn">${t("bdlv")[l][0]}</span><span class="tag">${t("promo")}</span><s>${money(q.list, cur)}</s><b>${money(q.price, cur)}</b><span class="pct">−${q.pct}${lang === "fr" ? " %" : "%"}</span></div>`; }); return rows.length ? `<div class="promo">${rows.join("")}</div>` : ""; };
 
@@ -563,7 +611,7 @@ function applyText() {
   document.title = "DS Editing — " + (lang === "fr" ? "Nouveau projet" : "New project");
   $("#pMiniature").textContent = price("miniature"); $("#pTrailer").textContent = price("trailer");
   if (orderToken) $("#trackLink").href = trackHref();
-  renderSteps(); renderProduit(); renderFormats(); renderFormule(); renderReels(); renderThumbs(); renderQty(); renderChips(); renderLinks("rushes"); renderLinks("references"); renderBrandkit(); renderCTA(); renderNav(); wirePreviews();
+  renderSteps(); renderProduit(); renderFormats(); renderMore(); renderFormule(); renderReels(); renderThumbs(); renderQty(); renderChips(); renderLinks("rushes"); renderLinks("references"); renderBrandkit(); renderCTA(); renderNav(); wirePreviews();
 }
 $("#langBtn").addEventListener("click", () => { lang = lang === "fr" ? "en" : "fr"; langTouched = true; applyText(); });
 
@@ -616,11 +664,14 @@ function renderFormats() {
 function applyAvail(rows) {
   if (!Array.isArray(rows)) return;
   avail = new Set(rows.map((r) => r && r.item_key).filter(Boolean));
+  prices = Object.fromEntries(rows.filter((r) => r && r.item_key).map((r) => [r.item_key, num(r.unit_price)]));
   if (!shown("single_cam_4k")) delete draft.single_cam;
   if (!shown("multicam_4k")) delete draft.multicam;
   if (draft.facecam && !shown("facecam_" + draft.facecam)) delete draft.facecam;
   if (draft.bundle && !shown("bundle_" + draft.bundle)) setBundle(null);
-  save(); renderFormats(); renderProduit(); renderFormule(); renderReels(); renderNav();
+  // une prestation qui n'a plus de prix chez ce client sort aussi du brouillon (les compteurs des cartes dédiées restent)
+  for (const k of Object.keys(draft.qty)) if (!LOCAL_QTY.has(k) && !Number.isFinite(prices[k])) delete draft.qty[k];
+  save(); renderFormats(); renderMore(); renderProduit(); renderFormule(); renderReels(); renderNav();
 }
 function renderFormule() {
   const f = t("formule");
@@ -639,6 +690,28 @@ function renderReels() {
   $("#reels").querySelectorAll("[data-choice]").forEach((el) => el.addEventListener("click", (e) => { if (e.target.closest(".qty") || e.target.closest(".preview")) return; const k = el.dataset.choice; if (!(draft.qty[k] > 0)) { draft.qty[k] = 1; save(); renderReels(); renderNav(); wirePreviews(); } }));
   wireQty($("#reels"));
 }
+// « Autres prestations » : une ligne par offre (libellé, prix, compteur 0-20), construite depuis la grille du client.
+// Les packs client (famille pack_client) passent en tête, en plus gros : c'est l'offre principale de ce studio.
+function renderMore() {
+  const wrap = $("#moreWrap"), list = moreOffers();
+  if (!list.length) { wrap.hidden = true; $("#moreOffers").innerHTML = ""; return; }   // rien à proposer : aucune section
+  wrap.hidden = false;
+  const line = (o, pack) => {
+    const k = o.item_key, n = draft.qty[k] || 0;
+    return `<div class="o ${pack ? "pack " : ""}${n > 0 ? "on" : ""}" data-offer="${esc(k)}">
+      <span class="oname">${esc(offerLabel(k))}</span><span class="oprice">${esc(money(prices[k], cur))}</span>
+      <span class="qty"><span class="lab">${t("f.qty")}</span><button type="button" data-dec="${esc(k)}">−</button><input type="number" min="0" max="${MAX_MORE}" value="${n}" data-q="${esc(k)}"/><button type="button" data-inc="${esc(k)}">+</button></span>
+    </div>`;
+  };
+  const packs = list.filter((o) => o.family === "pack_client"), rest = list.filter((o) => o.family !== "pack_client");
+  $("#moreOffers").innerHTML = (packs.length ? `<div class="ohead">${t("x.pack")}</div>${packs.map((o) => line(o, true)).join("")}` : "")
+    + (rest.length ? `${packs.length ? `<div class="ohead sec">${t("x.unit")}</div>` : ""}${rest.map((o) => line(o, false)).join("")}` : "");
+  $("#moreOffers").querySelectorAll("[data-offer]").forEach((el) => el.addEventListener("click", (e) => {
+    if (e.target.closest(".qty")) return; const k = el.dataset.offer;
+    if (!(draft.qty[k] > 0)) { draft.qty[k] = 1; save(); renderMore(); renderNav(); }
+  }));
+  wireQty($("#moreOffers"));
+}
 function renderThumbs() {
   const imgs = PREVIEWS.miniatures.filter(Boolean);
   const tiles = imgs.length ? imgs.map((u) => `<a href="${PREVIEWS.portfolio || u}" target="_blank" rel="noopener"><img src="${u}" alt=""/></a>`).join("") : [0, 1, 2].map(() => `<span>${t("exemple")}</span>`).join("");
@@ -655,7 +728,7 @@ function wireQty(root) {
       let v = +(input.value || 0);
       if (el.dataset.inc !== undefined) v++; if (el.dataset.dec !== undefined) v--;
       if (k === "episodes") { draft.episodes = Math.min(99, Math.max(1, v)); input.value = draft.episodes; }
-      else { draft.qty[k] = Math.min(99, Math.max(minQty(k), v)); input.value = draft.qty[k]; if (REELS.includes(k)) renderReels(); }
+      else { draft.qty[k] = Math.min(maxQty(k), Math.max(minQty(k), v)); input.value = draft.qty[k]; if (REELS.includes(k)) renderReels(); else if (!LOCAL_QTY.has(k)) renderMore(); }
       save(); renderNav(); wirePreviews();
     });
   });
@@ -681,6 +754,7 @@ function commande() {
   if (draft.multicam) out.push(t("fmt").multicam[0]);
   if (draft.facecam) out.push(`${t("fmt").facecam[0]} ${t("fclv")[draft.facecam][0]}`);
   for (const k of [...REELS, "miniature", "trailer"]) { const n = draft.qty[k] || 0; if (n > 0) out.push(`${n} ${n > 1 ? u[k][1] : u[k][0]}`); }
+  for (const [k, n] of Object.entries(moreQty())) out.push(`${n} × ${offerLabel(k)}`); // « Autres prestations »
   if (draft.cta === "yes") out.push(t("cta.unit"));
   return out.join(" · ");
 }
@@ -867,6 +941,8 @@ function workToDo(d) {
     out.push(fmt ? `${label} (${fmt})` : label);
     if ((key === "podcast" || key === "vsl") && d.formule) out.push(`${lang === "fr" ? "formule" : "package"} ${d.formule}`);
   }
+  // « Autres prestations » : libellé de l'offre lu en base (details.items), dans la langue de l'espace
+  for (const [k, n] of Object.entries(d.items || {})) out.push(`${n} × ${offerLabel(k)}`);
   return out.join(" · ");
 }
 function autreDemande(v) { return [v.autre_demande, draft.cta === "yes" ? `${t("cta.unit")}${draft.ctaNets ? " : " + draft.ctaNets : ""}` : ""].filter(Boolean).join(" · "); }
@@ -878,6 +954,8 @@ function order() {
     podcast: draft.produit === "podcast" ? units : "", vsl: draft.produit === "vsl" ? units : "", formule: draft.produit && draft.formule ? cap(draft.formule) : "",
     reels: n(q.reel_basique), reels_signature: n(q.reel_signature), miniature: n(q.miniature), trailer: n(q.trailer),
     single_cam: !!draft.single_cam, multicam: !!draft.multicam, facecam: draft.facecam || null, bundle: draft.bundle || null,
+    items: moreQty(),   // « Autres prestations » : { clé d'offre : quantité } — c'est ce que la base facture
+
     autre_demande: autreDemande(v), palette: v.palette, logos: v.logos,
     cta: draft.cta || "", cta_reseaux: draft.cta === "yes" ? (draft.ctaNets || "") : "", font: draft.font === "team" ? "team" : (draft.fontName || ""), autres: v.autres,
   };
@@ -914,11 +992,16 @@ $("#termsLink").href = `../conditions.html?lang=${lang}`;
 
 applyText();
 
+// Catalogue des offres : lu une fois, sans clé d'accès (lecture publique de `offers`).
+// Échec ou table vide : aucune section « Autres prestations », tout le reste de la page marche comme avant.
+loadCatalog().then((rows) => { if (Array.isArray(rows)) { catalog = rows; renderMore(); } }).catch(() => {});
+
 /* ---------------- accès : sans clé, on prévient tout de suite ; avec clé, on retrouve le nom et la langue du studio ---------------- */
 if (!accessKey) $("#msg").innerHTML = keyMsg("key");
 else rpc("client_slug", { p_key: accessKey }).then((d) => {
   if (!d || !d.slug || (slug && d.slug !== slug)) { $("#msg").innerHTML = keyMsg("bad_key"); return; }
   studio = d;
+  if (d.currency) cur = String(d.currency).toUpperCase(); // devise du studio : source principale (client_slug répond toujours)
   rpc("client_prices", { p_slug: d.slug, p_k: accessKey }).then(applyAvail).catch(() => {}); // échec ou vide : tout reste affiché
   rpc("client_bundle_promos", { p_slug: d.slug, p_k: accessKey }).then(applyPromos).catch(() => {}); // échec ou vide : aucune promo affichée
   if (!params.get("lang") && !langTouched && I18N[d.lang] && d.lang !== lang) { lang = d.lang; applyText(); } else $("#clientName").textContent = clientLabel();

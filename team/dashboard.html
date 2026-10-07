@@ -500,7 +500,7 @@ const T = {
       foot: ["Livrées : une commande à une partie = 1 livraison pour son monteur ; une commande à deux parties = 1 livraison par partie pour son monteur, et l'assemblage final pour le dispatch. La ligne « Sans monteur » reprend les commandes et parties sans attribution. Le total compte chaque commande une seule fois (une commande à deux monteurs compte pour chacun dans leurs lignes).", "En cours / En retard : l'état à l'instant (pas de période). En retard = commande pas encore livrée dont la date est dépassée : date souhaitée par le client d'abord, sinon date fixée par l'équipe, sinon 5 jours ouvrés après réception (comme le tableau de production).", "Délai moyen : de « fichiers prêts » (rushes téléchargés) à la livraison ; assemblage : de « parties livrées » à la livraison finale. Les commandes sans date « fichiers prêts » sont exclues de la moyenne.", "À revoir : passages qualité « à revoir » reçus (relivraisons + en attente), datés du dernier passage ; sur une commande à parties, comptés à l'assemblage."] },
     amountL: "Montant", amountMiss: "Prix manquant dans la grille :", override: "Montant forcé", recalc: "Recalculer", invoiced: "Facturé", sunday: "facturé dimanche",
     keys: { podcast_standard: "Épisode podcast · Standard", podcast_premium: "Épisode podcast · Premium", single_cam_4k: "Single cam 4K edit", multicam_4k: "Multicam 4K edit", bundle_standard: "Bundle Standard", bundle_premium: "Bundle Premium", reel_standard: "Reel standard", reel_premium: "Reel premium", facecam_simple: "Face cam Simple", facecam_dynamique: "Face cam Dynamique", facecam_signature: "Face cam Signature", vsl_standard: "VSL · Standard", vsl_premium: "VSL · Premium", intro: "Intro", miniature: "Miniature", trailer: "Trailer", cta: "CTA réseaux sociaux", extra_30min: "Supplément 30 min" },
-    grp: { episodes: "Épisodes", bundles: "Bundles", reels: "Reels", facecam: "Face cam", vsl: "VSL", extras: "Extras" }, bundleHelp: "Épisode + 3 reels du niveau inclus ; reels en plus au prix normal",
+    grp: { episodes: "Épisodes", bundles: "Bundles", reels: "Reels", facecam: "Face cam", vsl: "VSL", extras: "Extras", episode: "Épisodes", bundle: "Bundles", reel: "Reels", revision: "Révisions", pack_client: "Packs client", extra: "Extras", legacy: "Anciennes clés" }, bundleHelp: "Épisode + 3 reels du niveau inclus ; reels en plus au prix normal",
     tarifsHint: "Prix unitaires par client, dans sa devise. Vide = pas encore fixé : la commande validée attend un prix avant d'être facturée.", clientSel: "Client", saved: "enregistré", recalcAll: "Recalculer les commandes validées", space: "Espace client", billing: "Facturation", billingName: "Raison sociale", billingAddress: "Adresse (une ligne par ligne)", billingEmail: "E-mail de facturation", attention: "À l'attention de", currency: "Devise", tvaL: "TVA",
     factHint: "Une facture par client et par semaine, générée le dimanche à 23 h 50 (Bali). Relance automatique 2 jours après l'envoi.", cols: ["N°", "Client", "Semaine", "Total", "Statut", "Envoyée", ""], markPaid: "Marquer payée", paid: "Payée", issued: "Émise", cancel: "Annuler", extrasTitle: "Lignes manuelles (facturées avec la prochaine facture)", label: "Libellé", qty: "Qté", unit: "Prix unitaire", offered: "Offert", add: "Ajouter", pending: "En attente de facturation", none: "Aucune", del: "Supprimer",
     rdv: { settingsTitle: "Disponibilités", hint: "Créneaux proposés sur le site (boutons « Réserver un appel »), en heure de Paris. Deux plages max par jour ; jour vide = fermé. Le prospect voit les horaires dans son propre fuseau.",
@@ -554,7 +554,7 @@ const T = {
       foot: ["Delivered: a single-part order = 1 delivery for its editor; a two-part order = 1 delivery per part for its editor, and the final assembly for dispatch. The « No editor » row gathers orders and parts with no assignment. The total counts each order once (an order with two editors counts for each in their own rows).", "In progress / Late: the state right now (no period). Late = order not delivered yet whose date has passed: the client's requested date first, otherwise the date set by the team, otherwise 5 business days after receipt (same rule as the production board).", "Average turnaround: from « files ready » (footage downloaded) to delivery; assembly: from « parts delivered » to the final delivery. Orders without a « files ready » date are left out of the average.", "Needs changes: QC « needs changes » rounds received (redeliveries + pending), dated by the latest round; on a multi-part order they are counted at assembly."] },
     amountL: "Amount", amountMiss: "Missing price in the grid:", override: "Forced amount", recalc: "Recalculate", invoiced: "Invoiced", sunday: "invoiced Sunday",
     keys: { podcast_standard: "Podcast episode · Standard", podcast_premium: "Podcast episode · Premium", single_cam_4k: "Single-cam 4K edit", multicam_4k: "Multicam 4K edit", bundle_standard: "Standard Bundle", bundle_premium: "Premium Bundle", reel_standard: "Standard reel", reel_premium: "Premium reel", facecam_simple: "Face cam Simple", facecam_dynamique: "Face cam Dynamic", facecam_signature: "Face cam Signature", vsl_standard: "VSL · Standard", vsl_premium: "VSL · Premium", intro: "Intro", miniature: "Thumbnail", trailer: "Trailer", cta: "Social CTA", extra_30min: "Extra 30 min" },
-    grp: { episodes: "Episodes", bundles: "Bundles", reels: "Reels", facecam: "Face cam", vsl: "VSL", extras: "Extras" }, bundleHelp: "Episode + 3 reels of the tier included; extra reels at the normal price",
+    grp: { episodes: "Episodes", bundles: "Bundles", reels: "Reels", facecam: "Face cam", vsl: "VSL", extras: "Extras", episode: "Episodes", bundle: "Bundles", reel: "Reels", revision: "Revisions", pack_client: "Client packs", extra: "Extras", legacy: "Legacy keys" }, bundleHelp: "Episode + 3 reels of the tier included; extra reels at the normal price",
     tarifsHint: "Unit prices per client, in their currency. Empty = not set yet: the approved order waits for a price before being invoiced.", clientSel: "Client", saved: "saved", recalcAll: "Recalculate approved orders", space: "Client space", billing: "Billing", billingName: "Legal name", billingAddress: "Address (one line per line)", billingEmail: "Billing email", attention: "Attention", currency: "Currency", tvaL: "VAT",
     factHint: "One invoice per client per week, generated Sunday 11:50 pm (Bali). Automatic reminder 2 days after sending.", cols: ["No.", "Client", "Week", "Total", "Status", "Sent", ""], markPaid: "Mark paid", paid: "Paid", issued: "Issued", cancel: "Cancel", extrasTitle: "Manual lines (billed with the next invoice)", label: "Label", qty: "Qty", unit: "Unit price", offered: "Complimentary", add: "Add", pending: "Waiting for invoicing", none: "None", del: "Delete",
     rdv: { settingsTitle: "Availability", hint: "Slots offered on the website (“Book a call” buttons), Paris time. Up to two ranges per day; empty day = closed. Prospects see the times in their own time zone.",
@@ -585,7 +585,7 @@ let lang = params.get("lang") || (() => { try { return localStorage.getItem("ds_
 const t = (k) => T[lang][k];
 let tv = params.get("tv") === "1"; document.body.classList.toggle("tv", tv);
 let me = null, profile = null, myEditor = null, jobs = [], editors = [], filter = params.get("f") || "all", edFilter = params.get("editor") || "", q = "", known = new Set(), sb = null;
-let tab = params.get("tab") || "prod", studios = [], grids = [], invoicesAll = [], extras = [], tarifStudio = "", bookingSettings = null, bookingsAll = [], candidatesAll = [], interviewsAll = [], interviewSettings = null, scoringGrids = [], recruitOk = false;
+let tab = params.get("tab") || "prod", studios = [], grids = [], offerRows = [], invoicesAll = [], extras = [], tarifStudio = "", bookingSettings = null, bookingsAll = [], candidatesAll = [], interviewsAll = [], interviewSettings = null, scoringGrids = [], recruitOk = false;
 const money = (x, cur) => x == null ? "—" : (cur === "USD" ? "$" + Number(x).toLocaleString("en-US", { minimumFractionDigits: 2 }) : Number(x).toLocaleString("fr-FR", { minimumFractionDigits: 2 }) + " €");
 
 /* ===== Accès par lien personnel (lot B) : ?k=<code> =====
@@ -675,8 +675,11 @@ function setFb(id, f, ok, msg, ms) {
   fbMap.set(k, { ok, msg, until: Date.now() + ms }); document.querySelectorAll(`[data-fb="${k}"]`).forEach((el) => paint(el, true));
   setTimeout(() => { const x = fbMap.get(k); if (x && x.until <= Date.now()) { fbMap.delete(k); document.querySelectorAll(`[data-fb="${k}"]`).forEach((el) => paint(el, false)); } }, ms + 30);
 }
+// Libellé d'une offre : la table `offers` d'abord (toute nouvelle offre est nommée sans toucher au HTML),
+// l'objet `keys` en dur en repli si la lecture a échoué, la clé brute en dernier recours.
+const offerLabel = (k) => { const o = offerRows.find((x) => x.item_key === k); const l = o && (lang === "fr" ? o.label_fr : o.label_en); return l || t("keys")[k] || k; };
 // pricing_missing : clés de grille, ou codes de price_job v3 (formule_inconnue:x, facecam_inconnu:x, bundle_inconnu:x, vide)
-const missLabel = (k) => { const m = /^(formule_inconnue|facecam_inconnu|bundle_inconnu):(.*)$/.exec(k); const fr = lang === "fr"; if (m) return ({ formule_inconnue: fr ? "Formule inconnue" : "Unknown tier", facecam_inconnu: fr ? "Face cam inconnue" : "Unknown face cam", bundle_inconnu: fr ? "Bundle inconnu" : "Unknown bundle" })[m[1]] + " (" + m[2] + ")"; if (k === "vide") return fr ? "vide" : "empty"; return t("keys")[k] || k; };
+const missLabel = (k) => { const m = /^(formule_inconnue|facecam_inconnu|bundle_inconnu):(.*)$/.exec(k); const fr = lang === "fr"; if (m) return ({ formule_inconnue: fr ? "Formule inconnue" : "Unknown tier", facecam_inconnu: fr ? "Face cam inconnue" : "Unknown face cam", bundle_inconnu: fr ? "Bundle inconnu" : "Unknown bundle" })[m[1]] + " (" + m[2] + ")"; if (k === "vide") return fr ? "vide" : "empty"; return offerLabel(k); };
 const errText = (e) => { const m = String((e && e.message) || e || ""), E = t("errs"), k = Object.keys(E).find((x) => m.startsWith(x)); return k ? E[k] : m; };
 // « Livré » / « Relivrer » sans lien : on ouvre le détail, on met le curseur dans le champ frame.io et on dit pourquoi
 function needFrame(id, inp) { const row = document.querySelector(`.job[data-id="${id}"]`); if (row) row.classList.add("open"); openIds.add(id); setFb(id, "step", false, t("needFrame"), 7000); if (inp) inp.focus(); }
@@ -1270,7 +1273,19 @@ function renderEquipe() {
     </thead><tbody>${rows}</tbody></table></div>
     <ul class="eqnote">${jobs.length >= 400 ? `<li>${E.cap(jobs.length)}</li>` : ""}${E.foot.map((x) => `<li>${esc(x)}</li>`).join("")}</ul></div>`;
 }
+// Repli en dur : utilisé SEULEMENT si la table `offers` n'a rien renvoyé (lecture échouée, droits, table absente),
+// pour que l'onglet Tarifs ne se vide jamais. En marche normale les groupes viennent de la base (groupsFromOffers).
 const TARIF_GROUPS = [["episodes", ["podcast_standard", "podcast_premium", "single_cam_4k", "multicam_4k"]], ["bundles", ["bundle_standard", "bundle_premium"]], ["reels", ["reel_standard", "reel_premium"]], ["facecam", ["facecam_simple", "facecam_dynamique", "facecam_signature"]], ["vsl", ["vsl_standard", "vsl_premium"]], ["extras", ["intro", "miniature", "trailer", "cta", "extra_30min"]]];
+// Groupes construits tout seuls depuis `offers` : une famille apparaît à la place de sa première offre (ordre de `sort`),
+// et chaque famille garde ses offres dans l'ordre de `sort`. Une offre ajoutée en base apparaît ici sans retoucher le HTML.
+function groupsFromOffers() {
+  const rows = offerRows.filter((o) => o && o.item_key && o.family && o.family !== "legacy")
+    .slice().sort((a, b) => (Number(a.sort ?? 9999) - Number(b.sort ?? 9999)) || String(a.item_key).localeCompare(String(b.item_key)));
+  const out = [], byFam = new Map();
+  for (const o of rows) { let g = byFam.get(o.family); if (!g) { g = [o.family, []]; byFam.set(o.family, g); out.push(g); } g[1].push(o.item_key); }
+  return out.length ? out : TARIF_GROUPS;   // repli : objet en dur
+}
+const famLabel = (f) => t("grp")[f] || f;   // famille inconnue : on affiche son nom brut plutôt que « undefined »
 function renderTarifs() {
   if (!tarifStudio && studios.length) tarifStudio = studios[0].id;
   const s = studios.find((x) => x.id === tarifStudio); if (!s) { $("#admin").innerHTML = agentPanel(); wireAgentPanel(); return; }
@@ -1280,7 +1295,7 @@ function renderTarifs() {
       <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><label style="font-size:12px;color:var(--taupe)">${t("clientSel")}</label><select class="in" id="tarifStudio" style="width:auto">${studios.map((x) => `<option value="${x.id}" ${x.id === s.id ? "selected" : ""}>${esc(x.name)}</option>`).join("")}</select>
         <span class="badge">${s.currency} · ${s.lang}</span><a class="btn ghost" href="${spaceUrl}" target="_blank" rel="noopener">${t("space")} ↗</a><button type="button" class="btn ghost" id="recalcAll">${t("recalcAll")}</button><span id="tarifMsg" style="font-size:12px;color:var(--ok)"></span></div>
       <p style="font-size:12px;color:var(--taupe);margin:10px 0 12px">${t("tarifsHint")}</p>
-      ${TARIF_GROUPS.map(([gk, ks]) => `<h4 style="margin:14px 0 6px;font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--taupe)">${t("grp")[gk]}</h4><div class="grid">${ks.map((k) => `<label>${t("keys")[k]}<input class="in" type="number" step="0.01" min="0" data-key="${k}" value="${g[k] ?? ""}" placeholder="—"/></label>`).join("")}</div>${gk === "bundles" ? `<p style="font-size:12px;color:var(--taupe);margin:6px 0 0">${t("bundleHelp")}</p>` : ""}`).join("")}
+      ${groupsFromOffers().map(([gk, ks]) => `<h4 style="margin:14px 0 6px;font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--taupe)">${esc(famLabel(gk))}</h4><div class="grid">${ks.map((k) => `<label>${esc(offerLabel(k))}<input class="in" type="number" step="0.01" min="0" data-key="${k}" value="${g[k] ?? ""}" placeholder="—"/></label>`).join("")}</div>${gk === "bundles" || gk === "bundle" ? `<p style="font-size:12px;color:var(--taupe);margin:6px 0 0">${t("bundleHelp")}</p>` : ""}`).join("")}
     </div>
     <div class="panel"><h3>${t("billing")}</h3><div class="grid">
       <label>${t("billingName")}<input class="in" data-studio="billing_name" value="${esc(s.billing_name || "")}"/></label>
@@ -1318,11 +1333,14 @@ function renderFactures() {
 }
 async function loadAdmin() {
   if (!isAdmin() || LINKED) return;
-  const [a, b, c, d, e, f, g, h, m, n] = await Promise.all([sb.from("studios").select("*").order("name"), sb.from("price_grids").select("*"), sb.from("invoices").select("*").order("period_end", { ascending: false }).limit(300), sb.from("extra_lines").select("*").order("created_at", { ascending: false }).limit(200),
+  const [a, b, c, d, e, f, g, h, m, n, o] = await Promise.all([sb.from("studios").select("*").order("name"), sb.from("price_grids").select("*"), sb.from("invoices").select("*").order("period_end", { ascending: false }).limit(300), sb.from("extra_lines").select("*").order("created_at", { ascending: false }).limit(200),
     sb.from("booking_settings").select("*").eq("id", 1), sb.from("bookings").select("*").order("starts_at", { ascending: false }).limit(400),
     sb.from("candidates").select("*").order("application_score", { ascending: false, nullsFirst: false }).limit(500), sb.from("interview_bookings").select("*").order("starts_at", { ascending: false }).limit(400),
-    sb.from("interview_settings").select("*").eq("id", 1), sb.from("scoring_grids").select("*").order("created_at", { ascending: false }).limit(60)]);
+    sb.from("interview_settings").select("*").eq("id", 1), sb.from("scoring_grids").select("*").order("created_at", { ascending: false }).limit(60),
+    sb.from("offers").select("item_key,label_fr,label_en,family,sort").eq("active", true).order("sort")]);
   studios = a.data || []; grids = b.data || []; invoicesAll = c.data || []; extras = d.data || [];
+  // Catalogue des offres : vide (lecture échouée ou table absente) → l'onglet Tarifs retombe sur TARIF_GROUPS et t("keys")
+  offerRows = (o && !o.error && Array.isArray(o.data)) ? o.data : [];
   bookingSettings = Array.isArray(e.data) ? (e.data[0] || null) : (e.data || null); bookingsAll = f.data || [];
   recruitOk = !g.error && !h.error && !m.error;   // false tant que supabase/recruitment_v1.sql n'est pas appliqué : l'onglet l'indique, rien d'autre ne bouge
   candidatesAll = g.data || []; interviewsAll = h.data || []; interviewSettings = Array.isArray(m.data) ? (m.data[0] || null) : (m.data || null); scoringGrids = n.data || [];
