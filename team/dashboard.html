@@ -522,7 +522,7 @@ const T = {
       avTitle: "Disponibilités des entretiens", avHint: "Réglages propres au recrutement, séparés du calendrier des rendez-vous sales. Heures de début des créneaux (séparées par une virgule), en heure de Bali. Jour vide = fermé.",
       slot: "Durée d'un entretien (min)", lead: "Délai minimal avant un créneau (h)", horizon: "Réservable jusqu'à (jours)", maxChanges: "Modifications permises par candidat", tz: "Fuseau des heures", blocked: "Jours bloqués par le jury (un par ligne)",
       blockedHint: "2026-10-12 · 2026-12-24/2027-01-02 · 2026-10-14T13:00/2026-10-14T16:00 (heure de Bali)", save: "Enregistrer", badTime: "Heure invalide (format 13:00)", badBlock: "Date bloquée invalide (date inexistante, heure hors 00:00-23:59, ou début après la fin)", gridsTitle: "Grilles de notation (historique)", gridsHint: "Une ligne par version : on ajoute, on n'écrase jamais.",
-      version: "Version", date: "Date", reason: "Motif", weights: "Pondérations", noGrid: "Aucune grille enregistrée.", missing: "Tables introuvables : appliquer supabase/recruitment_v1.sql." } },
+      version: "Version", date: "Date", reason: "Motif", weights: "Pondérations", noGrid: "Aucune grille enregistrée.", missing: "Tables introuvables : appliquer supabase/recruitment_v1.sql.", reserved: "Accès réservé" } },
   en: { admBtn: "Admin", admOff: "Lock", admTitle: "Admin code", admGo: "Enter", admCancel: "Cancel", sub: "Production", live: "Live", tv: "TV mode", logout: "Log out", leave: "Leave", login: "Team space", loginSub: "Sign in with your DS Editing email.", loginBtn: "Enter",
     all: "All", tasks: (n) => `${n} task${n > 1 ? "s" : ""}`, stats: ["Received today", "In progress", "Late", "To review", "Delivered this week"],
     filters: { all: "All", na: "To assign", ready: "Files ready, to start", late: "Late", qc: "To review", asm: "To assemble", done: "Delivered" }, search: "Search…",
@@ -575,7 +575,7 @@ const T = {
       avTitle: "Interview availability", avHint: "Recruitment-only settings, separate from the sales appointment calendar. Slot start times (comma separated), Bali time. Empty day = closed.",
       slot: "Interview length (min)", lead: "Minimum notice before a slot (h)", horizon: "Bookable up to (days)", maxChanges: "Changes allowed per candidate", tz: "Time zone of the times", blocked: "Days blocked by the jury (one per line)",
       blockedHint: "2026-10-12 · 2026-12-24/2027-01-02 · 2026-10-14T13:00/2026-10-14T16:00 (Bali time)", save: "Save", badTime: "Invalid time (format 13:00)", badBlock: "Invalid blocked date (date does not exist, time outside 00:00-23:59, or start after end)", gridsTitle: "Scoring grids (history)", gridsHint: "One row per version: we add, never overwrite.",
-      version: "Version", date: "Date", reason: "Reason", weights: "Weights", noGrid: "No grid recorded.", missing: "Tables not found: apply supabase/recruitment_v1.sql." } },
+      version: "Version", date: "Date", reason: "Reason", weights: "Weights", noGrid: "No grid recorded.", missing: "Tables not found: apply supabase/recruitment_v1.sql.", reserved: "Restricted access" } },
 };
 const $ = (s) => document.querySelector(s);
 const params = new URLSearchParams(location.search);
@@ -641,6 +641,7 @@ const canEditPart = (p) => profile && (isAdmin() || (profile.role === "editor" &
 const remaining = (j) => target(j) - Date.now();
 const isLate = (j) => !isDone(j) && remaining(j) < 0;
 const cls = (j) => isDone(j) ? "done" : remaining(j) < 0 ? "r" : remaining(j) < 2 * 86400000 ? "o" : "g";
+const canRecruit = () => !!profile && profile.can_recruit === true;   // données candidats : drapeau profiles.can_recruit (supabase/recruitment_v2.sql), en plus du rôle
 const isAdmin = () => profile && ["admin", "dispatcher", "qc"].includes(profile.role);
 const isEditor = () => !!profile && profile.role === "editor";
 const isDispatch = () => LINKED && !!profile && profile.role === "dispatcher";
@@ -1194,7 +1195,7 @@ setInterval(() => { document.querySelectorAll("[data-cd]").forEach((el) => { con
 /* ===== onglets admin : Tarifs, Factures ===== */
 function renderTabs() {
   if (!isAdmin() || LINKED) return; $("#tabs").hidden = false;
-  $("#tabs").innerHTML = ["prod", "equipe", "tarifs", "factures", "rdv", "recrut"].map((k) => `<button type="button" class="tab ${tab === k ? "on" : ""}" data-tab="${k}">${t("tabs")[k]}</button>`).join("");
+  $("#tabs").innerHTML = ["prod", "equipe", "tarifs", "factures", "rdv", ...(canRecruit() ? ["recrut"] : [])].map((k) => `<button type="button" class="tab ${tab === k ? "on" : ""}" data-tab="${k}">${t("tabs")[k]}</button>`).join("");
   $("#tabs").querySelectorAll("[data-tab]").forEach((b) => b.addEventListener("click", () => { tab = b.dataset.tab; const u = new URL(location.href); tab === "prod" ? u.searchParams.delete("tab") : u.searchParams.set("tab", tab); history.replaceState(null, "", u); renderTabs(); renderAdmin(); }));
   renderAdmin();
 }
@@ -1441,6 +1442,7 @@ function rcFiche(c) {
 }
 function renderRecruit() {
   const R = t("rc"), tz = rcTz(), D = t("rdv").days;
+  if (!canRecruit()) { $("#admin").innerHTML = `<div class="panel rcp"><p style="color:var(--err);margin:0">${R.reserved}</p></div>`; return; }
   if (!recruitOk || !interviewSettings) { $("#admin").innerHTML = `<div class="panel rcp"><p style="color:var(--err);margin:0">${R.missing}</p></div>`; return; }
   const open = candidatesAll.find((c) => c.id === rcOpenId) || null; if (!open) rcOpenId = null;
   const list = candidatesAll.filter((c) => (!rcF.role || c.job_role === rcF.role) && (!rcF.status || c.status === rcF.status))
@@ -1682,13 +1684,14 @@ async function boot() {
   adminInit();
   sb = createClient(SUPABASE_URL, SUPABASE_ANON);
   let { data: { session } } = await sb.auth.getSession();
-  if (!session && OPEN_ACCESS) ({ data: { session } } = await sb.auth.signInWithPassword(OPEN_ACCESS));
+  if (session && OPEN_ACCESS && params.has("login") && session.user.email === OPEN_ACCESS.email) { await sb.auth.signOut(); session = null; }   // ?login=1 : connexion nominative (Rania, Putu), on quitte la session partagée « Équipe »
+  if (!session && OPEN_ACCESS && !params.has("login")) ({ data: { session } } = await sb.auth.signInWithPassword(OPEN_ACCESS));
   if (!session) { $("#gate").hidden = false; return; }
   me = session.user;
   const { data: p } = await sb.from("profiles").select("*").eq("id", me.id).single();
   profile = p || { role: "editor", display_name: me.email };
   renderWho();
-  $("#logout").hidden = !!OPEN_ACCESS; $("#gate").hidden = true; $("#app").hidden = false; $("#live").hidden = false;
+  $("#logout").hidden = !!OPEN_ACCESS && me.email === OPEN_ACCESS.email; $("#gate").hidden = true; $("#app").hidden = false; $("#live").hidden = false;
   renderToolbar(); await load(true); renderTabs();
   sb.channel("jobs-live").on("postgres_changes", { event: "*", schema: "public", table: "jobs" }, () => load(false)).subscribe();
   // état du PC du bureau : temps réel si la table est publiée, sinon le rafraîchissement de 60 s ci-dessous ; l'âge du dernier signal est réévalué toutes les 15 s
