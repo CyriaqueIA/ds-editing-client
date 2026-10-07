@@ -90,6 +90,11 @@
     .c .price{font-family:'Geist',system-ui,sans-serif;font-weight:600;font-size:11px;letter-spacing:.04em;font-variant-numeric:tabular-nums;color:var(--taupe);border:1px solid var(--line);border-radius:999px;padding:4px 9px;white-space:nowrap;transition:background .2s,color .2s,border-color .2s}
     .c.on .price{color:#0A0B0D;background:rgba(255,255,255,.85);border-color:transparent}
     .c .desc{font-size:13px;color:var(--taupe);line-height:1.45;flex:1}
+    .c.dis{opacity:.4;pointer-events:none}
+    .c .inc{display:block;margin-top:6px;font-weight:600}
+    .lv{display:flex;gap:6px;flex-wrap:wrap}
+    .lv button{font:inherit;font-size:12px;font-weight:600;border:1px solid var(--line);border-radius:999px;padding:5px 11px;background:transparent;color:var(--taupe);cursor:pointer}
+    .lv button.on{color:#0A0B0D;background:rgba(255,255,255,.85);border-color:transparent}
     .c .foot{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:4px}
     .preview{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.16);border-radius:999px;color:#fff;font:inherit;font-size:13px;font-weight:600;letter-spacing:-.01em;cursor:pointer;padding:5px 12px 5px 5px;display:inline-flex;align-items:center;gap:6px;-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);transition:border-color .2s,color .2s}
     .preview:hover{color:#fff;border-color:rgba(220,230,240,.35)}
@@ -237,6 +242,8 @@
       <label class="f" data-i="f.produit"></label>
       <div class="choices two" id="produit"></div>
       <p class="note" data-i="note.episode"></p>
+      <label class="f" data-i="f.formats"></label>
+      <div class="choices two" id="formats"></div>
     </section>
 
     <!-- 2. Formule -->
@@ -244,6 +251,7 @@
       <h2 data-i="s2.title"></h2>
       <p class="hint" data-i="s2.hint"></p>
       <div class="choices two" id="formule"></div>
+      <p class="note" id="formuleNote"></p>
     </section>
 
     <!-- 3. Extras -->
@@ -398,6 +406,10 @@ const I18N = {
     "f.produit":"Ce que vous nous confiez","f.episodes":"Nombre d'épisodes",
     produit:{podcast:["Podcast / Interview","Épisode complet monté, 16:9, prêt à publier."],vsl:["VSL","Vidéo de vente, 16:9, rythme et sous-titres travaillés."]},
     "note.episode":"Un épisode = une vidéo finie jusqu'à 60 minutes. Au-delà, un supplément par tranche de 30 minutes.",
+    "f.formats":"Autres formats","formuleOff":"La formule ne concerne que Podcast / Interview et VSL. Vous pouvez continuer.","bundle.inc":"3 reels {lv} inclus, reels en plus à −20 %","bundle.podcastOff":"Déjà inclus dans le Bundle.","bundle.pick":"Épisode podcast + 3 reels du niveau inclus ; reels en plus à −20 %. Choisissez un niveau.","facecam.pick":"Vidéo face caméra (YouTube). Choisissez un niveau.",
+    fmt:{single_cam:["Single cam 4K","Podcast ou interview, 1 caméra, full rush : review, dérush, color grading, audio mix"],multicam:["Multicam 4K","Cuts des rushes, changements de caméra, color grading, audio mix, logo, lower third"],facecam:["Face cam",""],bundle:["Bundle",""]},
+    fclv:{simple:["Simple","Vidéo face caméra (YouTube) : montage + motion design léger"],dynamique:["Dynamique","Plus de coupes, plus de motion design"],signature:["Signature","Full motion design, niveau le plus élevé"]},
+    bdlv:{standard:["Standard","Épisode podcast Standard + 3 reels Standard inclus ; reels en plus à −20 %"],premium:["Premium","Épisode podcast Premium + 3 reels Premium inclus ; reels en plus à −20 %"]},
     "s2.title":"Votre formule","s2.hint":"Le niveau de finition de l'épisode uniquement. Les extras se choisissent à part.",
     formule:{standard:["Standard","Montage propre et rythmé, habillage simple, son mixé. Pas d'intro dédiée."],premium:["Premium","Standard + une ouverture percutante de 45 secondes montée depuis vos meilleurs moments, titres animés, sound design."]},
     "s3.title":"Les extras","s3.hint":"Facultatif. Ajoutez ce qui accompagne l'épisode.",
@@ -426,7 +438,7 @@ const I18N = {
     "btn.prev":"Retour","btn.next":"Continuer","btn.send":"Envoyer à DS Editing","btn.sending":"Envoi…",
     saved:"Brouillon enregistré sur cet appareil", empty:"Votre commande apparaîtra ici",
     units:{episode:["épisode","épisodes"],reel_basique:["reel standard","reels standard"],reel_signature:["reel premium","reels premium"],miniature:["miniature","miniatures"],trailer:["trailer","trailers"]},
-    err:{projet:"Donnez un nom au projet.",produit:"Choisissez Podcast / Interview ou VSL.",formule:"Choisissez une formule.",rushes:"Ajoutez au moins un lien de rushes.",description:"Décrivez ce que vous attendez, même en trois lignes.",contact:"Indiquez un contact et un moyen de le joindre.",email:"Indiquez un e-mail valide, c'est là qu'arrivent la confirmation et le suivi.",send:"L'envoi a échoué. Réessayez, ou écrivez-nous sur WhatsApp.",terms:"Cochez les conditions de collaboration pour envoyer la commande.",
+    err:{projet:"Donnez un nom au projet.",produit:"Choisissez un produit : Podcast, VSL, Single cam, Multicam, Face cam ou Bundle.",formule:"Choisissez une formule.",rushes:"Ajoutez au moins un lien de rushes.",description:"Décrivez ce que vous attendez, même en trois lignes.",contact:"Indiquez un contact et un moyen de le joindre.",email:"Indiquez un e-mail valide, c'est là qu'arrivent la confirmation et le suivi.",send:"L'envoi a échoué. Réessayez, ou écrivez-nous sur WhatsApp.",terms:"Cochez les conditions de collaboration pour envoyer la commande.",
       key:"Ouvrez cet espace depuis votre lien personnel ou l'Espace client pour envoyer votre commande.",keyLink:"Aller à l'Espace client",bad_key:"Votre accès n'est pas reconnu pour ce studio. Ouvrez cet espace depuis votre lien personnel ou l'Espace client.",bad_email:"L'e-mail n'est pas valide. Corrigez-le à l'étape Brief.",no_project:"Donnez un nom au projet, à l'étape Produit.",no_rushes:"Aucun lien de rushes valide. Collez au moins un lien complet (https://…) à l'étape Fichiers.",rate_limit:"Beaucoup de commandes viennent d'être envoyées depuis cet espace. Réessayez dans une heure, ou écrivez-nous sur WhatsApp."},
     "s6.terms":"J'accepte les conditions de collaboration DS Editing : facture hebdomadaire, paiement à réception, pénalité de 20 % par semaine de retard.","s6.termsLink":"Lire les conditions","ok.space":"Ouvrir mon espace (commandes, factures)",
     "ok.track":"Votre numéro de suivi","ok.trackHint":"Gardez-le : il est aussi dans votre e-mail de confirmation.","ok.follow":"Suivre ma commande",
@@ -443,6 +455,10 @@ const I18N = {
     "f.produit":"What you're sending us","f.episodes":"Number of episodes",
     produit:{podcast:["Podcast / Interview","Full edited episode, 16:9, ready to publish."],vsl:["VSL","Sales video, 16:9, pacing and captions crafted."]},
     "note.episode":"One episode = one finished video up to 60 minutes. Beyond, a supplement per extra 30 minutes.",
+    "f.formats":"Other formats","formuleOff":"The package only applies to Podcast / Interview and VSL. You can continue.","bundle.inc":"3 {lv} reels included, extra reels at −20%","bundle.podcastOff":"Already included in the Bundle.","bundle.pick":"Podcast episode + 3 reels of the tier included; extra reels at −20%. Pick a tier.","facecam.pick":"Talking-head video (YouTube). Pick a tier.",
+    fmt:{single_cam:["Single-cam 4K","Podcast or interview, one camera, full rushes: review, cut, color grading, audio mix"],multicam:["Multicam 4K","Rush cuts, camera switching, color grading, audio mix, logo, lower thirds"],facecam:["Face cam",""],bundle:["Bundle",""]},
+    fclv:{simple:["Simple","Talking-head video (YouTube): editing + light motion design"],dynamique:["Dynamic","More cuts, more motion design"],signature:["Signature","Full motion design, top tier"]},
+    bdlv:{standard:["Standard","Standard podcast episode + 3 Standard reels included; extra reels −20%"],premium:["Premium","Premium podcast episode + 3 Premium reels included; extra reels −20%"]},
     "s2.title":"Your package","s2.hint":"The finish level of the episode only. Extras are chosen separately.",
     formule:{standard:["Standard","Clean, paced edit, simple graphics, mixed sound. No dedicated intro."],premium:["Premium","Standard + a punchy 45 s cold open cut from your strongest moments, motion titles, sound design."]},
     "s3.title":"Extras","s3.hint":"Optional. Add what goes with the episode.",
@@ -471,7 +487,7 @@ const I18N = {
     "btn.prev":"Back","btn.next":"Continue","btn.send":"Send to DS Editing","btn.sending":"Sending…",
     saved:"Draft saved on this device", empty:"Your order will appear here",
     units:{episode:["episode","episodes"],reel_basique:["standard reel","standard reels"],reel_signature:["premium reel","premium reels"],miniature:["thumbnail","thumbnails"],trailer:["trailer","trailers"]},
-    err:{projet:"Give the project a name.",produit:"Choose Podcast / Interview or VSL.",formule:"Choose a package.",rushes:"Add at least one footage link.",description:"Describe what you expect, even in three lines.",contact:"Give us a contact and a way to reach them.",email:"Enter a valid email, that's where the confirmation and tracking go.",send:"Sending failed. Try again, or message us on WhatsApp.",terms:"Tick the terms of collaboration to send the order.",
+    err:{projet:"Give the project a name.",produit:"Choose a product: Podcast, VSL, Single cam, Multicam, Face cam or Bundle.",formule:"Choose a package.",rushes:"Add at least one footage link.",description:"Describe what you expect, even in three lines.",contact:"Give us a contact and a way to reach them.",email:"Enter a valid email, that's where the confirmation and tracking go.",send:"Sending failed. Try again, or message us on WhatsApp.",terms:"Tick the terms of collaboration to send the order.",
       key:"Open this space from your personal link or the Client space to send your order.",keyLink:"Go to the Client space",bad_key:"Your access isn't recognised for this studio. Open this space from your personal link or the Client space.",bad_email:"The email isn't valid. Fix it in the Brief step.",no_project:"Give the project a name, in the Product step.",no_rushes:"No valid footage link. Paste at least one full link (https://…) in the Files step.",rate_limit:"A lot of orders were just sent from this space. Try again in an hour, or message us on WhatsApp."},
     "s6.terms":"I accept the DS Editing terms of collaboration: weekly invoice, payment on receipt, 20% penalty per week late.","s6.termsLink":"Read the terms","ok.space":"Open my space (orders, invoices)",
     "ok.track":"Your tracking number","ok.trackHint":"Keep it: it's also in your confirmation email.","ok.follow":"Track my order",
@@ -482,6 +498,13 @@ const I18N = {
 };
 const FORMULES = ["standard", "premium"];
 const REELS = ["reel_basique", "reel_signature"];
+const FACECAMS = ["simple", "dynamique", "signature"];
+const BUNDLES = ["standard", "premium"];
+const bundleReelKey = () => (draft.bundle === "premium" ? "reel_signature" : "reel_basique");
+const minQty = (k) => (draft.bundle && bundleReelKey() === k ? 3 : 0); // 3 reels du niveau sont inclus dans le Bundle
+// Clés de prix renvoyées par client_prices (RPC) : null = inconnu (appel échoué ou vide) → tout afficher comme avant
+let avail = null;
+const shown = (k) => !avail || avail.has(k);
 
 /* ---------------- client & langue ---------------- */
 const params = new URLSearchParams(location.search);
@@ -503,6 +526,9 @@ let step = 0;
 const draft = Object.assign({ qty: {}, episodes: 1 }, load());
 if (draft.formule && !["standard", "premium"].includes(draft.formule)) delete draft.formule;
 if (draft.produit && !["podcast", "vsl"].includes(draft.produit)) delete draft.produit;
+if (draft.facecam && !FACECAMS.includes(draft.facecam)) delete draft.facecam;
+if (draft.bundle && !BUNDLES.includes(draft.bundle)) delete draft.bundle;
+if (draft.bundle && draft.produit === "podcast") delete draft.produit; // Bundle = épisode podcast inclus
 const price = (k) => PRICES[k] ? PRICES[k] : t("quote");
 const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 
@@ -515,7 +541,7 @@ function applyText() {
   document.title = "DS Editing — " + (lang === "fr" ? "Nouveau projet" : "New project");
   $("#pMiniature").textContent = price("miniature"); $("#pTrailer").textContent = price("trailer");
   if (orderToken) $("#trackLink").href = trackHref();
-  renderSteps(); renderProduit(); renderFormule(); renderReels(); renderThumbs(); renderQty(); renderChips(); renderLinks("rushes"); renderLinks("references"); renderBrandkit(); renderCTA(); renderNav(); wirePreviews();
+  renderSteps(); renderProduit(); renderFormats(); renderFormule(); renderReels(); renderThumbs(); renderQty(); renderChips(); renderLinks("rushes"); renderLinks("references"); renderBrandkit(); renderCTA(); renderNav(); wirePreviews();
 }
 $("#langBtn").addEventListener("click", () => { lang = lang === "fr" ? "en" : "fr"; langTouched = true; applyText(); });
 
@@ -535,12 +561,49 @@ function choiceCard(key, name, desc, priceKey, previewKey, on, extraFoot = "") {
 }
 function renderProduit() {
   const p = t("produit");
-  $("#produit").innerHTML = ["podcast", "vsl"].map((k) => choiceCard(k, p[k][0], p[k][1], k, null, draft.produit === k)).join("");
-  $("#produit").querySelectorAll("[data-choice]").forEach((el) => el.addEventListener("click", () => { draft.produit = el.dataset.choice; save(); renderProduit(); renderNav(); wirePreviews(); }));
+  $("#produit").innerHTML = ["podcast", "vsl"].map((k) => choiceCard(k, p[k][0], k === "podcast" && draft.bundle ? t("bundle.podcastOff") : p[k][1], k, null, draft.produit === k)).join("");
+  const pc = $("#produit").querySelector('[data-choice="podcast"]'); if (pc) pc.classList.toggle("dis", !!draft.bundle); // Bundle = épisode podcast inclus : pas les deux
+  $("#produit").querySelectorAll("[data-choice]").forEach((el) => el.addEventListener("click", () => { if (el.dataset.choice === "podcast" && draft.bundle) return; draft.produit = el.dataset.choice; save(); renderProduit(); renderFormule(); renderNav(); wirePreviews(); }));
+}
+// Single cam / Multicam (cases à cocher), Face cam et Bundle (un niveau à choisir). Une offre sans prix pour ce client est cachée (client_prices).
+function setBundle(lv) {
+  const q = draft.qty; const oldK = bundleReelKey();
+  if (draft.bundle && q[oldK] === 3 && (draft.bundlePrev || 0) < 3) q[oldK] = draft.bundlePrev || 0; // on retire les 3 reels qu'on avait posés
+  if (lv) { draft.bundle = lv; if (draft.produit === "podcast") delete draft.produit; const k = bundleReelKey(); draft.bundlePrev = q[k] || 0; q[k] = Math.max(3, q[k] || 0); }
+  else { delete draft.bundle; delete draft.bundlePrev; }
+}
+function renderFormats() {
+  const f = t("fmt"), fl = t("fclv"), bl = t("bdlv"); const cards = [];
+  const lvBtns = (kind, ls, names, sel) => `<div class="lv">${ls.map((l) => `<button type="button" data-lv="${kind}:${l}" class="${l === sel ? "on" : ""}">${names[l][0]}</button>`).join("")}</div>`;
+  if (shown("single_cam_4k")) cards.push(choiceCard("single_cam", f.single_cam[0], f.single_cam[1], "single_cam", null, !!draft.single_cam));
+  if (shown("multicam_4k")) cards.push(choiceCard("multicam", f.multicam[0], f.multicam[1], "multicam", null, !!draft.multicam));
+  const fcs = FACECAMS.filter((l) => shown("facecam_" + l));
+  if (fcs.length) { const sel = fcs.includes(draft.facecam) ? draft.facecam : null; cards.push(choiceCard("facecam", f.facecam[0], sel ? fl[sel][1] : t("facecam.pick"), "facecam", null, !!sel, lvBtns("facecam", fcs, fl, sel))); }
+  const bds = BUNDLES.filter((l) => shown("bundle_" + l));
+  if (bds.length) { const sel = bds.includes(draft.bundle) ? draft.bundle : null; cards.push(choiceCard("bundle", f.bundle[0], sel ? bl[sel][1] : t("bundle.pick"), "bundle", null, !!sel, lvBtns("bundle", bds, bl, sel))); }
+  $("#formats").innerHTML = cards.join("");
+  $("#formats").querySelectorAll("[data-choice]").forEach((el) => el.addEventListener("click", (e) => {
+    const k = el.dataset.choice; const lvEl = e.target.closest("[data-lv]"); const lv = lvEl ? lvEl.dataset.lv.split(":")[1] : null;
+    if (k === "single_cam" || k === "multicam") draft[k] = !draft[k];
+    else if (k === "facecam") { if (lv) draft.facecam = draft.facecam === lv ? null : lv; else if (!draft.facecam) draft.facecam = fcs[0]; if (!draft.facecam) delete draft.facecam; }
+    else if (k === "bundle") { if (lv) setBundle(draft.bundle === lv ? null : lv); else if (!draft.bundle) setBundle(bds[0]); }
+    save(); renderFormats(); renderProduit(); renderFormule(); renderReels(); renderNav(); wirePreviews();
+  }));
+}
+// Applique la liste de prix du client : on cache ce qui n'a pas de prix et on retire du brouillon ce qui a disparu
+function applyAvail(rows) {
+  if (!Array.isArray(rows)) return;
+  avail = new Set(rows.map((r) => r && r.item_key).filter(Boolean));
+  if (!shown("single_cam_4k")) delete draft.single_cam;
+  if (!shown("multicam_4k")) delete draft.multicam;
+  if (draft.facecam && !shown("facecam_" + draft.facecam)) delete draft.facecam;
+  if (draft.bundle && !shown("bundle_" + draft.bundle)) setBundle(null);
+  save(); renderFormats(); renderProduit(); renderFormule(); renderReels(); renderNav();
 }
 function renderFormule() {
   const f = t("formule");
   $("#formule").innerHTML = FORMULES.map((k) => choiceCard(k, f[k][0], f[k][1], k, k, draft.formule === k)).join("");
+  $("#formuleNote").textContent = draft.produit ? "" : t("formuleOff");
   $("#formule").querySelectorAll("[data-choice]").forEach((el) => el.addEventListener("click", (e) => { if (e.target.closest(".preview")) return; draft.formule = el.dataset.choice; save(); renderFormule(); renderNav(); wirePreviews(); }));
 }
 function renderReels() {
@@ -548,7 +611,8 @@ function renderReels() {
   $("#reels").innerHTML = REELS.map((k) => {
     const n = draft.qty[k] || 0;
     const foot = `<div class="qty"><button type="button" data-dec="${k}">−</button><input type="number" min="0" max="99" value="${n}" data-q="${k}"/><button type="button" data-inc="${k}">+</button></div>`;
-    return choiceCard(k, r[k][0], r[k][1], k, k, n > 0, foot);
+    const inc = minQty(k) ? `<span class="inc">${t("bundle.inc").replace("{lv}", draft.bundle === "premium" ? "premium" : "standard")}</span>` : "";
+    return choiceCard(k, r[k][0], r[k][1] + inc, k, k, n > 0, foot);
   }).join("");
   $("#reels").querySelectorAll("[data-choice]").forEach((el) => el.addEventListener("click", (e) => { if (e.target.closest(".qty") || e.target.closest(".preview")) return; const k = el.dataset.choice; if (!(draft.qty[k] > 0)) { draft.qty[k] = 1; save(); renderReels(); renderNav(); wirePreviews(); } }));
   wireQty($("#reels"));
@@ -569,7 +633,7 @@ function wireQty(root) {
       let v = +(input.value || 0);
       if (el.dataset.inc !== undefined) v++; if (el.dataset.dec !== undefined) v--;
       if (k === "episodes") { draft.episodes = Math.min(99, Math.max(1, v)); input.value = draft.episodes; }
-      else { draft.qty[k] = Math.min(99, Math.max(0, v)); input.value = draft.qty[k]; if (REELS.includes(k)) renderReels(); }
+      else { draft.qty[k] = Math.min(99, Math.max(minQty(k), v)); input.value = draft.qty[k]; if (REELS.includes(k)) renderReels(); }
       save(); renderNav(); wirePreviews();
     });
   });
@@ -590,6 +654,10 @@ function commande() {
   const u = t("units"); const out = [];
   if (draft.produit) out.push(t("produit")[draft.produit][0]);
   if (draft.formule) out.push(`${lang === "fr" ? "formule" : "package"} ${t("formule")[draft.formule][0]}`);
+  if (draft.bundle) out.push(`${t("fmt").bundle[0]} ${t("bdlv")[draft.bundle][0]}`);
+  if (draft.single_cam) out.push(t("fmt").single_cam[0]);
+  if (draft.multicam) out.push(t("fmt").multicam[0]);
+  if (draft.facecam) out.push(`${t("fmt").facecam[0]} ${t("fclv")[draft.facecam][0]}`);
   for (const k of [...REELS, "miniature", "trailer"]) { const n = draft.qty[k] || 0; if (n > 0) out.push(`${n} ${n > 1 ? u[k][1] : u[k][0]}`); }
   if (draft.cta === "yes") out.push(t("cta.unit"));
   return out.join(" · ");
@@ -736,8 +804,8 @@ function load() { try { return JSON.parse(localStorage.getItem(KEY) || "{}"); } 
 /* ---------------- navigation & validation ---------------- */
 function validate(s) {
   const e = t("err"); const v = values(); document.querySelectorAll(".in.bad").forEach((x) => x.classList.remove("bad"));
-  if (s === 0) { if (!v.projet.trim()) { $("#projet").classList.add("bad"); return e.projet; } if (!draft.produit) return e.produit; }
-  if (s === 1) { if (!draft.formule) return e.formule; }
+  if (s === 0) { if (!v.projet.trim()) { $("#projet").classList.add("bad"); return e.projet; } if (!draft.produit && !draft.single_cam && !draft.multicam && !draft.facecam && !draft.bundle) return e.produit; if (draft.bundle && draft.produit === "podcast") return e.produit; }
+  if (s === 1) { if (draft.produit && !draft.formule) return e.formule; }
   if (s === 3) { if (!v.rushes) { $("#rushes input").classList.add("bad"); return e.rushes; } }
   if (s === 5) { if (!$("#terms").checked) { $("#terms").focus(); return e.terms; } }
   if (s === 4) { if (v.description.trim().length < 10) { $("#description").classList.add("bad"); return e.description; } if (!draft.contactName || !draft.contactHow) { $("#contactName").classList.add("bad"); $("#contactHow").classList.add("bad"); return e.contact; } if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(draft.email || "")) { $("#email").classList.add("bad"); return e.email; } }
@@ -761,13 +829,17 @@ async function rpc(fn, args) {
 }
 // Même résumé lisible que le moteur (livrablesSummary de poll.mjs) : « 1 épisode podcast (16:9) · formule Premium · 10 reels standard (9:16) »
 const DELIV = {
-  fr: { podcast: ["épisode podcast", "épisodes podcast", "16:9"], vsl: ["VSL", "VSL", "16:9"], reels: ["reel standard", "reels standard", "9:16"], reels_signature: ["reel premium", "reels premium", "9:16"], intro: ["intro", "intros", ""], miniature: ["miniature", "miniatures", ""], trailer: ["trailer", "trailers", ""] },
-  en: { podcast: ["podcast episode", "podcast episodes", "16:9"], vsl: ["VSL", "VSLs", "16:9"], reels: ["standard reel", "standard reels", "9:16"], reels_signature: ["premium reel", "premium reels", "9:16"], intro: ["intro", "intros", ""], miniature: ["thumbnail", "thumbnails", ""], trailer: ["trailer", "trailers", ""] },
+  fr: { podcast: ["épisode podcast", "épisodes podcast", "16:9"], vsl: ["VSL", "VSL", "16:9"], reels: ["reel standard", "reels standard", "9:16"], reels_signature: ["reel premium", "reels premium", "9:16"], intro: ["intro", "intros", ""], miniature: ["miniature", "miniatures", ""], trailer: ["trailer", "trailers", ""], single_cam: ["single cam 4K", "single cam 4K", "16:9"], multicam: ["multicam 4K", "multicam 4K", "16:9"], facecam: ["face cam", "face cam", "16:9"], bundle: ["bundle", "bundles", ""] },
+  en: { podcast: ["podcast episode", "podcast episodes", "16:9"], vsl: ["VSL", "VSLs", "16:9"], reels: ["standard reel", "standard reels", "9:16"], reels_signature: ["premium reel", "premium reels", "9:16"], intro: ["intro", "intros", ""], miniature: ["thumbnail", "thumbnails", ""], trailer: ["trailer", "trailers", ""], single_cam: ["single-cam 4K", "single-cam 4K", "16:9"], multicam: ["multicam 4K", "multicam 4K", "16:9"], facecam: ["face cam", "face cam", "16:9"], bundle: ["bundle", "bundles", ""] },
 };
 function workToDo(d) {
   const out = [];
   for (const [key, [sing, plur, fmt]] of Object.entries(DELIV[lang])) {
-    const raw = String(d[key] || "").trim(); if (!raw) continue;
+    if (key === "facecam" || key === "bundle") {   // niveau choisi : « face cam Dynamique (16:9) », « bundle Premium (épisode podcast + 3 reels premium inclus) »
+      if (!d[key]) continue; const lvl = (key === "facecam" ? t("fclv") : t("bdlv"))[d[key]][0];
+      out.push(key === "facecam" ? `${sing} ${lvl} (${fmt})` : `${sing} ${lvl} (${lang === "fr" ? "épisode podcast + 3 reels " + d[key] + " inclus" : "podcast episode + 3 " + d[key] + " reels included"})`); continue;
+    }
+    const raw = d[key] === true ? "1" : String(d[key] || "").trim(); if (!raw) continue;
     const n = parseInt(raw, 10);
     const label = Number.isFinite(n) ? `${n} ${n > 1 ? plur : sing}` : `${raw} ${plur}`;
     out.push(fmt ? `${label} (${fmt})` : label);
@@ -781,8 +853,9 @@ function linkList(k) { return (draft[k] || []).flatMap((s) => String(s).split(/\
 function order() {
   const v = values(); const q = draft.qty; const n = (x) => (x > 0 ? String(x) : ""); const units = String(draft.episodes || 1);
   const details = {
-    podcast: draft.produit === "podcast" ? units : "", vsl: draft.produit === "vsl" ? units : "", formule: draft.formule ? cap(draft.formule) : "",
+    podcast: draft.produit === "podcast" ? units : "", vsl: draft.produit === "vsl" ? units : "", formule: draft.produit && draft.formule ? cap(draft.formule) : "",
     reels: n(q.reel_basique), reels_signature: n(q.reel_signature), miniature: n(q.miniature), trailer: n(q.trailer),
+    single_cam: !!draft.single_cam, multicam: !!draft.multicam, facecam: draft.facecam || null, bundle: draft.bundle || null,
     autre_demande: autreDemande(v), palette: v.palette, logos: v.logos,
     cta: draft.cta || "", cta_reseaux: draft.cta === "yes" ? (draft.ctaNets || "") : "", font: draft.font === "team" ? "team" : (draft.fontName || ""), autres: v.autres,
   };
@@ -824,6 +897,7 @@ if (!accessKey) $("#msg").innerHTML = keyMsg("key");
 else rpc("client_slug", { p_key: accessKey }).then((d) => {
   if (!d || !d.slug || (slug && d.slug !== slug)) { $("#msg").innerHTML = keyMsg("bad_key"); return; }
   studio = d;
+  rpc("client_prices", { p_slug: d.slug, p_k: accessKey }).then(applyAvail).catch(() => {}); // échec ou vide : tout reste affiché
   if (!params.get("lang") && !langTouched && I18N[d.lang] && d.lang !== lang) { lang = d.lang; applyText(); } else $("#clientName").textContent = clientLabel();
 }).catch(() => {}); // base injoignable : l'envoi tranchera
 </script>
