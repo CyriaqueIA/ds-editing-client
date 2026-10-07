@@ -234,6 +234,16 @@
     .warn:empty{display:none}
     .warn a{color:var(--accent-blue);text-decoration:underline;text-underline-offset:2px}
 
+    /* page périmée : GitHub Pages sert le HTML avec « Cache-Control: max-age=600 » et ne laisse pas régler
+       ses en-têtes. Un onglet laissé ouvert garde l'ANCIEN formulaire et enverrait un payload au vieux
+       format. Tant que ce bandeau est là, le bouton d'envoi est mort (verrou JS : renderStale). */
+    .stale{flex-basis:100%;order:-3;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:10px 14px;padding:11px 14px;border:1px solid rgba(220,230,240,.5);border-radius:14px;background:var(--amber-soft);font-size:13px;line-height:1.45;color:var(--cream);text-align:center}
+    .stale[hidden]{display:none}
+    .stale>span{flex:1 1 210px;min-width:0}
+    .stale .btn{flex:none;padding:10px 18px;font-size:14px}
+    /* bouton d'envoi désactivé par le bandeau : il ne reste pas un bouton blanc à peine pâli, il est éteint */
+    .btn.primary.off{background:rgba(255,255,255,.07);color:var(--taupe);border-color:rgba(255,255,255,.16);box-shadow:none;opacity:.8}
+
     /* Survol : seulement sur un vrai pointeur. Au doigt, le :hover restait collé après un tap et une
        carte paraissait encore sélectionnée alors qu'elle ne l'était pas. */
     @media (hover:hover){
@@ -415,6 +425,9 @@
     </section>
 
     <div class="nav">
+      <!-- verrou anti-page-périmée : affiché par renderStale quand le serveur a une version plus récente.
+           Tant qu'il est là, « Envoyer » est désactivé : aucune commande au vieux format ne peut partir. -->
+      <div class="stale" id="staleWarn" hidden><span data-i="stale.text"></span><button type="button" class="btn ghost" id="staleReload" data-i="stale.btn"></button></div>
       <!-- avertissement d'accès : rendu à chaque étape par renderNav, il ne disparaît plus au premier « Continuer » -->
       <div class="warn" id="keyWarn"></div>
       <div class="msg" id="msg"></div>
@@ -508,6 +521,9 @@ const I18N = {
     quote:"Sur devis", quoteLong:"Sur devis, confirmé par notre équipe à réception.",
     "btn.prev":"Retour","btn.next":"Continuer","btn.send":"Envoyer à DS Editing","btn.sending":"Envoi…",
     saved:"Brouillon enregistré sur cet appareil", empty:"Votre commande apparaîtra ici",
+    // Le brouillon est bien relu au rechargement (load() / localStorage) : on ne fait donc pas peur pour rien.
+    // Seuls les fichiers joints (logo, palette) vivent en mémoire et sont à redéposer : le texte le dit.
+    "stale.text":"Une nouvelle version de ce formulaire est disponible. Rafraîchissez la page pour continuer : vos choix sont conservés sur cet appareil, seuls vos fichiers joints (logo, palette) sont à redéposer.","stale.btn":"Rafraîchir la page",
     units:{episode:["épisode","épisodes"],reel_basique:["reel standard","reels standard"],reel_signature:["reel premium","reels premium"],miniature:["miniature","miniatures"],trailer:["trailer","trailers"]},
     err:{projet:"Donnez un nom au projet.",produit0:"Choisissez ce que vous nous confiez, à l'étape 01 — Produit.",produit:"Votre commande est encore vide : choisissez un produit à l'étape 01 et sa formule à l'étape 02, ou un de vos packs à l'étape 01.",noVideo:"Il manque la vidéo : les extras s'ajoutent à un épisode ou à un pack. Choisissez-en un à l'étape 01 — Produit, on garde le reste de votre sélection.",formule:"Choisissez une formule ou un pack à l'étape 02 — Formule.",rushes:"Ajoutez au moins un lien de rushes.",description:"Décrivez ce que vous attendez, même en trois lignes.",contact:"Indiquez un contact et un moyen de le joindre.",email:"Indiquez un e-mail valide, c'est là qu'arrivent la confirmation et le suivi.",send:"L'envoi a échoué. Réessayez, ou écrivez-nous sur WhatsApp.",terms:"Cochez les conditions de collaboration pour envoyer la commande.",
       key:"Ouvrez cet espace depuis votre lien personnel ou l'Espace client pour envoyer votre commande.",keyLink:"Aller à l'Espace client",bad_key:"Votre accès n'est pas reconnu pour ce studio. Ouvrez cet espace depuis votre lien personnel ou l'Espace client.",bad_email:"L'e-mail n'est pas valide. Corrigez-le à l'étape Brief.",no_project:"Donnez un nom au projet, à l'étape Produit.",no_rushes:"Aucun lien de rushes valide. Collez au moins un lien complet (https://…) à l'étape Fichiers.",rate_limit:"Beaucoup de commandes viennent d'être envoyées depuis cet espace. Réessayez dans une heure, ou écrivez-nous sur WhatsApp."},
@@ -561,6 +577,7 @@ const I18N = {
     quote:"On quote", quoteLong:"On quote, confirmed by our team on receipt.",
     "btn.prev":"Back","btn.next":"Continue","btn.send":"Send to DS Editing","btn.sending":"Sending…",
     saved:"Draft saved on this device", empty:"Your order will appear here",
+    "stale.text":"A newer version of this form is available. Refresh the page to continue: your choices are kept on this device, only your attached files (logo, palette) need to be dropped again.","stale.btn":"Refresh the page",
     units:{episode:["episode","episodes"],reel_basique:["standard reel","standard reels"],reel_signature:["premium reel","premium reels"],miniature:["thumbnail","thumbnails"],trailer:["trailer","trailers"]},
     err:{projet:"Give the project a name.",produit0:"Choose what you're sending us, in step 01 — Product.",produit:"Your order is still empty: pick a product in step 01 and its package in step 02, or one of your packs in step 01.",noVideo:"The video itself is missing: extras come on top of an episode or a pack. Pick one in step 01 — Product, we keep the rest of your selection.",formule:"Choose a package or a pack in step 02 — Package.",rushes:"Add at least one footage link.",description:"Describe what you expect, even in three lines.",contact:"Give us a contact and a way to reach them.",email:"Enter a valid email, that's where the confirmation and tracking go.",send:"Sending failed. Try again, or message us on WhatsApp.",terms:"Tick the terms of collaboration to send the order.",
       key:"Open this space from your personal link or the Client space to send your order.",keyLink:"Go to the Client space",bad_key:"Your access isn't recognised for this studio. Open this space from your personal link or the Client space.",bad_email:"The email isn't valid. Fix it in the Brief step.",no_project:"Give the project a name, in the Product step.",no_rushes:"No valid footage link. Paste at least one full link (https://…) in the Files step.",rate_limit:"A lot of orders were just sent from this space. Try again in an hour, or message us on WhatsApp."},
@@ -1018,6 +1035,7 @@ function renderNav() {
   const c = commande(), tot = orderTotal();
   $("#summary").innerHTML = c ? `<b>${esc(c)}</b><br/>${esc(tot === null ? t("quote") : money(tot, cur))} · ${t("saved")}` : `${t("empty")}<br/>${t("saved")}`;
   $("#keyWarn").innerHTML = accessWarn;                                // visible à chaque étape, pas seulement à la première
+  renderStale();                                                       // bandeau « page périmée » + bouton d'envoi éteint, à chaque étape
 }
 function renderRecap() {
   const v = values(); const r = t("recap"); const none = t("none");
@@ -1154,6 +1172,66 @@ function values() {
 function save() { try { localStorage.setItem(KEY, JSON.stringify(draft)); } catch {} }
 function load() { try { return JSON.parse(localStorage.getItem(KEY) || "{}"); } catch { return {}; } }
 
+/* ---------------- verrou anti-page-périmée ----------------
+   Le site est sur GitHub Pages, qui sert les pages avec « Cache-Control: max-age=600 » et ne laisse pas
+   régler ses en-têtes. Un client qui laisse son onglet ouvert garde donc indéfiniment l'ANCIENNE version du
+   formulaire : s'il envoie depuis là, le payload est au format périmé (prix faux, voire double facturation).
+   Aucune constante de version à maintenir à la main (source d'oubli garantie) : on compare l'empreinte HTTP
+   de la page chargée à celle du serveur, par un HEAD.
+   RÈGLE NON NÉGOCIABLE — fail-open : on ne bloque QUE sur la preuve positive que le serveur est plus récent.
+   Réseau coupé, HEAD refusé, en-têtes absents, CORS, timeout, contrôle jamais initialisé : la commande part.
+   Mieux vaut une commande qui passe qu'un client bloqué par un contrôle cassé. */
+const STALE_MS = 2500;            // HEAD court : jamais une attente perceptible, même sur une connexion lente
+let pageStamp = null;             // empreinte de la version que le client a sous les yeux : {etag, lm} ; null = pas de contrôle possible
+let stale = false;                // une fois posé, seul un rechargement le lève
+async function headStamp() {
+  const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), STALE_MS);
+  try {
+    const r = await fetch(location.pathname, { method: "HEAD", cache: "no-store", signal: ctl.signal });
+    if (!r.ok) return null;
+    const etag = r.headers.get("ETag") || "", lm = r.headers.get("Last-Modified") || "";
+    return etag || lm ? { etag, lm } : null;        // aucun en-tête exploitable : rien à comparer
+  } catch { return null; }                          // réseau, CORS, timeout : on ne sait pas, donc on ne bloque pas
+  finally { clearTimeout(timer); }
+}
+/* « Page périmée », dans cet ordre strict :
+   1. LA TAILLE DU FICHIER, lue dans l'ETag. Mesuré sur ds-editing.com le 08/10 : GitHub Pages renvoie un
+      ETag de la forme « <mtime en hex>-<taille en hex> » (depot.html "6ac68585-1c046" → 0x1c046 = 114758
+      octets, exact au octet près sur les trois pages testées). On ne compare QUE le suffixe : il change
+      quand le contenu change, et il ne bouge pas sur un simple re-commit qui ne touche que le mtime.
+      Suffixes identiques → pas périmé, et on s'arrête là, même si le préfixe ou Last-Modified diffèrent.
+   2. ETag sans cette forme (ou absent) → Last-Modified, périmé seulement s'il est STRICTEMENT plus récent ;
+   3. à défaut seulement, repli sur l'ETag entier. Un ETag diffère légitimement d'un nœud CDN à l'autre : on
+      ne bloque JAMAIS sur un simple écart d'ETag quand Last-Modified est disponible et identique ou plus ancien.
+   Faux négatif assumé : une modification qui garderait EXACTEMENT la même taille d'octet passerait inaperçue
+   si Last-Modified ne la rattrape pas. Improbable, et la règle du fail-open prime sur la détection. */
+const lmTime = (s) => Date.parse(s || "");
+const etagSize = (e) => { const m = /^(?:W\/)?"?[0-9a-f]+-([0-9a-f]+)"?$/i.exec(String(e || "").trim()); return m ? m[1].toLowerCase() : ""; };
+function isStale(now) {
+  if (!pageStamp || !now) return false;
+  const sa = etagSize(pageStamp.etag), sb = etagSize(now.etag);
+  if (sa && sb) return sa !== sb;                 // taille du fichier : critère principal, il tranche seul
+  const a = lmTime(pageStamp.lm), b = lmTime(now.lm);
+  if (Number.isFinite(a) && Number.isFinite(b)) return b > a;
+  return !!(pageStamp.etag && now.etag && now.etag !== pageStamp.etag);
+}
+async function checkStale() {
+  if (stale) return true;
+  if (!pageStamp) return false;                     // contrôle indisponible depuis le chargement : on laisse passer
+  if (!isStale(await headStamp())) return false;
+  stale = true; renderStale();
+  return true;
+}
+// Le bandeau vit dans .nav (collée en bas) : visible à chaque étape, et le bouton d'envoi est éteint avec lui.
+function renderStale() {
+  $("#staleWarn").hidden = !stale;
+  $("#next").classList.toggle("off", stale);
+  if (stale) $("#next").disabled = true;            // jamais ré-activé ici : seul location.reload() lève le verrou
+}
+$("#staleReload").addEventListener("click", () => location.reload());
+// Retour sur l'onglet : le moment naturel où quelqu'un revient sur une vieille page. On le prévient AVANT qu'il remplisse tout.
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") checkStale(); });
+
 /* ---------------- navigation & validation ---------------- */
 function validate(s) {
   const e = t("err"); const v = values(); document.querySelectorAll(".in.bad").forEach((x) => x.classList.remove("bad"));
@@ -1260,9 +1338,13 @@ function done(token) {
 }
 async function submit() {
   const btn = $("#next");
-  const fail = (html) => { $("#msg").innerHTML = html; btn.disabled = false; btn.textContent = t("btn.send"); };
+  const fail = (html) => { $("#msg").innerHTML = html; btn.disabled = stale; btn.textContent = t("btn.send"); };
   if (!accessKey) return fail(keyMsg("key"));
   btn.disabled = true; btn.textContent = t("btn.sending");
+  /* Le seul moment qui compte vraiment : si le serveur a une version plus récente, rien ne part au vieux
+     format. Le bandeau prend le relais (#msg reste vide) et le bouton reste éteint jusqu'au rechargement.
+     Contrôle cassé ou injoignable → checkStale() rend false et la commande part : fail-open. */
+  if (await checkStale()) { btn.textContent = t("btn.send"); return; }
   try {
     const res = await rpc("create_order", { p_slug: orderSlug(), p_key: accessKey, p_order: order() });
     if (!res || !res.token) throw Object.assign(new Error("no_token"), { code: "send" });
@@ -1279,6 +1361,10 @@ const spaceKey = params.get("k"); if (spaceKey && slug) { const a = $("#spaceLin
 $("#termsLink").href = `../conditions.html?lang=${lang}`;
 
 applyText();
+
+// Empreinte HTTP de la version chargée, prise tout de suite : c'est la référence du verrou anti-page-périmée.
+// Échec → pageStamp reste null et le verrou ne bloquera jamais (fail-open).
+headStamp().then((s) => { pageStamp = s; });
 
 // Catalogue des offres : lu une fois, sans clé d'accès (lecture publique de `offers`).
 // Échec ou table vide : aucune section « Autres prestations », tout le reste de la page marche comme avant.
