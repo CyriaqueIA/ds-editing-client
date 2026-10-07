@@ -92,6 +92,13 @@
     .c .desc{font-size:13px;color:var(--taupe);line-height:1.45;flex:1}
     .c.dis{opacity:.4;pointer-events:none}
     .c .inc{display:block;margin-top:6px;font-weight:600}
+    .promo{display:flex;flex-direction:column;gap:6px;margin-top:2px}
+    .promo .row{display:flex;align-items:center;flex-wrap:wrap;gap:8px;font-size:13px;font-variant-numeric:tabular-nums}
+    .promo .tag{font-weight:600;font-size:11px;letter-spacing:.06em;text-transform:uppercase;border-radius:999px;padding:3px 9px;color:#0A0B0D;background:rgba(255,255,255,.85)}
+    .promo .lvn{color:var(--taupe);min-width:62px}
+    .promo s{color:var(--taupe);text-decoration:line-through}
+    .promo b{color:var(--cream);font-weight:600}
+    .promo .pct{color:var(--taupe)}
     .lv{display:flex;gap:6px;flex-wrap:wrap}
     .lv button{font:inherit;font-size:12px;font-weight:600;border:1px solid var(--line);border-radius:999px;padding:5px 11px;background:transparent;color:var(--taupe);cursor:pointer}
     .lv button.on{color:#0A0B0D;background:rgba(255,255,255,.85);border-color:transparent}
@@ -406,10 +413,10 @@ const I18N = {
     "f.produit":"Ce que vous nous confiez","f.episodes":"Nombre d'épisodes",
     produit:{podcast:["Podcast / Interview","Épisode complet monté, 16:9, prêt à publier."],vsl:["VSL","Vidéo de vente, 16:9, rythme et sous-titres travaillés."]},
     "note.episode":"Un épisode = une vidéo finie jusqu'à 60 minutes. Au-delà, un supplément par tranche de 30 minutes.",
-    "f.formats":"Autres formats","formuleOff":"La formule ne concerne que Podcast / Interview et VSL. Vous pouvez continuer.","bundle.inc":"3 reels {lv} inclus, reels en plus à −20 %","bundle.podcastOff":"Déjà inclus dans le Bundle.","bundle.pick":"Épisode podcast + 3 reels du niveau inclus ; reels en plus à −20 %. Choisissez un niveau.","facecam.pick":"Vidéo face caméra (YouTube). Choisissez un niveau.",
+    "f.formats":"Autres formats","formuleOff":"La formule ne concerne que Podcast / Interview et VSL. Vous pouvez continuer.","bundle.inc":"Dans le pack : 1 épisode + 3 reels inclus","promo":"PROMO","bundle.podcastOff":"Déjà inclus dans le Bundle.","bundle.pick":"1 épisode + 3 reels inclus. Choisissez un niveau.","facecam.pick":"Vidéo face caméra (YouTube). Choisissez un niveau.",
     fmt:{single_cam:["Single cam 4K","Podcast ou interview, 1 caméra, full rush : review, dérush, color grading, audio mix"],multicam:["Multicam 4K","Cuts des rushes, changements de caméra, color grading, audio mix, logo, lower third"],facecam:["Face cam",""],bundle:["Bundle",""]},
     fclv:{simple:["Simple","Vidéo face caméra (YouTube) : montage + motion design léger"],dynamique:["Dynamique","Plus de coupes, plus de motion design"],signature:["Signature","Full motion design, niveau le plus élevé"]},
-    bdlv:{standard:["Standard","Épisode podcast Standard + 3 reels Standard inclus ; reels en plus à −20 %"],premium:["Premium","Épisode podcast Premium + 3 reels Premium inclus ; reels en plus à −20 %"]},
+    bdlv:{standard:["Standard","1 épisode + 3 reels inclus"],premium:["Premium","1 épisode + 3 reels inclus"]},
     "s2.title":"Votre formule","s2.hint":"Le niveau de finition de l'épisode uniquement. Les extras se choisissent à part.",
     formule:{standard:["Standard","Montage propre et rythmé, habillage simple, son mixé. Pas d'intro dédiée."],premium:["Premium","Standard + une ouverture percutante de 45 secondes montée depuis vos meilleurs moments, titres animés, sound design."]},
     "s3.title":"Les extras","s3.hint":"Facultatif. Ajoutez ce qui accompagne l'épisode.",
@@ -455,10 +462,10 @@ const I18N = {
     "f.produit":"What you're sending us","f.episodes":"Number of episodes",
     produit:{podcast:["Podcast / Interview","Full edited episode, 16:9, ready to publish."],vsl:["VSL","Sales video, 16:9, pacing and captions crafted."]},
     "note.episode":"One episode = one finished video up to 60 minutes. Beyond, a supplement per extra 30 minutes.",
-    "f.formats":"Other formats","formuleOff":"The package only applies to Podcast / Interview and VSL. You can continue.","bundle.inc":"3 {lv} reels included, extra reels at −20%","bundle.podcastOff":"Already included in the Bundle.","bundle.pick":"Podcast episode + 3 reels of the tier included; extra reels at −20%. Pick a tier.","facecam.pick":"Talking-head video (YouTube). Pick a tier.",
+    "f.formats":"Other formats","formuleOff":"The package only applies to Podcast / Interview and VSL. You can continue.","bundle.inc":"In the pack: 1 episode + 3 reels included","promo":"PROMO","bundle.podcastOff":"Already included in the Bundle.","bundle.pick":"1 episode + 3 reels included. Pick a tier.","facecam.pick":"Talking-head video (YouTube). Pick a tier.",
     fmt:{single_cam:["Single-cam 4K","Podcast or interview, one camera, full rushes: review, cut, color grading, audio mix"],multicam:["Multicam 4K","Rush cuts, camera switching, color grading, audio mix, logo, lower thirds"],facecam:["Face cam",""],bundle:["Bundle",""]},
     fclv:{simple:["Simple","Talking-head video (YouTube): editing + light motion design"],dynamique:["Dynamic","More cuts, more motion design"],signature:["Signature","Full motion design, top tier"]},
-    bdlv:{standard:["Standard","Standard podcast episode + 3 Standard reels included; extra reels −20%"],premium:["Premium","Premium podcast episode + 3 Premium reels included; extra reels −20%"]},
+    bdlv:{standard:["Standard","1 episode + 3 reels included"],premium:["Premium","1 episode + 3 reels included"]},
     "s2.title":"Your package","s2.hint":"The finish level of the episode only. Extras are chosen separately.",
     formule:{standard:["Standard","Clean, paced edit, simple graphics, mixed sound. No dedicated intro."],premium:["Premium","Standard + a punchy 45 s cold open cut from your strongest moments, motion titles, sound design."]},
     "s3.title":"Extras","s3.hint":"Optional. Add what goes with the episode.",
@@ -505,6 +512,21 @@ const minQty = (k) => (draft.bundle && bundleReelKey() === k ? 3 : 0); // 3 reel
 // Clés de prix renvoyées par client_prices (RPC) : null = inconnu (appel échoué ou vide) → tout afficher comme avant
 let avail = null;
 const shown = (k) => !avail || avail.has(k);
+// Promos bundle (RPC client_bundle_promos) : { standard: {price, list, pct}, premium: … } ; absent = rien de barré, jamais de fausse promo
+let promos = {};
+const num = (x) => (x === null || x === undefined || x === "" ? NaN : Number(x));
+// Même format que client/espace.html : USD → « $1,234.50 », EUR → « 1 234,50 € » ; devise inconnue → nombre seul, jamais un mauvais symbole
+const money = (x, cur) => { const v = Number(x), o = { minimumFractionDigits: Number.isInteger(v) ? 0 : 2, maximumFractionDigits: 2 }; return cur === "USD" ? "$" + v.toLocaleString("en-US", o) : cur === "EUR" ? v.toLocaleString("fr-FR", o) + " €" : v.toLocaleString(lang === "fr" ? "fr-FR" : "en-US", o); };
+function applyPromos(rows) {
+  const out = {};
+  if (Array.isArray(rows)) for (const r of rows) {
+    const m = r && /^bundle_(standard|premium)$/.exec(String(r.item_key || "")); if (!m) continue;
+    const price = num(r.price), list = num(r.list_price), pct = num(r.save_pct);
+    if (price > 0 && list > price && pct > 0) out[m[1]] = { price, list, pct: Math.round(pct), cur: String(r.currency || "").toUpperCase() }; // sinon : pas de promo affichée
+  }
+  promos = out; renderFormats();
+}
+const promoHtml = (bds) => { const rows = bds.filter((l) => promos[l]).map((l) => { const q = promos[l], cur = q.cur || String((studio && studio.currency) || "").toUpperCase(); return `<div class="row"><span class="lvn">${t("bdlv")[l][0]}</span><span class="tag">${t("promo")}</span><s>${money(q.list, cur)}</s><b>${money(q.price, cur)}</b><span class="pct">−${q.pct}${lang === "fr" ? " %" : "%"}</span></div>`; }); return rows.length ? `<div class="promo">${rows.join("")}</div>` : ""; };
 
 /* ---------------- client & langue ---------------- */
 const params = new URLSearchParams(location.search);
@@ -580,7 +602,7 @@ function renderFormats() {
   const fcs = FACECAMS.filter((l) => shown("facecam_" + l));
   if (fcs.length) { const sel = fcs.includes(draft.facecam) ? draft.facecam : null; cards.push(choiceCard("facecam", f.facecam[0], sel ? fl[sel][1] : t("facecam.pick"), "facecam", null, !!sel, lvBtns("facecam", fcs, fl, sel))); }
   const bds = BUNDLES.filter((l) => shown("bundle_" + l));
-  if (bds.length) { const sel = bds.includes(draft.bundle) ? draft.bundle : null; cards.push(choiceCard("bundle", f.bundle[0], sel ? bl[sel][1] : t("bundle.pick"), "bundle", null, !!sel, lvBtns("bundle", bds, bl, sel))); }
+  if (bds.length) { const sel = bds.includes(draft.bundle) ? draft.bundle : null; cards.push(choiceCard("bundle", f.bundle[0], (sel ? bl[sel][1] : t("bundle.pick")) + promoHtml(bds), "bundle", null, !!sel, lvBtns("bundle", bds, bl, sel))); }
   $("#formats").innerHTML = cards.join("");
   $("#formats").querySelectorAll("[data-choice]").forEach((el) => el.addEventListener("click", (e) => {
     const k = el.dataset.choice; const lvEl = e.target.closest("[data-lv]"); const lv = lvEl ? lvEl.dataset.lv.split(":")[1] : null;
@@ -611,7 +633,7 @@ function renderReels() {
   $("#reels").innerHTML = REELS.map((k) => {
     const n = draft.qty[k] || 0;
     const foot = `<div class="qty"><button type="button" data-dec="${k}">−</button><input type="number" min="0" max="99" value="${n}" data-q="${k}"/><button type="button" data-inc="${k}">+</button></div>`;
-    const inc = minQty(k) ? `<span class="inc">${t("bundle.inc").replace("{lv}", draft.bundle === "premium" ? "premium" : "standard")}</span>` : "";
+    const inc = minQty(k) ? `<span class="inc">${t("bundle.inc")}</span>` : "";
     return choiceCard(k, r[k][0], r[k][1] + inc, k, k, n > 0, foot);
   }).join("");
   $("#reels").querySelectorAll("[data-choice]").forEach((el) => el.addEventListener("click", (e) => { if (e.target.closest(".qty") || e.target.closest(".preview")) return; const k = el.dataset.choice; if (!(draft.qty[k] > 0)) { draft.qty[k] = 1; save(); renderReels(); renderNav(); wirePreviews(); } }));
@@ -835,9 +857,9 @@ const DELIV = {
 function workToDo(d) {
   const out = [];
   for (const [key, [sing, plur, fmt]] of Object.entries(DELIV[lang])) {
-    if (key === "facecam" || key === "bundle") {   // niveau choisi : « face cam Dynamique (16:9) », « bundle Premium (épisode podcast + 3 reels premium inclus) »
+    if (key === "facecam" || key === "bundle") {   // niveau choisi : « face cam Dynamique (16:9) », « bundle Premium (1 épisode + 3 reels inclus) »
       if (!d[key]) continue; const lvl = (key === "facecam" ? t("fclv") : t("bdlv"))[d[key]][0];
-      out.push(key === "facecam" ? `${sing} ${lvl} (${fmt})` : `${sing} ${lvl} (${lang === "fr" ? "épisode podcast + 3 reels " + d[key] + " inclus" : "podcast episode + 3 " + d[key] + " reels included"})`); continue;
+      out.push(key === "facecam" ? `${sing} ${lvl} (${fmt})` : `${sing} ${lvl} (${lang === "fr" ? "1 épisode + 3 reels inclus" : "1 episode + 3 reels included"})`); continue;
     }
     const raw = d[key] === true ? "1" : String(d[key] || "").trim(); if (!raw) continue;
     const n = parseInt(raw, 10);
@@ -898,6 +920,7 @@ else rpc("client_slug", { p_key: accessKey }).then((d) => {
   if (!d || !d.slug || (slug && d.slug !== slug)) { $("#msg").innerHTML = keyMsg("bad_key"); return; }
   studio = d;
   rpc("client_prices", { p_slug: d.slug, p_k: accessKey }).then(applyAvail).catch(() => {}); // échec ou vide : tout reste affiché
+  rpc("client_bundle_promos", { p_slug: d.slug, p_k: accessKey }).then(applyPromos).catch(() => {}); // échec ou vide : aucune promo affichée
   if (!params.get("lang") && !langTouched && I18N[d.lang] && d.lang !== lang) { lang = d.lang; applyText(); } else $("#clientName").textContent = clientLabel();
 }).catch(() => {}); // base injoignable : l'envoi tranchera
 </script>
