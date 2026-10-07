@@ -12,24 +12,29 @@
 (function () {
   "use strict";
 
+  /* [nom, adresse, à quoi ça sert]. C'est LA liste : le menu et la page /espaces/ lisent toutes les deux ici. */
   var ESPACES = [
-    ["CRM — prospects et clients", "/crm/"],
-    ["Production — dashboard équipe", "/team/dashboard.html"],
-    ["Production direction", "/prod-admin/"],
-    ["Rapport du jour — monteurs", "/prod/"],
-    ["Entretiens — recrutement", "/entretien/"],
-    ["Espace client", "/client/"],
-    ["Suivi d'une commande", "/suivi.html"],
-    ["Site public", "/"]
+    ["Accueil des espaces", "/espaces/", "Tout DS Editing sur une page. Le seul lien à mettre en favori."],
+    ["CRM", "/crm/", "Prospects, fiches, tunnel, clients gagnés, ta journée."],
+    ["Production", "/team/dashboard.html", "Dashboard équipe : commandes, monteurs, tarifs, factures, rendez-vous."],
+    ["Production direction", "/prod-admin/", "La production du jour, vue direction."],
+    ["Rapport du jour", "/prod/", "Ce que les monteurs voient, sans connexion."],
+    ["Entretiens", "/entretien/", "Recrutement : candidats, créneaux, notes du jury."],
+    ["Espace client", "/client/", "L'entrée par code d'accès, côté client."],
+    ["Suivi d'une commande", "/suivi.html", "Le numéro à 7 chiffres que tu donnes au client."],
+    ["Site public", "/", "Ce que voit un prospect qui arrive sur ds-editing.com."]
   ];
+  window.DS_ESPACES = ESPACES; // lu par /espaces/
 
   function ls(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
 
   // GitHub Pages sert aussi le site sous /ds-editing-client/ : on préfixe pour ne pas tomber à la racine du compte.
   var BASE = /\.github\.io$/i.test(location.hostname) ? "/" + location.pathname.split("/")[1] : "";
+  window.DS_BASE = BASE;
 
   function mount() {
     if (document.querySelector(".dsnav")) return;
+    if (/\/espaces\/?$/.test(location.pathname.replace(/index\.html$/, ""))) return; // la page d'accueil des espaces EST le menu
     if (/[?&]tv=1\b/.test(location.search)) return;
     if (ls("ds_team_key") && !(Number(ls("ds_admin_until")) > Date.now())) return;
 
