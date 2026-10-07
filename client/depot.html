@@ -40,7 +40,6 @@
     .hd .client{margin-left:auto;display:flex;align-items:center;gap:8px;padding:6px 12px;border:1px solid rgba(255,255,255,.16);border-radius:999px;font-size:13px;background:rgba(255,255,255,.06);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)}
     .hd .client i{width:7px;height:7px;border-radius:50%;background:var(--amber);box-shadow:0 0 12px var(--amber)}
     .lang{margin-left:10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.16);color:var(--taupe);border-radius:999px;padding:6px 10px;cursor:pointer;font:inherit;font-size:12px;font-weight:600;-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);transition:border-color .2s,color .2s}
-    .lang:hover{color:var(--cream);border-color:rgba(220,230,240,.35)}
 
     main{flex:1;width:100%;max-width:960px;margin:0 auto;padding:28px 16px 90px}
     .intro h1{margin:18px 0 8px;font-size:clamp(34px,6vw,58px)}
@@ -48,7 +47,6 @@
 
     .steps{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin:26px 0 22px}
     .step{padding:10px 10px 8px;border:1px solid var(--line);border-radius:14px;background:var(--surface);position:relative;overflow:hidden;cursor:pointer;transition:border-color .2s}
-    .step:hover{border-color:var(--line-strong)}
     .step .n{font-family:'Geist',system-ui,sans-serif;font-weight:600;font-size:10px;letter-spacing:.06em;font-variant-numeric:tabular-nums;color:var(--taupe)}
     .step .t{font-size:12px;margin-top:3px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .step::after{content:"";position:absolute;left:0;bottom:0;height:2px;width:0;background:var(--amber);transition:width .35s}
@@ -83,14 +81,12 @@
     .choices.three{grid-template-columns:repeat(3,1fr)}
     @media (max-width:720px){.choices.two,.choices.three{grid-template-columns:1fr}}
     .c{border:1px solid var(--line);border-radius:14px;padding:16px;background:var(--surface);display:flex;flex-direction:column;gap:8px;cursor:pointer;transition:border-color .2s,background .2s;position:relative}
-    .c:hover{border-color:var(--line-strong)}
     .c.on{border-color:rgba(220,230,240,.5);background:var(--amber-soft)}
     .c .top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
     .c .name{font-weight:600;font-size:16px}
     .c .price{font-family:'Geist',system-ui,sans-serif;font-weight:600;font-size:11px;letter-spacing:.04em;font-variant-numeric:tabular-nums;color:var(--taupe);border:1px solid var(--line);border-radius:999px;padding:4px 9px;white-space:nowrap;transition:background .2s,color .2s,border-color .2s}
     .c.on .price{color:#0A0B0D;background:rgba(255,255,255,.85);border-color:transparent}
     .c .desc{font-size:13px;color:var(--taupe);line-height:1.45;flex:1}
-    .c.dis{opacity:.4;pointer-events:none}
     .c .inc{display:block;margin-top:6px;font-weight:600}
     .promo{display:flex;flex-direction:column;gap:6px;margin-top:2px}
     .promo .row{display:flex;align-items:center;flex-wrap:wrap;gap:8px;font-size:13px;font-variant-numeric:tabular-nums}
@@ -103,13 +99,11 @@
     .lv button{font:inherit;font-size:12px;font-weight:600;border:1px solid var(--line);border-radius:999px;padding:5px 11px;background:transparent;color:var(--taupe);cursor:pointer}
     .lv button.on{color:#0A0B0D;background:rgba(255,255,255,.85);border-color:transparent}
     .c .foot{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:4px}
-    .preview{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.16);border-radius:999px;color:#fff;font:inherit;font-size:13px;font-weight:600;letter-spacing:-.01em;cursor:pointer;padding:5px 12px 5px 5px;display:inline-flex;align-items:center;gap:6px;-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);transition:border-color .2s,color .2s}
-    .preview:hover{color:#fff;border-color:rgba(220,230,240,.35)}
+    .preview{flex:none;max-width:100%;white-space:nowrap;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.16);border-radius:999px;color:#fff;font:inherit;font-size:13px;font-weight:600;letter-spacing:-.01em;cursor:pointer;padding:5px 12px 5px 5px;display:inline-flex;align-items:center;gap:6px;-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);transition:border-color .2s,color .2s}
     .preview[disabled]{color:var(--taupe);cursor:default;opacity:.45}
     .preview i{width:20px;height:20px;border-radius:50%;border:1px solid currentColor;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-style:normal}
-    .qty{display:flex;align-items:center;gap:6px}
-    .qty button{width:34px;height:34px;border-radius:999px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);color:#fff;font-size:18px;cursor:pointer;line-height:1;transition:border-color .2s,background .2s}
-    .qty button:hover{border-color:rgba(220,230,240,.35);background:rgba(255,255,255,.1)}
+    .qty{display:flex;align-items:center;flex-wrap:wrap;gap:6px;row-gap:8px}
+    .qty button:not(.preview){width:34px;height:34px;border-radius:999px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);color:#fff;font-size:18px;cursor:pointer;line-height:1;transition:border-color .2s,background .2s}
     .qty input{width:52px;height:34px;text-align:center;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:12px;color:var(--cream);font:inherit;font-size:15px;font-variant-numeric:tabular-nums;outline:none;transition:border-color .15s,box-shadow .15s}
     .qty input:focus{border-color:rgba(220,227,234,.6);box-shadow:0 0 0 3px rgba(220,227,234,.14)}
     .qty input::-webkit-outer-spin-button,.qty input::-webkit-inner-spin-button{-webkit-appearance:none}
@@ -118,19 +112,15 @@
     .thumbs{display:flex;gap:8px;margin:8px 0 4px}
     .thumbs a,.thumbs span{width:96px;aspect-ratio:16/9;border-radius:10px;border:1px solid var(--line);background:linear-gradient(135deg,var(--surface),var(--surface-2));display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--taupe);text-decoration:none;overflow:hidden;transition:border-color .2s}
     .thumbs a img{width:100%;height:100%;object-fit:cover}
-    .thumbs a:hover{border-color:var(--amber)}
     .note{font-size:12px;color:var(--taupe);margin-top:8px;line-height:1.5}
 
     .links{display:flex;flex-direction:column;gap:8px}
     .links .l{display:flex;gap:8px}
     .links .l .in{flex:1}
     .links .l button{width:44px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--taupe);cursor:pointer;font-size:18px;transition:border-color .2s,color .2s}
-    .links .l button:hover{color:var(--err);border-color:var(--err)}
     .add{margin-top:8px;background:rgba(255,255,255,.04);border:1px dashed var(--line-strong);color:var(--taupe);border-radius:999px;padding:11px 16px;cursor:pointer;font:inherit;font-size:13px;font-weight:600;width:100%;transition:border-color .2s,color .2s,background .2s}
-    .add:hover{color:var(--cream);border-color:rgba(220,230,240,.35);background:rgba(255,255,255,.06)}
     .chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 4px}
     .chip{border:1px solid var(--line-strong);background:rgba(255,255,255,.04);color:var(--cream);border-radius:999px;padding:7px 12px;font:inherit;font-size:13px;cursor:pointer;transition:border-color .2s,background .2s}
-    .chip:hover{border-color:rgba(220,230,240,.5);color:var(--cream);background:var(--amber-soft)}
     .swatches{display:flex;gap:6px;margin-top:8px;min-height:18px}
     .swatches i{width:22px;height:22px;border-radius:6px;border:1px solid var(--line-strong)}
     .brandkit{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:22px}
@@ -140,26 +130,24 @@
     .ks{margin:6px 0 10px;font-size:12px;color:var(--taupe)}
     .drop{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:82px;border:1px dashed var(--line-strong);border-radius:14px;background:rgba(255,255,255,.03);cursor:pointer;color:var(--taupe);font-size:13px;text-align:center;padding:12px;transition:border-color .2s,background .2s,color .2s}
     .drop .up{color:var(--accent-blue)}
-    .drop:hover,.drop.over{border-color:rgba(220,230,240,.5);background:var(--amber-soft);color:var(--cream)}
+    .drop.over{border-color:rgba(220,230,240,.5);background:var(--amber-soft);color:var(--cream)}
     .drop.has{border-style:solid;border-color:rgba(220,227,234,.5);background:var(--surface);color:var(--cream)}
     .drop img{max-height:56px;max-width:80%;object-fit:contain;border-radius:6px}
     .cta-block{margin:22px 0 4px;padding-top:18px;border-top:1px solid var(--line)}
     .yn{display:flex;gap:10px}
     .yn button{min-width:78px;border:1px solid rgba(255,255,255,.16);border-radius:999px;background:rgba(255,255,255,.06);color:#fff;font:inherit;font-size:14px;font-weight:600;letter-spacing:-.01em;padding:11px 20px;cursor:pointer;-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);transition:border-color .2s,background .2s,color .2s}
-    .yn button:hover{border-color:rgba(220,230,240,.35)}
     .yn button.on{background:linear-gradient(180deg,#FFFFFF,#C9D0D7);border-color:transparent;color:#0A0B0D;box-shadow:inset 0 1px 0 #fff,0 8px 30px rgba(180,200,225,.18)}
     .cta-ex{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:14px;font-size:13px;color:var(--taupe)}
     .cta-ex #ctaChips{display:flex;gap:8px;flex-wrap:wrap}
     .cx{position:relative;display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:999px;background:var(--surface-2);color:var(--cream);font:inherit;font-size:13px;padding:8px 12px;cursor:default;transition:border-color .2s}
-    .cx.live{cursor:pointer}.cx.live:hover{border-color:rgba(220,230,240,.5)}
+    .cx.live{cursor:pointer}
     .cx i{width:14px;height:14px;border-radius:50%;border:1px solid var(--accent-blue);color:var(--accent-blue);font-size:9px;font-style:normal;display:inline-flex;align-items:center;justify-content:center}
     .cx .pop{display:none;position:absolute;bottom:calc(100% + 10px);left:0;z-index:30;width:280px;background:var(--surface-2);border:1px solid var(--line-strong);border-radius:14px;padding:8px;box-shadow:0 20px 50px rgba(0,0,0,.5)}
-    .cx:hover .pop,.cx:focus .pop{display:block}
+    .cx:focus .pop{display:block}
     .cx .pop img,.cx .pop video{display:block;width:100%;border-radius:8px;background:#000}
     .cx .pop span{display:block;padding:18px 8px;text-align:center;color:var(--taupe);font-size:12px}
     .fontpick{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
     .fontpick button{border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--taupe);font:inherit;font-size:14px;text-align:left;padding:16px;cursor:pointer;transition:border-color .2s,background .2s,color .2s}
-    .fontpick button:hover{border-color:var(--line-strong);color:var(--cream)}
     .fontpick button.on{border-color:rgba(220,230,240,.5);background:var(--amber-soft);color:var(--cream)}
     .check{display:flex;align-items:center;gap:10px;margin-top:10px;font-size:14px;color:var(--taupe);cursor:pointer}
     .check input{width:18px;height:18px;accent-color:var(--amber)}
@@ -168,9 +156,7 @@
     .btn{border:1px solid transparent;border-radius:999px;padding:13px 24px;line-height:1.2;font:inherit;font-size:15px;font-weight:600;letter-spacing:-.01em;cursor:pointer;transition:transform .12s,opacity .15s,background .2s,border-color .2s;white-space:nowrap;text-decoration:none}
     .btn:active{transform:scale(.98)}
     .btn.primary{background:linear-gradient(180deg,#FFFFFF,#C9D0D7);color:#0A0B0D;box-shadow:inset 0 1px 0 #fff,0 8px 30px rgba(180,200,225,.18)}
-    .btn.primary:hover{background:linear-gradient(180deg,#fff,#E4E8EC)}
     .btn.ghost{background:rgba(255,255,255,.06);color:#fff;border-color:rgba(255,255,255,.16);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)}
-    .btn.ghost:hover{color:var(--cream);border-color:rgba(220,230,240,.35)}
     .btn[disabled]{opacity:.45;cursor:not-allowed}
     .summary{font-size:12px;color:var(--taupe);text-align:center;line-height:1.4;flex:1;min-width:0;padding:6px 14px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.04);font-variant-numeric:tabular-nums}
     .summary b{color:var(--cream);font-weight:500}
@@ -204,7 +190,6 @@
     .modal .box{width:min(960px,100%);background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02)),var(--surface);border:1px solid rgba(255,255,255,.09);border-radius:22px;overflow:hidden;box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 30px 80px rgba(0,0,0,.6)}
     .modal .bar{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--line);font-size:13px}
     .modal .bar button{background:none;border:none;color:var(--taupe);font-size:20px;cursor:pointer;transition:color .15s}
-    .modal .bar button:hover{color:var(--cream)}
     .modal iframe{display:block;width:100%;aspect-ratio:16/9;border:0;background:#000}
     .modal video{display:block;width:100%;aspect-ratio:16/9;background:#000;max-height:72vh}
     .plist{display:flex;gap:8px;padding:10px;overflow-x:auto;border-top:1px solid var(--line)}
@@ -225,7 +210,6 @@
     .ohead.sec{margin-top:14px;color:var(--taupe)}
     .olist{display:flex;flex-direction:column;gap:8px}
     .o{display:flex;align-items:center;gap:12px;flex-wrap:wrap;border:1px solid var(--line);border-radius:14px;background:var(--surface);padding:12px 14px;cursor:pointer;transition:border-color .2s,background .2s}
-    .o:hover{border-color:var(--line-strong)}
     .o.on{border-color:rgba(220,230,240,.5);background:var(--amber-soft)}
     .o .oname{flex:1;min-width:150px;font-size:15px;font-weight:500}
     .o .oprice{font-family:'Geist',system-ui,sans-serif;font-weight:600;font-size:11px;letter-spacing:.04em;font-variant-numeric:tabular-nums;color:var(--taupe);border:1px solid var(--line);border-radius:999px;padding:4px 9px;white-space:nowrap;transition:background .2s,color .2s,border-color .2s}
@@ -234,6 +218,54 @@
     .o.pack .oname{font-size:18px;font-weight:600;letter-spacing:-.01em}
     .o.pack.on{background:var(--amber-soft)}
 
+    /* contenu réel d'un pack : chaque ligne à son prix unitaire (offers.bundle_parts), jamais une moyenne */
+    .parts{display:flex;flex-direction:column;gap:4px;margin-top:8px;padding-top:8px;border-top:1px solid var(--line)}
+    .parts .row{display:flex;align-items:baseline;flex-wrap:wrap;gap:6px;font-size:13px;font-variant-numeric:tabular-nums}
+    .parts .pq{color:var(--taupe);min-width:26px}
+    .parts .pn{flex:1;min-width:90px;color:var(--cream)}
+    .parts b{color:var(--cream);font-weight:600}
+    .parts s{color:var(--taupe);text-decoration:line-through}
+    .parts .pct,.parts .lvn{color:var(--taupe)}
+    .parts .tag{font-weight:600;font-size:11px;letter-spacing:.06em;text-transform:uppercase;border-radius:999px;padding:3px 9px;color:#0A0B0D;background:rgba(255,255,255,.85)}
+    .o .parts{flex-basis:100%;width:100%}
+
+    /* avertissement d'accès : visible sur TOUTES les étapes, pas seulement la première */
+    .warn{flex-basis:100%;order:-2;font-size:13px;line-height:1.45;color:var(--taupe);text-align:center;padding:8px 12px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.04)}
+    .warn:empty{display:none}
+    .warn a{color:var(--accent-blue);text-decoration:underline;text-underline-offset:2px}
+
+    /* Survol : seulement sur un vrai pointeur. Au doigt, le :hover restait collé après un tap et une
+       carte paraissait encore sélectionnée alors qu'elle ne l'était pas. */
+    @media (hover:hover){
+      .lang:hover{color:var(--cream);border-color:rgba(220,230,240,.35)}
+      .step:not(.active):hover{border-color:var(--line-strong)}
+      .c:not(.on):hover{border-color:var(--line-strong)}
+      .o:not(.on):hover{border-color:var(--line-strong)}
+      .preview:not([disabled]):hover{color:#fff;border-color:rgba(220,230,240,.35)}
+      .qty button:not(.preview):hover{border-color:rgba(220,230,240,.35);background:rgba(255,255,255,.1)}
+      .thumbs a:hover{border-color:var(--amber)}
+      .links .l button:hover{color:var(--err);border-color:var(--err)}
+      .add:hover{color:var(--cream);border-color:rgba(220,230,240,.35);background:rgba(255,255,255,.06)}
+      .chip:hover{border-color:rgba(220,230,240,.5);color:var(--cream);background:var(--amber-soft)}
+      .drop:not(.has):hover{border-color:rgba(220,230,240,.5);background:var(--amber-soft);color:var(--cream)}
+      .yn button:not(.on):hover{border-color:rgba(220,230,240,.35)}
+      .cx.live:hover{border-color:rgba(220,230,240,.5)}
+      .cx:hover .pop{display:block}
+      .fontpick button:not(.on):hover{border-color:var(--line-strong);color:var(--cream)}
+      .btn.primary:hover{background:linear-gradient(180deg,#fff,#E4E8EC)}
+      .btn.ghost:hover{color:var(--cream);border-color:rgba(220,230,240,.35)}
+      .modal .bar button:hover{color:var(--cream)}
+    }
+
+    /* téléphone : la barre du bas tenait sur 5 à 6 lignes avec un pack, la ligne Trailer était écrasée */
+    @media (max-width:520px){
+      .nav{gap:8px}
+      .nav .btn{flex:1 1 0;padding:13px 14px;text-align:center}
+      .summary{order:3;flex-basis:100%;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;line-clamp:3;overflow:hidden}
+      .qty .lab{flex-basis:100%;margin-right:0}
+      .qty .preview{margin-left:0!important}
+      .thumbs{flex-wrap:wrap}
+    }
     @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
   </style>
 </head>
@@ -266,8 +298,8 @@
       <label class="f" data-i="f.produit"></label>
       <div class="choices two" id="produit"></div>
       <p class="note" data-i="note.episode"></p>
-      <label class="f" data-i="f.formats"></label>
-      <div class="choices two" id="formats"></div>
+      <!-- garde-fou : si la grille du client ne laisse aucun produit affichable, l'étape dit quoi faire (jamais de cul-de-sac) -->
+      <p class="note" id="produitNote"></p>
       <!-- Autres prestations : construites depuis la grille du client, aucune offre en dur. Vide = section masquée. -->
       <div class="more" id="moreWrap" hidden>
         <h3 data-i="x.more"></h3>
@@ -288,16 +320,18 @@
     <section class="card panel" data-step="2">
       <h2 data-i="s3.title"></h2>
       <p class="hint" data-i="s3.hint"></p>
-      <div class="block">
+      <!-- Ici, UNIQUEMENT ce qui s'ajoute par-dessus l'épisode. Single cam, multicam et face cam sont des
+           épisodes (offers.family = episode / facecam) : ils vivent à l'étape 02, jamais ici. -->
+      <div class="block" id="reelsBlock">
         <h3 data-i="x.reels"></h3><p class="sub" data-i="x.reelsSub"></p>
         <div class="choices two" id="reels"></div>
       </div>
-      <div class="block">
+      <div class="block" id="miniatureBlock">
         <h3 data-i="x.miniature"></h3><p class="sub" data-i="x.miniatureSub"></p>
         <div class="thumbs" id="thumbs"></div>
         <div class="qty"><span class="lab" data-i="f.qty"></span><button type="button" data-dec="miniature">−</button><input type="number" min="0" max="99" data-q="miniature"/><button type="button" data-inc="miniature">+</button><span class="price" id="pMiniature" style="margin-left:10px"></span></div>
       </div>
-      <div class="block">
+      <div class="block" id="trailerBlock">
         <h3 data-i="x.trailer"></h3><p class="sub" data-i="x.trailerSub"></p>
         <div class="qty"><span class="lab" data-i="f.qty"></span><button type="button" data-dec="trailer">−</button><input type="number" min="0" max="99" data-q="trailer"/><button type="button" data-inc="trailer">+</button><span class="price" id="pTrailer" style="margin-left:10px"></span><button type="button" class="preview" data-prev="trailer" style="margin-left:14px"><i>▶</i><span data-i="preview"></span></button></div>
       </div>
@@ -381,6 +415,8 @@
     </section>
 
     <div class="nav">
+      <!-- avertissement d'accès : rendu à chaque étape par renderNav, il ne disparaît plus au premier « Continuer » -->
+      <div class="warn" id="keyWarn"></div>
       <div class="msg" id="msg"></div>
       <button type="button" class="btn ghost" id="prev" data-i="btn.prev"></button>
       <div class="summary" id="summary"></div>
@@ -423,7 +459,8 @@ const PREVIEWS = {
 // Exemples de CTA à l'écran : nom + image ou vidéo courte (gif, png, mp4). Vide = « Aperçu bientôt ».
 // Source : dossier Drive « Videos Espaces Clients 05 Brief », via sync_previews.mjs (client/previews.js). Secours : pastilles vides.
 const CTA_EXAMPLES = (window.DS_PREVIEWS && window.DS_PREVIEWS.cta && window.DS_PREVIEWS.cta.length) ? window.DS_PREVIEWS.cta : [{ name: "Jordan Pierre", media: "" }, { name: "Courtney Kay", media: "" }];
-const PRICES = { podcast: "", vsl: "", standard: "", premium: "", reel_basique: "", reel_signature: "", miniature: "", trailer: "" };
+// Aucun prix en dur ici : chaque carte lit la grille DU CLIENT (RPC client_prices → `prices`), comme « Autres prestations ».
+// Pas de prix posé pour ce client = « Sur devis » (cas rare et légitime : face cam, studio sans grille).
 
 /* ---------------- textes ---------------- */
 const I18N = {
@@ -434,16 +471,18 @@ const I18N = {
     "s1.title":"Votre projet","s1.hint":"Un nom, un produit. Le reste vient après.",
     "f.projet":"Nom du projet ou de l'épisode","ph.projet":"Ex. Épisode 12 — Dr Weber",
     "f.produit":"Ce que vous nous confiez","f.episodes":"Nombre d'épisodes",
-    produit:{podcast:["Podcast / Interview","Épisode complet monté, 16:9, prêt à publier."],vsl:["VSL","Vidéo de vente, 16:9, rythme et sous-titres travaillés."]},
+    produit:{podcast:["Podcast / Interview","Épisode complet monté, 16:9, prêt à publier."],vsl:["VSL","Vidéo de vente, 16:9, rythme et sous-titres travaillés."],facecam:["Face cam","Vidéo face caméra (YouTube), 16:9, montage et motion design."]},
     "note.episode":"Un épisode = une vidéo finie jusqu'à 60 minutes. Au-delà, un supplément par tranche de 30 minutes.",
-    "f.formats":"Autres formats","formuleOff":"La formule ne concerne que Podcast / Interview et VSL. Vous pouvez continuer.","bundle.inc":"Dans le pack : 1 épisode + 3 reels inclus","promo":"PROMO","bundle.podcastOff":"Déjà inclus dans le Bundle.","bundle.pick":"1 épisode + 3 reels inclus. Choisissez un niveau.","facecam.pick":"Vidéo face caméra (YouTube). Choisissez un niveau.",
+    "formuleOff":"Choisissez d'abord un produit à l'étape 01 — Produit.","bundle.inc":"{n} reels inclus dans le pack","promo":"PROMO","instead":"au lieu de","total":"Total","bundleNote":"Un pack contient déjà son épisode et ses reels : son contenu est détaillé sur la carte.",
+    "formuleNoProduct":"Vos vidéos sont dans « Autres prestations », à l'étape 01 — Produit : choisissez votre pack là-bas, puis revenez ajouter vos extras ici.","formuleAsk":"Rien n'est encore ouvert ici pour votre studio. Écrivez-nous sur WhatsApp : on cale votre formule avec vous et vous commandez juste après.","parts.incl":"inclus",
+    "x.quoting":"Votre grille est en cours de finalisation : choisissez ce dont vous avez besoin, nous confirmons le prix avec vous.","x.noProduct":"Votre offre est faite sur mesure : choisissez dans vos prestations ci-dessous.",
     fmt:{single_cam:["Single cam 4K","Podcast ou interview, 1 caméra, full rush : review, dérush, color grading, audio mix"],multicam:["Multicam 4K","Cuts des rushes, changements de caméra, color grading, audio mix, logo, lower third"],facecam:["Face cam",""],bundle:["Bundle",""]},
     fclv:{simple:["Simple","Vidéo face caméra (YouTube) : montage + motion design léger"],dynamique:["Dynamique","Plus de coupes, plus de motion design"],signature:["Signature","Full motion design, niveau le plus élevé"]},
-    bdlv:{standard:["Standard","1 épisode + 3 reels inclus"],premium:["Premium","1 épisode + 3 reels inclus"]},
+    bdlv:{standard:["Standard",""],premium:["Premium",""]},
     "x.more":"Autres prestations","x.moreSub":"Tout ce qui a un prix chez vous et qui n'est pas au-dessus. Mettez une quantité, on l'ajoute à la commande.","x.pack":"Votre pack","x.unit":"À l'unité",
-    "s2.title":"Votre formule","s2.hint":"Le niveau de finition de l'épisode uniquement. Les extras se choisissent à part.",
+    "s2.title":"Votre formule","s2.hint":"Le prix de votre vidéo : un seul choix, c'est l'épisode lui-même. Les extras se choisissent à l'étape suivante.",
     formule:{standard:["Standard","Montage propre et rythmé, habillage simple, son mixé. Pas d'intro dédiée."],premium:["Premium","Standard + une ouverture percutante de 45 secondes montée depuis vos meilleurs moments, titres animés, sound design."]},
-    "s3.title":"Les extras","s3.hint":"Facultatif. Ajoutez ce qui accompagne l'épisode.",
+    "s3.title":"Les extras","s3.hint":"Facultatif. Ce qui s'ajoute par-dessus votre épisode.",
     "x.reels":"Reels","x.reelsSub":"Extraits verticaux 9:16 de votre épisode, sous-titres animés.",
     reels:{reel_basique:["Reel standard","Les meilleurs moments, sous-titres animés, sound design."],reel_signature:["Reel premium","Motion design, b-roll, sound design poussé, niveau publicitaire."]},
     "x.miniature":"Miniature","x.miniatureSub":"Le visuel de couverture de l'épisode, une par vidéo.",
@@ -465,11 +504,12 @@ const I18N = {
     "f.autres":"Autre chose à nous dire ?","ph.autres":"Facultatif",
     "s6.title":"Récapitulatif","s6.hint":"Vérifiez, puis envoyez. Vous pouvez revenir en arrière.",
     recap:{projet:"Projet",commande:"Commande",autre_demande:"Autre demande",rushes:"Rushes",logos:"Logos et polices",references:"Vidéos d\'inspiration",description:"Brief",palette:"Palette",deadline:"Deadline souhaitée",contact:"Contact",email:"E-mail",autres:"Autres infos",prix:"Prix"},
+    "r.logo":"Logo","r.font":"Police","r.shot":"Capture",
     quote:"Sur devis", quoteLong:"Sur devis, confirmé par notre équipe à réception.",
     "btn.prev":"Retour","btn.next":"Continuer","btn.send":"Envoyer à DS Editing","btn.sending":"Envoi…",
     saved:"Brouillon enregistré sur cet appareil", empty:"Votre commande apparaîtra ici",
     units:{episode:["épisode","épisodes"],reel_basique:["reel standard","reels standard"],reel_signature:["reel premium","reels premium"],miniature:["miniature","miniatures"],trailer:["trailer","trailers"]},
-    err:{projet:"Donnez un nom au projet.",produit:"Choisissez une prestation : Podcast, VSL, Single cam, Multicam, Face cam, Bundle, ou un pack / une autre prestation de la liste.",formule:"Choisissez une formule.",rushes:"Ajoutez au moins un lien de rushes.",description:"Décrivez ce que vous attendez, même en trois lignes.",contact:"Indiquez un contact et un moyen de le joindre.",email:"Indiquez un e-mail valide, c'est là qu'arrivent la confirmation et le suivi.",send:"L'envoi a échoué. Réessayez, ou écrivez-nous sur WhatsApp.",terms:"Cochez les conditions de collaboration pour envoyer la commande.",
+    err:{projet:"Donnez un nom au projet.",produit0:"Choisissez ce que vous nous confiez, à l'étape 01 — Produit.",produit:"Votre commande est encore vide : choisissez un produit à l'étape 01 et sa formule à l'étape 02, ou un de vos packs à l'étape 01.",noVideo:"Il manque la vidéo : les extras s'ajoutent à un épisode ou à un pack. Choisissez-en un à l'étape 01 — Produit, on garde le reste de votre sélection.",formule:"Choisissez une formule ou un pack à l'étape 02 — Formule.",rushes:"Ajoutez au moins un lien de rushes.",description:"Décrivez ce que vous attendez, même en trois lignes.",contact:"Indiquez un contact et un moyen de le joindre.",email:"Indiquez un e-mail valide, c'est là qu'arrivent la confirmation et le suivi.",send:"L'envoi a échoué. Réessayez, ou écrivez-nous sur WhatsApp.",terms:"Cochez les conditions de collaboration pour envoyer la commande.",
       key:"Ouvrez cet espace depuis votre lien personnel ou l'Espace client pour envoyer votre commande.",keyLink:"Aller à l'Espace client",bad_key:"Votre accès n'est pas reconnu pour ce studio. Ouvrez cet espace depuis votre lien personnel ou l'Espace client.",bad_email:"L'e-mail n'est pas valide. Corrigez-le à l'étape Brief.",no_project:"Donnez un nom au projet, à l'étape Produit.",no_rushes:"Aucun lien de rushes valide. Collez au moins un lien complet (https://…) à l'étape Fichiers.",rate_limit:"Beaucoup de commandes viennent d'être envoyées depuis cet espace. Réessayez dans une heure, ou écrivez-nous sur WhatsApp."},
     "s6.terms":"J'accepte les conditions de collaboration DS Editing : facture hebdomadaire, paiement à réception, pénalité de 20 % par semaine de retard.","s6.termsLink":"Lire les conditions","ok.space":"Ouvrir mon espace (commandes, factures)",
     "ok.track":"Votre numéro de suivi","ok.trackHint":"Gardez-le : il est aussi dans votre e-mail de confirmation.","ok.follow":"Suivre ma commande",
@@ -484,16 +524,18 @@ const I18N = {
     "s1.title":"Your project","s1.hint":"A name, a product. The rest comes next.",
     "f.projet":"Project or episode name","ph.projet":"e.g. Episode 12 — Dr Weber",
     "f.produit":"What you're sending us","f.episodes":"Number of episodes",
-    produit:{podcast:["Podcast / Interview","Full edited episode, 16:9, ready to publish."],vsl:["VSL","Sales video, 16:9, pacing and captions crafted."]},
+    produit:{podcast:["Podcast / Interview","Full edited episode, 16:9, ready to publish."],vsl:["VSL","Sales video, 16:9, pacing and captions crafted."],facecam:["Face cam","Talking-head video (YouTube), 16:9, editing and motion design."]},
     "note.episode":"One episode = one finished video up to 60 minutes. Beyond, a supplement per extra 30 minutes.",
-    "f.formats":"Other formats","formuleOff":"The package only applies to Podcast / Interview and VSL. You can continue.","bundle.inc":"In the pack: 1 episode + 3 reels included","promo":"PROMO","bundle.podcastOff":"Already included in the Bundle.","bundle.pick":"1 episode + 3 reels included. Pick a tier.","facecam.pick":"Talking-head video (YouTube). Pick a tier.",
+    "formuleOff":"Pick a product first, in step 01 — Product.","bundle.inc":"{n} reels included in the pack","promo":"PROMO","instead":"instead of","total":"Total","bundleNote":"A pack already contains its episode and its reels: the contents are listed on the card.",
+    "formuleNoProduct":"Your videos live under “Other services”, in step 01 — Product: pick your pack there, then come back and add your extras here.","formuleAsk":"Nothing is open here for your studio yet. Message us on WhatsApp: we'll set your package with you and you can order right after.","parts.incl":"included",
+    "x.quoting":"Your price list is being finalised: pick what you need, we'll confirm the price with you.","x.noProduct":"Your offer is tailor-made: pick from your services below.",
     fmt:{single_cam:["Single-cam 4K","Podcast or interview, one camera, full rushes: review, cut, color grading, audio mix"],multicam:["Multicam 4K","Rush cuts, camera switching, color grading, audio mix, logo, lower thirds"],facecam:["Face cam",""],bundle:["Bundle",""]},
     fclv:{simple:["Simple","Talking-head video (YouTube): editing + light motion design"],dynamique:["Dynamic","More cuts, more motion design"],signature:["Signature","Full motion design, top tier"]},
-    bdlv:{standard:["Standard","1 episode + 3 reels included"],premium:["Premium","1 episode + 3 reels included"]},
+    bdlv:{standard:["Standard",""],premium:["Premium",""]},
     "x.more":"Other services","x.moreSub":"Everything priced in your grid that isn't above. Set a quantity and we add it to the order.","x.pack":"Your pack","x.unit":"Per item",
-    "s2.title":"Your package","s2.hint":"The finish level of the episode only. Extras are chosen separately.",
+    "s2.title":"Your package","s2.hint":"The price of your video: one single choice, it is the episode itself. Extras come in the next step.",
     formule:{standard:["Standard","Clean, paced edit, simple graphics, mixed sound. No dedicated intro."],premium:["Premium","Standard + a punchy 45 s cold open cut from your strongest moments, motion titles, sound design."]},
-    "s3.title":"Extras","s3.hint":"Optional. Add what goes with the episode.",
+    "s3.title":"Extras","s3.hint":"Optional. What is added on top of your episode.",
     "x.reels":"Reels","x.reelsSub":"Vertical 9:16 clips from your episode, animated captions.",
     reels:{reel_basique:["Standard reel","Best moments, animated captions, sound design."],reel_signature:["Premium reel","Motion design, b-roll, deep sound design, ad-grade."]},
     "x.miniature":"Thumbnail","x.miniatureSub":"The cover visual of the episode, one per video.",
@@ -515,11 +557,12 @@ const I18N = {
     "f.autres":"Anything else?","ph.autres":"Optional",
     "s6.title":"Summary","s6.hint":"Check, then send. You can go back.",
     recap:{projet:"Project",commande:"Order",autre_demande:"Other request",rushes:"Footage",logos:"Logos & fonts",references:"Inspiration videos",description:"Brief",palette:"Palette",deadline:"Desired deadline",contact:"Contact",email:"Email",autres:"Other info",prix:"Price"},
+    "r.logo":"Logo","r.font":"Font","r.shot":"Screenshot",
     quote:"On quote", quoteLong:"On quote, confirmed by our team on receipt.",
     "btn.prev":"Back","btn.next":"Continue","btn.send":"Send to DS Editing","btn.sending":"Sending…",
     saved:"Draft saved on this device", empty:"Your order will appear here",
     units:{episode:["episode","episodes"],reel_basique:["standard reel","standard reels"],reel_signature:["premium reel","premium reels"],miniature:["thumbnail","thumbnails"],trailer:["trailer","trailers"]},
-    err:{projet:"Give the project a name.",produit:"Choose a service: Podcast, VSL, Single cam, Multicam, Face cam, Bundle, or a pack / another service from the list.",formule:"Choose a package.",rushes:"Add at least one footage link.",description:"Describe what you expect, even in three lines.",contact:"Give us a contact and a way to reach them.",email:"Enter a valid email, that's where the confirmation and tracking go.",send:"Sending failed. Try again, or message us on WhatsApp.",terms:"Tick the terms of collaboration to send the order.",
+    err:{projet:"Give the project a name.",produit0:"Choose what you're sending us, in step 01 — Product.",produit:"Your order is still empty: pick a product in step 01 and its package in step 02, or one of your packs in step 01.",noVideo:"The video itself is missing: extras come on top of an episode or a pack. Pick one in step 01 — Product, we keep the rest of your selection.",formule:"Choose a package or a pack in step 02 — Package.",rushes:"Add at least one footage link.",description:"Describe what you expect, even in three lines.",contact:"Give us a contact and a way to reach them.",email:"Enter a valid email, that's where the confirmation and tracking go.",send:"Sending failed. Try again, or message us on WhatsApp.",terms:"Tick the terms of collaboration to send the order.",
       key:"Open this space from your personal link or the Client space to send your order.",keyLink:"Go to the Client space",bad_key:"Your access isn't recognised for this studio. Open this space from your personal link or the Client space.",bad_email:"The email isn't valid. Fix it in the Brief step.",no_project:"Give the project a name, in the Product step.",no_rushes:"No valid footage link. Paste at least one full link (https://…) in the Files step.",rate_limit:"A lot of orders were just sent from this space. Try again in an hour, or message us on WhatsApp."},
     "s6.terms":"I accept the DS Editing terms of collaboration: weekly invoice, payment on receipt, 20% penalty per week late.","s6.termsLink":"Read the terms","ok.space":"Open my space (orders, invoices)",
     "ok.track":"Your tracking number","ok.trackHint":"Keep it: it's also in your confirmation email.","ok.follow":"Track my order",
@@ -528,31 +571,94 @@ const I18N = {
     "ok.again":"Submit another project", footer:"your footage is handled on receipt", none:"—", already:"already sent",
   },
 };
-const FORMULES = ["standard", "premium"];
 const REELS = ["reel_basique", "reel_signature"];
-const FACECAMS = ["simple", "dynamique", "signature"];
-const BUNDLES = ["standard", "premium"];
-const bundleReelKey = () => (draft.bundle === "premium" ? "reel_signature" : "reel_basique");
-const minQty = (k) => (draft.bundle && bundleReelKey() === k ? 3 : 0); // 3 reels du niveau sont inclus dans le Bundle
+const REEL_DB = { reel_basique: "reel_standard", reel_signature: "reel_premium" }; // clés locales de la page → clés de la base
+/* ---------------- la commande : UN produit, UN épisode, des extras ----------------
+   01 Produit = le TYPE de vidéo, sans prix. 02 Formule = l'épisode lui-même et son prix : une seule carte
+   cochable, toutes familles confondues (podcast_*, vsl_*, single_cam_4k, multicam_4k, facecam_*, bundle_*).
+   03 Extra = seulement ce qui s'ajoute PAR-DESSUS l'épisode (reels, miniature, trailer).
+   Un seul champ `draft.offre` porte l'épisode : commander deux épisodes pour une vidéo est donc impossible. */
+const PRODUITS = ["podcast", "vsl", "facecam"];
+// Rattachement produit → épisode. La base ne porte PAS ce lien : `offers.family` dit seulement
+// episode / bundle / facecam / vsl. Il se lit donc sur la clé (podcast_*, vsl_*, facecam_*), sur
+// `offers.bundle_parts` pour un pack (bundle_standard contient podcast_standard, offers_v1c.sql l.41-45),
+// et à la main pour single_cam_4k / multicam_4k, décrits en base comme un épisode de podcast ou
+// d'interview (offers_v1.sql l.53-54 : « Single cam 4K edit », « Multicam 4K edit »).
+const EP_FIX = { single_cam_4k: "podcast", multicam_4k: "podcast" };
+const EP_FAMILIES = new Set(["episode", "bundle", "facecam", "vsl"]);
+// Repli si la table `offers` est injoignable : la page continue de marcher avec ces clés-là.
+const EP_FALLBACK = {
+  podcast: ["podcast_standard", "podcast_premium", "single_cam_4k", "multicam_4k", "bundle_standard", "bundle_premium"],
+  vsl: ["vsl_standard", "vsl_premium"],
+  facecam: ["facecam_simple", "facecam_dynamique", "facecam_signature"],
+};
+const EP_ALL = new Set(Object.values(EP_FALLBACK).flat());
+const BUNDLE_REELS = 3;                                                // repli si offers.bundle_reels_included n'est pas lu (seule constante de contenu de pack)
+const offerOf = (k) => catalog.find((o) => o && o.item_key === k) || null;
+const isBundle = (k) => { const o = offerOf(k); return o ? o.family === "bundle" : /^bundle_/.test(k || ""); };
+function produitOf(k, deep) {
+  if (EP_FIX[k]) return EP_FIX[k];
+  const m = /^(podcast|vsl|facecam)_/.exec(k || ""); if (m) return m[1];
+  if (!deep && isBundle(k)) {                                          // un pack appartient au produit de son épisode
+    for (const p of Object.keys((offerOf(k) || {}).bundle_parts || {})) { const r = produitOf(p, true); if (r) return r; }
+    return "podcast";
+  }
+  return null;
+}
+// Tous les épisodes rattachés à un produit, dans l'ordre de `offers.sort`, AVANT la grille du client.
+function epAll(p) {
+  const db = catalog.filter((o) => o && EP_FAMILIES.has(o.family) && produitOf(o.item_key) === p).map((o) => o.item_key);
+  return db.length ? db : EP_FALLBACK[p] || [];
+}
+// Les épisodes RÉELLEMENT tarifés chez ce client : c'est cette liste qui décide du mode devis (quoteMode).
+const epPriced = (p) => epAll(p).filter((k) => !dupHidden(k) && hasPrice(k));
+// Les épisodes proposés pour un produit, filtrés par la grille du client.
+const epKeys = (p) => epAll(p).filter(cardShown);
+const epN = () => Math.min(99, Math.max(1, Number(draft.episodes) || 1));
+const inclPer = () => { const n = Number((offerOf(draft.offre) || {}).bundle_reels_included); return Number.isFinite(n) && n > 0 ? n : BUNDLE_REELS; };
+const inclTotal = () => (draft.offre && isBundle(draft.offre) ? inclPer() * epN() : 0);
+const bundleReelKey = () => (/premium/.test(draft.offre || "") ? "reel_signature" : "reel_basique");
+const minQty = (k) => (bundleReelKey() === k ? inclTotal() : 0);       // les reels inclus dans un pack ne se retirent pas
 const maxQty = (k) => (LOCAL_QTY.has(k) ? 99 : MAX_MORE);              // cartes dédiées : 99 comme avant ; « Autres prestations » : 20
-// Clés de prix renvoyées par client_prices (RPC) : null = inconnu (appel échoué ou vide) → tout afficher comme avant
+// Clés de prix renvoyées par client_prices (RPC) : null = inconnu (appel échoué ou pas de clé d'accès)
 let avail = null;
-const shown = (k) => (!avail || avail.has(k)) && !dupHidden(k);
-// Promos bundle (RPC client_bundle_promos) : { standard: {price, list, pct}, premium: … } ; absent = rien de barré, jamais de fausse promo
+const hasPrice = (k) => Number.isFinite(prices[k]);
+/* Mode « Sur devis » : visiteur sans clé, RPC muette, ou client qui n'a AUCUNE VIDÉO COMMANDABLE —
+   ni épisode tarifé, ni pack client tarifé. Le critère n'est plus « aucun prix du tout » : april-jackson
+   a 11 lignes de grille à NULL et un seul prix posé (extra_30min, 30 $), ce qui suffisait à sortir du mode
+   devis. Résultat observé : l'étape 01 ne proposait plus aucun type, 02 et 03 étaient vides, et la seule
+   chose commandable était un supplément de 30 min — une commande sans vidéo. Un prix de supplément n'est
+   pas une grille utilisable : ce client voit le formulaire complet en « Sur devis », comme the-move-miami.
+   Dans ce mode on ne cache RIEN : un formulaire qui se vide est un deal perdu.
+   Un client qui a des épisodes pour certains types seulement (studio-test : podcast et VSL, pas de face
+   cam) ou seulement ses packs (recordia) reste en mode NORMAL : lui a bien une vidéo à commander, et seuls
+   les types sans épisode tarifé disparaissent de 01. */
+const quoteMode = () => !hasPacks() && !PRODUITS.some((p) => epPriced(p).length);
+// Une carte disparaît si elle n'a pas de prix chez ce client (chacun ne voit que SA nomenclature) ou si elle
+// doublonnerait un pack client déjà tarifé (anti-double facturation).
+const cardShown = (k) => !dupHidden(k) && (quoteMode() || hasPrice(k));
+// Promos pack (RPC client_bundle_promos) : { bundle_standard: {price, list, pct, cur}, … } ; absent = rien de barré, jamais de fausse promo
 let promos = {};
 const num = (x) => (x === null || x === undefined || x === "" ? NaN : Number(x));
-// Même format que client/espace.html : USD → « $1,234.50 », EUR → « 1 234,50 € » ; devise inconnue → nombre seul, jamais un mauvais symbole
-const money = (x, cur) => { const v = Number(x), o = { minimumFractionDigits: Number.isInteger(v) ? 0 : 2, maximumFractionDigits: 2 }; return cur === "USD" ? "$" + v.toLocaleString("en-US", o) : cur === "EUR" ? v.toLocaleString("fr-FR", o) + " €" : v.toLocaleString(lang === "fr" ? "fr-FR" : "en-US", o); };
+/* Le format suit la LANGUE AFFICHÉE, jamais le pays de la devise. USD → « $1,234.50 » (inchangé).
+   EUR → « 1 234,50 € » en français, « €1,234.50 » en anglais : un studio en euros lu en anglais
+   affichait « 169,90 € », illisible pour un client américain. Devise inconnue → nombre seul, jamais un
+   mauvais symbole. Les deux cas USD et EUR sont nommés ici, donc aucune devise n'hérite d'un autre format. */
+const money = (x, cur) => { const v = Number(x), o = { minimumFractionDigits: Number.isInteger(v) ? 0 : 2, maximumFractionDigits: 2 }, loc = lang === "fr" ? "fr-FR" : "en-US"; return cur === "USD" ? "$" + v.toLocaleString("en-US", o) : cur === "EUR" ? (lang === "fr" ? v.toLocaleString("fr-FR", o) + " €" : "€" + v.toLocaleString("en-US", o)) : v.toLocaleString(loc, o); };
+// LE prix affiché, partout : celui de la grille du client, à l'unité de CE qu'on vend (une vidéo, ou un pack
+// avec son contenu détaillé juste en dessous). Jamais une moyenne « pack ÷ 4 vidéos » : elle mélangeait
+// épisode et reels et trompait le client. Rien de posé pour ce client → « Sur devis ».
+const unitPriceTxt = (k) => (hasPrice(k) ? money(prices[k], cur) : t("quote"));
 function applyPromos(rows) {
   const out = {};
   if (Array.isArray(rows)) for (const r of rows) {
-    const m = r && /^bundle_(standard|premium)$/.exec(String(r.item_key || "")); if (!m) continue;
+    const k = r && String(r.item_key || ""); if (!k) continue;
     const price = num(r.price), list = num(r.list_price), pct = num(r.save_pct);
-    if (price > 0 && list > price && pct > 0) out[m[1]] = { price, list, pct: Math.round(pct), cur: String(r.currency || "").toUpperCase() }; // sinon : pas de promo affichée
+    if (price > 0 && list > price && pct > 0) out[k] = { price, list, pct: Math.round(pct), cur: String(r.currency || "").toUpperCase() }; // sinon : pas de promo affichée
   }
-  promos = out; renderFormats();
+  promos = out;
   if (!cur) { const withCur = Object.values(out).find((q) => q.cur); if (withCur) cur = withCur.cur; } // secours : devise lue sur une promo de bundle
-  renderMore();
+  rerender();
 }
 /* ---------------- catalogue des offres (table `offers`, lecture publique) ----------------
    Aucune offre n'est écrite en dur ici : toute offre active qui a un prix chez CE client et qui n'a pas
@@ -576,12 +682,46 @@ const moreOffers = () => catalog
   .slice()
   .sort((a, b) => ((a.family === "pack_client" ? 0 : 1) - (b.family === "pack_client" ? 0 : 1)) || (Number(a.sort ?? 9999) - Number(b.sort ?? 9999)) || String(a.item_key).localeCompare(String(b.item_key)));
 const moreQty = () => { const out = {}; for (const o of moreOffers()) { const n = draft.qty[o.item_key] || 0; if (n > 0) out[o.item_key] = n; } return out; };
+/* Garde-fou : une commande contient au moins UNE vidéo — l'épisode de l'étape 02, ou un pack / un
+   épisode pris dans « Autres prestations ». Des suppléments seuls (30 min en plus, miniature, charte)
+   ne font pas une commande : c'est ce qu'april-jackson pouvait envoyer. Contrôlé à la sortie de 03 ET
+   avant l'envoi, donc on ne peut pas y arriver en revenant en arrière. */
+const isVideoKey = (k) => { const f = famOf(k); return f ? (f === "pack_client" || EP_FAMILIES.has(f)) : EP_ALL.has(k); };
+const hasVideo = () => !!draft.offre || Object.keys(moreQty()).some(isVideoKey);
+// bundle_reels_included et bundle_parts sont lus EN BASE : le contenu d'un pack n'est jamais écrit ici.
+// Si ces colonnes manquent (base plus ancienne), on retombe sur les colonnes d'origine et sur BUNDLE_REELS.
+const CAT_COLS = "item_key,label_fr,label_en,family,sort,bundle_reels_included,bundle_parts";
 async function loadCatalog() {
-  const r = await fetch(`${SB_URL}/rest/v1/offers?select=item_key,label_fr,label_en,family,sort&active=is.true&order=sort`, { headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY } });
-  if (!r.ok) throw new Error("http_" + r.status);
-  return r.json();
+  let last = 0;
+  for (const cols of [CAT_COLS, "item_key,label_fr,label_en,family,sort"]) {
+    const r = await fetch(`${SB_URL}/rest/v1/offers?select=${cols}&active=is.true&order=sort`, { headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY } });
+    if (r.ok) return r.json();
+    last = r.status; if (r.status !== 400) break;                      // 400 = colonne inconnue, on retente ; autre erreur = on sort
+  }
+  throw new Error("http_" + last);
 }
-const promoHtml = (bds) => { const rows = bds.filter((l) => promos[l]).map((l) => { const q = promos[l], cur = q.cur || String((studio && studio.currency) || "").toUpperCase(); return `<div class="row"><span class="lvn">${t("bdlv")[l][0]}</span><span class="tag">${t("promo")}</span><s>${money(q.list, cur)}</s><b>${money(q.price, cur)}</b><span class="pct">−${q.pct}${lang === "fr" ? " %" : "%"}</span></div>`; }); return rows.length ? `<div class="promo">${rows.join("")}</div>` : ""; };
+/* Contenu RÉEL d'un pack, ligne par ligne, au prix unitaire de la grille du client (`offers.bundle_parts`).
+   Prix barré = somme des parts, affiché UNIQUEMENT si chaque part a un prix chez ce client (sinon on
+   annoncerait une économie inventée). Même mise en forme pour les bundles et pour les packs client
+   (rec_niveau_*, offers_v1d.sql l.86-93) : deux packs équivalents s'affichent pareil. */
+function partsHtml(k) {
+  const o = offerOf(k), parts = o && o.bundle_parts && typeof o.bundle_parts === "object" ? o.bundle_parts : null;
+  const ent = parts ? Object.entries(parts).filter(([, n]) => Number(n) > 0) : [];
+  if (!ent.length) return "";
+  let sum = 0, all = true;
+  const rows = ent.map(([pk, n]) => {
+    const qn = Number(n), up = prices[pk], priced = Number.isFinite(up);
+    if (priced) sum += Math.round(qn * up * 100) / 100; else all = false;
+    // Ligne sans prix dans la grille du client : jamais un prix inventé, jamais une ligne nue non plus
+    // (observé : « 1 × Multicam 4K edit » tout seul dans rec_niveau_2 chez recordia). Elle est « inclus ».
+    return `<div class="row"><span class="pq">${qn} ×</span><span class="pn">${esc(offerLabel(pk))}</span>${priced ? `<b>${esc(money(up, cur))}</b>` : `<span class="pct">${t("parts.incl")}</span>`}</div>`;
+  }).join("");
+  const pack = prices[k], rpc = promos[k];
+  const promo = rpc ? { list: rpc.list, pct: rpc.pct, cur: rpc.cur || cur }
+    : (all && Number.isFinite(pack) && sum > pack ? { list: sum, pct: Math.round((sum - pack) / sum * 100), cur } : null);
+  const foot = promo ? `<div class="row"><span class="tag">${t("promo")}</span><span class="pct">${t("instead")}</span><s>${esc(money(promo.list, promo.cur))}</s><span class="pct">−${promo.pct}${lang === "fr" ? " %" : "%"}</span></div>` : "";
+  return `<div class="parts">${rows}${foot}</div>`;
+}
 
 /* ---------------- client & langue ---------------- */
 const params = new URLSearchParams(location.search);
@@ -597,16 +737,28 @@ const accessKey = (params.get("k") || (() => { try { return localStorage.getItem
 let studio = null;      // { slug, name, lang } retrouvé depuis la clé (RPC client_slug)
 let langTouched = false; // la langue choisie à la main l'emporte sur celle du studio
 let orderToken = "";    // numéro de suivi, une fois la commande enregistrée
+let accessWarn = "";    // avertissement d'accès (pas de clé, clé non reconnue) : rendu à CHAQUE étape par renderNav
 const clientLabel = () => (studio && studio.name) || (slug ? slug.split("-").filter(Boolean).map(cap).join(" ") : "Demo");
 const KEY = "ds-depot-" + (slug || "demo");
 let step = 0;
 const draft = Object.assign({ qty: {}, episodes: 1 }, load());
-if (draft.formule && !["standard", "premium"].includes(draft.formule)) delete draft.formule;
-if (draft.produit && !["podcast", "vsl"].includes(draft.produit)) delete draft.produit;
-if (draft.facecam && !FACECAMS.includes(draft.facecam)) delete draft.facecam;
-if (draft.bundle && !BUNDLES.includes(draft.bundle)) delete draft.bundle;
-if (draft.bundle && draft.produit === "podcast") delete draft.produit; // Bundle = épisode podcast inclus
-const price = (k) => PRICES[k] ? PRICES[k] : t("quote");
+/* Brouillon relu : on le remet d'aplomb avant le premier rendu. Un brouillon d'avant cette version portait
+   formule / bundle / single_cam / multicam / facecam séparément — donc potentiellement DEUX épisodes :
+   on le convertit en un seul (`draft.offre`), et on efface les anciens champs pour de bon. */
+if (!draft.offre) {
+  draft.offre = draft.bundle ? "bundle_" + draft.bundle
+    : draft.facecam ? "facecam_" + draft.facecam
+    : draft.multicam ? "multicam_4k"
+    : draft.single_cam ? "single_cam_4k"
+    : (draft.produit === "podcast" || draft.produit === "vsl") && draft.formule ? `${draft.produit}_${draft.formule}` : "";
+}
+delete draft.formule; delete draft.bundle; delete draft.single_cam; delete draft.multicam; delete draft.facecam;
+if (draft.offre && !EP_ALL.has(draft.offre)) delete draft.offre;        // clé inconnue : on repart de zéro plutôt que d'envoyer n'importe quoi
+if (draft.offre) draft.produit = produitOf(draft.offre) || draft.produit;
+if (!PRODUITS.includes(draft.produit)) delete draft.produit;
+if (!draft.produit) delete draft.offre;                                 // pas de produit = pas d'épisode
+draft.episodes = Math.min(99, Math.max(1, Number(draft.episodes) || 1));
+if (draft.offre && isBundle(draft.offre) && !Number.isFinite(draft.bundleBase)) draft.bundleBase = Math.max(BUNDLE_REELS, draft.bundlePrev || 0);
 const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 
 function applyText() {
@@ -616,9 +768,16 @@ function applyText() {
   $("#langBtn").textContent = lang === "fr" ? "EN" : "FR";
   $("#clientName").textContent = clientLabel();
   document.title = "DS Editing — " + (lang === "fr" ? "Nouveau projet" : "New project");
-  $("#pMiniature").textContent = price("miniature"); $("#pTrailer").textContent = price("trailer");
   if (orderToken) $("#trackLink").href = trackHref();
-  renderSteps(); renderProduit(); renderFormats(); renderMore(); renderFormule(); renderReels(); renderThumbs(); renderQty(); renderChips(); renderLinks("rushes"); renderLinks("references"); renderBrandkit(); renderCTA(); renderNav(); wirePreviews();
+  renderSteps(); renderThumbs(); renderQty(); renderChips(); renderLinks("rushes"); renderLinks("references"); renderBrandkit(); renderCTA(); rerender();
+}
+// Un seul point de re-rendu des choix : toute carte repasse par là, donc aucune classe « on » ne peut rester collée.
+function rerender() {
+  renderProduit(); renderFormule(); renderReels(); renderMore();
+  // une prestation sans prix chez ce client n'a pas de bloc : on ne propose jamais une ligne non facturable
+  $("#miniatureBlock").hidden = !cardShown("miniature"); $("#trailerBlock").hidden = !cardShown("trailer");
+  $("#pMiniature").textContent = unitPriceTxt("miniature"); $("#pTrailer").textContent = unitPriceTxt("trailer");
+  renderQty(); renderNav(); wirePreviews();
 }
 $("#langBtn").addEventListener("click", () => { lang = lang === "fr" ? "en" : "fr"; langTouched = true; applyText(); });
 
@@ -628,80 +787,141 @@ function renderSteps() {
   document.querySelectorAll(".step[data-go]").forEach((el) => el.addEventListener("click", () => { const g = +el.dataset.go; if (g < step) go(g); }));
   document.querySelectorAll(".panel").forEach((p) => p.classList.toggle("active", +p.dataset.step === step));
 }
-function choiceCard(key, name, desc, priceKey, previewKey, on, extraFoot = "") {
+// priceTxt vide = aucune pastille de prix (01 Produit n'affiche QUE le type)
+function choiceCard(key, name, desc, priceTxt, previewKey, on, extraFoot = "") {
   const hasPrev = !!PREVIEWS[previewKey];
   return `<div class="c ${on ? "on" : ""}" data-choice="${key}">
-    <div class="top"><div class="name">${name}</div><div class="price">${price(priceKey)}</div></div>
+    <div class="top"><div class="name">${name}</div>${priceTxt ? `<div class="price">${priceTxt}</div>` : ""}</div>
     <div class="desc">${desc}</div>
     <div class="foot">${previewKey ? `<button type="button" class="preview" data-prev="${previewKey}" ${hasPrev ? "" : "disabled"}><i>▶</i><span>${hasPrev ? t("preview") : t("previewSoon")}</span></button>` : "<span></span>"}${extraFoot}</div>
   </div>`;
 }
+
+/* ---------------- les TROIS seuls gestes de sélection de la page ----------------
+   Aucune carte n'écrit elle-même dans `draft` : tout passe par setProduit (01), setEpisode (02) ou
+   toggleQty / setQty (compteurs). C'est ce qui garantit qu'une carte se dé-sélectionne au re-clic. */
+// 01 : changer OU dé-cocher le produit remet l'étape 02 à zéro. Jamais une formule orpheline.
+function setProduit(p) {
+  const off = draft.produit === p;
+  clearEpisode();
+  if (off) delete draft.produit; else draft.produit = p;
+  save(); rerender();
+}
+// 02 : UN seul épisode, toutes familles confondues. Deux épisodes pour une vidéo sont impossibles.
+function setEpisode(k) {
+  const off = draft.offre === k;
+  clearEpisode();
+  if (!off) { draft.offre = k; if (isBundle(k)) setBundleReels(); }
+  save(); rerender();
+}
+const clearEpisode = () => { if (draft.offre && isBundle(draft.offre)) unsetBundleReels(); delete draft.offre; };
+/* Les reels inclus dans un pack sont posés dans le compteur de l'étape 03 pour que le client les voie, et
+   ils ne sont PAS facturés (voir order()). `bundlePrev` = ce qu'il avait avant le pack, `bundleBase` = ce
+   que le pack a posé : au retrait du pack, on lui rend ses reels à lui et on retire seulement les inclus. */
+function setBundleReels() {
+  const k = bundleReelKey(), q = draft.qty;
+  draft.bundlePrev = q[k] || 0;
+  draft.bundleBase = Math.max(inclTotal(), draft.bundlePrev);
+  q[k] = draft.bundleBase;
+}
+function unsetBundleReels() {
+  const k = bundleReelKey(), q = draft.qty;
+  const extra = Math.max(0, (q[k] || 0) - (draft.bundleBase || 0));     // les reels ajoutés PAR-DESSUS le pack restent
+  q[k] = Math.max(0, (draft.bundlePrev || 0) + extra);
+  delete draft.bundlePrev; delete draft.bundleBase;
+}
+// La quantité d'épisodes change : les reels inclus suivent, les extras du client restent
+function syncBundleReels() {
+  if (!draft.offre || !isBundle(draft.offre)) return;
+  const k = bundleReelKey(), q = draft.qty;
+  const extra = Math.max(0, (q[k] || 0) - (draft.bundleBase || 0));
+  draft.bundleBase = Math.max(inclTotal(), draft.bundlePrev || 0);
+  q[k] = draft.bundleBase + extra;
+}
+function toggleQty(k) {
+  const n = draft.qty[k] || 0, lo = minQty(k);
+  draft.qty[k] = n > lo ? lo : Math.max(1, lo);                         // 0 ↔ 1, sans descendre sous les reels inclus d'un pack
+  save(); rerender();
+}
+
+// 01 Produit : le TYPE seulement, sans aucun prix. Un seul produit à la fois.
 function renderProduit() {
   const p = t("produit");
-  $("#produit").innerHTML = ["podcast", "vsl"].filter((k) => !(k === "podcast" && dupHidden("podcast_standard"))).map((k) => choiceCard(k, p[k][0], k === "podcast" && draft.bundle ? t("bundle.podcastOff") : p[k][1], k, null, draft.produit === k)).join("");
-  const pc = $("#produit").querySelector('[data-choice="podcast"]'); if (pc) pc.classList.toggle("dis", !!draft.bundle); // Bundle = épisode podcast inclus : pas les deux
-  $("#produit").querySelectorAll("[data-choice]").forEach((el) => el.addEventListener("click", () => { if (el.dataset.choice === "podcast" && draft.bundle) return; draft.produit = el.dataset.choice; save(); renderProduit(); renderFormule(); renderNav(); wirePreviews(); }));
+  const list = PRODUITS.filter((k) => epKeys(k).length);
+  $("#produit").innerHTML = list.map((k) => choiceCard("produit:" + k, p[k][0], p[k][1], "", null, draft.produit === k)).join("");
+  $("#produit").querySelectorAll("[data-choice]").forEach((el) => el.addEventListener("click", () => setProduit(el.dataset.choice.split(":")[1])));
+  // Garde-fou : la grille du client ne laisse aucun produit affichable → on dit où aller, jamais de cul-de-sac
+  $("#produitNote").textContent = list.length ? (avail !== null && quoteMode() ? t("x.quoting") : "") : (moreOffers().length ? t("x.noProduct") : t("x.quoting"));
 }
-// Single cam / Multicam (cases à cocher), Face cam et Bundle (un niveau à choisir). Une offre sans prix pour ce client est cachée (client_prices).
-function setBundle(lv) {
-  const q = draft.qty; const oldK = bundleReelKey();
-  if (draft.bundle && q[oldK] === 3 && (draft.bundlePrev || 0) < 3) q[oldK] = draft.bundlePrev || 0; // on retire les 3 reels qu'on avait posés
-  if (lv) { draft.bundle = lv; if (draft.produit === "podcast") delete draft.produit; const k = bundleReelKey(); draft.bundlePrev = q[k] || 0; q[k] = Math.max(3, q[k] || 0); }
-  else { delete draft.bundle; delete draft.bundlePrev; }
+// Libellé et description d'un épisode : les textes de la page quand ils existent, sinon le libellé de la base.
+function epText(k) {
+  const f = t("formule"), fm = t("fmt"), fl = t("fclv"), bl = t("bdlv");
+  const lv = (/_(standard|premium)$/.exec(k) || [])[1];
+  if (isBundle(k)) return [lv && bl[lv] ? `${fm.bundle[0]} ${bl[lv][0]}` : offerLabel(k), ""];
+  if (lv && /^(podcast|vsl)_/.test(k)) return f[lv];
+  if (k === "single_cam_4k") return fm.single_cam;
+  if (k === "multicam_4k") return fm.multicam;
+  const fc = (/^facecam_(\w+)$/.exec(k) || [])[1];
+  if (fc && fl[fc]) return [`${fm.facecam[0]} ${fl[fc][0]}`, fl[fc][1]];
+  return [offerLabel(k), ""];                                           // offre ajoutée en base : son libellé FR/EN, jamais une clé brute
 }
-function renderFormats() {
-  const f = t("fmt"), fl = t("fclv"), bl = t("bdlv"); const cards = [];
-  const lvBtns = (kind, ls, names, sel) => `<div class="lv">${ls.map((l) => `<button type="button" data-lv="${kind}:${l}" class="${l === sel ? "on" : ""}">${names[l][0]}</button>`).join("")}</div>`;
-  if (shown("single_cam_4k")) cards.push(choiceCard("single_cam", f.single_cam[0], f.single_cam[1], "single_cam", null, !!draft.single_cam));
-  if (shown("multicam_4k")) cards.push(choiceCard("multicam", f.multicam[0], f.multicam[1], "multicam", null, !!draft.multicam));
-  const fcs = FACECAMS.filter((l) => shown("facecam_" + l));
-  if (fcs.length) { const sel = fcs.includes(draft.facecam) ? draft.facecam : null; cards.push(choiceCard("facecam", f.facecam[0], sel ? fl[sel][1] : t("facecam.pick"), "facecam", null, !!sel, lvBtns("facecam", fcs, fl, sel))); }
-  const bds = BUNDLES.filter((l) => shown("bundle_" + l));
-  if (bds.length) { const sel = bds.includes(draft.bundle) ? draft.bundle : null; cards.push(choiceCard("bundle", f.bundle[0], (sel ? bl[sel][1] : t("bundle.pick")) + promoHtml(bds), "bundle", null, !!sel, lvBtns("bundle", bds, bl, sel))); }
-  $("#formats").innerHTML = cards.join("");
-  $("#formats").querySelectorAll("[data-choice]").forEach((el) => el.addEventListener("click", (e) => {
-    const k = el.dataset.choice; const lvEl = e.target.closest("[data-lv]"); const lv = lvEl ? lvEl.dataset.lv.split(":")[1] : null;
-    if (k === "single_cam" || k === "multicam") draft[k] = !draft[k];
-    else if (k === "facecam") { if (lv) draft.facecam = draft.facecam === lv ? null : lv; else if (!draft.facecam) draft.facecam = fcs[0]; if (!draft.facecam) delete draft.facecam; }
-    else if (k === "bundle") { if (lv) setBundle(draft.bundle === lv ? null : lv); else if (!draft.bundle) setBundle(bds[0]); }
-    save(); renderFormats(); renderProduit(); renderFormule(); renderReels(); renderNav(); wirePreviews();
+// Vidéos d'aperçu : seules les formules standard / premium en ont (PREVIEWS[produit][niveau])
+const epPrev = (k) => ((/^(?:podcast|vsl)_(standard|premium)$/.exec(k) || [])[1] || null);
+/* 02 Formule : l'épisode lui-même, et uniquement ceux du produit choisi en 01. Une seule carte cochable à
+   la fois, familles confondues : single cam, multicam, formules, face cam et packs sont TOUS des épisodes
+   (offers_v1.sql l.51-61), jamais des suppléments. Le compteur de quantité est posé sur la carte choisie. */
+/* D2 : quand l'étape 01 n'a aucun type à proposer, 02 ne doit PAS dire « choisissez d'abord un produit
+   à l'étape 01 » — observé mot pour mot chez recordia et april-jackson, le client tournait en rond entre
+   01 et 02. On dit la vérité et on l'oriente vers ce qui EST commandable chez lui : ses packs (étape 01,
+   « Autres prestations »), ou une prise de contact s'il n'a encore rien d'ouvert. */
+const noEpNote = () => (moreOffers().length ? t("formuleNoProduct") : t("formuleAsk"));
+const anyProduit = () => PRODUITS.some((p) => epKeys(p).length);
+function renderFormule() {
+  const box = $("#formule"), note = $("#formuleNote");
+  if (!draft.produit) { box.innerHTML = ""; note.textContent = anyProduit() ? t("formuleOff") : noEpNote(); return; } // cascade stricte : jamais une formule cliquable sans produit
+  const keys = epKeys(draft.produit);
+  box.innerHTML = keys.map((k) => {
+    const on = draft.offre === k, [name, desc] = epText(k);
+    const foot = on ? `<div class="qty"><span class="lab">${t("f.episodes")}</span><button type="button" data-dec="episodes">−</button><input type="number" min="1" max="99" value="${epN()}" data-q="episodes"/><button type="button" data-inc="episodes">+</button></div>` : "";
+    return choiceCard("ep:" + k, esc(name), esc(desc) + partsHtml(k), unitPriceTxt(k), epPrev(k), on, foot);
+  }).join("");
+  note.textContent = !keys.length ? noEpNote()
+    : avail !== null && quoteMode() ? t("x.quoting")
+    : draft.offre && isBundle(draft.offre) ? t("bundleNote") : "";
+  box.querySelectorAll("[data-choice]").forEach((el) => el.addEventListener("click", (e) => {
+    if (e.target.closest(".preview") || e.target.closest(".qty")) return;
+    setEpisode(el.dataset.choice.slice(3));                             // « ep:<clé d'offre> »
   }));
 }
-// Applique la liste de prix du client : on cache ce qui n'a pas de prix et on retire du brouillon ce qui a disparu
+// Applique la liste de prix du client : c'est elle qui décide de ce qui s'affiche (chacun ne voit que sa nomenclature)
 function applyAvail(rows) {
   if (!Array.isArray(rows)) return;
   avail = new Set(rows.map((r) => r && r.item_key).filter(Boolean));
   prices = Object.fromEntries(rows.filter((r) => r && r.item_key).map((r) => [r.item_key, num(r.unit_price)]));
   cleanDraft();
 }
-// Retire du brouillon et de l'écran tout ce qui est masqué (sans prix ou doublon d'un pack) ; rappelé quand le catalogue arrive après les prix
+// Retire du brouillon ce qui n'est plus affichable chez ce client : plus de commande non facturable
 function cleanDraft() {
   if (!avail) return;
-  if (draft.produit === "podcast" && dupHidden("podcast_standard")) delete draft.produit;
-  if (!shown("single_cam_4k")) delete draft.single_cam;
-  if (!shown("multicam_4k")) delete draft.multicam;
-  if (draft.facecam && !shown("facecam_" + draft.facecam)) delete draft.facecam;
-  if (draft.bundle && !shown("bundle_" + draft.bundle)) setBundle(null);
-  // une prestation qui n'a plus de prix chez ce client sort aussi du brouillon (les compteurs des cartes dédiées restent)
+  if (draft.produit && !epKeys(draft.produit).length) { clearEpisode(); delete draft.produit; }
+  if (draft.offre && !epKeys(draft.produit).includes(draft.offre)) clearEpisode();
+  for (const k of REELS) if (!cardShown(REEL_DB[k])) delete draft.qty[k];
+  if (!cardShown("miniature")) delete draft.qty.miniature;
+  if (!cardShown("trailer")) delete draft.qty.trailer;
+  // une prestation qui n'a plus de prix chez ce client sort aussi du brouillon
   for (const k of Object.keys(draft.qty)) if (!LOCAL_QTY.has(k) && (!Number.isFinite(prices[k]) || dupHidden(k))) delete draft.qty[k];
-  save(); renderFormats(); renderMore(); renderProduit(); renderFormule(); renderReels(); renderNav();
-}
-function renderFormule() {
-  const f = t("formule");
-  $("#formule").innerHTML = FORMULES.map((k) => choiceCard(k, f[k][0], f[k][1], k, k, draft.formule === k)).join("");
-  $("#formuleNote").textContent = draft.produit ? "" : t("formuleOff");
-  $("#formule").querySelectorAll("[data-choice]").forEach((el) => el.addEventListener("click", (e) => { if (e.target.closest(".preview")) return; draft.formule = el.dataset.choice; save(); renderFormule(); renderNav(); wirePreviews(); }));
+  save(); rerender();
 }
 function renderReels() {
-  const r = t("reels");
-  $("#reels").innerHTML = REELS.map((k) => {
-    const n = draft.qty[k] || 0;
-    const foot = `<div class="qty"><button type="button" data-dec="${k}">−</button><input type="number" min="0" max="99" value="${n}" data-q="${k}"/><button type="button" data-inc="${k}">+</button></div>`;
-    const inc = minQty(k) ? `<span class="inc">${t("bundle.inc")}</span>` : "";
-    return choiceCard(k, r[k][0], r[k][1] + inc, k, k, n > 0, foot);
+  const r = t("reels"), keys = REELS.filter((k) => cardShown(REEL_DB[k]));
+  $("#reelsBlock").hidden = !keys.length;
+  $("#reels").innerHTML = keys.map((k) => {
+    const n = draft.qty[k] || 0, lo = minQty(k);
+    const foot = `<div class="qty"><button type="button" data-dec="${k}">−</button><input type="number" min="${lo}" max="99" value="${n}" data-q="${k}"/><button type="button" data-inc="${k}">+</button></div>`;
+    const inc = lo ? `<span class="inc">${t("bundle.inc").replace("{n}", lo)}</span>` : "";
+    return choiceCard("qty:" + k, r[k][0], r[k][1] + inc, unitPriceTxt(REEL_DB[k]), k, n > 0, foot);
   }).join("");
-  $("#reels").querySelectorAll("[data-choice]").forEach((el) => el.addEventListener("click", (e) => { if (e.target.closest(".qty") || e.target.closest(".preview")) return; const k = el.dataset.choice; if (!(draft.qty[k] > 0)) { draft.qty[k] = 1; save(); renderReels(); renderNav(); wirePreviews(); } }));
-  wireQty($("#reels"));
+  $("#reels").querySelectorAll("[data-choice]").forEach((el) => el.addEventListener("click", (e) => { if (e.target.closest(".qty") || e.target.closest(".preview")) return; toggleQty(el.dataset.choice.split(":")[1]); }));
 }
 // « Autres prestations » : une ligne par offre (libellé, prix, compteur 0-20), construite depuis la grille du client.
 // Les packs client (famille pack_client) passent en tête, en plus gros : c'est l'offre principale de ce studio.
@@ -714,16 +934,15 @@ function renderMore() {
     return `<div class="o ${pack ? "pack " : ""}${n > 0 ? "on" : ""}" data-offer="${esc(k)}">
       <span class="oname">${esc(offerLabel(k))}</span><span class="oprice">${esc(money(prices[k], cur))}</span>
       <span class="qty"><span class="lab">${t("f.qty")}</span><button type="button" data-dec="${esc(k)}">−</button><input type="number" min="0" max="${MAX_MORE}" value="${n}" data-q="${esc(k)}"/><button type="button" data-inc="${esc(k)}">+</button></span>
+      ${partsHtml(k)}
     </div>`;
   };
   const packs = list.filter((o) => o.family === "pack_client"), rest = list.filter((o) => o.family !== "pack_client");
   $("#moreOffers").innerHTML = (packs.length ? `<div class="ohead">${t("x.pack")}</div>${packs.map((o) => line(o, true)).join("")}` : "")
     + (rest.length ? `${packs.length ? `<div class="ohead sec">${t("x.unit")}</div>` : ""}${rest.map((o) => line(o, false)).join("")}` : "");
   $("#moreOffers").querySelectorAll("[data-offer]").forEach((el) => el.addEventListener("click", (e) => {
-    if (e.target.closest(".qty")) return; const k = el.dataset.offer;
-    if (!(draft.qty[k] > 0)) { draft.qty[k] = 1; save(); renderMore(); renderNav(); }
+    if (e.target.closest(".qty")) return; toggleQty(el.dataset.offer); // re-clic sur la ligne = on l'enlève
   }));
-  wireQty($("#moreOffers"));
 }
 function renderThumbs() {
   const imgs = PREVIEWS.miniatures.filter(Boolean);
@@ -731,20 +950,23 @@ function renderThumbs() {
   const link = PREVIEWS.portfolio ? `<a class="preview" href="${PREVIEWS.portfolio}" target="_blank" rel="noopener" style="align-self:center;margin-left:6px"><i>↗</i><span>${t("portfolio")}</span></a>` : "";
   $("#thumbs").innerHTML = tiles + link;
 }
-function renderQty() { document.querySelectorAll('[data-q="episodes"],[data-q="miniature"],[data-q="trailer"]').forEach((i) => { i.value = i.dataset.q === "episodes" ? (draft.episodes || 1) : (draft.qty[i.dataset.q] || 0); }); wireQty(document); }
-function wireQty(root) {
-  root.querySelectorAll("[data-inc],[data-dec],[data-q]").forEach((el) => {
-    if (el.dataset.wired) return; el.dataset.wired = "1";
-    const k = el.dataset.inc || el.dataset.dec || el.dataset.q;
-    el.addEventListener(el.dataset.q !== undefined ? "change" : "click", () => {
-      const input = document.querySelector(`[data-q="${k}"]`);
-      let v = +(input.value || 0);
-      if (el.dataset.inc !== undefined) v++; if (el.dataset.dec !== undefined) v--;
-      if (k === "episodes") { draft.episodes = Math.min(99, Math.max(1, v)); input.value = draft.episodes; }
-      else { draft.qty[k] = Math.min(maxQty(k), Math.max(minQty(k), v)); input.value = draft.qty[k]; if (REELS.includes(k)) renderReels(); else if (!LOCAL_QTY.has(k)) renderMore(); }
-      save(); renderNav(); wirePreviews();
-    });
-  });
+function renderQty() { document.querySelectorAll("[data-q]").forEach((i) => { i.value = i.dataset.q === "episodes" ? epN() : (draft.qty[i.dataset.q] || 0); }); }
+/* UN seul écouteur pour tous les compteurs (+, −, saisie), posé une fois pour toute la page.
+   Cause racine du défaut F8 : wireQty rebranchait les boutons à chaque changement de langue, donc un clic
+   était compté deux fois. Ici il n'y a plus rien à rebrancher, le défaut ne peut plus revenir. */
+document.addEventListener("click", (e) => {
+  const b = e.target.closest("[data-inc],[data-dec]"); if (!b) return;
+  const k = b.dataset.inc !== undefined ? b.dataset.inc : b.dataset.dec;
+  setQty(k, (k === "episodes" ? epN() : (draft.qty[k] || 0)) + (b.dataset.inc !== undefined ? 1 : -1));
+});
+document.addEventListener("change", (e) => {
+  const i = e.target.closest("[data-q]"); if (!i) return;
+  setQty(i.dataset.q, +(i.value || 0));
+});
+function setQty(k, v) {
+  if (k === "episodes") { draft.episodes = Math.min(99, Math.max(1, v || 1)); syncBundleReels(); }
+  else draft.qty[k] = Math.min(maxQty(k), Math.max(minQty(k), v || 0));
+  save(); rerender();
 }
 function renderChips() {
   $("#chips").innerHTML = t("chips").map((c) => `<button type="button" class="chip">${c}</button>`).join("");
@@ -761,26 +983,46 @@ function collect(key) { return [...$("#" + key).querySelectorAll("input")].map((
 function commande() {
   const u = t("units"); const out = [];
   if (draft.produit) out.push(t("produit")[draft.produit][0]);
-  if (draft.formule) out.push(`${lang === "fr" ? "formule" : "package"} ${t("formule")[draft.formule][0]}`);
-  if (draft.bundle) out.push(`${t("fmt").bundle[0]} ${t("bdlv")[draft.bundle][0]}`);
-  if (draft.single_cam) out.push(t("fmt").single_cam[0]);
-  if (draft.multicam) out.push(t("fmt").multicam[0]);
-  if (draft.facecam) out.push(`${t("fmt").facecam[0]} ${t("fclv")[draft.facecam][0]}`);
+  if (draft.offre) { const n = epN(); out.push(n > 1 ? `${n} × ${epText(draft.offre)[0]}` : epText(draft.offre)[0]); }
   for (const k of [...REELS, "miniature", "trailer"]) { const n = draft.qty[k] || 0; if (n > 0) out.push(`${n} ${n > 1 ? u[k][1] : u[k][0]}`); }
   for (const [k, n] of Object.entries(moreQty())) out.push(`${n} × ${offerLabel(k)}`); // « Autres prestations »
   if (draft.cta === "yes") out.push(t("cta.unit"));
   return out.join(" · ");
 }
+/* ---------------- ce qui sera FACTURÉ ----------------
+   Mêmes lignes, même ordre, mêmes libellés et mêmes prix que price_job (offers_v1d.sql l.135-217) :
+   l'épisode choisi en 02 × sa quantité, les reels AU-DELÀ de ceux inclus dans un pack, la miniature, le
+   trailer, puis les « Autres prestations ». Un prix absent de la grille du client reste « Sur devis » sur
+   cette ligne-là, et seulement sur celle-là. */
+function orderLines() {
+  const out = [], q = draft.qty;
+  const add = (k, n) => { if (n > 0) out.push({ key: k, qty: n, unit: hasPrice(k) ? prices[k] : null }); };
+  if (draft.offre) add(draft.offre, epN());
+  for (const k of REELS) add(REEL_DB[k], Math.max(0, (q[k] || 0) - minQty(k)));
+  add("miniature", q.miniature || 0); add("trailer", q.trailer || 0);
+  for (const [k, n] of Object.entries(moreQty())) add(k, n);
+  return out;
+}
+const lineAmount = (l) => Math.round(l.qty * l.unit * 100) / 100;      // price_job arrondit ligne par ligne
+const orderTotal = () => { const l = orderLines(); return l.length && l.every((x) => x.unit !== null) ? l.reduce((s, x) => s + lineAmount(x), 0) : null; };
+// Le détail des prix du récap : à l'unité, ligne par ligne, puis le total. Plus aucun « Sur devis » en dur.
+function priceText() {
+  const l = orderLines(); if (!l.length) return "";
+  const tot = orderTotal();
+  return l.map((x) => `${x.qty} × ${offerLabel(x.key)} — ${x.unit === null ? t("quote") : `${money(x.unit, cur)}${x.qty > 1 ? ` = ${money(lineAmount(x), cur)}` : ""}`}`)
+    .concat(tot === null ? t("quoteLong") : `${t("total")} : ${money(tot, cur)}`).join("\n");
+}
 function renderNav() {
   $("#prev").style.visibility = step === 0 ? "hidden" : "visible";
   $("#next").textContent = step === 5 ? t("btn.send") : t("btn.next");
-  const c = commande();
-  $("#summary").innerHTML = c ? `<b>${esc(c)}</b><br/>${t("quote")} · ${t("saved")}` : `${t("empty")}<br/>${t("saved")}`;
+  const c = commande(), tot = orderTotal();
+  $("#summary").innerHTML = c ? `<b>${esc(c)}</b><br/>${esc(tot === null ? t("quote") : money(tot, cur))} · ${t("saved")}` : `${t("empty")}<br/>${t("saved")}`;
+  $("#keyWarn").innerHTML = accessWarn;                                // visible à chaque étape, pas seulement à la première
 }
 function renderRecap() {
   const v = values(); const r = t("recap"); const none = t("none");
-  const rows = [["projet", v.projet], ["commande", v.commande], ["prix", t("quoteLong")], ["autre_demande", v.autre_demande], ["rushes", v.rushes], ["logos", v.logos], ["references", v.references], ["description", v.description], ["palette", v.palette], ["deadline", v.deadline], ["contact", v.contact], ["email", v.email], ["autres", v.autres]];
-  $("#recap").innerHTML = rows.map(([k, val]) => `<div class="${["description", "rushes", "commande"].includes(k) ? "full" : ""}"><div class="k">${r[k]}</div><div class="v">${esc(val || none)}</div></div>`).join("");
+  const rows = [["projet", v.projet], ["commande", v.commande], ["prix", priceText()], ["autre_demande", v.autre_demande], ["rushes", v.rushes], ["logos", v.logos], ["references", v.references], ["description", v.description], ["palette", v.palette], ["deadline", v.deadline], ["contact", v.contact], ["email", v.email], ["autres", v.autres]];
+  $("#recap").innerHTML = rows.map(([k, val]) => `<div class="${["description", "rushes", "commande", "prix"].includes(k) ? "full" : ""}"><div class="k">${r[k]}</div><div class="v">${esc(val || none)}</div></div>`).join("");
 }
 function esc(s) { return String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
 
@@ -898,12 +1140,14 @@ $("#fontName").addEventListener("input", () => { draft.fontName = $("#fontName")
 $("#deadline").min = new Date().toISOString().slice(0, 10);
 function swatches() { const hex = ($("#palette").value.match(/#[0-9a-fA-F]{3,8}\b/g) || []).slice(0, 8); $("#swatches").innerHTML = hex.map((h) => `<i style="background:${h}" title="${h}"></i>`).join(""); }
 swatches();
+// « Logo : », « Police : », « Capture : » passent par I18N : plus de français dans le récap anglais
+const lbl = (k) => t(k) + (lang === "fr" ? " : " : ": ");
 function values() {
   const links = (k) => (draft[k] || []).filter(Boolean).join("\n");
   return {
     projet: draft.projet || "", commande: commande(), autre_demande: draft.autre_demande || "",
-    rushes: links("rushes"), logos: [FILES.logo ? `Logo : ${FILES.logo.name} (${t("bk.file")})` : "", draft.font === "team" ? `Police : ${t("bk.teamFont")}` : (draft.fontName ? `Police : ${draft.fontName}` : "")].filter(Boolean).join("\n"), references: links("references"),
-    description: draft.description || "", palette: [draft.palette || "", FILES.palette ? `Capture : ${FILES.palette.name} (${t("bk.file")})` : ""].filter(Boolean).join("\n"), deadline: draft.deadline || "",
+    rushes: links("rushes"), logos: [FILES.logo ? `${lbl("r.logo")}${FILES.logo.name} (${t("bk.file")})` : "", draft.font === "team" ? `${lbl("r.font")}${t("bk.teamFont")}` : (draft.fontName ? `${lbl("r.font")}${draft.fontName}` : "")].filter(Boolean).join("\n"), references: links("references"),
+    description: draft.description || "", palette: [draft.palette || "", FILES.palette ? `${lbl("r.shot")}${FILES.palette.name} (${t("bk.file")})` : ""].filter(Boolean).join("\n"), deadline: draft.deadline || "",
     contact: [draft.contactName, draft.contactHow].filter(Boolean).join(" — "), email: draft.email || "", autres: draft.autres || "",
   };
 }
@@ -913,11 +1157,23 @@ function load() { try { return JSON.parse(localStorage.getItem(KEY) || "{}"); } 
 /* ---------------- navigation & validation ---------------- */
 function validate(s) {
   const e = t("err"); const v = values(); document.querySelectorAll(".in.bad").forEach((x) => x.classList.remove("bad"));
-  // 4e voie : une quantité dans « Autres prestations » (pack client…) suffit à valider
-  if (s === 0) { if (!v.projet.trim()) { $("#projet").classList.add("bad"); return e.projet; } if (!draft.produit && !draft.single_cam && !draft.multicam && !draft.facecam && !draft.bundle && !Object.keys(moreQty()).length) return e.produit; if (draft.bundle && draft.produit === "podcast") return e.produit; }
-  if (s === 1) { if (draft.produit && !draft.formule) return e.formule; }
+  if (s === 0) {
+    if (!v.projet.trim()) { $("#projet").classList.add("bad"); return e.projet; }
+    // le produit est exigé à la sortie de l'étape 01 : on ne découvre plus deux étapes plus loin qu'il manque
+    if (PRODUITS.some((p) => epKeys(p).length) && !draft.produit) return e.produit0;
+  }
+  if (s === 1) { if (draft.produit && !draft.offre) return e.formule; } // un produit choisi = un épisode choisi
+  // La commande doit contenir au moins une prestation : contrôlé à la sortie des 3 colonnes de choix.
+  // Une quantité dans « Autres prestations » (pack client…) suffit aussi.
+  if (s === 2) {
+    const q = draft.qty;
+    const rien = !draft.offre && !REELS.some((k) => q[k] > 0) && !(q.miniature > 0) && !(q.trailer > 0) && !Object.keys(moreQty()).length;
+    if (rien) return e.produit;
+    if (!hasVideo()) return e.noVideo;                                   // des suppléments seuls ne font pas une commande
+  }
   if (s === 3) { if (!v.rushes) { $("#rushes input").classList.add("bad"); return e.rushes; } }
-  if (s === 5) { if (!$("#terms").checked) { $("#terms").focus(); return e.terms; } }
+  // dernier verrou avant l'envoi : jamais une commande sans vidéo, même en revenant en arrière
+  if (s === 5) { if (!hasVideo()) return e.noVideo; if (!$("#terms").checked) { $("#terms").focus(); return e.terms; } }
   if (s === 4) { if (v.description.trim().length < 10) { $("#description").classList.add("bad"); return e.description; } if (!draft.contactName || !draft.contactHow) { $("#contactName").classList.add("bad"); $("#contactHow").classList.add("bad"); return e.contact; } if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(draft.email || "")) { $("#email").classList.add("bad"); return e.email; } }
   return "";
 }
@@ -944,10 +1200,12 @@ const DELIV = {
 };
 function workToDo(d) {
   const out = [];
+  const units = Math.max(1, Number(d.units) || 1), many = units > 1 ? units + " × " : "";
   for (const [key, [sing, plur, fmt]] of Object.entries(DELIV[lang])) {
-    if (key === "facecam" || key === "bundle") {   // niveau choisi : « face cam Dynamique (16:9) », « bundle Premium (1 épisode + 3 reels inclus) »
+    if (key === "facecam" || key === "bundle") {   // niveau choisi : « face cam Dynamique (16:9) », « 2 × bundle Premium (1 épisode + 3 reels inclus) »
       if (!d[key]) continue; const lvl = (key === "facecam" ? t("fclv") : t("bdlv"))[d[key]][0];
-      out.push(key === "facecam" ? `${sing} ${lvl} (${fmt})` : `${sing} ${lvl} (${lang === "fr" ? "1 épisode + 3 reels inclus" : "1 episode + 3 reels included"})`); continue;
+      const inc = inclPer(), pack = lang === "fr" ? `1 épisode + ${inc} reels inclus` : `1 episode + ${inc} reels included`;
+      out.push(key === "facecam" ? `${many}${sing} ${lvl} (${fmt})` : `${many}${sing} ${lvl} (${pack})`); continue;
     }
     const raw = d[key] === true ? "1" : String(d[key] || "").trim(); if (!raw) continue;
     const n = parseInt(raw, 10);
@@ -963,17 +1221,33 @@ function autreDemande(v) { return [v.autre_demande, draft.cta === "yes" ? `${t("
 // Liens en tableau ; un lien collé sans « https:// » est complété
 function linkList(k) { return (draft[k] || []).flatMap((s) => String(s).split(/\s+/)).filter(Boolean).map((u) => (/^https?:\/\//i.test(u) ? u : (/^[\w-]+(\.[\w-]+)+([/?#]\S*)?$/.test(u) ? "https://" + u : u))); }
 function order() {
-  const v = values(); const q = draft.qty; const n = (x) => (x > 0 ? String(x) : ""); const units = String(draft.episodes || 1);
+  const v = values(); const q = draft.qty; const n = (x) => (x > 0 ? String(x) : "");
+  const k = draft.offre || "", N = epN(), bundled = !!draft.offre && isBundle(k);
+  const lv = (/_(standard|premium)$/.exec(k) || [])[1] || "";
+  const items = Object.assign({}, moreQty());   // « Autres prestations » : { clé d'offre : quantité }
+  /* price_job force la quantité 1 sur single_cam / multicam / facecam / bundle (offers_v1d.sql l.148-165).
+     Pour N épisodes, les N−1 suivants passent par le chemin générique `items`, qui ADDITIONNE la quantité
+     DANS la ligne existante au lieu d'en créer une deuxième (règle anti-doublon, offers_v1d.sql l.180-197).
+     Résultat : une seule ligne de facture, à la bonne quantité, jamais un doublon. */
+  if (N > 1 && (bundled || k === "single_cam_4k" || k === "multicam_4k" || k.startsWith("facecam_"))) items[k] = (items[k] || 0) + (N - 1);
+  /* Les reels inclus dans un pack NE SE FACTURENT PAS. price_job déduit `bundle_reels_included` UNE fois
+     (offers_v1d.sql l.167-168) : on lui envoie donc « extras du client + ce qu'il va déduire », et il
+     reste exactement les extras à facturer. Un reel ajouté en plus du pack, lui, est bien facturé. */
+  const reelN = (rk) => { const tot = q[rk] || 0; return bundled && bundleReelKey() === rk ? Math.max(0, tot - inclTotal()) + inclPer() : tot; };
   const details = {
-    podcast: draft.produit === "podcast" ? units : "", vsl: draft.produit === "vsl" ? units : "", formule: draft.produit && draft.formule ? cap(draft.formule) : "",
-    reels: n(q.reel_basique), reels_signature: n(q.reel_signature), miniature: n(q.miniature), trailer: n(q.trailer),
-    single_cam: !!draft.single_cam, multicam: !!draft.multicam, facecam: draft.facecam || null, bundle: draft.bundle || null,
-    items: moreQty(),   // « Autres prestations » : { clé d'offre : quantité } — c'est ce que la base facture
+    podcast: k.startsWith("podcast_") ? String(N) : "", vsl: k.startsWith("vsl_") ? String(N) : "",
+    formule: /^(podcast|vsl)_/.test(k) && lv ? cap(lv) : "",
+    reels: n(reelN("reel_basique")), reels_signature: n(reelN("reel_signature")), miniature: n(q.miniature), trailer: n(q.trailer),
+    single_cam: k === "single_cam_4k", multicam: k === "multicam_4k",
+    facecam: k.startsWith("facecam_") ? k.slice("facecam_".length) : null, bundle: bundled && lv ? lv : null,
+    items,
 
     autre_demande: autreDemande(v), palette: v.palette, logos: v.logos,
     cta: draft.cta || "", cta_reseaux: draft.cta === "yes" ? (draft.ctaNets || "") : "", font: draft.font === "team" ? "team" : (draft.fontName || ""), autres: v.autres,
   };
-  return { project: v.projet.trim(), email: v.email.trim(), contact: v.contact, lang, work_to_do: workToDo(details), details, rushes_links: linkList("rushes"), references_links: linkList("references"), logos: v.logos, description: v.description, deadline: v.deadline, terms_accepted: $("#terms").checked, terms_text: t("s6.terms") };
+  // Le brief du monteur annonce le nombre RÉEL de reels à produire (inclus compris), la facture non.
+  const brief = Object.assign({}, details, { units: N, reels: n(q.reel_basique), reels_signature: n(q.reel_signature), single_cam: k === "single_cam_4k" ? String(N) : "", multicam: k === "multicam_4k" ? String(N) : "" });
+  return { project: v.projet.trim(), email: v.email.trim(), contact: v.contact, lang, work_to_do: workToDo(brief), details, rushes_links: linkList("rushes"), references_links: linkList("references"), logos: v.logos, description: v.description, deadline: v.deadline, terms_accepted: $("#terms").checked, terms_text: t("s6.terms") };
 }
 const orderSlug = () => slug || (studio && studio.slug) || "";
 const trackHref = () => `../suivi.html?token=${encodeURIComponent(orderToken)}&lang=${lang}`;
@@ -1008,12 +1282,14 @@ applyText();
 
 // Catalogue des offres : lu une fois, sans clé d'accès (lecture publique de `offers`).
 // Échec ou table vide : aucune section « Autres prestations », tout le reste de la page marche comme avant.
-loadCatalog().then((rows) => { if (Array.isArray(rows)) { catalog = rows; cleanDraft(); renderMore(); } }).catch(() => {});
+loadCatalog().then((rows) => { if (Array.isArray(rows)) { catalog = rows; cleanDraft(); rerender(); } }).catch(() => {});
 
-/* ---------------- accès : sans clé, on prévient tout de suite ; avec clé, on retrouve le nom et la langue du studio ---------------- */
-if (!accessKey) $("#msg").innerHTML = keyMsg("key");
+/* ---------------- accès : sans clé, on prévient tout de suite ; avec clé, on retrouve le nom et la langue du studio ----------------
+   L'avertissement vit dans `accessWarn` et non dans #msg (vidé à chaque « Continuer ») : le client ne
+   découvre plus à l'envoi, après six étapes, qu'il ne pouvait pas commander. */
+if (!accessKey) { accessWarn = keyMsg("key"); renderNav(); }
 else rpc("client_slug", { p_key: accessKey }).then((d) => {
-  if (!d || !d.slug || (slug && d.slug !== slug)) { $("#msg").innerHTML = keyMsg("bad_key"); return; }
+  if (!d || !d.slug || (slug && d.slug !== slug)) { accessWarn = keyMsg("bad_key"); renderNav(); return; }
   studio = d;
   if (d.currency) cur = String(d.currency).toUpperCase(); // devise du studio : source principale (client_slug répond toujours)
   rpc("client_prices", { p_slug: d.slug, p_k: accessKey }).then(applyAvail).catch(() => {}); // échec ou vide : tout reste affiché
