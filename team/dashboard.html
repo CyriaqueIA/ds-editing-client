@@ -1716,5 +1716,7 @@ $("#langBtn").addEventListener("click", () => { lang = lang === "fr" ? "en" : "f
 $("#tvBtn").addEventListener("click", () => { tv = !tv; document.body.classList.toggle("tv", tv); closePc(); const u = new URL(location.href); tv ? u.searchParams.set("tv", "1") : u.searchParams.delete("tv"); history.replaceState(null, "", u); });
 boot();
 </script>
+<!-- menu des espaces DS Editing : liste unique dans /nav.js -->
+<script src="../nav.js" defer></script>
 </body>
 </html>
