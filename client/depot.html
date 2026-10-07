@@ -469,7 +469,7 @@ const I18N = {
     "btn.prev":"Retour","btn.next":"Continuer","btn.send":"Envoyer à DS Editing","btn.sending":"Envoi…",
     saved:"Brouillon enregistré sur cet appareil", empty:"Votre commande apparaîtra ici",
     units:{episode:["épisode","épisodes"],reel_basique:["reel standard","reels standard"],reel_signature:["reel premium","reels premium"],miniature:["miniature","miniatures"],trailer:["trailer","trailers"]},
-    err:{projet:"Donnez un nom au projet.",produit:"Choisissez un produit : Podcast, VSL, Single cam, Multicam, Face cam ou Bundle.",formule:"Choisissez une formule.",rushes:"Ajoutez au moins un lien de rushes.",description:"Décrivez ce que vous attendez, même en trois lignes.",contact:"Indiquez un contact et un moyen de le joindre.",email:"Indiquez un e-mail valide, c'est là qu'arrivent la confirmation et le suivi.",send:"L'envoi a échoué. Réessayez, ou écrivez-nous sur WhatsApp.",terms:"Cochez les conditions de collaboration pour envoyer la commande.",
+    err:{projet:"Donnez un nom au projet.",produit:"Choisissez une prestation : Podcast, VSL, Single cam, Multicam, Face cam, Bundle, ou un pack / une autre prestation de la liste.",formule:"Choisissez une formule.",rushes:"Ajoutez au moins un lien de rushes.",description:"Décrivez ce que vous attendez, même en trois lignes.",contact:"Indiquez un contact et un moyen de le joindre.",email:"Indiquez un e-mail valide, c'est là qu'arrivent la confirmation et le suivi.",send:"L'envoi a échoué. Réessayez, ou écrivez-nous sur WhatsApp.",terms:"Cochez les conditions de collaboration pour envoyer la commande.",
       key:"Ouvrez cet espace depuis votre lien personnel ou l'Espace client pour envoyer votre commande.",keyLink:"Aller à l'Espace client",bad_key:"Votre accès n'est pas reconnu pour ce studio. Ouvrez cet espace depuis votre lien personnel ou l'Espace client.",bad_email:"L'e-mail n'est pas valide. Corrigez-le à l'étape Brief.",no_project:"Donnez un nom au projet, à l'étape Produit.",no_rushes:"Aucun lien de rushes valide. Collez au moins un lien complet (https://…) à l'étape Fichiers.",rate_limit:"Beaucoup de commandes viennent d'être envoyées depuis cet espace. Réessayez dans une heure, ou écrivez-nous sur WhatsApp."},
     "s6.terms":"J'accepte les conditions de collaboration DS Editing : facture hebdomadaire, paiement à réception, pénalité de 20 % par semaine de retard.","s6.termsLink":"Lire les conditions","ok.space":"Ouvrir mon espace (commandes, factures)",
     "ok.track":"Votre numéro de suivi","ok.trackHint":"Gardez-le : il est aussi dans votre e-mail de confirmation.","ok.follow":"Suivre ma commande",
@@ -519,7 +519,7 @@ const I18N = {
     "btn.prev":"Back","btn.next":"Continue","btn.send":"Send to DS Editing","btn.sending":"Sending…",
     saved:"Draft saved on this device", empty:"Your order will appear here",
     units:{episode:["episode","episodes"],reel_basique:["standard reel","standard reels"],reel_signature:["premium reel","premium reels"],miniature:["thumbnail","thumbnails"],trailer:["trailer","trailers"]},
-    err:{projet:"Give the project a name.",produit:"Choose a product: Podcast, VSL, Single cam, Multicam, Face cam or Bundle.",formule:"Choose a package.",rushes:"Add at least one footage link.",description:"Describe what you expect, even in three lines.",contact:"Give us a contact and a way to reach them.",email:"Enter a valid email, that's where the confirmation and tracking go.",send:"Sending failed. Try again, or message us on WhatsApp.",terms:"Tick the terms of collaboration to send the order.",
+    err:{projet:"Give the project a name.",produit:"Choose a service: Podcast, VSL, Single cam, Multicam, Face cam, Bundle, or a pack / another service from the list.",formule:"Choose a package.",rushes:"Add at least one footage link.",description:"Describe what you expect, even in three lines.",contact:"Give us a contact and a way to reach them.",email:"Enter a valid email, that's where the confirmation and tracking go.",send:"Sending failed. Try again, or message us on WhatsApp.",terms:"Tick the terms of collaboration to send the order.",
       key:"Open this space from your personal link or the Client space to send your order.",keyLink:"Go to the Client space",bad_key:"Your access isn't recognised for this studio. Open this space from your personal link or the Client space.",bad_email:"The email isn't valid. Fix it in the Brief step.",no_project:"Give the project a name, in the Product step.",no_rushes:"No valid footage link. Paste at least one full link (https://…) in the Files step.",rate_limit:"A lot of orders were just sent from this space. Try again in an hour, or message us on WhatsApp."},
     "s6.terms":"I accept the DS Editing terms of collaboration: weekly invoice, payment on receipt, 20% penalty per week late.","s6.termsLink":"Read the terms","ok.space":"Open my space (orders, invoices)",
     "ok.track":"Your tracking number","ok.trackHint":"Keep it: it's also in your confirmation email.","ok.follow":"Track my order",
@@ -537,7 +537,7 @@ const minQty = (k) => (draft.bundle && bundleReelKey() === k ? 3 : 0); // 3 reel
 const maxQty = (k) => (LOCAL_QTY.has(k) ? 99 : MAX_MORE);              // cartes dédiées : 99 comme avant ; « Autres prestations » : 20
 // Clés de prix renvoyées par client_prices (RPC) : null = inconnu (appel échoué ou vide) → tout afficher comme avant
 let avail = null;
-const shown = (k) => !avail || avail.has(k);
+const shown = (k) => (!avail || avail.has(k)) && !dupHidden(k);
 // Promos bundle (RPC client_bundle_promos) : { standard: {price, list, pct}, premium: … } ; absent = rien de barré, jamais de fausse promo
 let promos = {};
 const num = (x) => (x === null || x === undefined || x === "" ? NaN : Number(x));
@@ -561,11 +561,18 @@ const CARD_KEYS = new Set(["podcast_standard", "podcast_premium", "vsl_standard"
 const LOCAL_QTY = new Set(["reel_basique", "reel_signature", "miniature", "trailer"]); // compteurs des cartes dédiées (clés propres à cette page)
 let catalog = [];     // offres actives lues en base : [{item_key, label_fr, label_en, family, sort}]
 let prices = {};      // prix de CE client : { item_key: unit_price } (client_prices)
+// Second verrou anti-doublon : un client qui a ses propres packs (famille pack_client tarifée) ne voit ni les offres
+// « episode » ni les « bundle » qui composent ces packs, même si un prix y a été resaisi par erreur. Sans pack : rien ne change.
+const DUP_KEYS = new Set(["podcast_standard", "podcast_premium", "single_cam_4k", "multicam_4k", "bundle_standard", "bundle_premium"]); // repli si la famille n'est pas lue en base
+const famOf = (k) => { const o = catalog.find((x) => x && x.item_key === k); return o ? o.family : null; };
+const isDupFam = (k) => { const f = famOf(k); return f ? (f === "episode" || f === "bundle") : DUP_KEYS.has(k); };
+const hasPacks = () => catalog.some((o) => o && o.family === "pack_client" && Number.isFinite(prices[o.item_key]));
+const dupHidden = (k) => hasPacks() && isDupFam(k);
 let cur = "";         // devise du studio : client_slug d'abord, client_bundle_promos en secours ; inconnue = nombre seul, jamais un mauvais symbole
 const MAX_MORE = 20;  // compteur de 0 à 20
 const offerLabel = (k) => { const o = catalog.find((x) => x.item_key === k); return (o && (lang === "fr" ? o.label_fr : o.label_en)) || k; };
 const moreOffers = () => catalog
-  .filter((o) => o && o.item_key && o.family !== "legacy" && !CARD_KEYS.has(o.item_key) && Number.isFinite(prices[o.item_key]))
+  .filter((o) => o && o.item_key && o.family !== "legacy" && !CARD_KEYS.has(o.item_key) && Number.isFinite(prices[o.item_key]) && !dupHidden(o.item_key))
   .slice()
   .sort((a, b) => ((a.family === "pack_client" ? 0 : 1) - (b.family === "pack_client" ? 0 : 1)) || (Number(a.sort ?? 9999) - Number(b.sort ?? 9999)) || String(a.item_key).localeCompare(String(b.item_key)));
 const moreQty = () => { const out = {}; for (const o of moreOffers()) { const n = draft.qty[o.item_key] || 0; if (n > 0) out[o.item_key] = n; } return out; };
@@ -631,7 +638,7 @@ function choiceCard(key, name, desc, priceKey, previewKey, on, extraFoot = "") {
 }
 function renderProduit() {
   const p = t("produit");
-  $("#produit").innerHTML = ["podcast", "vsl"].map((k) => choiceCard(k, p[k][0], k === "podcast" && draft.bundle ? t("bundle.podcastOff") : p[k][1], k, null, draft.produit === k)).join("");
+  $("#produit").innerHTML = ["podcast", "vsl"].filter((k) => !(k === "podcast" && dupHidden("podcast_standard"))).map((k) => choiceCard(k, p[k][0], k === "podcast" && draft.bundle ? t("bundle.podcastOff") : p[k][1], k, null, draft.produit === k)).join("");
   const pc = $("#produit").querySelector('[data-choice="podcast"]'); if (pc) pc.classList.toggle("dis", !!draft.bundle); // Bundle = épisode podcast inclus : pas les deux
   $("#produit").querySelectorAll("[data-choice]").forEach((el) => el.addEventListener("click", () => { if (el.dataset.choice === "podcast" && draft.bundle) return; draft.produit = el.dataset.choice; save(); renderProduit(); renderFormule(); renderNav(); wirePreviews(); }));
 }
@@ -665,12 +672,18 @@ function applyAvail(rows) {
   if (!Array.isArray(rows)) return;
   avail = new Set(rows.map((r) => r && r.item_key).filter(Boolean));
   prices = Object.fromEntries(rows.filter((r) => r && r.item_key).map((r) => [r.item_key, num(r.unit_price)]));
+  cleanDraft();
+}
+// Retire du brouillon et de l'écran tout ce qui est masqué (sans prix ou doublon d'un pack) ; rappelé quand le catalogue arrive après les prix
+function cleanDraft() {
+  if (!avail) return;
+  if (draft.produit === "podcast" && dupHidden("podcast_standard")) delete draft.produit;
   if (!shown("single_cam_4k")) delete draft.single_cam;
   if (!shown("multicam_4k")) delete draft.multicam;
   if (draft.facecam && !shown("facecam_" + draft.facecam)) delete draft.facecam;
   if (draft.bundle && !shown("bundle_" + draft.bundle)) setBundle(null);
   // une prestation qui n'a plus de prix chez ce client sort aussi du brouillon (les compteurs des cartes dédiées restent)
-  for (const k of Object.keys(draft.qty)) if (!LOCAL_QTY.has(k) && !Number.isFinite(prices[k])) delete draft.qty[k];
+  for (const k of Object.keys(draft.qty)) if (!LOCAL_QTY.has(k) && (!Number.isFinite(prices[k]) || dupHidden(k))) delete draft.qty[k];
   save(); renderFormats(); renderMore(); renderProduit(); renderFormule(); renderReels(); renderNav();
 }
 function renderFormule() {
@@ -900,7 +913,8 @@ function load() { try { return JSON.parse(localStorage.getItem(KEY) || "{}"); } 
 /* ---------------- navigation & validation ---------------- */
 function validate(s) {
   const e = t("err"); const v = values(); document.querySelectorAll(".in.bad").forEach((x) => x.classList.remove("bad"));
-  if (s === 0) { if (!v.projet.trim()) { $("#projet").classList.add("bad"); return e.projet; } if (!draft.produit && !draft.single_cam && !draft.multicam && !draft.facecam && !draft.bundle) return e.produit; if (draft.bundle && draft.produit === "podcast") return e.produit; }
+  // 4e voie : une quantité dans « Autres prestations » (pack client…) suffit à valider
+  if (s === 0) { if (!v.projet.trim()) { $("#projet").classList.add("bad"); return e.projet; } if (!draft.produit && !draft.single_cam && !draft.multicam && !draft.facecam && !draft.bundle && !Object.keys(moreQty()).length) return e.produit; if (draft.bundle && draft.produit === "podcast") return e.produit; }
   if (s === 1) { if (draft.produit && !draft.formule) return e.formule; }
   if (s === 3) { if (!v.rushes) { $("#rushes input").classList.add("bad"); return e.rushes; } }
   if (s === 5) { if (!$("#terms").checked) { $("#terms").focus(); return e.terms; } }
@@ -994,7 +1008,7 @@ applyText();
 
 // Catalogue des offres : lu une fois, sans clé d'accès (lecture publique de `offers`).
 // Échec ou table vide : aucune section « Autres prestations », tout le reste de la page marche comme avant.
-loadCatalog().then((rows) => { if (Array.isArray(rows)) { catalog = rows; renderMore(); } }).catch(() => {});
+loadCatalog().then((rows) => { if (Array.isArray(rows)) { catalog = rows; cleanDraft(); renderMore(); } }).catch(() => {});
 
 /* ---------------- accès : sans clé, on prévient tout de suite ; avec clé, on retrouve le nom et la langue du studio ---------------- */
 if (!accessKey) $("#msg").innerHTML = keyMsg("key");

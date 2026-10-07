@@ -116,6 +116,7 @@
     .due.done{opacity:.7;border-left-color:var(--blue)}.due.done .cd{color:var(--blue)}
     .links a{display:inline-block;font-size:12px;color:var(--cream);border:1px solid var(--line);background:rgba(255,255,255,.04);border-radius:999px;padding:4px 10px;margin:2px 4px 2px 0;text-decoration:none;transition:border-color .2s,color .2s}
     .links a:hover{border-color:rgba(220,230,240,.35);color:#fff}
+    .dupwarn{margin:0 0 12px;padding:9px 14px;border-radius:12px;border:1px solid rgba(245,196,0,.35);background:rgba(245,196,0,.12);color:var(--warn);font-size:12px;line-height:1.45}.dupwarn[hidden]{display:none}
     .badge{display:inline-block;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;border-radius:999px;padding:3px 9px;color:var(--taupe);border:1px solid var(--line)}
     .badge.ok{color:var(--ok);border-color:rgba(70,211,105,.4);background:rgba(70,211,105,.12)}.badge.err{color:var(--err);border-color:rgba(240,138,130,.5);background:rgba(240,138,130,.12)}
     .steps{display:flex;gap:6px;flex-wrap:wrap}
@@ -501,6 +502,7 @@ const T = {
     amountL: "Montant", amountMiss: "Prix manquant dans la grille :", override: "Montant forcé", recalc: "Recalculer", invoiced: "Facturé", sunday: "facturé dimanche",
     keys: { podcast_standard: "Épisode podcast · Standard", podcast_premium: "Épisode podcast · Premium", single_cam_4k: "Single cam 4K edit", multicam_4k: "Multicam 4K edit", bundle_standard: "Bundle Standard", bundle_premium: "Bundle Premium", reel_standard: "Reel standard", reel_premium: "Reel premium", facecam_simple: "Face cam Simple", facecam_dynamique: "Face cam Dynamique", facecam_signature: "Face cam Signature", vsl_standard: "VSL · Standard", vsl_premium: "VSL · Premium", intro: "Intro", miniature: "Miniature", trailer: "Trailer", cta: "CTA réseaux sociaux", extra_30min: "Supplément 30 min" },
     grp: { episodes: "Épisodes", bundles: "Bundles", reels: "Reels", facecam: "Face cam", vsl: "VSL", extras: "Extras", episode: "Épisodes", bundle: "Bundles", reel: "Reels", revision: "Révisions", pack_client: "Packs client", extra: "Extras", legacy: "Anciennes clés" }, bundleHelp: "Épisode + 3 reels du niveau inclus ; reels en plus au prix normal",
+    dupWarn: "Ce client a des packs. Les prix d'épisode et de bundle ci-dessous font doublon et seront masqués dans son espace.",
     tarifsHint: "Prix unitaires par client, dans sa devise. Vide = pas encore fixé : la commande validée attend un prix avant d'être facturée.", clientSel: "Client", saved: "enregistré", recalcAll: "Recalculer les commandes validées", space: "Espace client", billing: "Facturation", billingName: "Raison sociale", billingAddress: "Adresse (une ligne par ligne)", billingEmail: "E-mail de facturation", attention: "À l'attention de", currency: "Devise", tvaL: "TVA",
     factHint: "Une facture par client et par semaine, générée le dimanche à 23 h 50 (Bali). Relance automatique 2 jours après l'envoi.", cols: ["N°", "Client", "Semaine", "Total", "Statut", "Envoyée", ""], markPaid: "Marquer payée", paid: "Payée", issued: "Émise", cancel: "Annuler", extrasTitle: "Lignes manuelles (facturées avec la prochaine facture)", label: "Libellé", qty: "Qté", unit: "Prix unitaire", offered: "Offert", add: "Ajouter", pending: "En attente de facturation", none: "Aucune", del: "Supprimer",
     rdv: { settingsTitle: "Disponibilités", hint: "Créneaux proposés sur le site (boutons « Réserver un appel »), en heure de Paris. Deux plages max par jour ; jour vide = fermé. Le prospect voit les horaires dans son propre fuseau.",
@@ -555,6 +557,7 @@ const T = {
     amountL: "Amount", amountMiss: "Missing price in the grid:", override: "Forced amount", recalc: "Recalculate", invoiced: "Invoiced", sunday: "invoiced Sunday",
     keys: { podcast_standard: "Podcast episode · Standard", podcast_premium: "Podcast episode · Premium", single_cam_4k: "Single-cam 4K edit", multicam_4k: "Multicam 4K edit", bundle_standard: "Standard Bundle", bundle_premium: "Premium Bundle", reel_standard: "Standard reel", reel_premium: "Premium reel", facecam_simple: "Face cam Simple", facecam_dynamique: "Face cam Dynamic", facecam_signature: "Face cam Signature", vsl_standard: "VSL · Standard", vsl_premium: "VSL · Premium", intro: "Intro", miniature: "Thumbnail", trailer: "Trailer", cta: "Social CTA", extra_30min: "Extra 30 min" },
     grp: { episodes: "Episodes", bundles: "Bundles", reels: "Reels", facecam: "Face cam", vsl: "VSL", extras: "Extras", episode: "Episodes", bundle: "Bundles", reel: "Reels", revision: "Revisions", pack_client: "Client packs", extra: "Extras", legacy: "Legacy keys" }, bundleHelp: "Episode + 3 reels of the tier included; extra reels at the normal price",
+    dupWarn: "This client has packs. The episode and bundle prices below overlap and are hidden in their space.",
     tarifsHint: "Unit prices per client, in their currency. Empty = not set yet: the approved order waits for a price before being invoiced.", clientSel: "Client", saved: "saved", recalcAll: "Recalculate approved orders", space: "Client space", billing: "Billing", billingName: "Legal name", billingAddress: "Address (one line per line)", billingEmail: "Billing email", attention: "Attention", currency: "Currency", tvaL: "VAT",
     factHint: "One invoice per client per week, generated Sunday 11:50 pm (Bali). Automatic reminder 2 days after sending.", cols: ["No.", "Client", "Week", "Total", "Status", "Sent", ""], markPaid: "Mark paid", paid: "Paid", issued: "Issued", cancel: "Cancel", extrasTitle: "Manual lines (billed with the next invoice)", label: "Label", qty: "Qty", unit: "Unit price", offered: "Complimentary", add: "Add", pending: "Waiting for invoicing", none: "None", del: "Delete",
     rdv: { settingsTitle: "Availability", hint: "Slots offered on the website (“Book a call” buttons), Paris time. Up to two ranges per day; empty day = closed. Prospects see the times in their own time zone.",
@@ -1286,6 +1289,13 @@ function groupsFromOffers() {
   return out.length ? out : TARIF_GROUPS;   // repli : objet en dur
 }
 const famLabel = (f) => t("grp")[f] || f;   // famille inconnue : on affiche son nom brut plutôt que « undefined »
+// Doublon : le client a au moins un pack tarifé ET une offre episode/bundle tarifée (même règle que client/depot.html)
+function dupOverlap(studioId) {
+  const priced = new Set(grids.filter((x) => x.studio_id === studioId && x.unit_price !== null && x.unit_price !== "" && Number.isFinite(Number(x.unit_price))).map((x) => x.item_key));
+  const has = (fams) => offerRows.some((o) => o && fams.includes(o.family) && priced.has(o.item_key));
+  return has(["pack_client"]) && has(["episode", "bundle"]);
+}
+function updDupWarn() { const el = $("#dupWarn"), s = studios.find((x) => x.id === tarifStudio); if (el) el.hidden = !(s && dupOverlap(s.id)); }
 function renderTarifs() {
   if (!tarifStudio && studios.length) tarifStudio = studios[0].id;
   const s = studios.find((x) => x.id === tarifStudio); if (!s) { $("#admin").innerHTML = agentPanel(); wireAgentPanel(); return; }
@@ -1295,6 +1305,7 @@ function renderTarifs() {
       <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><label style="font-size:12px;color:var(--taupe)">${t("clientSel")}</label><select class="in" id="tarifStudio" style="width:auto">${studios.map((x) => `<option value="${x.id}" ${x.id === s.id ? "selected" : ""}>${esc(x.name)}</option>`).join("")}</select>
         <span class="badge">${s.currency} · ${s.lang}</span><a class="btn ghost" href="${spaceUrl}" target="_blank" rel="noopener">${t("space")} ↗</a><button type="button" class="btn ghost" id="recalcAll">${t("recalcAll")}</button><span id="tarifMsg" style="font-size:12px;color:var(--ok)"></span></div>
       <p style="font-size:12px;color:var(--taupe);margin:10px 0 12px">${t("tarifsHint")}</p>
+      <div class="dupwarn" id="dupWarn" role="status" hidden>${esc(t("dupWarn"))}</div>
       ${groupsFromOffers().map(([gk, ks]) => `<h4 style="margin:14px 0 6px;font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--taupe)">${esc(famLabel(gk))}</h4><div class="grid">${ks.map((k) => `<label>${esc(offerLabel(k))}<input class="in" type="number" step="0.01" min="0" data-key="${k}" value="${g[k] ?? ""}" placeholder="—"/></label>`).join("")}</div>${gk === "bundles" || gk === "bundle" ? `<p style="font-size:12px;color:var(--taupe);margin:6px 0 0">${t("bundleHelp")}</p>` : ""}`).join("")}
     </div>
     <div class="panel"><h3>${t("billing")}</h3><div class="grid">
@@ -1305,12 +1316,12 @@ function renderTarifs() {
       <label>${t("tvaL")}<select class="in" data-studio="tva">${["ue", "hors_ue", "us", "none"].map((v) => `<option value="${v}" ${s.tva === v ? "selected" : ""}>${v}</option>`).join("")}</select></label>
       <label style="grid-column:1/-1">${t("billingAddress")}<textarea class="in" rows="3" data-studio="billing_address">${esc(s.billing_address || "")}</textarea></label>
     </div></div>` + agentPanel();
-  wireAgentPanel();
+  wireAgentPanel(); updDupWarn();
   $("#tarifStudio").addEventListener("change", (e) => { tarifStudio = e.target.value; renderTarifs(); });
   $("#admin").querySelectorAll("[data-key]").forEach((i) => i.addEventListener("change", async () => {
     const v = i.value === "" ? null : Number(i.value);
     const { error } = await sb.from("price_grids").upsert({ studio_id: s.id, item_key: i.dataset.key, unit_price: v }, { onConflict: "studio_id,item_key" });
-    if (error) { alert(error.message); return; } $("#tarifMsg").textContent = "✓ " + t("saved"); setTimeout(() => { $("#tarifMsg").textContent = ""; }, 1500); await loadAdmin();
+    if (error) { alert(error.message); return; } $("#tarifMsg").textContent = "✓ " + t("saved"); setTimeout(() => { $("#tarifMsg").textContent = ""; }, 1500); await loadAdmin(); updDupWarn();
   }));
   $("#admin").querySelectorAll("[data-studio]").forEach((i) => i.addEventListener("change", async () => { const { error } = await sb.from("studios").update({ [i.dataset.studio]: i.value || null }).eq("id", s.id); if (error) alert(error.message); else { $("#tarifMsg").textContent = "✓ " + t("saved"); await loadAdmin(); } }));
   $("#recalcAll").addEventListener("click", async () => { const list = jobs.filter((j) => j.studio_id === s.id && j.qc_status === "ok" && !j.invoice_id); for (const j of list) await sb.rpc("price_job", { p_job: j.id }); await load(false); $("#tarifMsg").textContent = `✓ ${list.length}`; });
