@@ -88,6 +88,10 @@
     .c.on .price{color:#0A0B0D;background:rgba(255,255,255,.85);border-color:transparent}
     .c .desc{font-size:13px;color:var(--taupe);line-height:1.45;flex:1}
     .c .inc{display:block;margin-top:6px;font-weight:600}
+    /* une ligne d'exemple par type (01) : c'est elle qui empêche de cocher la mauvaise case */
+    .c .ex{display:block;margin-top:8px;font-size:12px;line-height:1.4;color:var(--accent-blue)}
+    /* prix d'appel d'un type (01) : « à partir de … / épisode » — plus long qu'une pastille de prix, il a le droit de passer à la ligne */
+    .c .price.unit{white-space:normal;text-align:right;max-width:52%;line-height:1.35}
     .promo{display:flex;flex-direction:column;gap:6px;margin-top:2px}
     .promo .row{display:flex;align-items:center;flex-wrap:wrap;gap:8px;font-size:13px;font-variant-numeric:tabular-nums}
     .promo .tag{font-weight:600;font-size:11px;letter-spacing:.06em;text-transform:uppercase;border-radius:999px;padding:3px 9px;color:#0A0B0D;background:rgba(255,255,255,.85)}
@@ -202,13 +206,15 @@
     .terms input{margin-top:3px;accent-color:var(--amber);width:16px;height:16px;flex:none}
     .terms a{color:var(--accent-blue);text-decoration:underline;text-underline-offset:2px}
 
-    /* « Autres prestations » : lignes construites depuis la grille du client (table offers × client_prices) */
+    /* « Vos vidéos / Options » : lignes construites depuis la grille du client (table offers × client_prices) */
     .more{margin-top:22px;padding-top:18px;border-top:1px solid var(--line)}
     .more h3{margin:0 0 4px;font-size:16px;font-weight:600}
     .more .sub{margin:0 0 12px;color:var(--taupe);font-size:13px;line-height:1.5}
     .ohead{display:flex;align-items:center;gap:8px;margin:0 0 8px;font-family:'Geist',system-ui,sans-serif;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--accent-blue)}
     .ohead.sec{margin-top:14px;color:var(--taupe)}
     .olist{display:flex;flex-direction:column;gap:8px}
+    /* sans ça, « display:flex » gagne contre l'attribut hidden et l'accordéon resterait ouvert */
+    .olist[hidden]{display:none}
     .o{display:flex;align-items:center;gap:12px;flex-wrap:wrap;border:1px solid var(--line);border-radius:14px;background:var(--surface);padding:12px 14px;cursor:pointer;transition:border-color .2s,background .2s}
     .o.on{border-color:rgba(220,230,240,.5);background:var(--amber-soft)}
     .o .oname{flex:1;min-width:150px;font-size:15px;font-weight:500}
@@ -228,6 +234,13 @@
     .parts .pct,.parts .lvn{color:var(--taupe)}
     .parts .tag{font-weight:600;font-size:11px;letter-spacing:.06em;text-transform:uppercase;border-radius:999px;padding:3px 9px;color:#0A0B0D;background:rgba(255,255,255,.85)}
     .o .parts{flex-basis:100%;width:100%}
+
+    /* accordéon « + Options (N) » (étape 03) : la liste à l'unité est repliée par défaut */
+    .acc{display:block;width:100%;text-align:left;margin:0;padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.04);color:var(--cream);font:inherit;font-size:15px;font-weight:600;letter-spacing:-.01em;cursor:pointer;transition:border-color .2s,background .2s}
+    .acc[aria-expanded="true"]{border-color:var(--line-strong)}
+    /* au moins une option payée : l'accordéon s'allume comme une carte cochée, même replié */
+    .acc.on{border-color:rgba(220,230,240,.5);background:var(--amber-soft)}
+    #optOffers{margin-top:10px}
 
     /* avertissement d'accès : visible sur TOUTES les étapes, pas seulement la première */
     .warn{flex-basis:100%;order:-2;font-size:13px;line-height:1.45;color:var(--taupe);text-align:center;padding:8px 12px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.04)}
@@ -251,6 +264,7 @@
       .step:not(.active):hover{border-color:var(--line-strong)}
       .c:not(.on):hover{border-color:var(--line-strong)}
       .o:not(.on):hover{border-color:var(--line-strong)}
+      .acc:hover{border-color:rgba(220,230,240,.35);background:rgba(255,255,255,.06)}
       .preview:not([disabled]):hover{color:#fff;border-color:rgba(220,230,240,.35)}
       .qty button:not(.preview):hover{border-color:rgba(220,230,240,.35);background:rgba(255,255,255,.1)}
       .thumbs a:hover{border-color:var(--amber)}
@@ -310,10 +324,13 @@
       <p class="note" data-i="note.episode"></p>
       <!-- garde-fou : si la grille du client ne laisse aucun produit affichable, l'étape dit quoi faire (jamais de cul-de-sac) -->
       <p class="note" id="produitNote"></p>
-      <!-- Autres prestations : construites depuis la grille du client, aucune offre en dur. Vide = section masquée. -->
+      <!-- Vos vidéos : SEULEMENT les lignes VIDÉO de la grille du client (packs du studio, épisodes sans carte
+           dédiée), construites depuis la base, aucune offre en dur. Vide = section masquée.
+           Un client à packs (recordia) n'a aucune carte de formule : toute son offre vit ici, donc ce bloc
+           ne quitte JAMAIS l'étape 01. Les lignes non-vidéo sont parties à l'étape 03 (#optWrap). -->
       <div class="more" id="moreWrap" hidden>
-        <h3 data-i="x.more"></h3>
-        <p class="sub" data-i="x.moreSub"></p>
+        <h3 data-i="x.vid"></h3>
+        <p class="sub" data-i="x.vidSub"></p>
         <div class="olist" id="moreOffers"></div>
       </div>
     </section>
@@ -323,6 +340,8 @@
       <h2 data-i="s2.title"></h2>
       <p class="hint" data-i="s2.hint"></p>
       <div class="choices two" id="formule"></div>
+      <!-- rassurance, pas une limite : la clause du site (index.html, FAQ) dit 1 aller-retour inclus -->
+      <p class="note" id="revNote" data-i="x.rev1" hidden></p>
       <p class="note" id="formuleNote"></p>
     </section>
 
@@ -344,6 +363,14 @@
       <div class="block" id="trailerBlock">
         <h3 data-i="x.trailer"></h3><p class="sub" data-i="x.trailerSub"></p>
         <div class="qty"><span class="lab" data-i="f.qty"></span><button type="button" data-dec="trailer">−</button><input type="number" min="0" max="99" data-q="trailer"/><button type="button" data-inc="trailer">+</button><span class="price" id="pTrailer" style="margin-left:10px"></span><button type="button" class="preview" data-prev="trailer" style="margin-left:14px"><i>▶</i><span data-i="preview"></span></button></div>
+      </div>
+      <!-- Options : les lignes NON-VIDÉO de la grille du client (charte graphique, intro, intro longue,
+           supplément 30 min, révisions). Elles étaient à l'étape 01, devant un client qui n'avait encore rien
+           choisi : l'addition montait avant la vidéo. Repliées par défaut ici, dépliées d'office si le client
+           en a déjà commandé une (son brouillon ne se cache pas). -->
+      <div class="block" id="optWrap" hidden>
+        <button type="button" class="acc" id="optToggle" aria-expanded="false" aria-controls="optOffers"></button>
+        <div class="olist" id="optOffers" hidden></div>
       </div>
       <div class="block">
         <label class="f" for="autre_demande" style="margin-top:0" data-i="f.autre_demande"></label>
@@ -454,6 +481,7 @@
 
 <div class="modal" id="modal"><div class="box"><div class="bar"><span id="modalTitle"></span><button type="button" id="modalClose">×</button></div><iframe id="modalFrame" allow="autoplay; fullscreen" allowfullscreen></iframe><div class="plist" id="plist"></div></div></div>
 
+<script src="forms.js?v=4"></script>
 <script src="previews.js?v=4"></script>
 <script>
 /* =========================================================================
@@ -472,7 +500,7 @@ const PREVIEWS = {
 // Exemples de CTA à l'écran : nom + image ou vidéo courte (gif, png, mp4). Vide = « Aperçu bientôt ».
 // Source : dossier Drive « Videos Espaces Clients 05 Brief », via sync_previews.mjs (client/previews.js). Secours : pastilles vides.
 const CTA_EXAMPLES = (window.DS_PREVIEWS && window.DS_PREVIEWS.cta && window.DS_PREVIEWS.cta.length) ? window.DS_PREVIEWS.cta : [{ name: "Jordan Pierre", media: "" }, { name: "Courtney Kay", media: "" }];
-// Aucun prix en dur ici : chaque carte lit la grille DU CLIENT (RPC client_prices → `prices`), comme « Autres prestations ».
+// Aucun prix en dur ici : chaque carte lit la grille DU CLIENT (RPC client_prices → `prices`), comme « Vos vidéos / Options ».
 // Pas de prix posé pour ce client = « Sur devis » (cas rare et légitime : face cam, studio sans grille).
 
 /* ---------------- textes ---------------- */
@@ -485,14 +513,20 @@ const I18N = {
     "f.projet":"Nom du projet ou de l'épisode","ph.projet":"Ex. Épisode 12 — Dr Weber",
     "f.produit":"Ce que vous nous confiez","f.episodes":"Nombre d'épisodes",
     produit:{podcast:["Podcast / Interview","Épisode complet monté, 16:9, prêt à publier."],vsl:["VSL","Vidéo de vente, 16:9, rythme et sous-titres travaillés."],facecam:["Face cam","Vidéo face caméra (YouTube), 16:9, montage et motion design."]},
+    // une ligne d'exemple par case : se tromper de case, c'est un brief faux et un aller-retour perdu
+    prodEx:{podcast:"2 personnes ou plus, plusieurs caméras",vsl:"Vidéo de vente, script écrit",facecam:"Toi seul face caméra"},
+    prodUnit:{podcast:"épisode",vsl:"vidéo",facecam:"vidéo"},
+    "x.from":"à partir de {p} / {u}",
     "note.episode":"Un épisode = une vidéo finie jusqu'à 60 minutes. Au-delà, un supplément par tranche de 30 minutes.",
     "formuleOff":"Choisissez d'abord un produit à l'étape 01 — Produit.","bundle.inc":"{n} reels inclus dans le pack","promo":"PROMO","instead":"au lieu de","total":"Total","bundleNote":"Un pack contient déjà son épisode et ses reels : son contenu est détaillé sur la carte.",
-    "formuleNoProduct":"Vos vidéos sont dans « Autres prestations », à l'étape 01 — Produit : choisissez votre pack là-bas, puis revenez ajouter vos extras ici.","formuleAsk":"Rien n'est encore ouvert ici pour votre studio. Écrivez-nous sur WhatsApp : on cale votre formule avec vous et vous commandez juste après.","parts.incl":"inclus",
-    "x.quoting":"Votre grille est en cours de finalisation : choisissez ce dont vous avez besoin, nous confirmons le prix avec vous.","x.noProduct":"Votre offre est faite sur mesure : choisissez dans vos prestations ci-dessous.",
+    "formuleNoProduct":"Vos vidéos sont à l'étape 01 — Produit, sous « Vos vidéos » : choisissez votre pack là-bas, puis revenez ajouter vos extras ici.","formuleAsk":"Rien n'est encore ouvert ici pour votre studio. Écrivez-nous sur WhatsApp : on cale votre formule avec vous et vous commandez juste après.","parts.incl":"inclus",
+    "x.rev1":"1 aller-retour de révision inclus.",
+    "x.quoting":"Votre grille est en cours de finalisation : choisissez ce dont vous avez besoin, nous confirmons le prix avec vous.","x.noProduct":"Votre offre est faite sur mesure : choisissez dans vos vidéos ci-dessous.",
     fmt:{single_cam:["Single cam 4K","Podcast ou interview, 1 caméra, full rush : review, dérush, color grading, audio mix"],multicam:["Multicam 4K","Cuts des rushes, changements de caméra, color grading, audio mix, logo, lower third"],facecam:["Face cam",""],bundle:["Bundle",""]},
     fclv:{simple:["Simple","Vidéo face caméra (YouTube) : montage + motion design léger"],dynamique:["Dynamique","Plus de coupes, plus de motion design"],signature:["Signature","Full motion design, niveau le plus élevé"]},
     bdlv:{standard:["Standard",""],premium:["Premium",""]},
-    "x.more":"Autres prestations","x.moreSub":"Tout ce qui a un prix chez vous et qui n'est pas au-dessus. Mettez une quantité, on l'ajoute à la commande.","x.pack":"Votre pack","x.unit":"À l'unité",
+    "x.vid":"Vos vidéos","x.vidSub":"Les formules ouvertes pour votre studio. Mettez une quantité, on l'ajoute à la commande.","x.pack":"Votre pack","x.unit":"À l'unité",
+    "x.opt":"Options","x.optSel":["Options · {n} choisie","Options · {n} choisies"],"x.optSub":"Facultatif. Tout ce qui s'ajoute par-dessus votre vidéo, à l'unité.",
     "s2.title":"Votre formule","s2.hint":"Le prix de votre vidéo : un seul choix, c'est l'épisode lui-même. Les extras se choisissent à l'étape suivante.",
     formule:{standard:["Standard","Montage propre et rythmé, habillage simple, son mixé. Pas d'intro dédiée."],premium:["Premium","Standard + une ouverture percutante de 45 secondes montée depuis vos meilleurs moments, titres animés, sound design."]},
     "s3.title":"Les extras","s3.hint":"Facultatif. Ce qui s'ajoute par-dessus votre épisode.",
@@ -525,7 +559,7 @@ const I18N = {
     // Seuls les fichiers joints (logo, palette) vivent en mémoire et sont à redéposer : le texte le dit.
     "stale.text":"Une nouvelle version de ce formulaire est disponible. Rafraîchissez la page pour continuer : vos choix sont conservés sur cet appareil, seuls vos fichiers joints (logo, palette) sont à redéposer.","stale.btn":"Rafraîchir la page",
     units:{episode:["épisode","épisodes"],reel_basique:["reel standard","reels standard"],reel_signature:["reel premium","reels premium"],miniature:["miniature","miniatures"],trailer:["trailer","trailers"]},
-    err:{projet:"Donnez un nom au projet.",produit0:"Choisissez ce que vous nous confiez, à l'étape 01 — Produit.",produit:"Votre commande est encore vide : choisissez un produit à l'étape 01 et sa formule à l'étape 02, ou un de vos packs à l'étape 01.",noVideo:"Il manque la vidéo : les extras s'ajoutent à un épisode ou à un pack. Choisissez-en un à l'étape 01 — Produit, on garde le reste de votre sélection.",formule:"Choisissez une formule ou un pack à l'étape 02 — Formule.",rushes:"Ajoutez au moins un lien de rushes.",description:"Décrivez ce que vous attendez, même en trois lignes.",contact:"Indiquez un contact et un moyen de le joindre.",email:"Indiquez un e-mail valide, c'est là qu'arrivent la confirmation et le suivi.",send:"L'envoi a échoué. Réessayez, ou écrivez-nous sur WhatsApp.",terms:"Cochez les conditions de collaboration pour envoyer la commande.",
+    err:{projet:"Donnez un nom au projet.",produit0:"Choisissez ce que vous nous confiez, à l'étape 01 — Produit.",produit:"Votre commande est encore vide : choisissez un produit à l'étape 01 — Produit et sa formule à l'étape 02 — Formule, ou un de vos packs à l'étape 01 sous « Vos vidéos ».",noVideo:"Il manque la vidéo : les extras s'ajoutent à un épisode ou à un pack. Choisissez votre épisode à l'étape 02 — Formule, ou un de vos packs à l'étape 01 — Produit. On garde le reste de votre sélection.",formule:"Choisissez une formule ou un pack à l'étape 02 — Formule.",rushes:"Ajoutez au moins un lien de rushes.",description:"Décrivez ce que vous attendez, même en trois lignes.",contact:"Indiquez un contact et un moyen de le joindre.",email:"Indiquez un e-mail valide, c'est là qu'arrivent la confirmation et le suivi.",send:"L'envoi a échoué. Réessayez, ou écrivez-nous sur WhatsApp.",terms:"Cochez les conditions de collaboration pour envoyer la commande.",
       key:"Ouvrez cet espace depuis votre lien personnel ou l'Espace client pour envoyer votre commande.",keyLink:"Aller à l'Espace client",bad_key:"Votre accès n'est pas reconnu pour ce studio. Ouvrez cet espace depuis votre lien personnel ou l'Espace client.",bad_email:"L'e-mail n'est pas valide. Corrigez-le à l'étape Brief.",no_project:"Donnez un nom au projet, à l'étape Produit.",no_rushes:"Aucun lien de rushes valide. Collez au moins un lien complet (https://…) à l'étape Fichiers.",rate_limit:"Beaucoup de commandes viennent d'être envoyées depuis cet espace. Réessayez dans une heure, ou écrivez-nous sur WhatsApp."},
     "s6.terms":"J'accepte les conditions de collaboration DS Editing : facture hebdomadaire, paiement à réception, pénalité de 20 % par semaine de retard.","s6.termsLink":"Lire les conditions","ok.space":"Ouvrir mon espace (commandes, factures)",
     "ok.track":"Votre numéro de suivi","ok.trackHint":"Gardez-le : il est aussi dans votre e-mail de confirmation.","ok.follow":"Suivre ma commande",
@@ -541,14 +575,19 @@ const I18N = {
     "f.projet":"Project or episode name","ph.projet":"e.g. Episode 12 — Dr Weber",
     "f.produit":"What you're sending us","f.episodes":"Number of episodes",
     produit:{podcast:["Podcast / Interview","Full edited episode, 16:9, ready to publish."],vsl:["VSL","Sales video, 16:9, pacing and captions crafted."],facecam:["Face cam","Talking-head video (YouTube), 16:9, editing and motion design."]},
+    prodEx:{podcast:"2+ people, multiple cameras",vsl:"Sales video, scripted",facecam:"Just you, facing the camera"},
+    prodUnit:{podcast:"episode",vsl:"video",facecam:"video"},
+    "x.from":"from {p} / {u}",
     "note.episode":"One episode = one finished video up to 60 minutes. Beyond, a supplement per extra 30 minutes.",
     "formuleOff":"Pick a product first, in step 01 — Product.","bundle.inc":"{n} reels included in the pack","promo":"PROMO","instead":"instead of","total":"Total","bundleNote":"A pack already contains its episode and its reels: the contents are listed on the card.",
-    "formuleNoProduct":"Your videos live under “Other services”, in step 01 — Product: pick your pack there, then come back and add your extras here.","formuleAsk":"Nothing is open here for your studio yet. Message us on WhatsApp: we'll set your package with you and you can order right after.","parts.incl":"included",
-    "x.quoting":"Your price list is being finalised: pick what you need, we'll confirm the price with you.","x.noProduct":"Your offer is tailor-made: pick from your services below.",
+    "formuleNoProduct":"Your videos are in step 01 — Product, under “Your videos”: pick your pack there, then come back and add your extras here.","formuleAsk":"Nothing is open here for your studio yet. Message us on WhatsApp: we'll set your package with you and you can order right after.","parts.incl":"included",
+    "x.rev1":"1 revision round included.",
+    "x.quoting":"Your price list is being finalised: pick what you need, we'll confirm the price with you.","x.noProduct":"Your offer is tailor-made: pick from your videos below.",
     fmt:{single_cam:["Single-cam 4K","Podcast or interview, one camera, full rushes: review, cut, color grading, audio mix"],multicam:["Multicam 4K","Rush cuts, camera switching, color grading, audio mix, logo, lower thirds"],facecam:["Face cam",""],bundle:["Bundle",""]},
     fclv:{simple:["Simple","Talking-head video (YouTube): editing + light motion design"],dynamique:["Dynamic","More cuts, more motion design"],signature:["Signature","Full motion design, top tier"]},
     bdlv:{standard:["Standard",""],premium:["Premium",""]},
-    "x.more":"Other services","x.moreSub":"Everything priced in your grid that isn't above. Set a quantity and we add it to the order.","x.pack":"Your pack","x.unit":"Per item",
+    "x.vid":"Your videos","x.vidSub":"The packages open for your studio. Set a quantity and we add it to the order.","x.pack":"Your pack","x.unit":"Per item",
+    "x.opt":"Options","x.optSel":["Options · {n} selected","Options · {n} selected"],"x.optSub":"Optional. Everything that goes on top of your video, per item.",
     "s2.title":"Your package","s2.hint":"The price of your video: one single choice, it is the episode itself. Extras come in the next step.",
     formule:{standard:["Standard","Clean, paced edit, simple graphics, mixed sound. No dedicated intro."],premium:["Premium","Standard + a punchy 45 s cold open cut from your strongest moments, motion titles, sound design."]},
     "s3.title":"Extras","s3.hint":"Optional. What is added on top of your episode.",
@@ -579,7 +618,7 @@ const I18N = {
     saved:"Draft saved on this device", empty:"Your order will appear here",
     "stale.text":"A newer version of this form is available. Refresh the page to continue: your choices are kept on this device, only your attached files (logo, palette) need to be dropped again.","stale.btn":"Refresh the page",
     units:{episode:["episode","episodes"],reel_basique:["standard reel","standard reels"],reel_signature:["premium reel","premium reels"],miniature:["thumbnail","thumbnails"],trailer:["trailer","trailers"]},
-    err:{projet:"Give the project a name.",produit0:"Choose what you're sending us, in step 01 — Product.",produit:"Your order is still empty: pick a product in step 01 and its package in step 02, or one of your packs in step 01.",noVideo:"The video itself is missing: extras come on top of an episode or a pack. Pick one in step 01 — Product, we keep the rest of your selection.",formule:"Choose a package or a pack in step 02 — Package.",rushes:"Add at least one footage link.",description:"Describe what you expect, even in three lines.",contact:"Give us a contact and a way to reach them.",email:"Enter a valid email, that's where the confirmation and tracking go.",send:"Sending failed. Try again, or message us on WhatsApp.",terms:"Tick the terms of collaboration to send the order.",
+    err:{projet:"Give the project a name.",produit0:"Choose what you're sending us, in step 01 — Product.",produit:"Your order is still empty: pick a product in step 01 — Product and its package in step 02 — Package, or one of your packs in step 01 under “Your videos”.",noVideo:"The video itself is missing: extras come on top of an episode or a pack. Pick your episode in step 02 — Package, or one of your packs in step 01 — Product. We keep the rest of your selection.",formule:"Choose a package or a pack in step 02 — Package.",rushes:"Add at least one footage link.",description:"Describe what you expect, even in three lines.",contact:"Give us a contact and a way to reach them.",email:"Enter a valid email, that's where the confirmation and tracking go.",send:"Sending failed. Try again, or message us on WhatsApp.",terms:"Tick the terms of collaboration to send the order.",
       key:"Open this space from your personal link or the Client space to send your order.",keyLink:"Go to the Client space",bad_key:"Your access isn't recognised for this studio. Open this space from your personal link or the Client space.",bad_email:"The email isn't valid. Fix it in the Brief step.",no_project:"Give the project a name, in the Product step.",no_rushes:"No valid footage link. Paste at least one full link (https://…) in the Files step.",rate_limit:"A lot of orders were just sent from this space. Try again in an hour, or message us on WhatsApp."},
     "s6.terms":"I accept the DS Editing terms of collaboration: weekly invoice, payment on receipt, 20% penalty per week late.","s6.termsLink":"Read the terms","ok.space":"Open my space (orders, invoices)",
     "ok.track":"Your tracking number","ok.trackHint":"Keep it: it's also in your confirmation email.","ok.follow":"Track my order",
@@ -636,7 +675,7 @@ const inclPer = () => { const n = Number((offerOf(draft.offre) || {}).bundle_ree
 const inclTotal = () => (draft.offre && isBundle(draft.offre) ? inclPer() * epN() : 0);
 const bundleReelKey = () => (/premium/.test(draft.offre || "") ? "reel_signature" : "reel_basique");
 const minQty = (k) => (bundleReelKey() === k ? inclTotal() : 0);       // les reels inclus dans un pack ne se retirent pas
-const maxQty = (k) => (LOCAL_QTY.has(k) ? 99 : MAX_MORE);              // cartes dédiées : 99 comme avant ; « Autres prestations » : 20
+const maxQty = (k) => (LOCAL_QTY.has(k) ? 99 : MAX_MORE);              // cartes dédiées : 99 comme avant ; « Vos vidéos / Options » : 20
 // Clés de prix renvoyées par client_prices (RPC) : null = inconnu (appel échoué ou pas de clé d'accès)
 let avail = null;
 const hasPrice = (k) => Number.isFinite(prices[k]);
@@ -679,7 +718,7 @@ function applyPromos(rows) {
 }
 /* ---------------- catalogue des offres (table `offers`, lecture publique) ----------------
    Aucune offre n'est écrite en dur ici : toute offre active qui a un prix chez CE client et qui n'a pas
-   sa carte dédiée plus haut apparaît d'elle-même dans « Autres prestations ». Nouvelle offre en base = rien à retoucher. */
+   sa carte dédiée plus haut apparaît d'elle-même dans « Vos vidéos / Options ». Nouvelle offre en base = rien à retoucher. */
 const CARD_KEYS = new Set(["podcast_standard", "podcast_premium", "vsl_standard", "vsl_premium", "single_cam_4k", "multicam_4k", "facecam_simple", "facecam_dynamique", "facecam_signature", "bundle_standard", "bundle_premium", "reel_standard", "reel_premium", "miniature", "trailer", "cta"]);
 const LOCAL_QTY = new Set(["reel_basique", "reel_signature", "miniature", "trailer"]); // compteurs des cartes dédiées (clés propres à cette page)
 let catalog = [];     // offres actives lues en base : [{item_key, label_fr, label_en, family, sort}]
@@ -694,13 +733,24 @@ const dupHidden = (k) => hasPacks() && isDupFam(k);
 let cur = "";         // devise du studio : client_slug d'abord, client_bundle_promos en secours ; inconnue = nombre seul, jamais un mauvais symbole
 const MAX_MORE = 20;  // compteur de 0 à 20
 const offerLabel = (k) => { const o = catalog.find((x) => x.item_key === k); return (o && (lang === "fr" ? o.label_fr : o.label_en)) || k; };
+/* Plus vendues à l'unité (décision du 08/10) : ces quatre-là ne sont QUE des pièces de pack. Elles restent
+   actives en base, s'affichent dans le détail des packs qui les contiennent (offers.bundle_parts : les 4 packs
+   recordia) et y sont facturées par price_job. Ce qui disparaît, c'est seulement leur ligne achetable à
+   l'unité : le filtre est posé ici, donc la ligne, le compteur ET la ligne de commande partent ensemble.
+   Aucune modification en base. */
+const NO_UNIT = new Set(["export_audio", "outro_perso", "logo_anim", "pack_medias_10"]);
 const moreOffers = () => catalog
-  .filter((o) => o && o.item_key && o.family !== "legacy" && !CARD_KEYS.has(o.item_key) && Number.isFinite(prices[o.item_key]) && !dupHidden(o.item_key))
+  .filter((o) => o && o.item_key && o.family !== "legacy" && !CARD_KEYS.has(o.item_key) && !NO_UNIT.has(o.item_key) && Number.isFinite(prices[o.item_key]) && !dupHidden(o.item_key))
   .slice()
   .sort((a, b) => ((a.family === "pack_client" ? 0 : 1) - (b.family === "pack_client" ? 0 : 1)) || (Number(a.sort ?? 9999) - Number(b.sort ?? 9999)) || String(a.item_key).localeCompare(String(b.item_key)));
 const moreQty = () => { const out = {}; for (const o of moreOffers()) { const n = draft.qty[o.item_key] || 0; if (n > 0) out[o.item_key] = n; } return out; };
+/* La coupe du 08/10 : les lignes VIDÉO restent à l'étape 01 (un client à packs n'a aucune carte de formule,
+   toute son offre est là — la déplacer viderait sa page), les lignes NON-VIDÉO descendent à l'étape 03,
+   repliées. Même liste source (moreOffers) des deux côtés : rien ne peut tomber entre les deux. */
+const packOffers = () => moreOffers().filter((o) => isVideoKey(o.item_key));
+const optOffers = () => moreOffers().filter((o) => !isVideoKey(o.item_key));
 /* Garde-fou : une commande contient au moins UNE vidéo — l'épisode de l'étape 02, ou un pack / un
-   épisode pris dans « Autres prestations ». Des suppléments seuls (30 min en plus, miniature, charte)
+   épisode pris dans « Vos vidéos » (étape 01). Des suppléments seuls (30 min en plus, miniature, charte)
    ne font pas une commande : c'est ce qu'april-jackson pouvait envoyer. Contrôlé à la sortie de 03 ET
    avant l'envoi, donc on ne peut pas y arriver en revenant en arrière. */
 const isVideoKey = (k) => { const f = famOf(k); return f ? (f === "pack_client" || EP_FAMILIES.has(f)) : EP_ALL.has(k); };
@@ -743,7 +793,9 @@ function partsHtml(k) {
 /* ---------------- client & langue ---------------- */
 const params = new URLSearchParams(location.search);
 const slug = (params.get("client") || "").toLowerCase();
-let lang = params.get("lang") || "fr";
+const FORMS = window.DS_FORMS || {};
+const client = FORMS[slug]; // ancien circuit Google Form : ne sert plus qu'au repli si la base est injoignable
+let lang = params.get("lang") || (client ? client.lang : "fr");
 if (!I18N[lang]) lang = "fr";
 const $ = (s) => document.querySelector(s);
 const t = (k) => (I18N[lang][k] ?? k);
@@ -755,7 +807,7 @@ let studio = null;      // { slug, name, lang } retrouvé depuis la clé (RPC cl
 let langTouched = false; // la langue choisie à la main l'emporte sur celle du studio
 let orderToken = "";    // numéro de suivi, une fois la commande enregistrée
 let accessWarn = "";    // avertissement d'accès (pas de clé, clé non reconnue) : rendu à CHAQUE étape par renderNav
-const clientLabel = () => (studio && studio.name) || (slug ? slug.split("-").filter(Boolean).map(cap).join(" ") : "Demo");
+const clientLabel = () => (studio && studio.name) || (client && client.client) || (slug ? slug.split("-").filter(Boolean).map(cap).join(" ") : "Demo");
 const KEY = "ds-depot-" + (slug || "demo");
 let step = 0;
 const draft = Object.assign({ qty: {}, episodes: 1 }, load());
@@ -775,6 +827,8 @@ if (draft.offre) draft.produit = produitOf(draft.offre) || draft.produit;
 if (!PRODUITS.includes(draft.produit)) delete draft.produit;
 if (!draft.produit) delete draft.offre;                                 // pas de produit = pas d'épisode
 draft.episodes = Math.min(99, Math.max(1, Number(draft.episodes) || 1));
+if (!draft.qty || typeof draft.qty !== "object") draft.qty = {};        // brouillon abîmé : objet vide plutôt qu'une page morte
+for (const k of NO_UNIT) delete draft.qty[k];                           // brouillon d'avant la coupe : la ligne n'existe plus, elle ne doit pas partir en silence
 if (draft.offre && isBundle(draft.offre) && !Number.isFinite(draft.bundleBase)) draft.bundleBase = Math.max(BUNDLE_REELS, draft.bundlePrev || 0);
 const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 
@@ -790,7 +844,7 @@ function applyText() {
 }
 // Un seul point de re-rendu des choix : toute carte repasse par là, donc aucune classe « on » ne peut rester collée.
 function rerender() {
-  renderProduit(); renderFormule(); renderReels(); renderMore();
+  renderProduit(); renderFormule(); renderReels(); renderPacks(); renderOptions();
   // une prestation sans prix chez ce client n'a pas de bloc : on ne propose jamais une ligne non facturable
   $("#miniatureBlock").hidden = !cardShown("miniature"); $("#trailerBlock").hidden = !cardShown("trailer");
   $("#pMiniature").textContent = unitPriceTxt("miniature"); $("#pTrailer").textContent = unitPriceTxt("trailer");
@@ -804,11 +858,11 @@ function renderSteps() {
   document.querySelectorAll(".step[data-go]").forEach((el) => el.addEventListener("click", () => { const g = +el.dataset.go; if (g < step) go(g); }));
   document.querySelectorAll(".panel").forEach((p) => p.classList.toggle("active", +p.dataset.step === step));
 }
-// priceTxt vide = aucune pastille de prix (01 Produit n'affiche QUE le type)
-function choiceCard(key, name, desc, priceTxt, previewKey, on, extraFoot = "") {
+// priceTxt vide = aucune pastille de prix (une carte sans prix dans la grille du client reste muette)
+function choiceCard(key, name, desc, priceTxt, previewKey, on, extraFoot = "", priceCls = "") {
   const hasPrev = !!PREVIEWS[previewKey];
   return `<div class="c ${on ? "on" : ""}" data-choice="${key}">
-    <div class="top"><div class="name">${name}</div>${priceTxt ? `<div class="price">${priceTxt}</div>` : ""}</div>
+    <div class="top"><div class="name">${name}</div>${priceTxt ? `<div class="price${priceCls ? " " + priceCls : ""}">${priceTxt}</div>` : ""}</div>
     <div class="desc">${desc}</div>
     <div class="foot">${previewKey ? `<button type="button" class="preview" data-prev="${previewKey}" ${hasPrev ? "" : "disabled"}><i>▶</i><span>${hasPrev ? t("preview") : t("previewSoon")}</span></button>` : "<span></span>"}${extraFoot}</div>
   </div>`;
@@ -861,14 +915,21 @@ function toggleQty(k) {
   save(); rerender();
 }
 
-// 01 Produit : le TYPE seulement, sans aucun prix. Un seul produit à la fois.
+/* Prix d'appel d'un type : le MOINS CHER de ses épisodes, À L'UNITÉ, lu dans la grille du client.
+   Les packs sont écartés : le prix d'un pack est un TOTAL (épisode + reels), l'annoncer en « à partir de »
+   serait faux dans les deux sens. Les prix à 0 aussi : une ligne offerte (geste commercial) afficherait
+   « à partir de 0 € » en tête de l'écran 01. Plus aucun prix valide → carte sans prix, comme avant. */
+const fromPrice = (p) => { const v = epKeys(p).filter((k) => !isBundle(k) && hasPrice(k) && prices[k] > 0).map((k) => prices[k]); return v.length ? Math.min(...v) : null; };
+// L'unité suit le type : un VSL ou une face cam n'est pas un « épisode ».
+const fromTxt = (p) => { const v = fromPrice(p); return v === null ? "" : esc(t("x.from").replace("{p}", money(v, cur)).replace("{u}", t("prodUnit")[p] || "")); };
+// 01 Produit : le TYPE, son exemple et son prix d'appel à l'unité. Un seul produit à la fois.
 function renderProduit() {
-  const p = t("produit");
+  const p = t("produit"), ex = t("prodEx");
   const list = PRODUITS.filter((k) => epKeys(k).length);
-  $("#produit").innerHTML = list.map((k) => choiceCard("produit:" + k, p[k][0], p[k][1], "", null, draft.produit === k)).join("");
+  $("#produit").innerHTML = list.map((k) => choiceCard("produit:" + k, p[k][0], p[k][1] + (ex[k] ? `<span class="ex">${esc(ex[k])}</span>` : ""), fromTxt(k), null, draft.produit === k, "", "unit")).join("");
   $("#produit").querySelectorAll("[data-choice]").forEach((el) => el.addEventListener("click", () => setProduit(el.dataset.choice.split(":")[1])));
   // Garde-fou : la grille du client ne laisse aucun produit affichable → on dit où aller, jamais de cul-de-sac
-  $("#produitNote").textContent = list.length ? (avail !== null && quoteMode() ? t("x.quoting") : "") : (moreOffers().length ? t("x.noProduct") : t("x.quoting"));
+  $("#produitNote").textContent = list.length ? (avail !== null && quoteMode() ? t("x.quoting") : "") : (packOffers().length ? t("x.noProduct") : t("x.quoting"));
 }
 // Libellé et description d'un épisode : les textes de la page quand ils existent, sinon le libellé de la base.
 function epText(k) {
@@ -890,13 +951,16 @@ const epPrev = (k) => ((/^(?:podcast|vsl)_(standard|premium)$/.exec(k) || [])[1]
 /* D2 : quand l'étape 01 n'a aucun type à proposer, 02 ne doit PAS dire « choisissez d'abord un produit
    à l'étape 01 » — observé mot pour mot chez recordia et april-jackson, le client tournait en rond entre
    01 et 02. On dit la vérité et on l'oriente vers ce qui EST commandable chez lui : ses packs (étape 01,
-   « Autres prestations »), ou une prise de contact s'il n'a encore rien d'ouvert. */
-const noEpNote = () => (moreOffers().length ? t("formuleNoProduct") : t("formuleAsk"));
+   « Vos vidéos »), ou une prise de contact s'il n'a encore rien d'ouvert. */
+// On n'envoie vers « Vos vidéos » (étape 01) que si ce client y a VRAIMENT une vidéo : sinon (april-jackson,
+// qui n'a qu'un supplément tarifé) on l'invitait à choisir un pack qui n'existe pas.
+const noEpNote = () => (packOffers().length ? t("formuleNoProduct") : t("formuleAsk"));
 const anyProduit = () => PRODUITS.some((p) => epKeys(p).length);
 function renderFormule() {
   const box = $("#formule"), note = $("#formuleNote");
-  if (!draft.produit) { box.innerHTML = ""; note.textContent = anyProduit() ? t("formuleOff") : noEpNote(); return; } // cascade stricte : jamais une formule cliquable sans produit
+  if (!draft.produit) { box.innerHTML = ""; $("#revNote").hidden = true; note.textContent = anyProduit() ? t("formuleOff") : noEpNote(); return; } // cascade stricte : jamais une formule cliquable sans produit
   const keys = epKeys(draft.produit);
+  $("#revNote").hidden = !keys.length;                                  // « 1 aller-retour inclus » : sous les cartes, jamais sans carte
   box.innerHTML = keys.map((k) => {
     const on = draft.offre === k, [name, desc] = epText(k);
     const foot = on ? `<div class="qty"><span class="lab">${t("f.episodes")}</span><button type="button" data-dec="episodes">−</button><input type="number" min="1" max="99" value="${epN()}" data-q="episodes"/><button type="button" data-inc="episodes">+</button></div>` : "";
@@ -926,7 +990,7 @@ function cleanDraft() {
   if (!cardShown("miniature")) delete draft.qty.miniature;
   if (!cardShown("trailer")) delete draft.qty.trailer;
   // une prestation qui n'a plus de prix chez ce client sort aussi du brouillon
-  for (const k of Object.keys(draft.qty)) if (!LOCAL_QTY.has(k) && (!Number.isFinite(prices[k]) || dupHidden(k))) delete draft.qty[k];
+  for (const k of Object.keys(draft.qty)) if (!LOCAL_QTY.has(k) && (!Number.isFinite(prices[k]) || dupHidden(k) || NO_UNIT.has(k))) delete draft.qty[k];
   save(); rerender();
 }
 function renderReels() {
@@ -940,27 +1004,54 @@ function renderReels() {
   }).join("");
   $("#reels").querySelectorAll("[data-choice]").forEach((el) => el.addEventListener("click", (e) => { if (e.target.closest(".qty") || e.target.closest(".preview")) return; toggleQty(el.dataset.choice.split(":")[1]); }));
 }
-// « Autres prestations » : une ligne par offre (libellé, prix, compteur 0-20), construite depuis la grille du client.
-// Les packs client (famille pack_client) passent en tête, en plus gros : c'est l'offre principale de ce studio.
-function renderMore() {
-  const wrap = $("#moreWrap"), list = moreOffers();
-  if (!list.length) { wrap.hidden = true; $("#moreOffers").innerHTML = ""; return; }   // rien à proposer : aucune section
-  wrap.hidden = false;
-  const line = (o, pack) => {
-    const k = o.item_key, n = draft.qty[k] || 0;
-    return `<div class="o ${pack ? "pack " : ""}${n > 0 ? "on" : ""}" data-offer="${esc(k)}">
+// Une ligne d'offre : libellé, prix à l'unité, compteur 0-20, et le contenu du pack détaillé en dessous.
+const offerLine = (o, pack) => {
+  const k = o.item_key, n = draft.qty[k] || 0;
+  return `<div class="o ${pack ? "pack " : ""}${n > 0 ? "on" : ""}" data-offer="${esc(k)}">
       <span class="oname">${esc(offerLabel(k))}</span><span class="oprice">${esc(money(prices[k], cur))}</span>
       <span class="qty"><span class="lab">${t("f.qty")}</span><button type="button" data-dec="${esc(k)}">−</button><input type="number" min="0" max="${MAX_MORE}" value="${n}" data-q="${esc(k)}"/><button type="button" data-inc="${esc(k)}">+</button></span>
       ${partsHtml(k)}
     </div>`;
-  };
+};
+const wireOffers = (box) => box.querySelectorAll("[data-offer]").forEach((el) => el.addEventListener("click", (e) => {
+  if (e.target.closest(".qty")) return; toggleQty(el.dataset.offer);    // re-clic sur la ligne = on l'enlève
+}));
+// 01 « Vos vidéos » : les lignes VIDÉO de la grille du client. Les packs client passent en tête, en plus gros :
+// c'est l'offre principale de ce studio, et pour lui la seule — il n'a aucune carte de formule.
+function renderPacks() {
+  const wrap = $("#moreWrap"), list = packOffers();
+  if (!list.length) { wrap.hidden = true; $("#moreOffers").innerHTML = ""; return; }   // rien à proposer : aucune section
+  wrap.hidden = false;
   const packs = list.filter((o) => o.family === "pack_client"), rest = list.filter((o) => o.family !== "pack_client");
-  $("#moreOffers").innerHTML = (packs.length ? `<div class="ohead">${t("x.pack")}</div>${packs.map((o) => line(o, true)).join("")}` : "")
-    + (rest.length ? `${packs.length ? `<div class="ohead sec">${t("x.unit")}</div>` : ""}${rest.map((o) => line(o, false)).join("")}` : "");
-  $("#moreOffers").querySelectorAll("[data-offer]").forEach((el) => el.addEventListener("click", (e) => {
-    if (e.target.closest(".qty")) return; toggleQty(el.dataset.offer); // re-clic sur la ligne = on l'enlève
-  }));
+  $("#moreOffers").innerHTML = (packs.length ? `<div class="ohead">${t("x.pack")}</div>${packs.map((o) => offerLine(o, true)).join("")}` : "")
+    + (rest.length ? `${packs.length ? `<div class="ohead sec">${t("x.unit")}</div>` : ""}${rest.map((o) => offerLine(o, false)).join("")}` : "");
+  wireOffers($("#moreOffers"));
 }
+/* 03 « + Options (N) » : les lignes NON-VIDÉO, repliées. L'état d'ouverture vit ici et pas dans le brouillon :
+   le compteur saisi, lui, est dans draft.qty — il survit donc au repli ET au changement d'étape. Une option
+   déjà commandée force l'ouverture, pour qu'aucune ligne facturée ne soit cachée. */
+let optOpen = false, optAuto = false;
+function renderOptions() {
+  const wrap = $("#optWrap"), body = $("#optOffers"), list = optOffers();
+  if (!list.length) { wrap.hidden = true; body.hidden = true; body.innerHTML = ""; return; }
+  wrap.hidden = false;
+  // UNE fois, au premier rendu réel (les prix sont arrivés) : un brouillon qui contient déjà une option
+  // s'ouvre tout seul. Ensuite c'est le client qui décide — sinon il ne pourrait plus refermer.
+  if (!optAuto) { optAuto = true; optOpen = list.some((o) => (draft.qty[o.item_key] || 0) > 0); }
+  body.hidden = !optOpen;
+  /* Le bouton dit ce que le client PAIE avant de dire ce qu'il peut ajouter : replié avec deux options
+     cochées, « Options (6) » lui cachait qu'il les paie. Dès qu'il y a une sélection, le compte affiché est
+     celui des options CHOISIES, et le bouton s'allume comme une carte sélectionnée. */
+  const sel = list.reduce((n, o) => n + ((draft.qty[o.item_key] || 0) > 0 ? 1 : 0), 0);
+  const lab = sel ? t("x.optSel")[sel > 1 ? 1 : 0].replace("{n}", sel) : `${t("x.opt")} (${list.length})`;
+  $("#optToggle").setAttribute("aria-expanded", optOpen ? "true" : "false");
+  $("#optToggle").classList.toggle("on", sel > 0);
+  $("#optToggle").textContent = `${optOpen ? "−" : "+"} ${lab}`;
+  body.innerHTML = `<p class="sub">${t("x.optSub")}</p>` + list.map((o) => offerLine(o, false)).join("");
+  wireOffers(body);
+}
+// Un seul écouteur, posé une fois : rebrancher un bouton à chaque rendu, c'est le clic compté deux fois (défaut F8).
+$("#optToggle").addEventListener("click", () => { optOpen = !optOpen; renderOptions(); renderQty(); });
 function renderThumbs() {
   const imgs = PREVIEWS.miniatures.filter(Boolean);
   const tiles = imgs.length ? imgs.map((u) => `<a href="${PREVIEWS.portfolio || u}" target="_blank" rel="noopener"><img src="${u}" alt=""/></a>`).join("") : [0, 1, 2].map(() => `<span>${t("exemple")}</span>`).join("");
@@ -1002,14 +1093,14 @@ function commande() {
   if (draft.produit) out.push(t("produit")[draft.produit][0]);
   if (draft.offre) { const n = epN(); out.push(n > 1 ? `${n} × ${epText(draft.offre)[0]}` : epText(draft.offre)[0]); }
   for (const k of [...REELS, "miniature", "trailer"]) { const n = draft.qty[k] || 0; if (n > 0) out.push(`${n} ${n > 1 ? u[k][1] : u[k][0]}`); }
-  for (const [k, n] of Object.entries(moreQty())) out.push(`${n} × ${offerLabel(k)}`); // « Autres prestations »
+  for (const [k, n] of Object.entries(moreQty())) out.push(`${n} × ${offerLabel(k)}`); // « Vos vidéos / Options »
   if (draft.cta === "yes") out.push(t("cta.unit"));
   return out.join(" · ");
 }
 /* ---------------- ce qui sera FACTURÉ ----------------
    Mêmes lignes, même ordre, mêmes libellés et mêmes prix que price_job (offers_v1d.sql l.135-217) :
    l'épisode choisi en 02 × sa quantité, les reels AU-DELÀ de ceux inclus dans un pack, la miniature, le
-   trailer, puis les « Autres prestations ». Un prix absent de la grille du client reste « Sur devis » sur
+   trailer, puis les lignes « Vos vidéos / Options ». Un prix absent de la grille du client reste « Sur devis » sur
    cette ligne-là, et seulement sur celle-là. */
 function orderLines() {
   const out = [], q = draft.qty;
@@ -1032,8 +1123,12 @@ function priceText() {
 function renderNav() {
   $("#prev").style.visibility = step === 0 ? "hidden" : "visible";
   $("#next").textContent = step === 5 ? t("btn.send") : t("btn.next");
-  const c = commande(), tot = orderTotal();
-  $("#summary").innerHTML = c ? `<b>${esc(c)}</b><br/>${esc(tot === null ? t("quote") : money(tot, cur))} · ${t("saved")}` : `${t("empty")}<br/>${t("saved")}`;
+  /* La barre collante ne porte PLUS l'addition pendant le parcours : le client voyait le total du paquet
+     monter dès son premier clic, alors que la règle maison est le prix à l'unité. Elle dit ce qu'il a choisi
+     et que son brouillon est gardé. Le total chiffré n'apparaît qu'au récap, après les lignes à l'unité. */
+  const c = commande(), tot = step === 5 ? orderTotal() : undefined;
+  const totTxt = tot === undefined ? "" : `${esc(tot === null ? t("quote") : money(tot, cur))} · `;
+  $("#summary").innerHTML = c ? `<b>${esc(c)}</b><br/>${totTxt}${t("saved")}` : `${t("empty")}<br/>${t("saved")}`;
   $("#keyWarn").innerHTML = accessWarn;                                // visible à chaque étape, pas seulement à la première
   renderStale();                                                       // bandeau « page périmée » + bouton d'envoi éteint, à chaque étape
 }
@@ -1242,7 +1337,7 @@ function validate(s) {
   }
   if (s === 1) { if (draft.produit && !draft.offre) return e.formule; } // un produit choisi = un épisode choisi
   // La commande doit contenir au moins une prestation : contrôlé à la sortie des 3 colonnes de choix.
-  // Une quantité dans « Autres prestations » (pack client…) suffit aussi.
+  // Une quantité dans « Vos vidéos » (pack client) ou dans « Options » suffit aussi.
   if (s === 2) {
     const q = draft.qty;
     const rien = !draft.offre && !REELS.some((k) => q[k] > 0) && !(q.miniature > 0) && !(q.trailer > 0) && !Object.keys(moreQty()).length;
@@ -1291,7 +1386,7 @@ function workToDo(d) {
     out.push(fmt ? `${label} (${fmt})` : label);
     if ((key === "podcast" || key === "vsl") && d.formule) out.push(`${lang === "fr" ? "formule" : "package"} ${d.formule}`);
   }
-  // « Autres prestations » : libellé de l'offre lu en base (details.items), dans la langue de l'espace
+  // « Vos vidéos / Options » : libellé de l'offre lu en base (details.items), dans la langue de l'espace
   for (const [k, n] of Object.entries(d.items || {})) out.push(`${n} × ${offerLabel(k)}`);
   return out.join(" · ");
 }
@@ -1302,7 +1397,7 @@ function order() {
   const v = values(); const q = draft.qty; const n = (x) => (x > 0 ? String(x) : "");
   const k = draft.offre || "", N = epN(), bundled = !!draft.offre && isBundle(k);
   const lv = (/_(standard|premium)$/.exec(k) || [])[1] || "";
-  const items = Object.assign({}, moreQty());   // « Autres prestations » : { clé d'offre : quantité }
+  const items = Object.assign({}, moreQty());   // « Vos vidéos / Options » : { clé d'offre : quantité }
   /* price_job force la quantité 1 sur single_cam / multicam / facecam / bundle (offers_v1d.sql l.148-165).
      Pour N épisodes, les N−1 suivants passent par le chemin générique `items`, qui ADDITIONNE la quantité
      DANS la ligne existante au lieu d'en créer une deuxième (règle anti-doublon, offers_v1d.sql l.180-197).
@@ -1350,11 +1445,26 @@ async function submit() {
     if (!res || !res.token) throw Object.assign(new Error("no_token"), { code: "send" });
     done(String(res.token));
   } catch (e) {
-    // Pas de repli : le brouillon reste enregistré sur l'appareil, le client réessaie.
+    // Pas de repli vers les anciens formulaires Google (supprimés du circuit le 29/09) : le brouillon reste enregistré, le client réessaie.
     if (e.offline) return fail(esc(t("err").send));
     if (e.code === "bad_key") return fail(keyMsg("bad_key"));
     fail(esc(["bad_email", "no_project", "no_rushes", "terms", "rate_limit"].includes(e.code) ? t("err")[e.code] : t("err").send));
   }
+}
+/* repli : même circuit que le formulaire Google, sans serveur (seulement si la base est injoignable et que le studio a un formulaire) */
+async function sendForm() {
+  const v = values(); const q = draft.qty; const fd = new FormData();
+  const k = draft.offre || "", lv = (/_(standard|premium)$/.exec(k) || [])[1] || "";
+  const put = (key, val) => { const id = client.entries[key]; if (id && val !== undefined && val !== "") fd.append("entry." + id, val); };
+  put("projet", v.projet);
+  put("podcast", k.startsWith("podcast_") ? String(epN()) : ""); put("vsl", k.startsWith("vsl_") ? String(epN()) : "");
+  put("formule", /^(podcast|vsl)_/.test(k) && lv ? cap(lv) : "");
+  put("reels", q.reel_basique ? String(q.reel_basique) : ""); put("reels_signature", q.reel_signature ? String(q.reel_signature) : "");
+  put("miniature", q.miniature ? String(q.miniature) : ""); put("trailer", q.trailer ? String(q.trailer) : "");
+  put("autre_demande", autreDemande(v)); put("description", v.description); put("rushes", v.rushes); put("logos", v.logos); put("references", v.references); put("palette", v.palette); put("contact", v.contact); put("email", v.email); put("autres", v.autres);
+  if ($("#terms").checked && client.options && client.options.terms) put("terms", client.options.terms);
+  if (v.deadline && client.entries.deadline) { const [y, m, d] = v.deadline.split("-"); fd.append(`entry.${client.entries.deadline}_year`, y); fd.append(`entry.${client.entries.deadline}_month`, String(+m)); fd.append(`entry.${client.entries.deadline}_day`, String(+d)); }
+  await fetch(client.action, { method: "POST", mode: "no-cors", body: fd });
 }
 $("#again").addEventListener("click", () => location.reload());
 const spaceKey = params.get("k"); if (spaceKey && slug) { const a = $("#spaceLink"); a.href = `espace.html?client=${encodeURIComponent(slug)}&k=${encodeURIComponent(spaceKey)}&lang=${lang}`; a.style.display = "inline-block"; }
@@ -1367,7 +1477,7 @@ applyText();
 headStamp().then((s) => { pageStamp = s; });
 
 // Catalogue des offres : lu une fois, sans clé d'accès (lecture publique de `offers`).
-// Échec ou table vide : aucune section « Autres prestations », tout le reste de la page marche comme avant.
+// Échec ou table vide : aucune section « Vos vidéos / Options », tout le reste de la page marche comme avant.
 loadCatalog().then((rows) => { if (Array.isArray(rows)) { catalog = rows; cleanDraft(); rerender(); } }).catch(() => {});
 
 /* ---------------- accès : sans clé, on prévient tout de suite ; avec clé, on retrouve le nom et la langue du studio ----------------
@@ -1381,7 +1491,7 @@ else rpc("client_slug", { p_key: accessKey }).then((d) => {
   rpc("client_prices", { p_slug: d.slug, p_k: accessKey }).then(applyAvail).catch(() => {}); // échec ou vide : tout reste affiché
   rpc("client_bundle_promos", { p_slug: d.slug, p_k: accessKey }).then(applyPromos).catch(() => {}); // échec ou vide : aucune promo affichée
   if (!params.get("lang") && !langTouched && I18N[d.lang] && d.lang !== lang) { lang = d.lang; applyText(); } else $("#clientName").textContent = clientLabel();
-}).catch(() => {}); // base injoignable : l'envoi tranchera
+}).catch(() => {}); // base injoignable : l'envoi tranchera (repli éventuel)
 </script>
 </body>
 </html>
