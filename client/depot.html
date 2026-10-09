@@ -494,8 +494,9 @@ const PREVIEWS = {
   ...(window.DS_PREVIEWS || {}),
   // Trailers : depuis le Drive (dossier « Trailers », previews.js v2 items[]) — vide = « Aperçu bientôt »
   trailer: ((window.DS_PREVIEWS || {}).items || []).filter((i) => i.cat === "trailers").map((i) => ({ src: "../" + i.path, poster: "../" + i.posterPath, title: i.title, vertical: !!i.vertical })),
-  portfolio: "",                 // lien vers le portfolio miniatures
-  miniatures: ["", "", ""],      // 3 images d'exemple (URL d'image)
+  portfolio: "portfolio.html",   // lien vers le portfolio (onglet Miniatures)
+  // Miniatures : depuis le Drive (dossier « Miniatures », previews.js v2 items[]) — vide = pastilles « Exemple »
+  miniatures: ((window.DS_PREVIEWS || {}).items || []).filter((i) => i.cat === "miniatures" && i.path).map((i) => ({ src: "../" + i.path, title: i.title || "" })),
 };
 // Exemples de CTA à l'écran : nom + image ou vidéo courte (gif, png, mp4). Vide = « Aperçu bientôt ».
 // Source : dossier Drive « Videos Espaces Clients 05 Brief », via sync_previews.mjs (client/previews.js). Secours : pastilles vides.
@@ -1053,8 +1054,9 @@ function renderOptions() {
 // Un seul écouteur, posé une fois : rebrancher un bouton à chaque rendu, c'est le clic compté deux fois (défaut F8).
 $("#optToggle").addEventListener("click", () => { optOpen = !optOpen; renderOptions(); renderQty(); });
 function renderThumbs() {
-  const imgs = PREVIEWS.miniatures.filter(Boolean);
-  const tiles = imgs.length ? imgs.map((u) => `<a href="${PREVIEWS.portfolio || u}" target="_blank" rel="noopener"><img src="${u}" alt=""/></a>`).join("") : [0, 1, 2].map(() => `<span>${t("exemple")}</span>`).join("");
+  const imgs = PREVIEWS.miniatures.filter((m) => m && m.src);
+  // Chaque vignette ouvre l'image en taille réelle ; le lien « Voir le portfolio » mène à la galerie complète.
+  const tiles = imgs.length ? imgs.map((m) => `<a href="${m.src}" target="_blank" rel="noopener" title="${m.title.replace(/"/g, "&quot;")}"><img src="${m.src}" alt="${m.title.replace(/"/g, "&quot;")}" loading="lazy"/></a>`).join("") : [0, 1, 2].map(() => `<span>${t("exemple")}</span>`).join("");
   const link = PREVIEWS.portfolio ? `<a class="preview" href="${PREVIEWS.portfolio}" target="_blank" rel="noopener" style="align-self:center;margin-left:6px"><i>↗</i><span>${t("portfolio")}</span></a>` : "";
   $("#thumbs").innerHTML = tiles + link;
 }
