@@ -239,7 +239,7 @@
     .fx .fxh b{margin:0}
     .fx .fxp{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
     .fx .fxpath{flex:1 1 320px;min-width:0;font-size:13px;color:var(--cream);background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:12px;padding:8px 12px;word-break:break-all;user-select:all;font-variant-numeric:tabular-nums}
-    .fx .fxpath.gone{color:var(--taupe)}
+    .fx .fxpath.gone{color:var(--taupe);text-decoration:line-through}
     .fx .btn{height:34px;padding:0 14px;font-size:12px}
     .fx .btn.okd{color:var(--ok);border-color:rgba(70,211,105,.4);background:rgba(70,211,105,.12)}
     .fx .fxkv{display:flex;gap:8px 24px;flex-wrap:wrap}
@@ -530,7 +530,7 @@ const T = {
     gh: { morning: "Rituels du matin", prios: "3 priorités du jour", week: "7 derniers jours", tz: "heure de Bali", loading: "Lecture en cours…", retry: "Réessayer",
       rit: { bilan_veille: "Relire le bilan de la veille", agenda_jour: "Vérifier l'agenda et les rendez-vous du jour", relances_jour: "Préparer les relances du jour", nouveaux_contacts: "Repérer les nouveaux contacts à traiter", crm_a_jour: "Vérifier que le CRM est à jour" },
       pri: (n) => `Priorité ${n}`, priDone: (n) => `Priorité ${n} faite`, nRit: (a, b) => `${a}/${b} rituels`, nPri: (a, b) => `${a}/${b} priorités`, at: (h) => `coché à ${h}`, empty: "Pas encore posée", none: "Rien de noté", noMember: "Aucun commercial à afficher.", saved: "✓ Enregistré",
-      wait: "En attente de la migration : les rituels et priorités seront disponibles dès que la base sera mise à jour.", denied: "Accès refusé : ce compte n'a pas le droit de lire ou d'écrire ici.", tooMany: "Trop de modifications d'affilée : réessaie dans une minute.", err: "Lecture ou écriture impossible : " },
+      net: "Réseau indisponible : rien n'a été enregistré, réessaie dans un instant.", wait: "En attente de la migration : les rituels et priorités seront disponibles dès que la base sera mise à jour.", denied: "Accès refusé : ce compte n'a pas le droit de lire ou d'écrire ici.", tooMany: "Trop de modifications d'affilée : réessaie dans une minute.", err: "Lecture ou écriture impossible : " },
     grille: { title: "Grille tarifaire interne", mark: "Interne — ne pas envoyer au client", lead: "Lue en direct dans la base (offers, price_grids). Rien n'est recopié dans le code.",
       loading: "Lecture de la base…", err: "Lecture impossible : ", s1: "1 · Grille générale (prix le plus courant en base, studios en EUR, hors clients à prix négociés)", s2: "2 · Offres miroir par client",
       cOffer: "Offre", cClient: "Client", cPrice: "Prix DS", cSame: "Studios à ce prix", cGap: "Écart", cFloor: "Plancher de négociation", cResale: "Prix de revente", cMargin: "Marge laissée au revendeur",
@@ -594,7 +594,7 @@ const T = {
     gh: { morning: "Morning routines", prios: "Today's 3 priorities", week: "Last 7 days", tz: "Bali time", loading: "Loading…", retry: "Retry",
       rit: { bilan_veille: "Read yesterday's recap", agenda_jour: "Check today's agenda and appointments", relances_jour: "Prepare today's follow-ups", nouveaux_contacts: "Spot the new contacts to handle", crm_a_jour: "Check the CRM is up to date" },
       pri: (n) => `Priority ${n}`, priDone: (n) => `Priority ${n} done`, nRit: (a, b) => `${a}/${b} routines`, nPri: (a, b) => `${a}/${b} priorities`, at: (h) => `ticked at ${h}`, empty: "Not set yet", none: "Nothing logged", noMember: "No sales member to show.", saved: "✓ Saved",
-      wait: "Waiting for the migration: routines and priorities will be available once the database is updated.", denied: "Access denied: this account cannot read or write here.", tooMany: "Too many changes in a row: try again in a minute.", err: "Cannot read or write: " },
+      net: "Network unavailable: nothing was saved, try again in a moment.", wait: "Waiting for the migration: routines and priorities will be available once the database is updated.", denied: "Access denied: this account cannot read or write here.", tooMany: "Too many changes in a row: try again in a minute.", err: "Cannot read or write: " },
     grille: { title: "Internal price grid", mark: "Internal — do not send to the client", lead: "Read live from the database (offers, price_grids). Nothing is copied into the code.",
       loading: "Reading the database…", err: "Cannot read: ", s1: "1 · General grid (most common price in the database, EUR studios, excluding negotiated-price clients)", s2: "2 · Mirror offers by client",
       cOffer: "Offer", cClient: "Client", cPrice: "DS price", cSame: "Studios at this price", cGap: "Spread", cFloor: "Negotiation floor", cResale: "Resale price", cMargin: "Margin left to the reseller",
@@ -1340,13 +1340,15 @@ function renderAdmin() {
    Les identifiants ci-dessous sont les seuls écrits en base ; les libellés restent dans T.<langue>.gh.rit. Ne jamais renommer un identifiant déjà coché. */
 const RITUALS = ["bilan_veille", "agenda_jour", "relances_jour", "nouveaux_contacts", "crm_a_jour"];
 const isSales = () => !!profile && profile.role === "sales";
-const canRituals = () => !LINKED && !!profile && profile.role === "admin";   // admin SEUL : dispatch et qualité n'ont pas à lire les priorités de Ghali (et la base les refuserait)
+const canRituals = () => !LINKED && !ADMIN_MODE && !!me && !(OPEN_ACCESS && String(me.email || "").toLowerCase() === String(OPEN_ACCESS.email).toLowerCase()) && !!profile && profile.role === "admin";   // admin NOMINATIF seulement (même règle que canGrille) : le compte partagé « Équipe » (OPEN_ACCESS, ouvert à tout visiteur de l'URL nue) est admin en base et lirait les priorités de Ghali. Dispatch et qualité : non (et la base les refuserait)
+const GH_SERVICE = ["claude"];   // comptes de service (log automatique du CRM, rôle sales en base) : jamais une carte « commercial qui n'a rien fait »
 const GH = { today: "", name: "", idx: null, team: null, timer: 0, redraw: null };
 const ghRpc = async (fn, args) => { try { return await sb.rpc(fn, args); } catch (e) { return { error: e }; } };
 // r = résultat complet de sb.rpc : { data, error, status }
 const ghErr = (r) => {
   const e = (r && r.error) || {}, m = String(e.message || e.details || e || ""), G = t("gh");
-  if (e.code === "PGRST202" || e.code === "42883" || (r && r.status === 404) || /could not find the function|schema cache/i.test(m)) return { wait: true, msg: G.wait };   // migration pas encore appliquée
+  if (e.code === "PGRST202" || e.code === "42883") return { wait: true, msg: G.wait };   // fonction absente : migration pas encore appliquée. Un 404 ou une coupure réseau ne suffit PAS (ce serait mentir)
+  if (!e.code && (!(r && r.status) || /fetch|network|load failed|timeout/i.test(m))) return { msg: G.net };
   if (e.code === "42501" || /ACCES_REFUSE/.test(m)) return { msg: G.denied };
   if (e.code === "54000" || /TROP_D_ECRITURES/.test(m)) return { msg: G.tooMany };
   return { msg: G.err + m };
@@ -1453,7 +1455,7 @@ async function renderRituals() {
   if (!GH.timer) GH.timer = setInterval(() => { if (tab === "rituels" && canRituals() && !document.hidden) renderRituals(); }, 60000);   // l'admin voit les coches arriver sans recharger
 }
 function ghPaintTeam() {
-  const G = t("gh"), d = GH.team, today = d.today, mem = (d.members || []).filter((m) => m.role === "sales");
+  const G = t("gh"), d = GH.team, today = d.today, mem = (d.members || []).filter((m) => m.role === "sales" && !GH_SERVICE.includes(String(m.name || "").trim().toLowerCase()));
   if (!mem.length) { $("#admin").innerHTML = `<div class="panel"><p style="margin:0;color:var(--taupe)">${G.noMember}</p></div>`; return; }
   const opened = new Set([...document.querySelectorAll(".gh-det[open]")].map((x) => x.dataset.u));
   $("#admin").innerHTML = mem.map((m) => {
@@ -1966,10 +1968,11 @@ async function bootLink() {
 // Repli sur l'annuaire du CRM : utilisé UNIQUEMENT quand `profiles` n'a pas de ligne. Un membre actif en `sales` devient le rôle « sales » du dashboard (jamais « editor » : il verrait les commandes).
 async function salesFromCrm() {
   try {
-    const { data, error } = await sb.from("crm_members").select("display_name,role,active").eq("user_id", me.id).maybeSingle();
-    if (!error && data && data.active === true && data.role === "sales") return { role: "sales", display_name: data.display_name || me.email };
-  } catch {}
-  return null;
+    const { data, error } = await sb.from("crm_members").select("display_name,role,active").eq("user_id", me.id).limit(2);
+    if (error || !Array.isArray(data) || data.length > 1) return { error: true };   // réseau, refus RLS ou doublon : on ne SAIT pas, donc jamais « editor » (il verrait la production)
+    const m = data[0];
+    return { profile: m && m.active === true && m.role === "sales" ? { role: "sales", display_name: m.display_name || me.email } : null };
+  } catch { return { error: true }; }
 }
 async function boot() {
   applyText();
@@ -1983,7 +1986,12 @@ async function boot() {
   if (!session) { $("#gate").hidden = false; return; }
   me = session.user;
   const { data: p } = await sb.from("profiles").select("*").eq("id", me.id).single();
-  profile = p || await salesFromCrm() || { role: "editor", display_name: me.email };
+  if (p) profile = p;
+  else {
+    const c = await salesFromCrm();
+    if (c.error) { linkScreen("down"); return; }   // écran « Service indisponible » + Réessayer ; aucune dégradation vers « editor »
+    profile = c.profile || { role: "editor", display_name: me.email };
+  }
   renderWho();
   if (isSales()) { $("#logout").hidden = false; await bootSales(); return; }   // commercial sans ligne `profiles` : sa vue seulement, aucune requête de production
   $("#logout").hidden = !!OPEN_ACCESS && me.email === OPEN_ACCESS.email; $("#gate").hidden = true; $("#app").hidden = false; $("#live").hidden = false;
