@@ -174,7 +174,7 @@ td .sub{display:block;color:var(--muted);font-size:12.5px;max-width:340px;overfl
 <div class="shell" id="app" hidden>
   <div class="top">
     <span class="brand"><i></i>DS<em>Editing CRM</em></span>
-    <div class="who"><span id="whoami"></span><button class="btn" type="button" id="logout">Se déconnecter</button></div>
+    <div class="who"><span id="whoami"></span><button class="btn" type="button" id="logout" hidden>Se déconnecter</button><a class="btn" id="notYou" href="?login=1" hidden>Ce n'est pas vous ?</a></div>
   </div>
   <div class="tabs" id="tabs" role="tablist"></div>
   <main id="view"></main>
@@ -546,11 +546,13 @@ async function boot(user) {
   const { data, error } = await sb.from("crm_members").select("*");
   const me = !error && data ? data.find((m) => m.user_id === user.id && m.active) : null;
   if (!me) {
-    await sb.auth.signOut(); $("app").hidden = true; $("login").hidden = false;
+    await sb.auth.signOut({ scope: "local" }); $("app").hidden = true; $("login").hidden = false;
     $("loginMsg").textContent = "Ce compte n'a pas accès au CRM. Demande l'accès à Cyriaque."; return;
   }
   S.me = me; S.tab = me.role === "viewer" ? "fiches" : "jour"; S.sel = null; S.open = null; S.actsFor = null;
   $("login").hidden = true; $("app").hidden = false;
+  const shared = !!OPEN_ACCESS && user.email === OPEN_ACCESS.email;
+  $("logout").hidden = shared; $("notYou").hidden = !shared;   // session nominative : Déconnexion ; compte partagé : pas de bouton, mais un lien vers la connexion nominative
   const who = $("whoami"); who.textContent = "";
   who.appendChild(h("b", { text: me.display_name })); who.appendChild(document.createTextNode(me.role === "viewer" ? " · lecture seule" : me.role === "admin" ? " · admin" : ""));
   $("view").textContent = ""; $("view").appendChild(h("div", { class: "empty", text: "Chargement des fiches…" }));
@@ -565,13 +567,15 @@ async function init() {
     if (error) { $("loginMsg").textContent = "E-mail ou mot de passe incorrect."; return; }
     $("password").value = ""; boot(data.user);
   });
-  $("logout").addEventListener("click", async () => { await sb.auth.signOut(); S.me = null; S.open = null; $("app").hidden = true; $("overlay").hidden = true; $("login").hidden = false; });
+  $("logout").addEventListener("click", async () => { await sb.auth.signOut({ scope: "local" }); S.me = null; S.open = null; $("app").hidden = true; $("overlay").hidden = true; $("login").hidden = false; });
   $("overlay").addEventListener("click", (ev) => { if (ev.target === $("overlay")) closeFiche(); });
   document.addEventListener("keydown", (ev) => { if (ev.key === "Escape" && S.open) closeFiche(); });
-  const { data } = await sb.auth.getSession();
-  if (OPEN_ACCESS) $("logout").hidden = true;
-  if (data.session) boot(data.session.user);
-  else if (OPEN_ACCESS) { const r = await sb.auth.signInWithPassword(OPEN_ACCESS); if (r.error) $("login").hidden = false; else boot(r.data.user); }
+  const nominative = new URLSearchParams(location.search).has("login");   // ?login=1 : connexion nominative (même motif que team/dashboard.html), pas d'auto-login
+  const { data: sessData } = await sb.auth.getSession();
+  let session = sessData?.session ?? null;
+  if (session && OPEN_ACCESS && nominative && session.user.email === OPEN_ACCESS.email) { await sb.auth.signOut({ scope: "local" }); session = null; }   // on quitte la session partagée « Équipe » ; scope local : ne révoque PAS les jetons des autres personnes connectées au même compte partagé
+  if (session) boot(session.user);
+  else if (OPEN_ACCESS && !nominative) { const r = await sb.auth.signInWithPassword(OPEN_ACCESS); if (r.error) $("login").hidden = false; else boot(r.data.user); }
   else $("login").hidden = false;
 }
 init();
