@@ -51,7 +51,8 @@
     .ed{display:flex;align-items:center;gap:12px;min-height:60px;padding:10px 12px;background:var(--surface);border:1px solid var(--line);border-radius:14px;color:var(--cream);font-size:15px;font-weight:600;text-align:left;transition:border-color .15s,background .15s}
     .ed:hover{border-color:var(--line-strong)}
     .ed:focus-visible{outline:none;border-color:rgba(220,230,240,.5);background:var(--amber-soft)}
-    .av{flex:none;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-size:14px;font-weight:700;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.35)}
+    .av{flex:none;width:44px;height:44px;border-radius:50%;overflow:hidden;display:grid;place-items:center;font-size:16px;font-weight:700;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.35)}
+    .av img{display:block;width:100%;height:100%;object-fit:cover;border-radius:50%}
     .loading{grid-column:1/-1;color:var(--taupe);font-size:14px;padding:6px 2px}
     .me{display:flex;align-items:center;gap:12px;padding:14px 16px}
     .me strong{font-size:16px;font-weight:600}
@@ -244,6 +245,19 @@
   function fmtDate(iso) { const [y, m, d] = iso.split("-").map(Number); const s = new Intl.DateTimeFormat(LOCALE[lang], { weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(new Date(y, m - 1, d)); return s.charAt(0).toUpperCase() + s.slice(1); }
   function fmtTime(ts) { const d = new Date(ts); const h = d.getHours(), m = String(d.getMinutes()).padStart(2, "0"); if (lang === "fr") return `${h} h ${m}`; if (lang === "id") return `${String(h).padStart(2, "0")}.${m}`; return `${h % 12 || 12}:${m} ${h < 12 ? "am" : "pm"}`; }
   function avStyle(name) { let h = 0; for (const ch of name) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return AV[h % AV.length]; }
+  // Photo du monteur si elle existe, sinon (ou si elle ne charge pas) son initiale dans son rond coloré.
+  function setAv(el, e) {
+    const ini = () => { el.textContent = e.name.charAt(0).toUpperCase(); el.style.background = avStyle(e.name); };
+    el.textContent = ""; el.style.background = "";
+    // prod_me ne connaît pas toujours la photo : on la reprend dans la liste, par id
+    const src = e.avatar_url || (state.editors.find((x) => x.id === e.id) || {}).avatar_url;
+    const url = typeof src === "string" && /^https:\/\//i.test(src) ? src : "";
+    if (!url) return ini();
+    const img = document.createElement("img"); img.alt = e.name; img.loading = "lazy"; img.decoding = "async";
+    if (/\.jpe?g$/i.test(url)) img.srcset = `${url} 1x, ${url.replace(/\.jpe?g$/i, "@2x.jpg")} 2x`;
+    img.addEventListener("error", () => { if (img.srcset) { img.removeAttribute("srcset"); img.src = url; img.addEventListener("error", ini, { once: true }); } else ini(); }, { once: true });
+    img.src = url; el.style.background = "var(--surface-2)"; el.appendChild(img);
+  }
   const iconFor = (key) => ICONS[String(key).split("_")[0]] || ICONS.other;
 
   const state = { editors: [], cats: [], clients: [], me: null, key: null, date: todayISO(), counts: {}, links: {}, revs: [], server: null, draftUsed: false, last: null, token: 0 };
@@ -299,7 +313,7 @@
     if (!state.editors.length) { box.innerHTML = `<div class="loading" data-t="needLink">${T[lang].needLink}</div>`; return; }
     for (const e of state.editors) {
       const b = document.createElement("button"); b.type = "button"; b.className = "ed"; b.dataset.id = e.id;
-      const av = document.createElement("span"); av.className = "av"; av.textContent = e.name.charAt(0).toUpperCase(); av.style.background = avStyle(e.name);
+      const av = document.createElement("span"); av.className = "av"; setAv(av, e);
       const n = document.createElement("span"); n.textContent = e.name;
       b.append(av, n); b.addEventListener("click", () => pickEditor(e)); box.appendChild(b);
     }
@@ -314,7 +328,7 @@
   function selectEditor(e) {
     state.me = e;
     $("#who").hidden = true; $("#me").hidden = false; $("#report").hidden = false; $("#done").hidden = true;
-    $("#meName").textContent = e.name; $("#meAv").textContent = e.name.charAt(0).toUpperCase(); $("#meAv").style.background = avStyle(e.name);
+    $("#meName").textContent = e.name; setAv($("#meAv"), e);
     loadReport();
   }
   $("#notMe").addEventListener("click", () => {
