@@ -290,6 +290,27 @@
       .qty .preview{margin-left:0!important}
       .thumbs{flex-wrap:wrap}
     }
+    /* Mobile (08/10/2026) : bornée, le desktop ne bouge pas. iOS zoome au focus si un champ est < 16 px. */
+    @media (max-width:900px){
+      html body input:not([type=checkbox]):not([type=radio]):not([type=file]):not([type=hidden]),html body select,html body textarea{font-size:16px}
+    }
+    @media (max-width:640px){
+      body{overflow-wrap:anywhere}
+      .hd{gap:8px}
+      .hd .brand{min-width:0}
+      .hd .client{min-width:0;flex:0 1 auto}
+      .hd .client span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:120px}
+      .lang{margin-left:0;flex:none;min-height:44px;min-width:44px}
+      .steps{grid-template-columns:repeat(3,minmax(0,1fr))}
+      .row,.choices.two,.choices.three,.brandkit,.recap,.next{grid-template-columns:minmax(0,1fr)}
+      .fontpick{grid-template-columns:minmax(0,1fr)}
+      .links .l{min-width:0}
+      .qty button:not(.preview){width:44px;height:44px}
+      .qty input{height:44px;width:60px}
+      .preview,.chip,.lv button,.yn button,.cx,.links .l button{min-height:44px}
+      .check,.terms{min-height:44px;align-items:center}
+      .warn a,.msg a,.success a,.next a,.recap a{display:inline-flex;align-items:center;min-height:44px}
+    }
     @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
   </style>
 </head>
