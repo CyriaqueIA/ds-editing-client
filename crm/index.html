@@ -185,6 +185,7 @@ td .sub{display:block;color:var(--muted);font-size:12.5px;max-width:340px;overfl
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
+// ATTENTION : si cet e-mail change, changer AUSSI la fonction crm_is_open_access() côté base (sinon le garde-fou « compte partagé » de crm_team_week() et des policies ne reconnaît plus le compte et le trou se rouvre en silence).
 const OPEN_ACCESS = { email: "acces.libre@ds-editing.com", password: "HAs0lMotAKsCmNdx" }; // 05/10 : accès libre demandé par Cyriaque (compte partagé « Équipe »). Pour remettre les mots de passe : null ici + désactiver le compte.
 const SUPABASE_URL = "https://xkanmjlpysxpohsuqvwg.supabase.co";
 const SUPABASE_ANON = "sb_publishable_lIZtV_WtN5NcGSb0dnfaiQ_AgKYBIVa";
