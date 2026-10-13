@@ -578,7 +578,7 @@ const I18N = {
     /* Verdict d'un lien de rushes (client/links.js). Dire ce qui ne va pas ET quoi faire : jamais culpabiliser.
        {site} = le nom du service lu dans le lien (Spotify, Frame.io…). */
     lk:{page:"Ce lien est une page {site}, pas un fichier. Colle plutôt le dossier Drive, WeTransfer ou Dropbox qui contient tes rushes.",
-      unknown:"On ne reconnaît pas {site} comme un fichier à télécharger. Vérifie le lien, ou colle un dossier Drive, WeTransfer ou Dropbox.",
+      unknown:"On ne connaît pas cet hébergeur ({site}) : on récupérera tes fichiers à la main. Un dossier Drive, WeTransfer ou Dropbox arrive plus vite chez le monteur.",
       bad:"Ce lien est incomplet. Il doit commencer par https:// et pointer vers tes rushes.",
       drive:"Lien Google Drive non reconnu. Renvoie le lien de partage du fichier ou du dossier (« Partager » → « Copier le lien »).",
       dropbox:"Ce lien Dropbox n'est pas un lien de partage. Renvoie celui créé avec « Partager ».",
@@ -646,7 +646,7 @@ const I18N = {
     "f.rushes":"Raw footage links","f.logos":"Logos & fonts","f.logosSmall":"Drive or WeTransfer links","f.logosSent":"You already have them, nothing new",
     "f.references":"The videos we should take after","f.referencesSmall":"paste links to videos you love, we'll match their style: pacing, captions, graphics","add.link":"+ Add a link","ph.link":"https://…",
     lk:{page:"This is a {site} page, not a file. Paste the Drive, WeTransfer or Dropbox folder that holds your footage instead.",
-      unknown:"We don't recognise {site} as a downloadable file. Check the link, or paste a Drive, WeTransfer or Dropbox folder.",
+      unknown:"We don't know this host ({site}): we'll fetch your files by hand. A Drive, WeTransfer or Dropbox folder reaches the editor faster.",
       bad:"This link is incomplete. It must start with https:// and point to your footage.",
       drive:"Google Drive link not recognised. Send the file or folder share link (“Share” → “Copy link”).",
       dropbox:"This Dropbox link isn't a share link. Send the one created with “Share”.",
@@ -1143,19 +1143,21 @@ function renderLinks(key) {
   if (check) list.forEach((v, i) => linkNote(i));
 }
 /* Verdict d'UN champ de rushes. Trois cas, trois messages, jamais de reproche :
-   page d'écoute ou de réseau social (le cas Mediacast) et domaine inconnu → refusés, avec un bouton pour
-   remettre le lien à sa vraie place (« vidéos d'inspiration ») ; source connue mais non automatisable
-   (Frame.io, OneDrive, MEGA…) → avertissement visible, ça passe, c'est du vrai matériel ; lien cassé →
+   page d'écoute ou de réseau social (le cas Mediacast) → refusée, avec un bouton pour remettre le lien à sa
+   vraie place (« vidéos d'inspiration ») ; source non automatisable, connue (Frame.io, OneDrive, MEGA…) ou
+   inconnue → avertissement visible, ça passe, c'est du vrai matériel ; adresse qui n'en est pas une →
    « vérifie le lien ». Filtre absent (links.js non chargé) : on ne dit rien et rien ne bloque — fail-open,
    mieux vaut une commande qui passe qu'un client coincé par un contrôle cassé. */
 function linkNote(i) {
   const box = $(`#rushes [data-lk="${i}"]`); if (!box) return;
   const r = window.DS_LINKS ? DS_LINKS.classifyField(collect("rushes")[i] || "") : { status: "empty" };
   const l = t("lk");
+  // le champ corrigé perd son liseré rouge tout de suite, sans attendre le prochain « Continuer »
+  const inp = box.parentNode.querySelector("input"); if (inp && r.status !== "block") inp.classList.remove("bad");
   box.className = "lk" + (r.status === "block" ? " bad" : r.status === "warn" ? " man" : "");
   box.hidden = r.status !== "block" && r.status !== "warn";
   if (box.hidden) { box.innerHTML = ""; return; }
-  const movable = r.status === "block" && (r.reason === "page" || r.reason === "unknown");
+  const movable = r.status === "block" && r.reason === "page";           // seul cas déplaçable : c'était une référence, pas des rushes
   box.innerHTML = esc(String(l[r.reason] || l.unknown).replace("{site}", r.label || "")) + (movable ? ` <button type="button" class="chip mv" data-mv="${i}">${esc(l.move)}</button>` : "");
   const b = box.querySelector("[data-mv]"); if (b) b.addEventListener("click", () => moveToRefs(i));
 }

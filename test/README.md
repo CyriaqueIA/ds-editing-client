@@ -11,9 +11,13 @@ node --test test/links.test.js
 Classe un lien collé dans le formulaire de dépôt (`client/depot.html`, étape 04 — Fichiers)
 en quatre statuts : `ok` (le robot le télécharge seul : Google Drive, SwissTransfer,
 WeTransfer, Dropbox, lien direct vers un fichier), `warn` (vrai matériel, récupéré à la
-main : Frame.io, OneDrive, MEGA, iCloud, Google Photos, Smash…), `block` (ne peut pas être
-des rushes : page Spotify / YouTube / réseau social, domaine inconnu sans fichier, lien
-cassé) et `empty`.
+main : Frame.io, OneDrive, MEGA, iCloud, Google Photos, Smash, **et tout hébergeur qu'on
+ne connaît pas**), `block` (ne peut pas être des rushes : page Spotify / YouTube / réseau
+social, ou adresse qui n'en est pas une) et `empty`.
+
+On ne bloque que ce qui ne peut pas être des rushes (décision du 13/10/2026) : récupérer
+des fichiers à la main coûte 20 minutes, un client qui n'arrive pas à valider sa commande
+coûte la commande.
 
 Les règles reproduisent celles du robot de téléchargement (`ds-editing-ops/agent-bali/lib/
 sources.mjs`, fonction `classify`) : **toute règle ajoutée d'un côté doit l'être de

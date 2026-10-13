@@ -68,10 +68,33 @@ test("une URL cassée est refusée", () => {
   }
 });
 
-test("un domaine inconnu sans extension de fichier est refusé", () => {
-  const r = L.classify("https://www.mediacast-studio.fr/notre-podcast");
-  assert.equal(r.status, "block");
+/* Décision du 13/10/2026 : un hébergeur qu'on ne connaît pas NE BLOQUE PLUS. Le récupérer à la main coûte
+   20 minutes, un client qui n'arrive pas à valider sa commande coûte la commande. */
+test("un domaine inconnu sans extension de fichier passe avec avertissement", () => {
+  const r = L.classify("https://www.mediacast-studio.fr/espace-rushes");
+  assert.equal(r.status, "warn");
   assert.equal(r.reason, "unknown");
+  assert.equal(L.blocked("https://www.mediacast-studio.fr/espace-rushes"), false);
+});
+
+test("un lien S3 signé sans extension passe avec avertissement", () => {
+  const u = "https://mediacast.s3.eu-west-3.amazonaws.com/rushes/ep12?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Signature=0abc";
+  const r = L.classify(u);
+  assert.equal(r.status, "warn");
+  assert.equal(L.blocked(u), false);
+});
+
+test("aucun hébergeur ne bloque : seules les pages et les adresses cassées sont refusées", () => {
+  const cas = [
+    "https://rushes.mon-studio-a-moi.io/dossier/12",
+    "https://files.agence-x.co.uk/download/abc123",
+    "https://cdn.inconnu.tv/p/9f8e7d",
+    "https://nas.studio-mediacast.fr:5001/sharing/aZ9xK",
+  ];
+  for (const u of cas) {
+    assert.equal(L.classify(u).status, "warn", u);
+    assert.equal(L.blocked(u), false, u);
+  }
 });
 
 test("un lien direct vers un fichier est accepté", () => {

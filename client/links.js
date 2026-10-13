@@ -21,8 +21,11 @@
      2. quelques services de transfert réels mais non automatisables (Smash,
         Filemail, TransferNow, pCloud, Box…) passent en « manuel » plutôt que
         de tomber en « lien direct » et d'échouer chez le robot.
-   Volontairement strict sur les rushes : mieux vaut faire reformuler la
-   cliente que perdre 156 Go.
+   Jusqu'où on bloque (décision de Cyriaque, 13/10/2026) : SEULEMENT ce qui ne
+   peut pas être des rushes — une page d'écoute ou de réseau social, et une
+   adresse qui n'en est pas une (faute de frappe). Un hébergeur qu'on ne connaît
+   pas passe avec un avertissement : le récupérer à la main coûte 20 minutes,
+   un client qui n'arrive pas à valider sa commande coûte la commande.
 
    Statuts rendus : "ok" (téléchargeable tout seul), "warn" (vrai matériel,
    récupéré à la main), "block" (ne peut pas être des rushes), "empty".
@@ -132,12 +135,15 @@
       return res("dropbox", "ok", "", "Dropbox", href);
     }
 
-    // Lien direct : accepté seulement s'il pointe vraiment vers un fichier. Sans extension sur un domaine
-    // inconnu, c'est presque toujours une page web — le cas qui a coûté 156 Go.
+    /* Lien direct. Avec une extension de fichier, le robot le prend seul. Sans extension sur un domaine
+       inconnu, il ne saura probablement pas : AVERTISSEMENT, jamais un refus (décision de Cyriaque du
+       13/10/2026). Récupérer des rushes à la main coûte 20 minutes ; un client qui n'arrive pas à valider
+       sa commande coûte la commande. Seules les pages (Spotify & co.) et les vraies fautes de frappe
+       bloquent encore. */
     var path = u.pathname;
     try { path = decodeURIComponent(u.pathname); } catch (e) { /* chemin mal encodé : on garde le brut */ }
     if (FILE_EXT.test(path)) return res("direct", "ok", "", shortHost(host), href);
-    return res("unknown", "block", "unknown", shortHost(host), href);
+    return res("unknown", "warn", "unknown", shortHost(host), href);
   }
 
   var RANK = { empty: 0, ok: 1, warn: 2, block: 3 };
