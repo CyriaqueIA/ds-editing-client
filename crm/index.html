@@ -551,6 +551,7 @@ async function boot(user) {
   }
   S.me = me; S.tab = me.role === "viewer" ? "fiches" : "jour"; S.sel = null; S.open = null; S.actsFor = null;
   $("login").hidden = true; $("app").hidden = false;
+  $("logout").hidden = !!OPEN_ACCESS && user.email === OPEN_ACCESS.email;   // session nominative : on montre Déconnexion ; le compte partagé reste sans bouton
   const who = $("whoami"); who.textContent = "";
   who.appendChild(h("b", { text: me.display_name })); who.appendChild(document.createTextNode(me.role === "viewer" ? " · lecture seule" : me.role === "admin" ? " · admin" : ""));
   $("view").textContent = ""; $("view").appendChild(h("div", { class: "empty", text: "Chargement des fiches…" }));
@@ -568,10 +569,12 @@ async function init() {
   $("logout").addEventListener("click", async () => { await sb.auth.signOut(); S.me = null; S.open = null; $("app").hidden = true; $("overlay").hidden = true; $("login").hidden = false; });
   $("overlay").addEventListener("click", (ev) => { if (ev.target === $("overlay")) closeFiche(); });
   document.addEventListener("keydown", (ev) => { if (ev.key === "Escape" && S.open) closeFiche(); });
-  const { data } = await sb.auth.getSession();
+  const nominative = new URLSearchParams(location.search).has("login");   // ?login=1 : connexion nominative (même motif que team/dashboard.html), pas d'auto-login
+  let { data: { session } } = await sb.auth.getSession();
   if (OPEN_ACCESS) $("logout").hidden = true;
-  if (data.session) boot(data.session.user);
-  else if (OPEN_ACCESS) { const r = await sb.auth.signInWithPassword(OPEN_ACCESS); if (r.error) $("login").hidden = false; else boot(r.data.user); }
+  if (session && OPEN_ACCESS && nominative && session.user.email === OPEN_ACCESS.email) { await sb.auth.signOut(); session = null; }   // on quitte la session partagée « Équipe »
+  if (session) boot(session.user);
+  else if (OPEN_ACCESS && !nominative) { const r = await sb.auth.signInWithPassword(OPEN_ACCESS); if (r.error) $("login").hidden = false; else boot(r.data.user); }
   else $("login").hidden = false;
 }
 init();
