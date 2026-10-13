@@ -228,6 +228,7 @@
     .dl.running.now .dlp i{animation:blink 1.6s infinite}
     .dl.access .dlp{color:var(--warn);border-color:rgba(245,196,0,.35);background:rgba(245,196,0,.12)}
     .dl.error .dlp,.dl.abandon .dlp{color:var(--err);border-color:rgba(240,138,130,.5);background:rgba(240,138,130,.12)}
+    .dl.partial .dlp{color:var(--warn);border-color:rgba(245,196,0,.35);background:rgba(245,196,0,.12)}
     .dl.purged .dlp{border-style:dashed}
     .chip .n{display:inline-block;min-width:20px;margin-left:6px;padding:1px 6px;border-radius:999px;background:rgba(255,255,255,.1);font-size:11px;font-weight:600;text-align:center;font-variant-numeric:tabular-nums}
     .chip.has .n{background:rgba(70,211,105,.18);color:var(--ok)}
@@ -474,9 +475,9 @@ const T = {
   fr: { admBtn: "Admin", admOff: "Verrouiller", admTitle: "Code admin", admGo: "Valider", admCancel: "Annuler", sub: "Production", live: "En direct", tv: "Mode télé", logout: "Déconnexion", leave: "Quitter", login: "Espace équipe", loginSub: "Connecte-toi avec ton e-mail DS Editing.", loginBtn: "Entrer",
     all: "Tous", tasks: (n) => `${n} tâche${n > 1 ? "s" : ""}`, stats: ["Reçues aujourd'hui", "En cours", "En retard", "À contrôler", "Livrées cette semaine"],
     filters: { all: "Tout", na: "À attribuer", ready: "Fichiers prêts, à démarrer", late: "En retard", qc: "À contrôler", asm: "À assembler", done: "Livrées" }, search: "Rechercher…",
-    dl: { waiting: "En attente", running: "Téléchargement en cours", ready: "Fichiers prêts", error: "Erreur", abandon: "Abandonné", access: "Accès demandé au client", purged: "Nettoyé",
-      tips: { waiting: "Le PC du bureau n'a pas encore commencé le téléchargement.", running: "Le PC du bureau télécharge les rushes.", ready: "Les rushes sont sur le PC du bureau.", access: "Le lien est privé : un e-mail a demandé au client d'ouvrir l'accès.", purged: "Le dossier a été supprimé du PC du bureau après la livraison." },
-      nTry: (n, m) => `essai ${n}/${m}`, nFiles: (n) => `${n} fichier${n > 1 ? "s" : ""}`, nFailed: (n) => `${n} lien${n > 1 ? "s" : ""} en échec`, since: (d) => `depuis ${d}`, pcOn: (k) => `PC Bali occupé sur ${k}`, pcOff: "PC hors ligne", manual: "à télécharger à la main",
+    dl: { waiting: "En attente", running: "Téléchargement en cours", ready: "Fichiers prêts", error: "Erreur", abandon: "Abandonné", partial: "Rushes reçus", access: "Accès demandé au client", purged: "Nettoyé",
+      tips: { waiting: "Le PC du bureau n'a pas encore commencé le téléchargement.", running: "Le PC du bureau télécharge les rushes.", ready: "Les rushes sont sur le PC du bureau.", partial: "Les rushes sont sur le PC du bureau, mais certains liens n'ont pas pu être téléchargés : ne rien supprimer, récupérer ces liens à la main.", access: "Le lien est privé : un e-mail a demandé au client d'ouvrir l'accès.", purged: "Le dossier a été supprimé du PC du bureau après la livraison." },
+      nTry: (n, m) => `essai ${n}/${m}`, nFiles: (n) => `${n} fichier${n > 1 ? "s" : ""}`, nFailed: (n) => `${n} lien${n > 1 ? "s" : ""} en échec`, since: (d) => `depuis ${d}`, pcOn: (k) => `PC Bali occupé sur ${k}`, pcOff: "PC hors ligne", manual: "à télécharger à la main", nManual: (n) => `${n} lien${n > 1 ? "s" : ""} à la main`,
       title: "Fichiers sur le PC du bureau", noPath: "Pas encore de dossier : les rushes ne sont pas téléchargés.", copy: "Copier le chemin", copied: "Chemin copié", copyFail: "Copie impossible", size: "Poids", count: "Fichiers", doneAt: "Téléchargement terminé", startedAt: "Téléchargement démarré", accessAt: "Accès demandé", purgedAt: "Dossier nettoyé", tries: "Essais",
       failed: "Liens en échec", relaunch: "Relancer le téléchargement", relaunched: "Relancé : le PC du bureau réessaie à son prochain passage." },
     pc: { name: "PC Bali", title: "PC du bureau", online: "en ligne", late: (d) => `sans signal depuis ${d}`, off: (d) => `hors ligne depuis ${d}`, never: "jamais vu", neverHint: "L'agent de téléchargement n'a encore jamais donné de signal.", lessMin: "moins d'une minute", dayU: "j",
@@ -529,9 +530,9 @@ const T = {
   en: { admBtn: "Admin", admOff: "Lock", admTitle: "Admin code", admGo: "Enter", admCancel: "Cancel", sub: "Production", live: "Live", tv: "TV mode", logout: "Log out", leave: "Leave", login: "Team space", loginSub: "Sign in with your DS Editing email.", loginBtn: "Enter",
     all: "All", tasks: (n) => `${n} task${n > 1 ? "s" : ""}`, stats: ["Received today", "In progress", "Late", "To review", "Delivered this week"],
     filters: { all: "All", na: "To assign", ready: "Files ready, to start", late: "Late", qc: "To review", asm: "To assemble", done: "Delivered" }, search: "Search…",
-    dl: { waiting: "Waiting", running: "Downloading", ready: "Files ready", error: "Error", abandon: "Gave up", access: "Access requested from client", purged: "Cleaned up",
-      tips: { waiting: "The office PC has not started the download yet.", running: "The office PC is downloading the footage.", ready: "The footage is on the office PC.", access: "The link is private: an email asked the client to open access.", purged: "The folder was removed from the office PC after delivery." },
-      nTry: (n, m) => `attempt ${n}/${m}`, nFiles: (n) => `${n} file${n > 1 ? "s" : ""}`, nFailed: (n) => `${n} failed link${n > 1 ? "s" : ""}`, since: (d) => `since ${d}`, pcOn: (k) => `Bali PC busy on ${k}`, pcOff: "PC offline", manual: "download by hand",
+    dl: { waiting: "Waiting", running: "Downloading", ready: "Files ready", error: "Error", abandon: "Gave up", partial: "Footage received", access: "Access requested from client", purged: "Cleaned up",
+      tips: { waiting: "The office PC has not started the download yet.", running: "The office PC is downloading the footage.", ready: "The footage is on the office PC.", partial: "The footage is on the office PC, but some links could not be downloaded: delete nothing, fetch those links by hand.", access: "The link is private: an email asked the client to open access.", purged: "The folder was removed from the office PC after delivery." },
+      nTry: (n, m) => `attempt ${n}/${m}`, nFiles: (n) => `${n} file${n > 1 ? "s" : ""}`, nFailed: (n) => `${n} failed link${n > 1 ? "s" : ""}`, since: (d) => `since ${d}`, pcOn: (k) => `Bali PC busy on ${k}`, pcOff: "PC offline", manual: "download by hand", nManual: (n) => `${n} link${n > 1 ? "s" : ""} by hand`,
       title: "Files on the office PC", noPath: "No folder yet: the footage is not downloaded.", copy: "Copy path", copied: "Path copied", copyFail: "Copy failed", size: "Size", count: "Files", doneAt: "Download finished", startedAt: "Download started", accessAt: "Access requested", purgedAt: "Folder cleaned up", tries: "Attempts",
       failed: "Failed links", relaunch: "Restart download", relaunched: "Restarted: the office PC retries on its next pass." },
     pc: { name: "Bali PC", title: "Office PC", online: "online", late: (d) => `no signal for ${d}`, off: (d) => `offline for ${d}`, never: "never seen", neverHint: "The download agent has never sent a signal yet.", lessMin: "less than a minute", dayU: "d",
@@ -707,23 +708,23 @@ const isReadyToStart = (j) => !!j.files_downloaded_at && !j.files_purged_at && !
 // état du téléchargement d'une commande : purged · ready · running · abandon · access · error · waiting
 // « en cours » = téléchargement démarré, fichiers pas encore là ; si le PC est en ligne et occupé sur une AUTRE commande, celle-ci est en file d'attente
 function dlInfo(j) {
-  const err = String(j.download_error || "").trim(); const abandon = /^\[abandon\]/i.test(err);
+  const err = String(j.download_error || "").trim(); const abandon = /^\[abandon\]/i.test(err), partial = /^\[partiel\]/i.test(err);
   const m = /essai\s+(\d+)/i.exec(err); const tries = Math.max(Number(j.download_attempts) || 0, m ? +m[1] : 0);
   const busy = agent && agent.current_token && pcState() !== "err" ? String(agent.current_token) : "";
   const current = !!busy && busy === String(j.token) && !j.files_downloaded_at && !j.files_purged_at;
   const fresh = !!j.download_started_at && Date.now() - new Date(j.download_started_at).getTime() < 120000;   // le signal du PC peut arriver juste après le début
   const queued = !!busy && !current && !fresh;
-  const s = j.files_purged_at ? "purged" : j.files_downloaded_at ? "ready" : current ? "running" : abandon ? "abandon" : j.access_request_sent_at ? "access" : err ? "error" : j.download_started_at && !queued ? "running" : "waiting";
+  const s = j.files_purged_at ? "purged" : j.files_downloaded_at ? (partial ? "partial" : "ready") : current ? "running" : abandon ? "abandon" : j.access_request_sent_at ? "access" : err ? "error" : j.download_started_at && !queued ? "running" : "waiting";
   return { s, tries, current, err, busy: s === "waiting" ? busy : "" };
 }
-// download_error = « [abandon] essai 3 — lien → raison | lien → raison »
+// download_error = « [partiel] lien → raison » (fichiers reçus, liens en échec) ou « [abandon] essai 3 — lien → raison | lien → raison »
 function dlErrors(j) {
-  const s = String(j.download_error || "").trim().replace(/^\[abandon\]\s*/i, "").replace(/^essai\s+\d+(\s*\/\s*\d+)?\s*[—–:-]\s*/i, "");
+  const s = String(j.download_error || "").trim().replace(/^\[(?:abandon|partiel)\]\s*/i, "").replace(/^essai\s+\d+(\s*\/\s*\d+)?\s*[—–:-]\s*/i, "");
   return s.split(" | ").map((x) => x.trim()).filter(Boolean).map((x) => { const k = x.indexOf(" → "); return k < 0 ? { link: "", why: x } : { link: x.slice(0, k).trim(), why: x.slice(k + 3).trim() }; });
 }
 function dlLine(j) {
   const D = t("dl"), i = dlInfo(j), meta = []; let label = D[i.s];
-  if (i.s === "ready") { if (j.files_bytes != null) meta.push(fmtBytes(j.files_bytes)); if (j.files_count != null) meta.push(D.nFiles(j.files_count)); }
+  if (i.s === "ready" || i.s === "partial") { if (j.files_bytes != null) meta.push(fmtBytes(j.files_bytes)); if (j.files_count != null) meta.push(D.nFiles(j.files_count)); }
   else if (i.s === "purged") meta.push(fmtD(j.files_purged_at));
   else if (i.s === "running") meta.push(i.current ? `${t("pc").name} · ${esc(agent.current_token)}` : D.since(fmtDT(j.download_started_at)));
   else if (i.s === "error") { label += " · " + D.nTry(Math.min(Math.max(i.tries, 1), DL_MAX), DL_MAX); const n = dlErrors(j).filter((e) => e.link).length; if (n) meta.push(D.nFailed(n)); }
@@ -731,11 +732,12 @@ function dlLine(j) {
   else if (i.s === "access") { meta.push(fmtDT(j.access_request_sent_at)); if (i.tries) meta.push(D.nTry(Math.min(i.tries, DL_MAX), DL_MAX)); }
   else if (i.busy) meta.push(D.pcOn(esc(i.busy)));
   else if (agentOk && pcState() === "err") meta.push(D.pcOff);
+  if (i.s === "partial") { const n = dlErrors(j).filter((e) => e.link).length; label += " · " + (n ? D.nManual(n) : D.manual); }
   const tip = i.err || D.tips[i.s] || "";
   return `<div class="dl ${i.s}${i.current ? " now" : ""}" data-dl="${j.id}" data-dl-state="${i.s}" title="${esc(tip)}"><span class="dlp"><i></i>${label}</span>${meta.length ? ` <span class="dlm">${meta.join(" · ")}</span>` : ""}</div>`;
 }
 function filesBlock(j) {
-  const D = t("dl"), i = dlInfo(j), gone = !!j.files_purged_at, errs = j.files_downloaded_at || gone ? [] : dlErrors(j);
+  const D = t("dl"), i = dlInfo(j), gone = !!j.files_purged_at, errs = gone || (j.files_downloaded_at && i.s !== "partial") ? [] : dlErrors(j);
   const kv = (k, v) => `<span><em>${k}</em><strong>${v}</strong></span>`, kvs = [];
   if (j.files_bytes != null) kvs.push(kv(D.size, fmtBytes(j.files_bytes)));
   if (j.files_count != null) kvs.push(kv(D.count, Number(j.files_count).toLocaleString(loc())));
