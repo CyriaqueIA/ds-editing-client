@@ -119,7 +119,17 @@
     .note{font-size:12px;color:var(--taupe);margin-top:8px;line-height:1.5}
 
     .links{display:flex;flex-direction:column;gap:8px}
+    .links .lw{display:flex;flex-direction:column;gap:6px}
     .links .l{display:flex;gap:8px}
+    /* Verdict d'un lien de rushes (client/links.js), écrit sous son champ. Incident Mediacast du 13/10/2026 :
+       un lien Spotify validé comme des rushes, le robot en échec, 156 Go jetés.
+       « bad » et « man », pas « block » ni « warn » : ces deux noms-là sont déjà pris par .block (séparateur
+       de section) et .warn (bandeau d'accès), et la note héritait de leur bordure et de leur marge. */
+    .lk{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:12px;line-height:1.45;color:var(--taupe)}
+    .lk[hidden]{display:none}
+    .lk.bad{color:var(--err)}
+    .lk.man{color:var(--accent-blue)}
+    .lk .mv{flex:none;font-size:12px;padding:6px 11px;color:var(--cream)}
     .links .l .in{flex:1}
     .links .l button{width:44px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--taupe);cursor:pointer;font-size:18px;transition:border-color .2s,color .2s}
     .add{margin-top:8px;background:rgba(255,255,255,.04);border:1px dashed var(--line-strong);color:var(--taupe);border-radius:999px;padding:11px 16px;cursor:pointer;font:inherit;font-size:13px;font-weight:600;width:100%;transition:border-color .2s,color .2s,background .2s}
@@ -504,6 +514,8 @@
 
 <script src="forms.js?v=4"></script>
 <script src="previews.js?v=4"></script>
+<!-- Filtre des liens de rushes : seule source de vérité côté site (règles du robot + plateformes d'écoute). -->
+<script src="links.js?v=1"></script>
 <script>
 /* =========================================================================
    À REMPLIR PAR DS EDITING — liens d'aperçu et prix.
@@ -563,6 +575,15 @@ const I18N = {
     "bk.logo":"Ton logo ici","bk.logoSub":"PNG, SVG ou JPG. Facultatif.","bk.logoDrop":"Glisse ton logo ici","bk.palette":"Ta palette graphique ici","bk.paletteSub":"Une capture de ta palette, ou tes codes couleur en dessous.","bk.paletteDrop":"Glisse ta palette ici","bk.font":"Une police d'écriture spécifique à utiliser ?","bk.fontOwn":"J'ai une police spécifique","bk.fontTeam":"Laisser l'équipe artistique décider","ph.font":"Nom de la police, ou un lien","bk.teamFont":"l'équipe artistique décide","bk.file":"fichier joint",
     "f.rushes":"Liens des rushes","f.logos":"Logos et polices","f.logosSmall":"liens Drive ou WeTransfer","f.logosSent":"Vous les avez déjà, rien de nouveau",
     "f.references":"Les vidéos dont on doit s'inspirer","f.referencesSmall":"colle les liens de vidéos que tu adores, on reprend leur style : rythme, sous-titres, habillage","add.link":"+ Ajouter un lien","ph.link":"https://…",
+    /* Verdict d'un lien de rushes (client/links.js). Dire ce qui ne va pas ET quoi faire : jamais culpabiliser.
+       {site} = le nom du service lu dans le lien (Spotify, Frame.io…). */
+    lk:{page:"Ce lien est une page {site}, pas un fichier. Colle plutôt le dossier Drive, WeTransfer ou Dropbox qui contient tes rushes.",
+      unknown:"On ne connaît pas cet hébergeur ({site}) : on récupérera tes fichiers à la main. Un dossier Drive, WeTransfer ou Dropbox arrive plus vite chez le monteur.",
+      bad:"Ce lien est incomplet. Il doit commencer par https:// et pointer vers tes rushes.",
+      drive:"Lien Google Drive non reconnu. Renvoie le lien de partage du fichier ou du dossier (« Partager » → « Copier le lien »).",
+      dropbox:"Ce lien Dropbox n'est pas un lien de partage. Renvoie celui créé avec « Partager ».",
+      manual:"{site} : on ne sait pas le télécharger automatiquement, on le récupérera à la main. Un dossier Drive, WeTransfer ou Dropbox arrive plus vite chez le monteur.",
+      move:"Déplacer vers les vidéos d'inspiration"},
     "s5.title":"Votre brief","s5.hint":"Plus c'est précis, plus le premier montage est juste. Cliquez sur une puce pour insérer une rubrique.",
     "f.description":"Description et détails","ph.description":"Objectif, audience, ton, ce qu'il faut garder ou couper, durée visée…",
     chips:["Objectif :","Ton :","À garder :","À couper :","Durée visée :"],
@@ -581,7 +602,7 @@ const I18N = {
     // Seuls les fichiers joints (logo, palette) vivent en mémoire et sont à redéposer : le texte le dit.
     "stale.text":"Une nouvelle version de ce formulaire est disponible. Rafraîchissez la page pour continuer : vos choix sont conservés sur cet appareil, seuls vos fichiers joints (logo, palette) sont à redéposer.","stale.btn":"Rafraîchir la page",
     units:{episode:["épisode","épisodes"],reel_basique:["reel standard","reels standard"],reel_signature:["reel premium","reels premium"],miniature:["miniature","miniatures"],trailer:["trailer","trailers"]},
-    err:{projet:"Donnez un nom au projet.",produit0:"Choisissez ce que vous nous confiez, à l'étape 01 — Produit.",produit:"Votre commande est encore vide : choisissez un produit à l'étape 01 — Produit et sa formule à l'étape 02 — Formule, ou un de vos packs à l'étape 01 sous « Vos vidéos ».",noVideo:"Il manque la vidéo : les extras s'ajoutent à un épisode ou à un pack. Choisissez votre épisode à l'étape 02 — Formule, ou un de vos packs à l'étape 01 — Produit. On garde le reste de votre sélection.",formule:"Choisissez une formule ou un pack à l'étape 02 — Formule.",rushes:"Ajoutez au moins un lien de rushes.",description:"Décrivez ce que vous attendez, même en trois lignes.",contact:"Indiquez un contact et un moyen de le joindre.",email:"Indiquez un e-mail valide, c'est là qu'arrivent la confirmation et le suivi.",send:"L'envoi a échoué. Réessayez, ou écrivez-nous sur WhatsApp.",terms:"Cochez les conditions de collaboration pour envoyer la commande.",
+    err:{projet:"Donnez un nom au projet.",produit0:"Choisissez ce que vous nous confiez, à l'étape 01 — Produit.",produit:"Votre commande est encore vide : choisissez un produit à l'étape 01 — Produit et sa formule à l'étape 02 — Formule, ou un de vos packs à l'étape 01 sous « Vos vidéos ».",noVideo:"Il manque la vidéo : les extras s'ajoutent à un épisode ou à un pack. Choisissez votre épisode à l'étape 02 — Formule, ou un de vos packs à l'étape 01 — Produit. On garde le reste de votre sélection.",formule:"Choisissez une formule ou un pack à l'étape 02 — Formule.",rushes:"Ajoutez au moins un lien de rushes.",rushesBad:"Un de vos liens de rushes n'est pas un fichier téléchargeable (étape 04 — Fichiers) : corrigez-le, ou déplacez-le vers les vidéos d'inspiration.",description:"Décrivez ce que vous attendez, même en trois lignes.",contact:"Indiquez un contact et un moyen de le joindre.",email:"Indiquez un e-mail valide, c'est là qu'arrivent la confirmation et le suivi.",send:"L'envoi a échoué. Réessayez, ou écrivez-nous sur WhatsApp.",terms:"Cochez les conditions de collaboration pour envoyer la commande.",
       key:"Ouvrez cet espace depuis votre lien personnel ou l'Espace client pour envoyer votre commande.",keyLink:"Aller à l'Espace client",bad_key:"Votre accès n'est pas reconnu pour ce studio. Ouvrez cet espace depuis votre lien personnel ou l'Espace client.",bad_email:"L'e-mail n'est pas valide. Corrigez-le à l'étape Brief.",no_project:"Donnez un nom au projet, à l'étape Produit.",no_rushes:"Aucun lien de rushes valide. Collez au moins un lien complet (https://…) à l'étape Fichiers.",rate_limit:"Beaucoup de commandes viennent d'être envoyées depuis cet espace. Réessayez dans une heure, ou écrivez-nous sur WhatsApp."},
     "s6.terms":"J'accepte les conditions de collaboration DS Editing : facture hebdomadaire, paiement à réception, pénalité de 20 % par semaine de retard.","s6.termsLink":"Lire les conditions","ok.space":"Ouvrir mon espace (commandes, factures)",
     "ok.track":"Votre numéro de suivi","ok.trackHint":"Gardez-le : il est aussi dans votre e-mail de confirmation.","ok.follow":"Suivre ma commande",
@@ -624,6 +645,13 @@ const I18N = {
     "bk.logo":"Your logo here","bk.logoSub":"PNG, SVG or JPG. Optional.","bk.logoDrop":"Drop your logo here","bk.palette":"Your colour palette here","bk.paletteSub":"A screenshot of your palette, or your colour codes below.","bk.paletteDrop":"Drop your palette here","bk.font":"A specific font to use?","bk.fontOwn":"I have a specific font","bk.fontTeam":"Let the art team decide","ph.font":"Font name, or a link","bk.teamFont":"art team decides","bk.file":"file attached",
     "f.rushes":"Raw footage links","f.logos":"Logos & fonts","f.logosSmall":"Drive or WeTransfer links","f.logosSent":"You already have them, nothing new",
     "f.references":"The videos we should take after","f.referencesSmall":"paste links to videos you love, we'll match their style: pacing, captions, graphics","add.link":"+ Add a link","ph.link":"https://…",
+    lk:{page:"This is a {site} page, not a file. Paste the Drive, WeTransfer or Dropbox folder that holds your footage instead.",
+      unknown:"We don't know this host ({site}): we'll fetch your files by hand. A Drive, WeTransfer or Dropbox folder reaches the editor faster.",
+      bad:"This link is incomplete. It must start with https:// and point to your footage.",
+      drive:"Google Drive link not recognised. Send the file or folder share link (“Share” → “Copy link”).",
+      dropbox:"This Dropbox link isn't a share link. Send the one created with “Share”.",
+      manual:"{site}: we can't download it automatically, we'll fetch it by hand. A Drive, WeTransfer or Dropbox folder reaches the editor faster.",
+      move:"Move to the inspiration videos"},
     "s5.title":"Your brief","s5.hint":"The more precise, the better the first cut. Click a chip to insert a section.",
     "f.description":"Description & details","ph.description":"Goal, audience, tone, what to keep or cut, target length…",
     chips:["Goal:","Tone:","Keep:","Cut:","Target length:"],
@@ -640,7 +668,7 @@ const I18N = {
     saved:"Draft saved on this device", empty:"Your order will appear here",
     "stale.text":"A newer version of this form is available. Refresh the page to continue: your choices are kept on this device, only your attached files (logo, palette) need to be dropped again.","stale.btn":"Refresh the page",
     units:{episode:["episode","episodes"],reel_basique:["standard reel","standard reels"],reel_signature:["premium reel","premium reels"],miniature:["thumbnail","thumbnails"],trailer:["trailer","trailers"]},
-    err:{projet:"Give the project a name.",produit0:"Choose what you're sending us, in step 01 — Product.",produit:"Your order is still empty: pick a product in step 01 — Product and its package in step 02 — Package, or one of your packs in step 01 under “Your videos”.",noVideo:"The video itself is missing: extras come on top of an episode or a pack. Pick your episode in step 02 — Package, or one of your packs in step 01 — Product. We keep the rest of your selection.",formule:"Choose a package or a pack in step 02 — Package.",rushes:"Add at least one footage link.",description:"Describe what you expect, even in three lines.",contact:"Give us a contact and a way to reach them.",email:"Enter a valid email, that's where the confirmation and tracking go.",send:"Sending failed. Try again, or message us on WhatsApp.",terms:"Tick the terms of collaboration to send the order.",
+    err:{projet:"Give the project a name.",produit0:"Choose what you're sending us, in step 01 — Product.",produit:"Your order is still empty: pick a product in step 01 — Product and its package in step 02 — Package, or one of your packs in step 01 under “Your videos”.",noVideo:"The video itself is missing: extras come on top of an episode or a pack. Pick your episode in step 02 — Package, or one of your packs in step 01 — Product. We keep the rest of your selection.",formule:"Choose a package or a pack in step 02 — Package.",rushes:"Add at least one footage link.",rushesBad:"One of your footage links isn't a downloadable file (step 04 — Files): fix it, or move it to the inspiration videos.",description:"Describe what you expect, even in three lines.",contact:"Give us a contact and a way to reach them.",email:"Enter a valid email, that's where the confirmation and tracking go.",send:"Sending failed. Try again, or message us on WhatsApp.",terms:"Tick the terms of collaboration to send the order.",
       key:"Open this space from your personal link or the Client space to send your order.",keyLink:"Go to the Client space",bad_key:"Your access isn't recognised for this studio. Open this space from your personal link or the Client space.",bad_email:"The email isn't valid. Fix it in the Brief step.",no_project:"Give the project a name, in the Product step.",no_rushes:"No valid footage link. Paste at least one full link (https://…) in the Files step.",rate_limit:"A lot of orders were just sent from this space. Try again in an hour, or message us on WhatsApp."},
     "s6.terms":"I accept the DS Editing terms of collaboration: weekly invoice, payment on receipt, 20% penalty per week late.","s6.termsLink":"Read the terms","ok.space":"Open my space (orders, invoices)",
     "ok.track":"Your tracking number","ok.trackHint":"Keep it: it's also in your confirmation email.","ok.follow":"Track my order",
@@ -1103,11 +1131,53 @@ function renderChips() {
   $("#chips").innerHTML = t("chips").map((c) => `<button type="button" class="chip">${c}</button>`).join("");
   $("#chips").querySelectorAll(".chip").forEach((b) => b.addEventListener("click", () => { const ta = $("#description"); const sep = ta.value && !ta.value.endsWith("\n") ? "\n" : ""; ta.value += sep + b.textContent + " "; ta.focus(); draft.description = ta.value; save(); }));
 }
+/* Les deux listes de liens. « rushes » passe par le filtre client/links.js : un lien qu'on ne peut pas
+   télécharger est dit SOUS SON CHAMP, à la saisie, et bloque l'étape 04 (validate). « references » reste
+   permissif : on n'y télécharge rien, donc tout lien y est bon à prendre pour le monteur. */
 function renderLinks(key) {
   const list = (draft[key] && draft[key].length ? draft[key] : [""]);
-  $("#" + key).innerHTML = list.map((v, i) => `<div class="l"><input class="in" type="url" value="${esc(v)}" placeholder="${t("ph.link")}"/><button type="button" data-rm="${key}" data-x="${i}">×</button></div>`).join("");
-  $("#" + key).querySelectorAll("input").forEach((inp) => inp.addEventListener("input", () => { draft[key] = collect(key); save(); }));
+  const check = key === "rushes";
+  $("#" + key).innerHTML = list.map((v, i) => `<div class="lw"><div class="l"><input class="in" type="url" value="${esc(v)}" placeholder="${t("ph.link")}"/><button type="button" data-rm="${key}" data-x="${i}">×</button></div>${check ? `<div class="lk" data-lk="${i}" hidden></div>` : ""}</div>`).join("");
+  $("#" + key).querySelectorAll("input").forEach((inp, i) => inp.addEventListener("input", () => { draft[key] = collect(key); save(); if (check) linkNote(i); }));
   $("#" + key).querySelectorAll("[data-rm]").forEach((b) => b.addEventListener("click", () => { const arr = collect(key); arr.splice(+b.dataset.x, 1); draft[key] = arr.length ? arr : [""]; save(); renderLinks(key); }));
+  if (check) list.forEach((v, i) => linkNote(i));
+}
+/* Verdict d'UN champ de rushes. Trois cas, trois messages, jamais de reproche :
+   page d'écoute ou de réseau social (le cas Mediacast) → refusée, avec un bouton pour remettre le lien à sa
+   vraie place (« vidéos d'inspiration ») ; source non automatisable, connue (Frame.io, OneDrive, MEGA…) ou
+   inconnue → avertissement visible, ça passe, c'est du vrai matériel ; adresse qui n'en est pas une →
+   « vérifie le lien ». Filtre absent (links.js non chargé) : on ne dit rien et rien ne bloque — fail-open,
+   mieux vaut une commande qui passe qu'un client coincé par un contrôle cassé. */
+function linkNote(i) {
+  const box = $(`#rushes [data-lk="${i}"]`); if (!box) return;
+  const r = window.DS_LINKS ? DS_LINKS.classifyField(collect("rushes")[i] || "") : { status: "empty" };
+  const l = t("lk");
+  // le champ corrigé perd son liseré rouge tout de suite, sans attendre le prochain « Continuer »
+  const inp = box.parentNode.querySelector("input"); if (inp && r.status !== "block") inp.classList.remove("bad");
+  box.className = "lk" + (r.status === "block" ? " bad" : r.status === "warn" ? " man" : "");
+  box.hidden = r.status !== "block" && r.status !== "warn";
+  if (box.hidden) { box.innerHTML = ""; return; }
+  const movable = r.status === "block" && r.reason === "page";           // seul cas déplaçable : c'était une référence, pas des rushes
+  box.innerHTML = esc(String(l[r.reason] || l.unknown).replace("{site}", r.label || "")) + (movable ? ` <button type="button" class="chip mv" data-mv="${i}">${esc(l.move)}</button>` : "");
+  const b = box.querySelector("[data-mv]"); if (b) b.addEventListener("click", () => moveToRefs(i));
+}
+/* Le lien de Manon était une référence utile, pas des rushes : on le déplace au lieu de le jeter.
+   Seuls les liens refusés partent ; ce qui était téléchargeable dans le même champ reste dans les rushes. */
+function moveToRefs(i) {
+  const arr = collect("rushes"), f = DS_LINKS.classifyField(arr[i] || "");
+  const bad = f.items.filter((x) => x.status === "block").map((x) => x.url).filter(Boolean);
+  if (!bad.length) return;
+  arr[i] = f.items.filter((x) => x.status !== "block").map((x) => x.url).filter(Boolean).join(" ");
+  if (!arr[i]) arr.splice(i, 1);
+  draft.rushes = arr.length ? arr : [""];
+  draft.references = [...collect("references").filter(Boolean), ...bad];
+  save(); renderLinks("rushes"); renderLinks("references");
+  const ins = $("#references").querySelectorAll("input"); ins[ins.length - 1]?.focus();
+}
+// Le premier lien de rushes qu'on ne peut pas télécharger, s'il y en a un (−1 sinon).
+function badRush() {
+  if (!window.DS_LINKS) return -1;                                       // filtre non chargé : on ne bloque pas
+  return collect("rushes").findIndex((v) => DS_LINKS.blocked(v));
 }
 document.querySelectorAll("[data-add]").forEach((b) => b.addEventListener("click", () => { const k = b.dataset.add; draft[k] = [...collect(k), ""]; save(); renderLinks(k); const ins = $("#" + k).querySelectorAll("input"); ins[ins.length - 1]?.focus(); }));
 function collect(key) { return [...$("#" + key).querySelectorAll("input")].map((i) => i.value.trim()); }
@@ -1367,9 +1437,16 @@ function validate(s) {
     if (rien) return e.produit;
     if (!hasVideo()) return e.noVideo;                                   // des suppléments seuls ne font pas une commande
   }
-  if (s === 3) { if (!v.rushes) { $("#rushes input").classList.add("bad"); return e.rushes; } }
-  // dernier verrou avant l'envoi : jamais une commande sans vidéo, même en revenant en arrière
-  if (s === 5) { if (!hasVideo()) return e.noVideo; if (!$("#terms").checked) { $("#terms").focus(); return e.terms; } }
+  /* Étape 04 — Fichiers. Avant, on ne vérifiait que « champ non vide » : c'est par là que le lien Spotify de
+     Mediacast est entré (13/10/2026), que le robot s'est cassé les dents six fois et que 156 Go de rushes
+     ont été jetés. Un lien qui n'est pas un fichier ne passe plus l'étape. */
+  if (s === 3) {
+    if (!v.rushes) { $("#rushes input").classList.add("bad"); return e.rushes; }
+    const b = badRush();
+    if (b >= 0) { const inp = $("#rushes").querySelectorAll("input")[b]; if (inp) inp.classList.add("bad"); linkNote(b); return e.rushesBad; }
+  }
+  // dernier verrou avant l'envoi : jamais une commande sans vidéo ni un lien mort, même en revenant en arrière
+  if (s === 5) { if (!hasVideo()) return e.noVideo; if (badRush() >= 0) return e.rushesBad; if (!$("#terms").checked) { $("#terms").focus(); return e.terms; } }
   if (s === 4) { if (v.description.trim().length < 10) { $("#description").classList.add("bad"); return e.description; } if (!draft.contactName || !draft.contactHow) { $("#contactName").classList.add("bad"); $("#contactHow").classList.add("bad"); return e.contact; } if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(draft.email || "")) { $("#email").classList.add("bad"); return e.email; } }
   return "";
 }
