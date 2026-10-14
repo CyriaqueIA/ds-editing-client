@@ -247,6 +247,17 @@
     var b = $("curLock"); if (b) { b.textContent = L.lock; b.hidden = false; b.addEventListener("click", function () { ls.del(S.until); location.reload(); }); }   // « Verrouiller » : efface la vue admin de l'appareil (dashboard compris)
     document.body.classList.remove("cur"); var c = $("curtain"); if (c && c.parentNode) c.parentNode.removeChild(c); done(); }
   if (num(S.until) > Date.now()) { release(); return; }
+  /* 14/10 : porte nominative — un lien ?p=<jeton> VALIDE fait tomber le rideau (verification reelle aupres de Supabase, pas la simple presence du parametre : sinon n'importe qui ajouterait ?p=x). Bon jeton = meme memoire d'appareil 12 h que le bon code ; boot() refait ensuite la vraie connexion. */
+  var PORTE = new URLSearchParams(location.search).get("p");
+  if (PORTE) {
+    try {
+      var dec = atob(PORTE.replace(/-/g, "+").replace(/_/g, "/")).split("\n");
+      if (dec[0] && dec[1]) fetch("https://xkanmjlpysxpohsuqvwg.supabase.co/auth/v1/token?grant_type=password", {
+        method: "POST", headers: { apikey: "sb_publishable_lIZtV_WtN5NcGSb0dnfaiQ_AgKYBIVa", "Content-Type": "application/json" },
+        body: JSON.stringify({ email: dec[0], password: dec[1] })
+      }).then(function (r) { if (r.ok) { ls.set(S.until, String(Date.now() + S.ttl)); ls.del(S.fails); release(); } }).catch(function () {});
+    } catch (e) {}
+  }
   var timer = 0;
   function sha(s) {
     var c = window.crypto;
