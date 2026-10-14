@@ -1061,7 +1061,7 @@ function wireBoard() {
 }
 /* ===== onglet Grille (interne) : lecture seule de offers + price_grids (+ price_grids_internal pour plancher et prix de revente). AUCUN prix dans ce fichier.
    Droit = rôle admin seul ET connexion nominative (ni lien personnel, ni vue admin par code). Sinon : ni onglet, ni intitulé. ===== */
-const GRILLE_OWNERS = ["cyriaque.gely@ds-editing.com"];   // 13/10 : tester profile.role ne suffit PAS — le compte partagé « Équipe » (OPEN_ACCESS, ouvert à tous sans mot de passe) est admin en base, il verrait plancher et marge. L'onglet est donc nominatif. Pour l'ouvrir à quelqu'un d'autre : ajouter son e-mail ici.
+const GRILLE_OWNERS = ["cyriaque.gely@ds-editing.com", "ghali.benjelloun@ds-editing.com"];   // 14/10 (QCM q5) : Ghali voit la grille interne. 13/10 : tester profile.role ne suffit PAS — le compte partagé « Équipe » (OPEN_ACCESS, ouvert à tous sans mot de passe) est admin en base, il verrait plancher et marge. L'onglet est donc nominatif. Pour l'ouvrir à quelqu'un d'autre : ajouter son e-mail ici.
 const canGrille = () => !LINKED && !ADMIN_MODE && !!me && GRILLE_OWNERS.includes(String(me.email || "").toLowerCase()) && !!profile && profile.role === "admin";   // admin SEUL (décision du 07/10) : ni dispatcher ni qc, plus strict que Tarifs
 const pct = (x) => (x * 100).toLocaleString(lang === "fr" ? "fr-FR" : "en-GB", { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + " %";
 async function renderGrille() {
@@ -1989,6 +1989,17 @@ async function boot() {
   adminInit();
   sb = createClient(SUPABASE_URL, SUPABASE_ANON);
   let { data: { session } } = await sb.auth.getSession();
+  /* ?p=<jeton> : porte nominative (lien magique personnel, décision du 14/10). Le jeton encode « e-mail \n clé » en base64url ; la clé est le mot de passe Supabase de la personne, aléatoire, jamais tapé. Si la session en place n'est pas cette personne, on la quitte en scope local (ne révoque pas les autres sessions du compte partagé). Jeton invalide → comportement normal. */
+  const PORTE = params.get("p");
+  if (PORTE) {
+    try {
+      const [pEmail, pKey] = atob(PORTE.replace(/-/g, "+").replace(/_/g, "/")).split("\n");
+      if (pEmail && pKey) {
+        if (session && String(session.user.email).toLowerCase() !== pEmail.toLowerCase()) { await sb.auth.signOut({ scope: "local" }); session = null; }
+        if (!session) { const r = await sb.auth.signInWithPassword({ email: pEmail, password: pKey }); if (!r.error) session = r.data.session; }
+      }
+    } catch (e) { /* jeton illisible : on laisse la suite décider */ }
+  }
   if (session && OPEN_ACCESS && params.has("login") && session.user.email === OPEN_ACCESS.email) { await sb.auth.signOut(); session = null; }   // ?login=1 : connexion nominative (Rania, Putu), on quitte la session partagée « Équipe »
   if (!session && OPEN_ACCESS && !params.has("login")) ({ data: { session } } = await sb.auth.signInWithPassword(OPEN_ACCESS));
   if (!session) { $("#gate").hidden = false; return; }

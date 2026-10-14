@@ -571,9 +571,21 @@ async function init() {
   $("logout").addEventListener("click", async () => { await sb.auth.signOut({ scope: "local" }); S.me = null; S.open = null; $("app").hidden = true; $("overlay").hidden = true; $("login").hidden = false; });
   $("overlay").addEventListener("click", (ev) => { if (ev.target === $("overlay")) closeFiche(); });
   document.addEventListener("keydown", (ev) => { if (ev.key === "Escape" && S.open) closeFiche(); });
-  const nominative = new URLSearchParams(location.search).has("login");   // ?login=1 : connexion nominative (même motif que team/dashboard.html), pas d'auto-login
+  const qs = new URLSearchParams(location.search);
+  const nominative = qs.has("login");   // ?login=1 : connexion nominative (même motif que team/dashboard.html), pas d'auto-login
   const { data: sessData } = await sb.auth.getSession();
   let session = sessData?.session ?? null;
+  /* ?p=<jeton> : porte nominative (lien magique personnel, décision du 14/10). Même mécanique que team/dashboard.html. */
+  const PORTE = qs.get("p");
+  if (PORTE) {
+    try {
+      const [pEmail, pKey] = atob(PORTE.replace(/-/g, "+").replace(/_/g, "/")).split("\n");
+      if (pEmail && pKey) {
+        if (session && String(session.user.email).toLowerCase() !== pEmail.toLowerCase()) { await sb.auth.signOut({ scope: "local" }); session = null; }
+        if (!session) { const r = await sb.auth.signInWithPassword({ email: pEmail, password: pKey }); if (!r.error) session = r.data.session; }
+      }
+    } catch (e) { /* jeton illisible : on laisse la suite décider */ }
+  }
   if (session && OPEN_ACCESS && nominative && session.user.email === OPEN_ACCESS.email) { await sb.auth.signOut({ scope: "local" }); session = null; }   // on quitte la session partagée « Équipe » ; scope local : ne révoque PAS les jetons des autres personnes connectées au même compte partagé
   if (session) boot(session.user);
   else if (OPEN_ACCESS && !nominative) { const r = await sb.auth.signInWithPassword(OPEN_ACCESS); if (r.error) $("login").hidden = false; else boot(r.data.user); }

@@ -709,6 +709,17 @@ async function boot() {
   applyText();
   sb = createClient(SUPABASE_URL, SUPABASE_ANON);
   let { data: { session } } = await sb.auth.getSession();
+  /* ?p=<jeton> : porte nominative (lien magique personnel, décision du 14/10). Même mécanique que team/dashboard.html. */
+  const PORTE = new URLSearchParams(location.search).get("p");
+  if (PORTE) {
+    try {
+      const [pEmail, pKey] = atob(PORTE.replace(/-/g, "+").replace(/_/g, "/")).split("\n");
+      if (pEmail && pKey) {
+        if (session && String(session.user.email).toLowerCase() !== pEmail.toLowerCase()) { await sb.auth.signOut({ scope: "local" }); session = null; }
+        if (!session) { const r = await sb.auth.signInWithPassword({ email: pEmail, password: pKey }); if (!r.error) session = r.data.session; }
+      }
+    } catch (e) { /* jeton illisible : on laisse la suite décider */ }
+  }
   if (!session && OPEN_ACCESS) ({ data: { session } } = await sb.auth.signInWithPassword(OPEN_ACCESS));
   if (session) {
     me = session.user;
