@@ -499,7 +499,7 @@ import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 const SUPABASE_URL = "https://xkanmjlpysxpohsuqvwg.supabase.co";
 const SUPABASE_ANON = "sb_publishable_lIZtV_WtN5NcGSb0dnfaiQ_AgKYBIVa";
 // ATTENTION : si cet e-mail change, changer AUSSI la fonction crm_is_open_access() côté base (sinon le garde-fou « compte partagé » de crm_team_week() et des policies ne reconnaît plus le compte et le trou se rouvre en silence).
-const OPEN_ACCESS = { email: "acces.libre@ds-editing.com", password: "HAs0lMotAKsCmNdx" }; // 05/10 : accès libre demandé par Cyriaque (compte partagé « Équipe »). Pour remettre les mots de passe : null ici + désactiver le compte.
+const OPEN_ACCESS = null; // 14/10 : accès libre FERMÉ (liens magiques ?p= distribués aux 5 + télé). Pour le rouvrir un jour : remettre { email, password } du compte partagé et lever son bannissement en base.
 const BUSINESS_DAYS_DEFAULT = 5;   // délai par défaut quand le client n'a pas donné de date
 
 const T = {
@@ -701,6 +701,7 @@ const isLate = (j) => !isDone(j) && remaining(j) < 0;
 const cls = (j) => isDone(j) ? "done" : remaining(j) < 0 ? "r" : remaining(j) < 2 * 86400000 ? "o" : "g";
 const canRecruit = () => !!profile && profile.can_recruit === true;   // données candidats : drapeau profiles.can_recruit (supabase/recruitment_v2.sql), en plus du rôle
 const isAdmin = () => profile && ["admin", "dispatcher", "qc"].includes(profile.role);
+const canMoney = () => !!profile && profile.role === "admin";   // 14/10 (QCM q10) : Tarifs et Factures réservés au rôle admin — Putu (dispatcher) et la qualité ne voient jamais les prix. NB : le vrai verrou en base (RLS price_grids/invoices autorise encore dispatcher et qc) reste à poser.
 const isEditor = () => !!profile && profile.role === "editor";
 const isDispatch = () => LINKED && !!profile && profile.role === "dispatcher";
 const FRAME_OK = (u) => /^https?:\/\//i.test(String(u || "").trim());
@@ -1324,8 +1325,8 @@ setInterval(() => { document.querySelectorAll("[data-cd]").forEach((el) => { con
 /* ===== onglets admin : Tarifs, Factures ===== */
 function renderTabs() {
   if (!isAdmin() || LINKED) return; $("#tabs").hidden = false;
-  if ((tab === "grille" && !canGrille()) || (tab === "rituels" && !canRituals())) { tab = "prod"; const u = new URL(location.href); u.searchParams.delete("tab"); history.replaceState(null, "", u); }   // onglet Grille / Rituels demandé par l'adresse sans y avoir droit : retour à la production, rien ne s'affiche
-  $("#tabs").innerHTML = ["prod", "equipe", "tarifs", "factures", "rdv", ...(canRecruit() ? ["recrut"] : []), ...(canGrille() ? ["grille"] : []), ...(canRituals() ? ["rituels"] : [])].map((k) => `<button type="button" class="tab ${tab === k ? "on" : ""}" data-tab="${k}">${t("tabs")[k]}</button>`).join("");
+  if ((tab === "grille" && !canGrille()) || (tab === "rituels" && !canRituals()) || ((tab === "tarifs" || tab === "factures") && !canMoney())) { tab = "prod"; const u = new URL(location.href); u.searchParams.delete("tab"); history.replaceState(null, "", u); }   // onglet Grille / Rituels / Tarifs / Factures demandé par l'adresse sans y avoir droit : retour à la production, rien ne s'affiche
+  $("#tabs").innerHTML = ["prod", "equipe", ...(canMoney() ? ["tarifs", "factures"] : []), "rdv", ...(canRecruit() ? ["recrut"] : []), ...(canGrille() ? ["grille"] : []), ...(canRituals() ? ["rituels"] : [])].map((k) => `<button type="button" class="tab ${tab === k ? "on" : ""}" data-tab="${k}">${t("tabs")[k]}</button>`).join("");
   $("#tabs").querySelectorAll("[data-tab]").forEach((b) => b.addEventListener("click", () => { tab = b.dataset.tab; const u = new URL(location.href); tab === "prod" ? u.searchParams.delete("tab") : u.searchParams.set("tab", tab); history.replaceState(null, "", u); renderTabs(); renderAdmin(); }));
   renderAdmin();
 }
