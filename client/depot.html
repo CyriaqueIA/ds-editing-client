@@ -549,10 +549,11 @@ const I18N = {
     "s1.title":"Votre projet","s1.hint":"Un nom, un produit. Le reste vient après.",
     "f.projet":"Nom du projet ou de l'épisode","ph.projet":"Ex. Épisode 12 — Dr Weber",
     "f.produit":"Ce que vous nous confiez","f.episodes":"Nombre d'épisodes",
-    produit:{podcast:["Podcast / Interview","Épisode complet monté, 16:9, prêt à publier."],vsl:["VSL","Vidéo de vente, 16:9, rythme et sous-titres travaillés."],facecam:["Face cam","Vidéo face caméra (YouTube), 16:9, montage et motion design."]},
+    produit:{podcast:["Podcast / Interview","Épisode complet monté, 16:9, prêt à publier."],vsl:["VSL","Vidéo de vente, 16:9, rythme et sous-titres travaillés."],facecam:["Face cam","Vidéo face caméra (YouTube), 16:9, montage et motion design."],reel:["Reel","Reels seuls, 9:16, sous-titres animés et sound design, sans épisode."]},
+    "formuleReel":"Reels seuls : pas d'épisode à choisir. Indiquez le nombre de reels à l'étape 03 — Extras.",
     // une ligne d'exemple par case : se tromper de case, c'est un brief faux et un aller-retour perdu
-    prodEx:{podcast:"2 personnes ou plus, plusieurs caméras",vsl:"Vidéo de vente, script écrit",facecam:"Toi seul face caméra"},
-    prodUnit:{podcast:"épisode",vsl:"vidéo",facecam:"vidéo"},
+    prodEx:{podcast:"2 personnes ou plus, plusieurs caméras",vsl:"Vidéo de vente, script écrit",facecam:"Toi seul face caméra",reel:"Seulement des reels, à partir de vos rushes"},
+    prodUnit:{podcast:"épisode",vsl:"vidéo",facecam:"vidéo",reel:"reel"},
     "x.from":"à partir de {p} / {u}",
     "note.episode":"Un épisode = une vidéo finie jusqu'à 60 minutes. Au-delà, un supplément par tranche de 30 minutes.",
     "formuleOff":"Choisissez d'abord un produit à l'étape 01 — Produit.","bundle.inc":"{n} reels inclus dans le pack","promo":"PROMO","instead":"au lieu de","total":"Total","bundleNote":"Un pack contient déjà son épisode et ses reels : son contenu est détaillé sur la carte.",
@@ -605,7 +606,7 @@ const I18N = {
     // Seuls les fichiers joints (logo, palette) vivent en mémoire et sont à redéposer : le texte le dit.
     "stale.text":"Une nouvelle version de ce formulaire est disponible. Rafraîchissez la page pour continuer : vos choix sont conservés sur cet appareil, seuls vos fichiers joints (logo, palette) sont à redéposer.","stale.btn":"Rafraîchir la page",
     units:{episode:["épisode","épisodes"],reel_basique:["reel standard","reels standard"],reel_signature:["reel premium","reels premium"],miniature:["miniature","miniatures"],trailer:["trailer","trailers"]},
-    err:{projet:"Donnez un nom au projet.",produit0:"Choisissez ce que vous nous confiez, à l'étape 01 — Produit.",produit:"Votre commande est encore vide : choisissez un produit à l'étape 01 — Produit et sa formule à l'étape 02 — Formule, ou un de vos packs à l'étape 01 sous « Vos vidéos ».",noVideo:"Il manque la vidéo : les extras s'ajoutent à un épisode ou à un pack. Choisissez votre épisode à l'étape 02 — Formule, ou un de vos packs à l'étape 01 — Produit. On garde le reste de votre sélection.",formule:"Choisissez une formule ou un pack à l'étape 02 — Formule.",rushes:"Ajoutez au moins un lien de rushes.",rushesBad:"Un de vos liens de rushes n'est pas un fichier téléchargeable (étape 04 — Fichiers) : corrigez-le, ou déplacez-le vers les vidéos d'inspiration.",description:"Décrivez ce que vous attendez, même en trois lignes.",contact:"Indiquez un contact et un moyen de le joindre.",email:"Indiquez un e-mail valide, c'est là qu'arrivent la confirmation et le suivi.",send:"L'envoi a échoué. Réessayez, ou écrivez-nous sur WhatsApp.",terms:"Cochez les conditions de collaboration pour envoyer la commande.",
+    err:{projet:"Donnez un nom au projet.",reel0:"Indiquez au moins un reel (étape 03 — Extras).",produit0:"Choisissez ce que vous nous confiez, à l'étape 01 — Produit.",produit:"Votre commande est encore vide : choisissez un produit à l'étape 01 — Produit et sa formule à l'étape 02 — Formule, ou un de vos packs à l'étape 01 sous « Vos vidéos ».",noVideo:"Il manque la vidéo : les extras s'ajoutent à un épisode ou à un pack. Choisissez votre épisode à l'étape 02 — Formule, ou un de vos packs à l'étape 01 — Produit. On garde le reste de votre sélection.",formule:"Choisissez une formule ou un pack à l'étape 02 — Formule.",rushes:"Ajoutez au moins un lien de rushes.",rushesBad:"Un de vos liens de rushes n'est pas un fichier téléchargeable (étape 04 — Fichiers) : corrigez-le, ou déplacez-le vers les vidéos d'inspiration.",description:"Décrivez ce que vous attendez, même en trois lignes.",contact:"Indiquez un contact et un moyen de le joindre.",email:"Indiquez un e-mail valide, c'est là qu'arrivent la confirmation et le suivi.",send:"L'envoi a échoué. Réessayez, ou écrivez-nous sur WhatsApp.",terms:"Cochez les conditions de collaboration pour envoyer la commande.",
       key:"Ouvrez cet espace depuis votre lien personnel ou l'Espace client pour envoyer votre commande.",keyLink:"Aller à l'Espace client",bad_key:"Votre accès n'est pas reconnu pour ce studio. Ouvrez cet espace depuis votre lien personnel ou l'Espace client.",bad_email:"L'e-mail n'est pas valide. Corrigez-le à l'étape Brief.",no_project:"Donnez un nom au projet, à l'étape Produit.",no_rushes:"Aucun lien de rushes valide. Collez au moins un lien complet (https://…) à l'étape Fichiers.",rate_limit:"Beaucoup de commandes viennent d'être envoyées depuis cet espace. Réessayez dans une heure, ou écrivez-nous sur WhatsApp."},
     "team.note":"Dépôt interne par {n} pour le compte du client. L'e-mail saisi à l'étape Brief recevra les mails automatiques (confirmation, suivi, facture) : mets le tien si le client ne doit rien recevoir.",
     "s6.terms":"J'accepte les conditions de collaboration DS Editing : facture hebdomadaire, paiement à réception, pénalité de 20 % par semaine de retard.","s6.termsLink":"Lire les conditions","ok.space":"Ouvrir mon espace (commandes, factures)",
@@ -621,9 +622,10 @@ const I18N = {
     "s1.title":"Your project","s1.hint":"A name, a product. The rest comes next.",
     "f.projet":"Project or episode name","ph.projet":"e.g. Episode 12 — Dr Weber",
     "f.produit":"What you're sending us","f.episodes":"Number of episodes",
-    produit:{podcast:["Podcast / Interview","Full edited episode, 16:9, ready to publish."],vsl:["VSL","Sales video, 16:9, pacing and captions crafted."],facecam:["Face cam","Talking-head video (YouTube), 16:9, editing and motion design."]},
-    prodEx:{podcast:"2+ people, multiple cameras",vsl:"Sales video, scripted",facecam:"Just you, facing the camera"},
-    prodUnit:{podcast:"episode",vsl:"video",facecam:"video"},
+    produit:{podcast:["Podcast / Interview","Full edited episode, 16:9, ready to publish."],vsl:["VSL","Sales video, 16:9, pacing and captions crafted."],facecam:["Face cam","Talking-head video (YouTube), 16:9, editing and motion design."],reel:["Reel","Reels only, 9:16, animated captions and sound design, no episode."]},
+    "formuleReel":"Reels only: no episode to pick. Set the number of reels in step 03 — Extras.",
+    prodEx:{podcast:"2+ people, multiple cameras",vsl:"Sales video, scripted",facecam:"Just you, facing the camera",reel:"Reels only, from your footage"},
+    prodUnit:{podcast:"episode",vsl:"video",facecam:"video",reel:"reel"},
     "x.from":"from {p} / {u}",
     "note.episode":"One episode = one finished video up to 60 minutes. Beyond, a supplement per extra 30 minutes.",
     "formuleOff":"Pick a product first, in step 01 — Product.","bundle.inc":"{n} reels included in the pack","promo":"PROMO","instead":"instead of","total":"Total","bundleNote":"A pack already contains its episode and its reels: the contents are listed on the card.",
@@ -672,7 +674,7 @@ const I18N = {
     saved:"Draft saved on this device", empty:"Your order will appear here",
     "stale.text":"A newer version of this form is available. Refresh the page to continue: your choices are kept on this device, only your attached files (logo, palette) need to be dropped again.","stale.btn":"Refresh the page",
     units:{episode:["episode","episodes"],reel_basique:["standard reel","standard reels"],reel_signature:["premium reel","premium reels"],miniature:["thumbnail","thumbnails"],trailer:["trailer","trailers"]},
-    err:{projet:"Give the project a name.",produit0:"Choose what you're sending us, in step 01 — Product.",produit:"Your order is still empty: pick a product in step 01 — Product and its package in step 02 — Package, or one of your packs in step 01 under “Your videos”.",noVideo:"The video itself is missing: extras come on top of an episode or a pack. Pick your episode in step 02 — Package, or one of your packs in step 01 — Product. We keep the rest of your selection.",formule:"Choose a package or a pack in step 02 — Package.",rushes:"Add at least one footage link.",rushesBad:"One of your footage links isn't a downloadable file (step 04 — Files): fix it, or move it to the inspiration videos.",description:"Describe what you expect, even in three lines.",contact:"Give us a contact and a way to reach them.",email:"Enter a valid email, that's where the confirmation and tracking go.",send:"Sending failed. Try again, or message us on WhatsApp.",terms:"Tick the terms of collaboration to send the order.",
+    err:{projet:"Give the project a name.",reel0:"Add at least one reel (step 03 — Extras).",produit0:"Choose what you're sending us, in step 01 — Product.",produit:"Your order is still empty: pick a product in step 01 — Product and its package in step 02 — Package, or one of your packs in step 01 under “Your videos”.",noVideo:"The video itself is missing: extras come on top of an episode or a pack. Pick your episode in step 02 — Package, or one of your packs in step 01 — Product. We keep the rest of your selection.",formule:"Choose a package or a pack in step 02 — Package.",rushes:"Add at least one footage link.",rushesBad:"One of your footage links isn't a downloadable file (step 04 — Files): fix it, or move it to the inspiration videos.",description:"Describe what you expect, even in three lines.",contact:"Give us a contact and a way to reach them.",email:"Enter a valid email, that's where the confirmation and tracking go.",send:"Sending failed. Try again, or message us on WhatsApp.",terms:"Tick the terms of collaboration to send the order.",
       key:"Open this space from your personal link or the Client space to send your order.",keyLink:"Go to the Client space",bad_key:"Your access isn't recognised for this studio. Open this space from your personal link or the Client space.",bad_email:"The email isn't valid. Fix it in the Brief step.",no_project:"Give the project a name, in the Product step.",no_rushes:"No valid footage link. Paste at least one full link (https://…) in the Files step.",rate_limit:"A lot of orders were just sent from this space. Try again in an hour, or message us on WhatsApp."},
     "team.note":"Internal order placed by {n} on behalf of the client. The email entered in the Brief step receives the automatic emails (confirmation, tracking, invoice): use yours if the client must not receive anything.",
     "s6.terms":"I accept the DS Editing terms of collaboration: weekly invoice, payment on receipt, 20% penalty per week late.","s6.termsLink":"Read the terms","ok.space":"Open my space (orders, invoices)",
@@ -689,7 +691,12 @@ const REEL_DB = { reel_basique: "reel_standard", reel_signature: "reel_premium" 
    cochable, toutes familles confondues (podcast_*, vsl_*, single_cam_4k, multicam_4k, facecam_*, bundle_*).
    03 Extra = seulement ce qui s'ajoute PAR-DESSUS l'épisode (reels, miniature, trailer).
    Un seul champ `draft.offre` porte l'épisode : commander deux épisodes pour une vidéo est donc impossible. */
-const PRODUITS = ["podcast", "vsl", "facecam"];
+/* « Reels seulement » (19/10, demande de Cyriaque pour les clients de The Move Miami déposés par Putu) : un 4e
+   produit SANS épisode. L'étape 02 — Formule est sautée, les reels se comptent à l'étape 03 — Extras, et la
+   commande est valide avec des reels seuls (hasVideo). Aucune offre en base : rien ne change pour price_job. */
+const REEL_ONLY = "reel";
+const PRODUITS = ["podcast", "vsl", "facecam", REEL_ONLY];
+const reelsOnly = () => draft.produit === REEL_ONLY;
 // Rattachement produit → épisode. La base ne porte PAS ce lien : `offers.family` dit seulement
 // episode / bundle / facecam / vsl. Il se lit donc sur la clé (podcast_*, vsl_*, facecam_*), sur
 // `offers.bundle_parts` pour un pack (bundle_standard contient podcast_standard, offers_v1c.sql l.41-45),
@@ -809,7 +816,7 @@ const optOffers = () => moreOffers().filter((o) => !isVideoKey(o.item_key));
    ne font pas une commande : c'est ce qu'april-jackson pouvait envoyer. Contrôlé à la sortie de 03 ET
    avant l'envoi, donc on ne peut pas y arriver en revenant en arrière. */
 const isVideoKey = (k) => { const f = famOf(k); return f ? (f === "pack_client" || EP_FAMILIES.has(f)) : EP_ALL.has(k); };
-const hasVideo = () => !!draft.offre || Object.keys(moreQty()).some(isVideoKey);
+const hasVideo = () => !!draft.offre || Object.keys(moreQty()).some(isVideoKey) || (reelsOnly() && REELS.some((k) => (draft.qty[k] || 0) > 0));   // reels seuls : un reel est la vidéo
 // bundle_reels_included et bundle_parts sont lus EN BASE : le contenu d'un pack n'est jamais écrit ici.
 // Si ces colonnes manquent (base plus ancienne), on retombe sur les colonnes d'origine et sur BUNDLE_REELS.
 const CAT_COLS = "item_key,label_fr,label_en,family,sort,bundle_reels_included,bundle_parts";
@@ -978,17 +985,20 @@ function toggleQty(k) {
    Les packs sont écartés : le prix d'un pack est un TOTAL (épisode + reels), l'annoncer en « à partir de »
    serait faux dans les deux sens. Les prix à 0 aussi : une ligne offerte (geste commercial) afficherait
    « à partir de 0 € » en tête de l'écran 01. Plus aucun prix valide → carte sans prix, comme avant. */
-const fromPrice = (p) => { const v = epKeys(p).filter((k) => !isBundle(k) && hasPrice(k) && prices[k] > 0).map((k) => prices[k]); return v.length ? Math.min(...v) : null; };
+const fromPrice = (p) => { const v = (p === REEL_ONLY ? REELS.map((k) => REEL_DB[k]) : epKeys(p)).filter((k) => !isBundle(k) && hasPrice(k) && prices[k] > 0).map((k) => prices[k]); return v.length ? Math.min(...v) : null; };
 // L'unité suit le type : un VSL ou une face cam n'est pas un « épisode ».
 const fromTxt = (p) => { const v = fromPrice(p); return v === null ? "" : esc(t("x.from").replace("{p}", money(v, cur)).replace("{u}", t("prodUnit")[p] || "")); };
 // 01 Produit : le TYPE, son exemple et son prix d'appel à l'unité. Un seul produit à la fois.
 function renderProduit() {
   const p = t("produit"), ex = t("prodEx");
-  const list = PRODUITS.filter((k) => epKeys(k).length);
+  // la case « Reels » suit les cartes reels de l'étape 03 : visible dès qu'un reel est commandable chez ce client (ou en mode devis)
+  const list = PRODUITS.filter((k) => (k === REEL_ONLY ? REELS.some((r) => cardShown(REEL_DB[r])) : epKeys(k).length));
   $("#produit").innerHTML = list.map((k) => choiceCard("produit:" + k, p[k][0], p[k][1] + (ex[k] ? `<span class="ex">${esc(ex[k])}</span>` : ""), fromTxt(k), null, draft.produit === k, "", "unit")).join("");
   $("#produit").querySelectorAll("[data-choice]").forEach((el) => el.addEventListener("click", () => setProduit(el.dataset.choice.split(":")[1])));
   // Garde-fou : la grille du client ne laisse aucun produit affichable → on dit où aller, jamais de cul-de-sac
-  $("#produitNote").textContent = list.length ? (avail !== null && quoteMode() ? t("x.quoting") : "") : (packOffers().length ? t("x.noProduct") : t("x.quoting"));
+  // un client à packs (recordia) n'a que la case « Reel » ici : on continue de l'orienter vers « Vos vidéos » pour ses épisodes
+  const epCards = list.some((k) => k !== REEL_ONLY);
+  $("#produitNote").textContent = epCards ? (avail !== null && quoteMode() ? t("x.quoting") : "") : (packOffers().length ? t("x.noProduct") : t("x.quoting"));
 }
 // Libellé et description d'un épisode : les textes de la page quand ils existent, sinon le libellé de la base.
 function epText(k) {
@@ -1018,6 +1028,7 @@ const anyProduit = () => PRODUITS.some((p) => epKeys(p).length);
 function renderFormule() {
   const box = $("#formule"), note = $("#formuleNote");
   if (!draft.produit) { box.innerHTML = ""; $("#revNote").hidden = true; note.textContent = anyProduit() ? t("formuleOff") : noEpNote(); return; } // cascade stricte : jamais une formule cliquable sans produit
+  if (reelsOnly()) { box.innerHTML = ""; $("#revNote").hidden = true; note.textContent = t("formuleReel"); return; }   // reels seuls : pas d'épisode, l'étape est sautée (on n'y arrive qu'en cliquant la pastille 02)
   const keys = epKeys(draft.produit);
   $("#revNote").hidden = !keys.length;                                  // « 1 aller-retour inclus » : sous les cartes, jamais sans carte
   box.innerHTML = keys.map((k) => {
@@ -1437,12 +1448,13 @@ function validate(s) {
     // le produit est exigé à la sortie de l'étape 01 : on ne découvre plus deux étapes plus loin qu'il manque
     if (PRODUITS.some((p) => epKeys(p).length) && !draft.produit) return e.produit0;
   }
-  if (s === 1) { if (draft.produit && !draft.offre) return e.formule; } // un produit choisi = un épisode choisi
+  if (s === 1) { if (draft.produit && !reelsOnly() && !draft.offre) return e.formule; } // un produit choisi = un épisode choisi (sauf reels seuls)
   // La commande doit contenir au moins une prestation : contrôlé à la sortie des 3 colonnes de choix.
   // Une quantité dans « Vos vidéos » (pack client) ou dans « Options » suffit aussi.
   if (s === 2) {
     const q = draft.qty;
     const rien = !draft.offre && !REELS.some((k) => q[k] > 0) && !(q.miniature > 0) && !(q.trailer > 0) && !Object.keys(moreQty()).length;
+    if (reelsOnly() && !REELS.some((k) => q[k] > 0)) return e.reel0;    // reels seuls : au moins un reel
     if (rien) return e.produit;
     if (!hasVideo()) return e.noVideo;                                   // des suppléments seuls ne font pas une commande
   }
@@ -1460,8 +1472,8 @@ function validate(s) {
   return "";
 }
 function go(s) { step = s; $("#msg").textContent = ""; if (step === 5) renderRecap(); renderSteps(); renderNav(); window.scrollTo({ top: 0, behavior: "smooth" }); }
-$("#prev").addEventListener("click", () => go(Math.max(0, step - 1)));
-$("#next").addEventListener("click", async () => { const err = validate(step); if (err) { $("#msg").textContent = err; const bad = document.querySelector(".in.bad"); if (bad) { if (bad.scrollIntoView) bad.scrollIntoView({ behavior: "smooth", block: "center" }); bad.focus(); } return; } if (step < 5) return go(step + 1); await submit(); });
+$("#prev").addEventListener("click", () => go(step === 2 && reelsOnly() ? 0 : Math.max(0, step - 1)));   // reels seuls : 02 sautée dans les deux sens
+$("#next").addEventListener("click", async () => { const err = validate(step); if (err) { $("#msg").textContent = err; const bad = document.querySelector(".in.bad"); if (bad) { if (bad.scrollIntoView) bad.scrollIntoView({ behavior: "smooth", block: "center" }); bad.focus(); } return; } if (step < 5) return go(step === 0 && reelsOnly() ? 2 : step + 1); await submit(); });   // reels seuls : 02 — Formule sautée
 
 /* ---------------- envoi : la commande est écrite directement en base (RPC create_order), le moteur fait l'accueil ---------------- */
 // Appel d'une RPC Supabase avec la clé publique. Erreur métier → e.code (bad_key, no_rushes…) ; base injoignable → e.offline.
@@ -1528,6 +1540,7 @@ function order() {
     cta: draft.cta || "", cta_reseaux: draft.cta === "yes" ? (draft.ctaNets || "") : "", font: draft.font === "team" ? "team" : (draft.fontName || ""), autres: v.autres,
   };
   if (BY) details.deposited_by = BY;   // dépôt interne : affiché sur la commande dans le dashboard équipe
+  if (reelsOnly()) details.reels_only = true;   // produit « Reel » : commande sans épisode
   // Le brief du monteur annonce le nombre RÉEL de reels à produire (inclus compris), la facture non.
   const brief = Object.assign({}, details, { units: N, reels: n(q.reel_basique), reels_signature: n(q.reel_signature), single_cam: k === "single_cam_4k" ? String(N) : "", multicam: k === "multicam_4k" ? String(N) : "" });
   return { project: v.projet.trim(), email: v.email.trim(), contact: v.contact, lang, work_to_do: workToDo(brief), details, rushes_links: linkList("rushes"), references_links: linkList("references"), logos: v.logos, description: v.description, deadline: v.deadline, terms_accepted: $("#terms").checked, terms_text: t("s6.terms") };
