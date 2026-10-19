@@ -77,6 +77,21 @@
     .chip{border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.04);color:var(--cream);border-radius:999px;padding:8px 13px;font-size:13px;font-weight:500;cursor:pointer;transition:border-color .2s,background .2s,color .2s}
     .chip:hover{border-color:rgba(220,230,240,.35)}
     .chip.on{border-color:rgba(220,230,240,.5);background:var(--amber-soft);color:#fff}
+    /* Nouvelle commande pour un client (19/10) : bouton de la barre + fenêtre qui liste les studios */
+    .chip.newo{border-color:rgba(220,230,240,.45);background:var(--amber-soft);font-weight:600}
+    .ordm{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.62);display:flex;align-items:flex-start;justify-content:center;padding:8vh 16px 16px}
+    .ordm[hidden]{display:none}
+    .ordm .box{width:min(760px,100%);max-height:84vh;overflow:auto;background:var(--surface-2);border:1px solid var(--line-strong);border-radius:16px;padding:18px;box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 14px 40px rgba(0,0,0,.55)}
+    .ordm .bh{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px}
+    .ordm .bh b{font-size:16px;font-weight:600}
+    .ordm .hint{font-size:13px;color:var(--taupe);line-height:1.45;margin:0 0 12px}
+    .ordm .in{margin-bottom:8px}
+    .ordm .st{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface);margin-top:6px}
+    .ordm .st .nm{font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .ordm .st .nm small{color:var(--taupe);font-weight:400;margin-left:8px;font-size:12px}
+    .ordm .by{font-size:12px;color:var(--taupe);margin-top:10px}
+    body.tv .ordm,body.tv .chip.newo{display:none}
+    @media(max-width:560px){.ordm .st{grid-template-columns:1fr}.ordm .st .btn{justify-content:center}}
     .toolbar .search{margin-left:auto;width:240px}
 
     /* ---- lignes ---- */
@@ -481,6 +496,15 @@
     <div class="board" id="board"></div>
     <div class="admin" id="admin" hidden></div>
   </div>
+  <!-- Nouvelle commande pour un client (19/10) : l'équipe ouvre l'espace de dépôt d'un studio avec son code déjà rempli -->
+  <div class="ordm" id="ordm" hidden role="dialog" aria-modal="true" aria-labelledby="ordT">
+    <div class="box">
+      <div class="bh"><b id="ordT"></b><button type="button" class="btn ghost" id="ordX" aria-label="Fermer">✕</button></div>
+      <p class="hint" id="ordH"></p>
+      <input class="in" id="ordQ" type="search" autocomplete="off"/>
+      <div id="ordL"></div>
+    </div>
+  </div>
 </main>
 
 <div class="admmodal" id="admModal" hidden role="dialog" aria-modal="true" aria-labelledby="admT">
@@ -506,6 +530,7 @@ const T = {
   fr: { admBtn: "Admin", admOff: "Verrouiller", admTitle: "Code admin", admGo: "Valider", admCancel: "Annuler", sub: "Production", live: "En direct", tv: "Mode télé", logout: "Déconnexion", leave: "Quitter", login: "Espace équipe", loginSub: "Connecte-toi avec ton e-mail DS Editing.", loginBtn: "Entrer",
     all: "Tous", tasks: (n) => `${n} tâche${n > 1 ? "s" : ""}`, stats: ["Reçues aujourd'hui", "En cours", "En retard", "À contrôler", "Livrées cette semaine"],
     filters: { all: "Tout", na: "À attribuer", ready: "Fichiers prêts, à démarrer", late: "En retard", qc: "À contrôler", asm: "À assembler", done: "Livrées" }, search: "Rechercher…",
+    newOrder: { btn: "+ Nouvelle commande", title: "Déposer une commande pour un client", hint: "Choisis le client : son espace de dépôt s'ouvre avec son code d'accès déjà rempli. Tu remplis le brief, les formats attendus et les liens de rushes à sa place. L'e-mail saisi dans le brief reçoit les mails automatiques (confirmation, suivi, facture) : mets le tien si le client ne doit rien recevoir.", search: "Rechercher un client…", depot: "Déposer une commande", space: "Espace client", loading: "Lecture des clients…", empty: "Aucun client trouvé.", err: "Lecture des clients impossible :", by: (n) => `Déposée par l'équipe (${n})` },
     dl: { waiting: "En attente", running: "Téléchargement en cours", ready: "Fichiers prêts", error: "Erreur", abandon: "Abandonné", partial: "Rushes reçus", access: "Accès demandé au client", purged: "Nettoyé",
       tips: { waiting: "Le PC du bureau n'a pas encore commencé le téléchargement.", running: "Le PC du bureau télécharge les rushes.", ready: "Les rushes sont sur le PC du bureau.", partial: "Les rushes sont sur le PC du bureau, mais certains liens n'ont pas pu être téléchargés : ne rien supprimer, récupérer ces liens à la main.", access: "Le lien est privé : un e-mail a demandé au client d'ouvrir l'accès.", purged: "Le dossier a été supprimé du PC du bureau après la livraison." },
       nTry: (n, m) => `essai ${n}/${m}`, nFiles: (n) => `${n} fichier${n > 1 ? "s" : ""}`, nFailed: (n) => `${n} lien${n > 1 ? "s" : ""} en échec`, since: (d) => `depuis ${d}`, pcOn: (k) => `PC Bali occupé sur ${k}`, pcOff: "PC hors ligne", manual: "à télécharger à la main", nManual: (n) => `${n} lien${n > 1 ? "s" : ""} à la main`,
@@ -570,6 +595,7 @@ const T = {
   en: { admBtn: "Admin", admOff: "Lock", admTitle: "Admin code", admGo: "Enter", admCancel: "Cancel", sub: "Production", live: "Live", tv: "TV mode", logout: "Log out", leave: "Leave", login: "Team space", loginSub: "Sign in with your DS Editing email.", loginBtn: "Enter",
     all: "All", tasks: (n) => `${n} task${n > 1 ? "s" : ""}`, stats: ["Received today", "In progress", "Late", "To review", "Delivered this week"],
     filters: { all: "All", na: "To assign", ready: "Files ready, to start", late: "Late", qc: "To review", asm: "To assemble", done: "Delivered" }, search: "Search…",
+    newOrder: { btn: "+ New order", title: "Place an order for a client", hint: "Pick the client: their drop space opens with their access code already filled in. You fill in the brief, the expected formats and the footage links on their behalf. The email entered in the brief receives the automatic emails (confirmation, tracking, invoice): use yours if the client must not receive anything.", search: "Search a client…", depot: "Place an order", space: "Client space", loading: "Loading clients…", empty: "No client found.", err: "Could not read clients:", by: (n) => `Placed by the team (${n})` },
     dl: { waiting: "Waiting", running: "Downloading", ready: "Files ready", error: "Error", abandon: "Gave up", partial: "Footage received", access: "Access requested from client", purged: "Cleaned up",
       tips: { waiting: "The office PC has not started the download yet.", running: "The office PC is downloading the footage.", ready: "The footage is on the office PC.", partial: "The footage is on the office PC, but some links could not be downloaded: delete nothing, fetch those links by hand.", access: "The link is private: an email asked the client to open access.", purged: "The folder was removed from the office PC after delivery." },
       nTry: (n, m) => `attempt ${n}/${m}`, nFiles: (n) => `${n} file${n > 1 ? "s" : ""}`, nFailed: (n) => `${n} failed link${n > 1 ? "s" : ""}`, since: (d) => `since ${d}`, pcOn: (k) => `Bali PC busy on ${k}`, pcOff: "PC offline", manual: "download by hand", nManual: (n) => `${n} link${n > 1 ? "s" : ""} by hand`,
@@ -926,11 +952,39 @@ function renderStats() {
 }
 function renderToolbar() {
   const f = t("filters");
-  $("#toolbar").innerHTML = Object.keys(f).filter((k) => (k !== "na" || isDispatch()) && (k !== "asm" || isAdmin())).map((k) => `<button type="button" class="chip${k === "na" ? " na" : ""}${k === "asm" ? " asm" : ""} ${filter === k ? "on" : ""}" data-f="${k}">${f[k]}${k === "ready" ? ` <span class="n" id="readyN">0</span>` : ""}${k === "na" ? ` <span class="n" id="naN">0</span>` : ""}${k === "asm" ? ` <span class="n" id="asmN">0</span>` : ""}</button>`).join("") + `<input class="in search" id="search" placeholder="${t("search")}" value="${esc(q)}"/>`;
+  $("#toolbar").innerHTML = Object.keys(f).filter((k) => (k !== "na" || isDispatch()) && (k !== "asm" || isAdmin())).map((k) => `<button type="button" class="chip${k === "na" ? " na" : ""}${k === "asm" ? " asm" : ""} ${filter === k ? "on" : ""}" data-f="${k}">${f[k]}${k === "ready" ? ` <span class="n" id="readyN">0</span>` : ""}${k === "na" ? ` <span class="n" id="naN">0</span>` : ""}${k === "asm" ? ` <span class="n" id="asmN">0</span>` : ""}</button>`).join("") + (isAdmin() ? `<button type="button" class="chip newo" id="newOrder">${t("newOrder").btn}</button>` : "") + `<input class="in search" id="search" placeholder="${t("search")}" value="${esc(q)}"/>`;
   $("#toolbar").querySelectorAll("[data-f]").forEach((b) => b.addEventListener("click", () => { filter = b.dataset.f; renderToolbar(); renderBoard(); }));
+  const no = $("#newOrder"); if (no) no.addEventListener("click", openOrders);
   $("#search").addEventListener("input", (e) => { q = e.target.value.toLowerCase(); renderBoard(); });
   paintReady();
 }
+/* ---- Nouvelle commande pour un client (19/10). L'équipe (admin, dispatch, qualité) ouvre l'espace de dépôt de n'importe quel studio,
+   code d'accès déjà rempli : Putu dépose ainsi à la main les rushes, le brief et les formats de The Move Miami. La commande passe par
+   la RPC create_order comme une commande client (source « espace »), avec details.deposited_by = qui l'a déposée (paramètre ?by=).
+   Lecture de studios.access_token : politique RLS studios_team (admin/dispatcher/qc) — un monteur ne voit ni le bouton ni les codes. */
+let studiosCache = null, ordQ = "";
+async function openOrders() {
+  const O = t("newOrder"); $("#ordT").textContent = O.title; $("#ordH").textContent = O.hint; $("#ordQ").placeholder = O.search; $("#ordQ").value = ordQ; $("#ordm").hidden = false;
+  if (!studiosCache) {
+    $("#ordL").innerHTML = `<p class="hint">${esc(O.loading)}</p>`;
+    const { data, error } = await sb.from("studios").select("slug,name,lang,access_token").order("name");
+    if (error) { $("#ordL").innerHTML = `<p class="hint">${esc(O.err)} ${esc(error.message)}</p>`; return; }
+    studiosCache = (data || []).filter((s) => s.access_token);
+  }
+  renderOrders(); $("#ordQ").focus();
+}
+function renderOrders() {
+  const O = t("newOrder"); const by = encodeURIComponent((profile && profile.display_name) || (me && me.email) || "");
+  const list = (studiosCache || []).filter((s) => !ordQ || `${s.name} ${s.slug}`.toLowerCase().includes(ordQ));
+  const url = (page, s) => `../client/${page}.html?client=${encodeURIComponent(s.slug)}&k=${encodeURIComponent(s.access_token)}&lang=${s.lang === "en" ? "en" : "fr"}${page === "depot" && by ? `&by=${by}` : ""}`;
+  $("#ordL").innerHTML = (list.length ? list.map((s) => `<div class="st"><div class="nm">${esc(s.name)}<small class="mono">${esc(s.slug)} · ${esc((s.lang || "fr").toUpperCase())}</small></div><a class="btn ghost" href="${url("espace", s)}" target="_blank" rel="noopener noreferrer">${esc(O.space)}</a><a class="btn" href="${url("depot", s)}" target="_blank" rel="noopener noreferrer">${esc(O.depot)}</a></div>`).join("") : `<p class="hint">${esc(O.empty)}</p>`);
+}
+const closeOrders = () => { $("#ordm").hidden = true; };
+$("#ordX").addEventListener("click", closeOrders);
+$("#ordm").addEventListener("click", (e) => { if (e.target === $("#ordm")) closeOrders(); });
+$("#ordQ").addEventListener("input", (e) => { ordQ = e.target.value.trim().toLowerCase(); renderOrders(); });
+document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("#ordm").hidden) closeOrders(); });
+
 function visible() {
   return byEditor(jobs).filter((j) => {
     if (filter === "na" && !isUnassigned(j)) return false;
@@ -1000,7 +1054,8 @@ function renderBoard() {
 // monteur (lien) : le brief d'abord, en grand ; contact et montants ne sont de toute façon jamais envoyés par la base
 function briefBlock(j) {
   const L = t("lk"), link = (u) => `<a href="${safeUrl(u)}" target="_blank" rel="noopener noreferrer">${esc(u)}</a>`, refs = (j.references_links || []).filter(Boolean);
-  return `<div class="bf"><b>${L.brief}</b>${j.work_to_do ? `<span class="wk2">${esc(j.work_to_do)}</span>` : ""}<span class="tx">${esc(j.description || "—")}</span>${j.brief_url ? `<div class="links"><a href="${safeUrl(j.brief_url)}" target="_blank" rel="noopener noreferrer">${t("brief")}</a></div>` : ""}${refs.length ? `<div class="links"><b>${L.refs}</b>${refs.map(link).join("")}</div>` : ""}${j.logos ? `<div style="margin-top:8px"><b>${L.logos}</b><span class="tx">${esc(j.logos)}</span></div>` : ""}</div>`;
+  const depBy = j.details && j.details.deposited_by ? `<span class="tx" style="color:var(--taupe)">${esc(t("newOrder").by(j.details.deposited_by))}</span>` : "";
+  return `<div class="bf"><b>${L.brief}</b>${depBy}${j.work_to_do ? `<span class="wk2">${esc(j.work_to_do)}</span>` : ""}<span class="tx">${esc(j.description || "—")}</span>${j.brief_url ? `<div class="links"><a href="${safeUrl(j.brief_url)}" target="_blank" rel="noopener noreferrer">${t("brief")}</a></div>` : ""}${refs.length ? `<div class="links"><b>${L.refs}</b>${refs.map(link).join("")}</div>` : ""}${j.logos ? `<div style="margin-top:8px"><b>${L.logos}</b><span class="tx">${esc(j.logos)}</span></div>` : ""}</div>`;
 }
 function amountBlock(j) {
   const s = studios.find((x) => x.id === j.studio_id); const cur = s ? s.currency : "EUR";

@@ -255,6 +255,7 @@
     /* avertissement d'accès : visible sur TOUTES les étapes, pas seulement la première */
     .warn{flex-basis:100%;order:-2;font-size:13px;line-height:1.45;color:var(--taupe);text-align:center;padding:8px 12px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.04)}
     .warn:empty{display:none}
+    .warn.team{color:var(--cream);border-color:rgba(220,227,234,.35);background:rgba(220,227,234,.10)}
     .warn a{color:var(--accent-blue);text-decoration:underline;text-underline-offset:2px}
 
     /* page périmée : GitHub Pages sert le HTML avec « Cache-Control: max-age=600 » et ne laisse pas régler
@@ -487,6 +488,8 @@
            Tant qu'il est là, « Envoyer » est désactivé : aucune commande au vieux format ne peut partir. -->
       <div class="stale" id="staleWarn" hidden><span data-i="stale.text"></span><button type="button" class="btn ghost" id="staleReload" data-i="stale.btn"></button></div>
       <!-- avertissement d'accès : rendu à chaque étape par renderNav, il ne disparaît plus au premier « Continuer » -->
+      <!-- dépôt interne (?by=) : rappel à chaque étape que l'équipe remplit pour le client -->
+      <div class="warn team" id="teamNote"></div>
       <div class="warn" id="keyWarn"></div>
       <div class="msg" id="msg"></div>
       <button type="button" class="btn ghost" id="prev" data-i="btn.prev"></button>
@@ -604,6 +607,7 @@ const I18N = {
     units:{episode:["épisode","épisodes"],reel_basique:["reel standard","reels standard"],reel_signature:["reel premium","reels premium"],miniature:["miniature","miniatures"],trailer:["trailer","trailers"]},
     err:{projet:"Donnez un nom au projet.",produit0:"Choisissez ce que vous nous confiez, à l'étape 01 — Produit.",produit:"Votre commande est encore vide : choisissez un produit à l'étape 01 — Produit et sa formule à l'étape 02 — Formule, ou un de vos packs à l'étape 01 sous « Vos vidéos ».",noVideo:"Il manque la vidéo : les extras s'ajoutent à un épisode ou à un pack. Choisissez votre épisode à l'étape 02 — Formule, ou un de vos packs à l'étape 01 — Produit. On garde le reste de votre sélection.",formule:"Choisissez une formule ou un pack à l'étape 02 — Formule.",rushes:"Ajoutez au moins un lien de rushes.",rushesBad:"Un de vos liens de rushes n'est pas un fichier téléchargeable (étape 04 — Fichiers) : corrigez-le, ou déplacez-le vers les vidéos d'inspiration.",description:"Décrivez ce que vous attendez, même en trois lignes.",contact:"Indiquez un contact et un moyen de le joindre.",email:"Indiquez un e-mail valide, c'est là qu'arrivent la confirmation et le suivi.",send:"L'envoi a échoué. Réessayez, ou écrivez-nous sur WhatsApp.",terms:"Cochez les conditions de collaboration pour envoyer la commande.",
       key:"Ouvrez cet espace depuis votre lien personnel ou l'Espace client pour envoyer votre commande.",keyLink:"Aller à l'Espace client",bad_key:"Votre accès n'est pas reconnu pour ce studio. Ouvrez cet espace depuis votre lien personnel ou l'Espace client.",bad_email:"L'e-mail n'est pas valide. Corrigez-le à l'étape Brief.",no_project:"Donnez un nom au projet, à l'étape Produit.",no_rushes:"Aucun lien de rushes valide. Collez au moins un lien complet (https://…) à l'étape Fichiers.",rate_limit:"Beaucoup de commandes viennent d'être envoyées depuis cet espace. Réessayez dans une heure, ou écrivez-nous sur WhatsApp."},
+    "team.note":"Dépôt interne par {n} pour le compte du client. L'e-mail saisi à l'étape Brief recevra les mails automatiques (confirmation, suivi, facture) : mets le tien si le client ne doit rien recevoir.",
     "s6.terms":"J'accepte les conditions de collaboration DS Editing : facture hebdomadaire, paiement à réception, pénalité de 20 % par semaine de retard.","s6.termsLink":"Lire les conditions","ok.space":"Ouvrir mon espace (commandes, factures)",
     "ok.track":"Votre numéro de suivi","ok.trackHint":"Gardez-le : il est aussi dans votre e-mail de confirmation.","ok.follow":"Suivre ma commande",
     "ok.title":"C'est parti","ok.text":"Votre projet est chez nous. Vous recevrez un lien de relecture frame.io dès que le premier montage sera prêt.",
@@ -670,6 +674,7 @@ const I18N = {
     units:{episode:["episode","episodes"],reel_basique:["standard reel","standard reels"],reel_signature:["premium reel","premium reels"],miniature:["thumbnail","thumbnails"],trailer:["trailer","trailers"]},
     err:{projet:"Give the project a name.",produit0:"Choose what you're sending us, in step 01 — Product.",produit:"Your order is still empty: pick a product in step 01 — Product and its package in step 02 — Package, or one of your packs in step 01 under “Your videos”.",noVideo:"The video itself is missing: extras come on top of an episode or a pack. Pick your episode in step 02 — Package, or one of your packs in step 01 — Product. We keep the rest of your selection.",formule:"Choose a package or a pack in step 02 — Package.",rushes:"Add at least one footage link.",rushesBad:"One of your footage links isn't a downloadable file (step 04 — Files): fix it, or move it to the inspiration videos.",description:"Describe what you expect, even in three lines.",contact:"Give us a contact and a way to reach them.",email:"Enter a valid email, that's where the confirmation and tracking go.",send:"Sending failed. Try again, or message us on WhatsApp.",terms:"Tick the terms of collaboration to send the order.",
       key:"Open this space from your personal link or the Client space to send your order.",keyLink:"Go to the Client space",bad_key:"Your access isn't recognised for this studio. Open this space from your personal link or the Client space.",bad_email:"The email isn't valid. Fix it in the Brief step.",no_project:"Give the project a name, in the Product step.",no_rushes:"No valid footage link. Paste at least one full link (https://…) in the Files step.",rate_limit:"A lot of orders were just sent from this space. Try again in an hour, or message us on WhatsApp."},
+    "team.note":"Internal order placed by {n} on behalf of the client. The email entered in the Brief step receives the automatic emails (confirmation, tracking, invoice): use yours if the client must not receive anything.",
     "s6.terms":"I accept the DS Editing terms of collaboration: weekly invoice, payment on receipt, 20% penalty per week late.","s6.termsLink":"Read the terms","ok.space":"Open my space (orders, invoices)",
     "ok.track":"Your tracking number","ok.trackHint":"Keep it: it's also in your confirmation email.","ok.follow":"Track my order",
     "ok.title":"You're all set","ok.text":"Your project is with us. You'll get a frame.io review link as soon as the first cut is ready.",
@@ -853,6 +858,9 @@ const t = (k) => (I18N[lang][k] ?? k);
 const SB_URL = "https://xkanmjlpysxpohsuqvwg.supabase.co";
 const SB_KEY = "sb_publishable_lIZtV_WtN5NcGSb0dnfaiQ_AgKYBIVa"; // clé publique
 const accessKey = (params.get("k") || (() => { try { return localStorage.getItem("ds_client_key"); } catch { return null; } })() || "").trim();
+// Dépôt interne (19/10) : ouvert depuis le dashboard équipe (« + Nouvelle commande »), ?by=<prénom> = qui dépose pour le compte du client.
+// Même circuit que le client (create_order), seule trace : details.deposited_by + un bandeau. Sans ?by, rien ne change pour le client.
+const BY = (params.get("by") || "").trim().slice(0, 60);
 let studio = null;      // { slug, name, lang } retrouvé depuis la clé (RPC client_slug)
 let langTouched = false; // la langue choisie à la main l'emporte sur celle du studio
 let orderToken = "";    // numéro de suivi, une fois la commande enregistrée
@@ -888,6 +896,7 @@ function applyText() {
   document.querySelectorAll("[data-ph]").forEach((el) => { el.placeholder = t(el.dataset.ph); });
   $("#langBtn").textContent = lang === "fr" ? "EN" : "FR";
   $("#clientName").textContent = clientLabel();
+  $("#teamNote").textContent = BY ? String(t("team.note")).replace("{n}", BY) : "";
   document.title = "DS Editing — " + (lang === "fr" ? "Nouveau projet" : "New project");
   if (orderToken) $("#trackLink").href = trackHref();
   renderSteps(); renderThumbs(); renderQty(); renderChips(); renderLinks("rushes"); renderLinks("references"); renderBrandkit(); renderCTA(); rerender();
@@ -1518,6 +1527,7 @@ function order() {
     autre_demande: autreDemande(v), palette: v.palette, logos: v.logos,
     cta: draft.cta || "", cta_reseaux: draft.cta === "yes" ? (draft.ctaNets || "") : "", font: draft.font === "team" ? "team" : (draft.fontName || ""), autres: v.autres,
   };
+  if (BY) details.deposited_by = BY;   // dépôt interne : affiché sur la commande dans le dashboard équipe
   // Le brief du monteur annonce le nombre RÉEL de reels à produire (inclus compris), la facture non.
   const brief = Object.assign({}, details, { units: N, reels: n(q.reel_basique), reels_signature: n(q.reel_signature), single_cam: k === "single_cam_4k" ? String(N) : "", multicam: k === "multicam_4k" ? String(N) : "" });
   return { project: v.projet.trim(), email: v.email.trim(), contact: v.contact, lang, work_to_do: workToDo(brief), details, rushes_links: linkList("rushes"), references_links: linkList("references"), logos: v.logos, description: v.description, deadline: v.deadline, terms_accepted: $("#terms").checked, terms_text: t("s6.terms") };
