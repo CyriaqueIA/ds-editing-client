@@ -1638,7 +1638,7 @@ function wireNewClient() {
     $("#ncGo").disabled = false;
     if (error) { $("#ncMsg").textContent = error.message; return; }
     await loadAdmin(); tarifStudio = data && data.id ? data.id : tarifStudio; renderTarifs();
-    const m = $("#ncMsg"); if (m) m.textContent = N.ok(data.name, data.grid_rows);
+    const m = $("#ncMsg"); if (m) m.textContent = N.ok(data.name, grids.filter((g) => g.studio_id === data.id && g.unit_price != null).length);   // compte réel des prix posés (la base pose aussi une grille par défaut à la création)
   });
 }
 function renderTarifs() {
