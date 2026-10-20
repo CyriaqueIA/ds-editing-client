@@ -92,6 +92,8 @@
     .c .ex{display:block;margin-top:8px;font-size:12px;line-height:1.4;color:var(--accent-blue)}
     /* prix d'appel d'un type (01) : « à partir de … / épisode » — plus long qu'une pastille de prix, il a le droit de passer à la ligne */
     .c .price.unit{white-space:normal;text-align:right;max-width:52%;line-height:1.35}
+    /* dépôt interne sans prix (?np=1) : rien qui ressemble à un montant, même vide */
+    html.np .price,html.np .oprice,html.np .parts b,html.np .parts s,html.np .parts .tag,html.np .promo{display:none!important}
     .promo{display:flex;flex-direction:column;gap:6px;margin-top:2px}
     .promo .row{display:flex;align-items:center;flex-wrap:wrap;gap:8px;font-size:13px;font-variant-numeric:tabular-nums}
     .promo .tag{font-weight:600;font-size:11px;letter-spacing:.06em;text-transform:uppercase;border-radius:999px;padding:3px 9px;color:#0A0B0D;background:rgba(255,255,255,.85)}
@@ -762,7 +764,7 @@ const num = (x) => (x === null || x === undefined || x === "" ? NaN : Number(x))
    EUR → « 1 234,50 € » en français, « €1,234.50 » en anglais : un studio en euros lu en anglais
    affichait « 169,90 € », illisible pour un client américain. Devise inconnue → nombre seul, jamais un
    mauvais symbole. Les deux cas USD et EUR sont nommés ici, donc aucune devise n'hérite d'un autre format. */
-const money = (x, cur) => { const v = Number(x), o = { minimumFractionDigits: Number.isInteger(v) ? 0 : 2, maximumFractionDigits: 2 }, loc = lang === "fr" ? "fr-FR" : "en-US"; return cur === "USD" ? "$" + v.toLocaleString("en-US", o) : cur === "EUR" ? (lang === "fr" ? v.toLocaleString("fr-FR", o) + " €" : "€" + v.toLocaleString("en-US", o)) : v.toLocaleString(loc, o); };
+const money = (x, cur) => { if (NO_PRICE) return ""; const v = Number(x), o = { minimumFractionDigits: Number.isInteger(v) ? 0 : 2, maximumFractionDigits: 2 }, loc = lang === "fr" ? "fr-FR" : "en-US"; return cur === "USD" ? "$" + v.toLocaleString("en-US", o) : cur === "EUR" ? (lang === "fr" ? v.toLocaleString("fr-FR", o) + " €" : "€" + v.toLocaleString("en-US", o)) : v.toLocaleString(loc, o); };
 // LE prix affiché, partout : celui de la grille du client, à l'unité de CE qu'on vend (une vidéo, ou un pack
 // avec son contenu détaillé juste en dessous). Jamais une moyenne « pack ÷ 4 vidéos » : elle mélangeait
 // épisode et reels et trompait le client. Rien de posé pour ce client → « Sur devis ».
@@ -868,6 +870,9 @@ const accessKey = (params.get("k") || (() => { try { return localStorage.getItem
 // Dépôt interne (19/10) : ouvert depuis le dashboard équipe (« + Nouvelle commande »), ?by=<prénom> = qui dépose pour le compte du client.
 // Même circuit que le client (create_order), seule trace : details.deposited_by + un bandeau. Sans ?by, rien ne change pour le client.
 const BY = (params.get("by") || "").trim().slice(0, 60);
+// Dépôt interne SANS prix (20/10, QCM prix & accès q8) : ?np=1 posé par le dashboard pour qui n'a pas les prix (Putu). Aucun montant, aucun total, aucune promo à l'écran.
+const NO_PRICE = BY !== "" && params.get("np") === "1";
+if (NO_PRICE) document.documentElement.classList.add("np");
 let studio = null;      // { slug, name, lang } retrouvé depuis la clé (RPC client_slug)
 let langTouched = false; // la langue choisie à la main l'emporte sur celle du studio
 let orderToken = "";    // numéro de suivi, une fois la commande enregistrée
@@ -987,7 +992,7 @@ function toggleQty(k) {
    « à partir de 0 € » en tête de l'écran 01. Plus aucun prix valide → carte sans prix, comme avant. */
 const fromPrice = (p) => { const v = (p === REEL_ONLY ? REELS.map((k) => REEL_DB[k]) : epKeys(p)).filter((k) => !isBundle(k) && hasPrice(k) && prices[k] > 0).map((k) => prices[k]); return v.length ? Math.min(...v) : null; };
 // L'unité suit le type : un VSL ou une face cam n'est pas un « épisode ».
-const fromTxt = (p) => { const v = fromPrice(p); return v === null ? "" : esc(t("x.from").replace("{p}", money(v, cur)).replace("{u}", t("prodUnit")[p] || "")); };
+const fromTxt = (p) => { const v = fromPrice(p); return v === null || NO_PRICE ? "" : esc(t("x.from").replace("{p}", money(v, cur)).replace("{u}", t("prodUnit")[p] || "")); };
 // 01 Produit : le TYPE, son exemple et son prix d'appel à l'unité. Un seul produit à la fois.
 function renderProduit() {
   const p = t("produit"), ex = t("prodEx");
@@ -1228,7 +1233,7 @@ const lineAmount = (l) => Math.round(l.qty * l.unit * 100) / 100;      // price_
 const orderTotal = () => { const l = orderLines(); return l.length && l.every((x) => x.unit !== null) ? l.reduce((s, x) => s + lineAmount(x), 0) : null; };
 // Le détail des prix du récap : à l'unité, ligne par ligne, puis le total. Plus aucun « Sur devis » en dur.
 function priceText() {
-  const l = orderLines(); if (!l.length) return "";
+  const l = orderLines(); if (!l.length || NO_PRICE) return "";
   const tot = orderTotal();
   return l.map((x) => `${x.qty} × ${offerLabel(x.key)} — ${x.unit === null ? t("quote") : `${money(x.unit, cur)}${x.qty > 1 ? ` = ${money(lineAmount(x), cur)}` : ""}`}`)
     .concat(tot === null ? t("quoteLong") : `${t("total")} : ${money(tot, cur)}`).join("\n");
@@ -1240,14 +1245,14 @@ function renderNav() {
      monter dès son premier clic, alors que la règle maison est le prix à l'unité. Elle dit ce qu'il a choisi
      et que son brouillon est gardé. Le total chiffré n'apparaît qu'au récap, après les lignes à l'unité. */
   const c = commande(), tot = step === 5 ? orderTotal() : undefined;
-  const totTxt = tot === undefined ? "" : `${esc(tot === null ? t("quote") : money(tot, cur))} · `;
+  const totTxt = tot === undefined || NO_PRICE ? "" : `${esc(tot === null ? t("quote") : money(tot, cur))} · `;
   $("#summary").innerHTML = c ? `<b>${esc(c)}</b><br/>${totTxt}${t("saved")}` : `${t("empty")}<br/>${t("saved")}`;
   $("#keyWarn").innerHTML = accessWarn;                                // visible à chaque étape, pas seulement à la première
   renderStale();                                                       // bandeau « page périmée » + bouton d'envoi éteint, à chaque étape
 }
 function renderRecap() {
   const v = values(); const r = t("recap"); const none = t("none");
-  const rows = [["projet", v.projet], ["commande", v.commande], ["prix", priceText()], ["autre_demande", v.autre_demande], ["rushes", v.rushes], ["logos", v.logos], ["references", v.references], ["description", v.description], ["palette", v.palette], ["deadline", v.deadline], ["contact", v.contact], ["email", v.email], ["autres", v.autres]];
+  const rows = [["projet", v.projet], ["commande", v.commande], ...(NO_PRICE ? [] : [["prix", priceText()]]), ["autre_demande", v.autre_demande], ["rushes", v.rushes], ["logos", v.logos], ["references", v.references], ["description", v.description], ["palette", v.palette], ["deadline", v.deadline], ["contact", v.contact], ["email", v.email], ["autres", v.autres]];
   $("#recap").innerHTML = rows.map(([k, val]) => `<div class="${["description", "rushes", "commande", "prix"].includes(k) ? "full" : ""}"><div class="k">${r[k]}</div><div class="v">${esc(val || none)}</div></div>`).join("");
 }
 function esc(s) { return String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }

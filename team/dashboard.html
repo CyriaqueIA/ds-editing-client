@@ -569,6 +569,7 @@ const T = {
     keys: { podcast_standard: "Épisode podcast · Standard", podcast_premium: "Épisode podcast · Premium", single_cam_4k: "Single cam 4K edit", multicam_4k: "Multicam 4K edit", bundle_standard: "Bundle Standard", bundle_premium: "Bundle Premium", reel_standard: "Reel standard", reel_premium: "Reel premium", facecam_simple: "Face cam Simple", facecam_dynamique: "Face cam Dynamique", facecam_signature: "Face cam Signature", vsl_standard: "VSL · Standard", vsl_premium: "VSL · Premium", intro: "Intro", miniature: "Miniature", trailer: "Trailer", cta: "CTA réseaux sociaux", extra_30min: "Supplément 30 min" },
     grp: { episodes: "Épisodes", bundles: "Bundles", reels: "Reels", facecam: "Face cam", vsl: "VSL", extras: "Extras", episode: "Épisodes", bundle: "Bundles", reel: "Reels", revision: "Révisions", pack_client: "Packs client", extra: "Extras", legacy: "Anciennes clés" }, bundleHelp: "Épisode + 3 reels du niveau inclus ; reels en plus au prix normal",
     dupWarn: "Ce client a des packs. Les prix d'épisode et de bundle ci-dessous font doublon et seront masqués dans son espace.",
+    newClient: { btn: "+ Nouveau client", title: "Nouveau client", name: "Nom du studio", slug: "Adresse courte (vide = déduite du nom)", lang: "Langue de l'espace", currency: "Devise", email: "E-mail de facturation", contact: "Contact", go: "Créer avec la grille standard", cancel: "Annuler", hint: "La grille standard (prix le plus courant par offre dans cette devise) est posée d'office : ajuste ensuite case par case. Le code d'accès est généré.", ok: (n, r) => `✓ ${n} créé · ${r} prix posés`, nameReq: "Le nom est obligatoire." },
     tarifsHint: "Prix unitaires par client, dans sa devise. Vide = pas encore fixé : la commande validée attend un prix avant d'être facturée.", clientSel: "Client", saved: "enregistré", recalcAll: "Recalculer les commandes validées", space: "Espace client", billing: "Facturation", billingName: "Raison sociale", billingAddress: "Adresse (une ligne par ligne)", billingEmail: "E-mail de facturation", attention: "À l'attention de", currency: "Devise", tvaL: "TVA",
     factHint: "Une facture par client et par semaine, générée le dimanche à 23 h 50 (Bali). Relance automatique 2 jours après l'envoi.", cols: ["N°", "Client", "Semaine", "Total", "Statut", "Envoyée", ""], markPaid: "Marquer payée", paid: "Payée", issued: "Émise", cancel: "Annuler", extrasTitle: "Lignes manuelles (facturées avec la prochaine facture)", label: "Libellé", qty: "Qté", unit: "Prix unitaire", offered: "Offert", add: "Ajouter", pending: "En attente de facturation", none: "Aucune", del: "Supprimer",
     rdv: { settingsTitle: "Disponibilités", hint: "Créneaux proposés sur le site (boutons « Réserver un appel »), en heure de Paris. Deux plages max par jour ; jour vide = fermé. Le prospect voit les horaires dans son propre fuseau.",
@@ -634,6 +635,7 @@ const T = {
     keys: { podcast_standard: "Podcast episode · Standard", podcast_premium: "Podcast episode · Premium", single_cam_4k: "Single-cam 4K edit", multicam_4k: "Multicam 4K edit", bundle_standard: "Standard Bundle", bundle_premium: "Premium Bundle", reel_standard: "Standard reel", reel_premium: "Premium reel", facecam_simple: "Face cam Simple", facecam_dynamique: "Face cam Dynamic", facecam_signature: "Face cam Signature", vsl_standard: "VSL · Standard", vsl_premium: "VSL · Premium", intro: "Intro", miniature: "Thumbnail", trailer: "Trailer", cta: "Social CTA", extra_30min: "Extra 30 min" },
     grp: { episodes: "Episodes", bundles: "Bundles", reels: "Reels", facecam: "Face cam", vsl: "VSL", extras: "Extras", episode: "Episodes", bundle: "Bundles", reel: "Reels", revision: "Revisions", pack_client: "Client packs", extra: "Extras", legacy: "Legacy keys" }, bundleHelp: "Episode + 3 reels of the tier included; extra reels at the normal price",
     dupWarn: "This client has packs. The episode and bundle prices below overlap and are hidden in their space.",
+    newClient: { btn: "+ New client", title: "New client", name: "Studio name", slug: "Short address (empty = derived from the name)", lang: "Space language", currency: "Currency", email: "Billing email", contact: "Contact", go: "Create with the standard grid", cancel: "Cancel", hint: "The standard grid (most common price per offer in this currency) is applied right away: adjust cell by cell afterwards. The access code is generated.", ok: (n, r) => `✓ ${n} created · ${r} prices set`, nameReq: "The name is required." },
     tarifsHint: "Unit prices per client, in their currency. Empty = not set yet: the approved order waits for a price before being invoiced.", clientSel: "Client", saved: "saved", recalcAll: "Recalculate approved orders", space: "Client space", billing: "Billing", billingName: "Legal name", billingAddress: "Address (one line per line)", billingEmail: "Billing email", attention: "Attention", currency: "Currency", tvaL: "VAT",
     factHint: "One invoice per client per week, generated Sunday 11:50 pm (Bali). Automatic reminder 2 days after sending.", cols: ["No.", "Client", "Week", "Total", "Status", "Sent", ""], markPaid: "Mark paid", paid: "Paid", issued: "Issued", cancel: "Cancel", extrasTitle: "Manual lines (billed with the next invoice)", label: "Label", qty: "Qty", unit: "Unit price", offered: "Complimentary", add: "Add", pending: "Waiting for invoicing", none: "None", del: "Delete",
     rdv: { settingsTitle: "Availability", hint: "Slots offered on the website (“Book a call” buttons), Paris time. Up to two ranges per day; empty day = closed. Prospects see the times in their own time zone.",
@@ -727,7 +729,9 @@ const isLate = (j) => !isDone(j) && remaining(j) < 0;
 const cls = (j) => isDone(j) ? "done" : remaining(j) < 0 ? "r" : remaining(j) < 2 * 86400000 ? "o" : "g";
 const canRecruit = () => !!profile && profile.can_recruit === true;   // données candidats : drapeau profiles.can_recruit (supabase/recruitment_v2.sql), en plus du rôle
 const isAdmin = () => profile && ["admin", "dispatcher", "qc"].includes(profile.role);
-const canMoney = () => !!profile && profile.role === "admin";   // 14/10 (QCM q10) : Tarifs et Factures réservés au rôle admin — Putu (dispatcher) et la qualité ne voient jamais les prix. NB : le vrai verrou en base (RLS price_grids/invoices autorise encore dispatcher et qc) reste à poser.
+const canMoney = () => !!profile && profile.role === "admin";
+// 20/10 (QCM prix & accès q2) : Rania = onglet Tarifs + création de clients (drapeau profiles.can_price, supabase/vue_equipe_v1.sql), SANS factures ni montants. Putu : jamais.
+const canTarifs = () => !!profile && (profile.role === "admin" || profile.can_price === true);   // 14/10 (QCM q10) : Tarifs et Factures réservés au rôle admin — Putu (dispatcher) et la qualité ne voient jamais les prix. NB : le vrai verrou en base (RLS price_grids/invoices autorise encore dispatcher et qc) reste à poser.
 const isEditor = () => !!profile && profile.role === "editor";
 const isDispatch = () => LINKED && !!profile && profile.role === "dispatcher";
 const FRAME_OK = (u) => /^https?:\/\//i.test(String(u || "").trim());
@@ -976,7 +980,7 @@ async function openOrders() {
 function renderOrders() {
   const O = t("newOrder"); const by = encodeURIComponent((profile && profile.display_name) || (me && me.email) || "");
   const list = (studiosCache || []).filter((s) => !ordQ || `${s.name} ${s.slug}`.toLowerCase().includes(ordQ));
-  const url = (page, s) => `../client/${page}.html?client=${encodeURIComponent(s.slug)}&k=${encodeURIComponent(s.access_token)}&lang=${s.lang === "en" ? "en" : "fr"}${page === "depot" && by ? `&by=${by}` : ""}`;
+  const url = (page, s) => `../client/${page}.html?client=${encodeURIComponent(s.slug)}&k=${encodeURIComponent(s.access_token)}&lang=${s.lang === "en" ? "en" : "fr"}${page === "depot" && by ? `&by=${by}` : ""}${page === "depot" && !canMoney() ? "&np=1" : ""}`;   // np=1 (20/10, QCM q8) : dépôt interne SANS prix pour qui n'a pas les prix (Putu)
   $("#ordL").innerHTML = (list.length ? list.map((s) => `<div class="st"><div class="nm">${esc(s.name)}<small class="mono">${esc(s.slug)} · ${esc((s.lang || "fr").toUpperCase())}</small></div><a class="btn ghost" href="${url("espace", s)}" target="_blank" rel="noopener noreferrer">${esc(O.space)}</a><a class="btn" href="${url("depot", s)}" target="_blank" rel="noopener noreferrer">${esc(O.depot)}</a></div>`).join("") : `<p class="hint">${esc(O.empty)}</p>`);
 }
 const closeOrders = () => { $("#ordm").hidden = true; };
@@ -1070,7 +1074,7 @@ function amountBlock(j) {
 }
 function wireBoard() {
   const B = $("#board");
-  B.querySelectorAll("[data-recalc]").forEach((b) => b.addEventListener("click", async () => { const { error } = await sb.rpc("price_job", { p_job: b.dataset.recalc }); if (error) alert(error.message); await load(false); }));
+  B.querySelectorAll("[data-recalc]").forEach((b) => b.addEventListener("click", async () => { const { error } = await sb.rpc("price_job_team",{ p_job: b.dataset.recalc }); if (error) alert(error.message); await load(false); }));
   B.querySelectorAll("[data-more]").forEach((b) => b.addEventListener("click", () => { const on = b.closest(".job").classList.toggle("open"); on ? openIds.add(b.dataset.more) : openIds.delete(b.dataset.more); }));
   B.querySelectorAll("[data-copy]").forEach((b) => b.addEventListener("click", async () => {
     const j = jobs.find((x) => x.id === b.dataset.copy); if (!j || !j.files_path) return;
@@ -1380,8 +1384,8 @@ setInterval(() => { document.querySelectorAll("[data-cd]").forEach((el) => { con
 /* ===== onglets admin : Tarifs, Factures ===== */
 function renderTabs() {
   if (!isAdmin() || LINKED) return; $("#tabs").hidden = false;
-  if ((tab === "grille" && !canGrille()) || (tab === "rituels" && !canRituals()) || ((tab === "tarifs" || tab === "factures") && !canMoney())) { tab = "prod"; const u = new URL(location.href); u.searchParams.delete("tab"); history.replaceState(null, "", u); }   // onglet Grille / Rituels / Tarifs / Factures demandé par l'adresse sans y avoir droit : retour à la production, rien ne s'affiche
-  $("#tabs").innerHTML = ["prod", "equipe", ...(canMoney() ? ["tarifs", "factures"] : []), "rdv", ...(canRecruit() ? ["recrut"] : []), ...(canGrille() ? ["grille"] : []), ...(canRituals() ? ["rituels"] : [])].map((k) => `<button type="button" class="tab ${tab === k ? "on" : ""}" data-tab="${k}">${t("tabs")[k]}</button>`).join("");
+  if ((tab === "grille" && !canGrille()) || (tab === "rituels" && !canRituals()) || (tab === "tarifs" && !canTarifs()) || (tab === "factures" && !canMoney())) { tab = "prod"; const u = new URL(location.href); u.searchParams.delete("tab"); history.replaceState(null, "", u); }   // onglet Grille / Rituels / Tarifs / Factures demandé par l'adresse sans y avoir droit : retour à la production, rien ne s'affiche
+  $("#tabs").innerHTML = ["prod", "equipe", ...(canTarifs() ? ["tarifs"] : []), ...(canMoney() ? ["factures"] : []), "rdv", ...(canRecruit() ? ["recrut"] : []), ...(canGrille() ? ["grille"] : []), ...(canRituals() ? ["rituels"] : [])].map((k) => `<button type="button" class="tab ${tab === k ? "on" : ""}" data-tab="${k}">${t("tabs")[k]}</button>`).join("");
   $("#tabs").querySelectorAll("[data-tab]").forEach((b) => b.addEventListener("click", () => { tab = b.dataset.tab; const u = new URL(location.href); tab === "prod" ? u.searchParams.delete("tab") : u.searchParams.set("tab", tab); history.replaceState(null, "", u); renderTabs(); renderAdmin(); }));
   renderAdmin();
 }
@@ -1610,9 +1614,36 @@ function dupOverlap(studioId) {
   return has(["pack_client"]) && has(["episode", "bundle"]);
 }
 function updDupWarn() { const el = $("#dupWarn"), s = studios.find((x) => x.id === tarifStudio); if (el) el.hidden = !(s && dupOverlap(s.id)); }
+// Nouveau client (20/10, QCM q3) : formulaire court → RPC studio_create (admin ou can_price) qui pose la grille standard et génère le code d'accès.
+function newClientPanel() {
+  const N = t("newClient");
+  return `<div class="panel" id="ncPanel"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><h3 style="margin:0">${esc(N.title)}</h3><button type="button" class="btn ghost" id="ncToggle" aria-expanded="false">${esc(N.btn)}</button><span id="ncMsg" style="font-size:12px;color:var(--ok)" role="status"></span></div>
+    <form id="ncForm" hidden style="margin-top:12px"><p style="font-size:12px;color:var(--taupe);margin:0 0 10px">${esc(N.hint)}</p><div class="grid">
+      <label>${esc(N.name)}<input class="in" id="ncName" required maxlength="80"/></label>
+      <label>${esc(N.slug)}<input class="in" id="ncSlug" maxlength="60" pattern="[a-z0-9-]*"/></label>
+      <label>${esc(N.lang)}<select class="in" id="ncLang"><option value="fr">FR</option><option value="en">EN</option></select></label>
+      <label>${esc(N.currency)}<select class="in" id="ncCur"><option>EUR</option><option>USD</option></select></label>
+      <label>${esc(N.email)}<input class="in" id="ncEmail" type="email" maxlength="120"/></label>
+      <label>${esc(N.contact)}<input class="in" id="ncContact" maxlength="80"/></label>
+    </div><div style="display:flex;gap:8px;margin-top:10px"><button type="submit" class="btn" id="ncGo">${esc(N.go)}</button><button type="button" class="btn ghost" id="ncCancel">${esc(N.cancel)}</button></div></form></div>`;
+}
+function wireNewClient() {
+  const N = t("newClient"), f = $("#ncForm"); if (!f) return;
+  $("#ncToggle").addEventListener("click", () => { f.hidden = !f.hidden; $("#ncToggle").setAttribute("aria-expanded", String(!f.hidden)); if (!f.hidden) $("#ncName").focus(); });
+  $("#ncCancel").addEventListener("click", () => { f.hidden = true; $("#ncToggle").setAttribute("aria-expanded", "false"); });
+  f.addEventListener("submit", async (ev) => {
+    ev.preventDefault(); const name = $("#ncName").value.trim(); if (!name) { $("#ncMsg").textContent = N.nameReq; return; }
+    $("#ncGo").disabled = true; $("#ncMsg").textContent = "…";
+    const { data, error } = await sb.rpc("studio_create", { p_name: name, p_slug: $("#ncSlug").value.trim() || null, p_lang: $("#ncLang").value, p_currency: $("#ncCur").value, p_billing_email: $("#ncEmail").value.trim() || null, p_contact_name: $("#ncContact").value.trim() || null });
+    $("#ncGo").disabled = false;
+    if (error) { $("#ncMsg").textContent = error.message; return; }
+    await loadAdmin(); tarifStudio = data && data.id ? data.id : tarifStudio; renderTarifs();
+    const m = $("#ncMsg"); if (m) m.textContent = N.ok(data.name, data.grid_rows);
+  });
+}
 function renderTarifs() {
   if (!tarifStudio && studios.length) tarifStudio = studios[0].id;
-  const s = studios.find((x) => x.id === tarifStudio); if (!s) { $("#admin").innerHTML = agentPanel(); wireAgentPanel(); return; }
+  const s = studios.find((x) => x.id === tarifStudio); if (!s) { $("#admin").innerHTML = newClientPanel() + agentPanel(); wireNewClient(); wireAgentPanel(); return; }
   const g = Object.fromEntries(grids.filter((x) => x.studio_id === s.id).map((x) => [x.item_key, x.unit_price]));
   const spaceUrl = `${location.origin}${location.pathname.replace(/team\/dashboard\.html$/, "")}client/espace.html?client=${s.slug}&k=${s.access_token}`;
   $("#admin").innerHTML = `<div class="panel">
@@ -1629,8 +1660,8 @@ function renderTarifs() {
       <label>${t("currency")}<select class="in" data-studio="currency"><option ${s.currency === "EUR" ? "selected" : ""}>EUR</option><option ${s.currency === "USD" ? "selected" : ""}>USD</option></select></label>
       <label>${t("tvaL")}<select class="in" data-studio="tva">${["ue", "hors_ue", "us", "none"].map((v) => `<option value="${v}" ${s.tva === v ? "selected" : ""}>${v}</option>`).join("")}</select></label>
       <label style="grid-column:1/-1">${t("billingAddress")}<textarea class="in" rows="3" data-studio="billing_address">${esc(s.billing_address || "")}</textarea></label>
-    </div></div>` + agentPanel();
-  wireAgentPanel(); updDupWarn();
+    </div></div>` + newClientPanel() + agentPanel();
+  wireNewClient(); wireAgentPanel(); updDupWarn();
   $("#tarifStudio").addEventListener("change", (e) => { tarifStudio = e.target.value; renderTarifs(); });
   $("#admin").querySelectorAll("[data-key]").forEach((i) => i.addEventListener("change", async () => {
     const v = i.value === "" ? null : Number(i.value);
@@ -1638,7 +1669,7 @@ function renderTarifs() {
     if (error) { alert(error.message); return; } $("#tarifMsg").textContent = "✓ " + t("saved"); setTimeout(() => { $("#tarifMsg").textContent = ""; }, 1500); await loadAdmin(); updDupWarn();
   }));
   $("#admin").querySelectorAll("[data-studio]").forEach((i) => i.addEventListener("change", async () => { const { error } = await sb.from("studios").update({ [i.dataset.studio]: i.value || null }).eq("id", s.id); if (error) alert(error.message); else { $("#tarifMsg").textContent = "✓ " + t("saved"); await loadAdmin(); } }));
-  $("#recalcAll").addEventListener("click", async () => { const list = jobs.filter((j) => j.studio_id === s.id && j.qc_status === "ok" && !j.invoice_id); for (const j of list) await sb.rpc("price_job", { p_job: j.id }); await load(false); $("#tarifMsg").textContent = `✓ ${list.length}`; });
+  $("#recalcAll").addEventListener("click", async () => { const list = jobs.filter((j) => j.studio_id === s.id && j.qc_status === "ok" && !j.invoice_id); for (const j of list) await sb.rpc("price_job_team",{ p_job: j.id }); await load(false); $("#tarifMsg").textContent = `✓ ${list.length}`; });
 }
 function renderFactures() {
   const stName = (id) => studios.find((x) => x.id === id)?.name || "—";
@@ -2067,6 +2098,8 @@ async function boot() {
     if (c.error) { linkScreen("down"); return; }   // écran « Service indisponible » + Réessayer ; aucune dégradation vers « editor »
     profile = c.profile || { role: "editor", display_name: me.email };
   }
+  // menu « Espaces » (nav.js) : il ne propose que ce que ce profil peut ouvrir (20/10, QCM prix & accès). Effacé à la déconnexion.
+  ls.set("ds_nav_role", canMoney() ? "admin" : canTarifs() ? "price" : "team"); ls.set("ds_nav_recruit", canRecruit() ? "1" : "0");
   renderWho();
   if (isSales()) { $("#logout").hidden = false; await bootSales(); return; }   // commercial sans ligne `profiles` : sa vue seulement, aucune requête de production
   $("#logout").hidden = !!OPEN_ACCESS && me.email === OPEN_ACCESS.email; $("#gate").hidden = true; $("#app").hidden = false; $("#live").hidden = false;
@@ -2085,7 +2118,7 @@ $("#loginBtn").addEventListener("click", async () => {
   location.reload();
 });
 $("#password").addEventListener("keydown", (e) => { if (e.key === "Enter") $("#loginBtn").click(); });
-$("#logout").addEventListener("click", async () => { ls.del(KEY_STORE); ls.del(ADM.until); if (LINKED) { location.replace(location.pathname + "?bye=1"); return; } await sb.auth.signOut(); location.reload(); });
+$("#logout").addEventListener("click", async () => { ls.del(KEY_STORE); ls.del(ADM.until); ls.del("ds_nav_role"); ls.del("ds_nav_recruit"); if (LINKED) { location.replace(location.pathname + "?bye=1"); return; } await sb.auth.signOut(); location.reload(); });
 $("#lkRetry").addEventListener("click", () => location.reload());
 $("#langBtn").addEventListener("click", () => { lang = lang === "fr" ? "en" : "fr"; try { localStorage.setItem("ds_lang", lang); } catch {} applyText(); if (lkKind) linkScreen(lkKind); if (isSales()) { renderWho(); renderSalesTabs(); if (GH.redraw) GH.redraw(); } else if (profile) { renderWho(); renderEditorBar(); renderToolbar(); renderStats(); renderBoard(); renderTabs(); alertsHtml = null; renderPc(); renderAlerts(); } });
 $("#tvBtn").addEventListener("click", () => { tv = !tv; document.body.classList.toggle("tv", tv); closePc(); const u = new URL(location.href); tv ? u.searchParams.set("tv", "1") : u.searchParams.delete("tv"); history.replaceState(null, "", u); });
