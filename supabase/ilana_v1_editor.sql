@@ -16,7 +16,7 @@
 
 alter table editors add column if not exists is_ai boolean not null default false;
 
-alter table editors add column if not exists pilot_ids uuid[] not null default '{}'   -- monteurs humains qui pilotent cette IA;
+alter table editors add column if not exists pilot_ids uuid[] not null default '{}';   -- monteurs humains qui pilotent cette IA
 
 insert into editors (name, sort, active, is_ai, pilot_ids)
   values ('Ilana', 14, true, true, (select coalesce(array_agg(id order by sort), '{}') from editors where name in ('Rafi', 'Ferdi')))
@@ -25,14 +25,14 @@ insert into editors (name, sort, active, is_ai, pilot_ids)
 
 insert into editor_keys (editor_id) select id from editors where name = 'Ilana' on conflict do nothing;
 
-alter table studios add column if not exists ai_ok boolean; -- dernier avis du client sur une monteuse IA (null = jamais répondu)
+alter table studios add column if not exists ai_ok boolean;   -- dernier avis du client sur une monteuse IA (null = jamais répondu)
 
 alter table studios add column if not exists ai_ok_at timestamptz;
 
 -- ───────────── 2. /prod : pilote + minutes de pilotage par vidéo terminée (IA seulement)
 alter table prod_reports add column if not exists pilot_id uuid references editors(id);
 
-alter table prod_reports add column if not exists pilot_minutes jsonb not null default '{}'::jsonb   -- { "reel_fr": [25, 40], … } une valeur par terminé;
+alter table prod_reports add column if not exists pilot_minutes jsonb not null default '{}'::jsonb;   -- { "reel_fr": [25, 40], … } une valeur par terminé
 
 alter table prod_reports add column if not exists pilot_total int not null default 0;
 
