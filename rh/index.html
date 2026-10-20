@@ -173,7 +173,8 @@ const T = {
     k: { title: "KPI per editor", lead: "Contract rules: presence ≥ target of the month, performance index out of 100 = volume + deadlines + internal QC + revision management. Points = finished videos × rate per category (same rule as the daily report).", editor: "Editor", presence: "Presence", present: "Days present", index: "Index /100", sVol: "Volume", sDl: "On time", sQc: "QC pass", sRev: "Rev. mgmt", days: "Days reported", videos: "Videos", points: "Points", perDay: "Pts / day", reels: "Reels", intros: "Intros", podcasts: "Podcasts", revs: "Revisions", revMin: "Rev. min", delivered: "Delivered", late: "Late", qc: "QC rounds", office: "Office", home: "Home", absent: "Absent", total: "Team total", none: "—", target: (p) => `target ${p}%`, of: (a, b) => `${a} / ${b} days`,
       foot: ["Presence: days marked Office or Home in the Presence tab, plus days with a daily report (a report proves the editor worked). Divided by the days of the month (calendar or business days, see Rules). Red when under the target.", "Index /100: weighted average of 4 scores. Volume = videos done vs the volume target (or vs the best editor when the target is 0). On time = orders delivered on or before the expected date. QC pass = orders delivered without a « needs changes » verdict. Rev. mgmt = 100 − revisions per video. A score without data is left out and the weights are rescaled.", "Days reported: days where the editor sent the daily report (/prod). Revisions: revisions declared in the daily report. QC rounds: « needs changes » verdicts from quality on orders delivered this month.", "Late: orders delivered after the expected date (client date, otherwise the date set by the team, otherwise 5 business days)."],
       set: { title: "Rules (contract)", presT: "Presence target (%)", basis: "Presence basis", cal: "Calendar days", bus: "Business days (Mon–Fri)", volT: "Volume target (videos / month, 0 = relative to the best editor)", wV: "Weight · volume", wD: "Weight · deadlines", wQ: "Weight · QC", wR: "Weight · revisions", save: "Save rules", saved: "Rules saved", fail: "Not saved: ", sum: (n) => `Weights total ${n} (rescaled to 100)` } },
-    p: { title: "Presence", lead: "Click a cell to cycle: Office → Home → Absent → Leave → Sick → empty. Saved immediately. A small dot = a daily report was sent that day.", editor: "Editor", office: "Office", home: "Home", off: "Absent", leave: "Leave", sick: "Sick", saved: "Saved", fail: "Not saved: ", worked: "report sent", noWork: "no report", pts: "pts" },
+    p: { title: "Presence", lead: "Editors work at the office, so Office is the default. Click a cell to cycle: Office → Absent → Leave → Sick → Home → empty. Click a day header to put everyone at the office that day. Saved immediately. A small dot = a daily report was sent that day.", editor: "Editor", office: "Office", home: "Home", off: "Absent", leave: "Leave", sick: "Sick", saved: "Saved", fail: "Not saved: ", worked: "report sent", noWork: "no report", pts: "pts",
+      allToday: "Everyone at the office today", fillReports: "Fill the month from reports", fillHint: "Every day with a daily report and no presence yet becomes « Office ».", dayAll: (d) => `Everyone at the office on ${d}?`, done: (n) => `${n} day${n > 1 ? "s" : ""} filled`, nothing: "Nothing to fill" },
     d: { title: "Daily reports", lead: "What each editor declared, day by day. Newest first.", none: "No report this month.", videos: (n) => `${n} video${n > 1 ? "s" : ""}`, pts: (n) => `${n} pts`, revs: (n, m) => `${n} revision${n > 1 ? "s" : ""}${m ? " · " + m + " min" : ""}`, noDetail: "(no detail written)" },
     dow: ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"] },
   fr: { kicker: "RH · Monteurs", title: "Monteurs — KPI & présence", stats: "Graphiques (prod-admin)", csv: "Export CSV", logout: "Déconnexion", login: "Espace RH", loginSub: "Connecte-toi avec ton e-mail DS Editing.", loginBtn: "Entrer",
@@ -183,7 +184,8 @@ const T = {
     k: { title: "KPI par monteur", lead: "Règles du contrat : présence ≥ cible du mois, index de performance sur 100 = volume + délais + contrôle qualité interne + gestion des révisions. Points = vidéos terminées × barème de la catégorie (même règle que le rapport du jour).", editor: "Monteur", presence: "Présence", present: "Jours présents", index: "Index /100", sVol: "Volume", sDl: "À l'heure", sQc: "QC OK", sRev: "Révisions", days: "Jours déclarés", videos: "Vidéos", points: "Points", perDay: "Pts / jour", reels: "Reels", intros: "Intros", podcasts: "Podcasts", revs: "Révisions", revMin: "Min. révision", delivered: "Livrées", late: "En retard", qc: "Passages QC", office: "Bureau", home: "Maison", absent: "Absent", total: "Total équipe", none: "—", target: (p) => `cible ${p} %`, of: (a, b) => `${a} / ${b} jours`,
       foot: ["Présence : jours marqués Bureau ou Maison dans l'onglet Présence, plus les jours avec un rapport du jour (un rapport prouve que le monteur a travaillé). Divisé par les jours du mois (calendaires ou ouvrés, voir Règles). Rouge sous la cible.", "Index /100 : moyenne pondérée de 4 scores. Volume = vidéos terminées par rapport à la cible (ou au meilleur monteur si la cible est 0). À l'heure = commandes livrées au plus tard à la date attendue. QC OK = commandes livrées sans verdict « à revoir ». Révisions = 100 − révisions par vidéo. Un score sans donnée est ignoré et les poids sont recalculés.", "Jours déclarés : jours où le monteur a envoyé son rapport du jour (/prod). Révisions : révisions déclarées dans le rapport du jour. Passages QC : verdicts « à revoir » de la qualité sur les commandes livrées ce mois.", "En retard : commandes livrées après la date attendue (date client, sinon date fixée par l'équipe, sinon 5 jours ouvrés)."],
       set: { title: "Règles (contrat)", presT: "Cible de présence (%)", basis: "Base de présence", cal: "Jours calendaires", bus: "Jours ouvrés (lun–ven)", volT: "Cible de volume (vidéos / mois, 0 = par rapport au meilleur monteur)", wV: "Poids · volume", wD: "Poids · délais", wQ: "Poids · QC", wR: "Poids · révisions", save: "Enregistrer les règles", saved: "Règles enregistrées", fail: "Non enregistré : ", sum: (n) => `Total des poids ${n} (ramené à 100)` } },
-    p: { title: "Présence", lead: "Clique une case pour tourner : Bureau → Maison → Absent → Congé → Malade → vide. Enregistré tout de suite. Petit point = rapport du jour envoyé ce jour-là.", editor: "Monteur", office: "Bureau", home: "Maison", off: "Absent", leave: "Congé", sick: "Malade", saved: "Enregistré", fail: "Non enregistré : ", worked: "rapport envoyé", noWork: "pas de rapport", pts: "pts" },
+    p: { title: "Présence", lead: "Les monteurs travaillent au bureau : Bureau est la valeur par défaut. Clique une case pour tourner : Bureau → Absent → Congé → Malade → Maison → vide. Clique l'en-tête d'un jour pour mettre tout le monde au bureau ce jour-là. Enregistré tout de suite. Petit point = rapport du jour envoyé ce jour-là.", editor: "Monteur", office: "Bureau", home: "Maison", off: "Absent", leave: "Congé", sick: "Malade", saved: "Enregistré", fail: "Non enregistré : ", worked: "rapport envoyé", noWork: "pas de rapport", pts: "pts",
+      allToday: "Tout le monde au bureau aujourd'hui", fillReports: "Remplir le mois d'après les rapports", fillHint: "Chaque jour avec un rapport du jour et sans présence devient « Bureau ».", dayAll: (d) => `Tout le monde au bureau le ${d} ?`, done: (n) => `${n} jour${n > 1 ? "s" : ""} rempli${n > 1 ? "s" : ""}`, nothing: "Rien à remplir" },
     d: { title: "Rapports du jour", lead: "Ce que chaque monteur a déclaré, jour par jour. Le plus récent d'abord.", none: "Aucun rapport ce mois-ci.", videos: (n) => `${n} vidéo${n > 1 ? "s" : ""}`, pts: (n) => `${n} pts`, revs: (n, m) => `${n} révision${n > 1 ? "s" : ""}${m ? " · " + m + " min" : ""}`, noDetail: "(aucun détail écrit)" },
     dow: ["Di", "Lu", "Ma", "Me", "Je", "Ve", "Sa"] },
 };
@@ -200,7 +202,7 @@ const ymd = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate(
 const COLORS = ["#FF6A2B", "#5FD39A", "#7FB0E0", "#F5C400", "#E38BFF", "#F08A82", "#7CE0D6", "#FFB86B", "#B6E36B", "#FF8FC7", "#9BA8FF", "#EDE8DC"];
 const color = (name) => COLORS[[...String(name)].reduce((a, c) => a + c.charCodeAt(0), 0) % COLORS.length];
 const avatar = (e) => `<span class="av" style="background:${color(e.name)}">${e.avatar_url ? `<img src="${esc(e.avatar_url)}" alt=""/>` : esc(String(e.name || "?").slice(0, 2).toUpperCase())}</span>`;
-const PLACES = ["office", "home", "off", "leave", "sick"];
+const PLACES = ["office", "off", "leave", "sick", "home"];   // ordre du cycle au clic : le bureau est la norme (20/10), l'absence la correction la plus fréquente
 const PLACE_CH = { office: "O", home: "H", off: "A", leave: "L", sick: "S" };
 
 let sb = null, me = null, profile = null, tab = params.get("tab") || "kpi", month = null, M = null, toastT = 0;
@@ -325,7 +327,7 @@ function renderPresence() {
   const work = new Map(); for (const r of M.reports) work.set(r.editor_id + "|" + r.report_date, r);
   const eds = M.editors.filter((e) => e.active !== false || M.presence.some((p) => p.editor_id === e.id));
   const days = Array.from({ length: n }, (_, i) => { const d = new Date(month.getFullYear(), month.getMonth(), i + 1); return { iso: ymd(d), n: i + 1, we: d.getDay() === 0 || d.getDay() === 6, dow: DOW[d.getDay()] }; });
-  const head = `<tr><th class="d">${P.editor}</th>${days.map((d) => `<th class="${d.we ? "we" : ""} ${d.iso === today ? "today" : ""}"><div>${d.dow}</div><div>${d.n}</div></th>`).join("")}<th>${P.office}</th><th>${P.home}</th><th>${P.off}</th></tr>`;
+  const head = `<tr><th class="d">${P.editor}</th>${days.map((d) => `<th class="dayh ${d.we ? "we" : ""} ${d.iso === today ? "today" : ""}" data-day="${d.iso}" title="${esc(P.dayAll(d.iso))}" style="cursor:pointer"><div>${d.dow}</div><div>${d.n}</div></th>`).join("")}<th>${P.office}</th><th>${P.home}</th><th>${P.off}</th></tr>`;
   const rows = eds.map((e) => {
     const sum = { office: 0, home: 0, off: 0 };
     const cells = days.map((d) => { const p = pres.get(e.id + "|" + d.iso), w = work.get(e.id + "|" + d.iso); if (p) { if (p.place in sum) sum[p.place]++; else sum.off++; }
@@ -333,10 +335,31 @@ function renderPresence() {
       return `<td class="cell ${p ? p.place : ""} ${w ? "worked" : ""} ${d.we ? "we" : ""}" data-e="${e.id}" data-d="${d.iso}" title="${esc(e.name)} · ${d.iso} · ${esc(tip)}">${p ? PLACE_CH[p.place] : ""}</td>`; }).join("");
     return `<tr><td class="d">${avatar(e)}${esc(e.name)}</td>${cells}<td class="sum">${sum.office || ""}</td><td class="sum">${sum.home || ""}</td><td class="sum">${sum.off || ""}</td></tr>`;
   }).join("");
-  $("#v-presence").innerHTML = `<div class="panel"><div class="ph"><div><h2>${P.title}</h2><p class="lead">${P.lead}</p></div></div>
+  const inMonth = today >= M.from && today < M.to;
+  $("#v-presence").innerHTML = `<div class="panel"><div class="ph"><div><h2>${P.title}</h2><p class="lead">${P.lead}</p></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">${inMonth ? `<button class="btn sm primary" id="allToday" type="button">${P.allToday}</button>` : ""}<button class="btn sm" id="fillReports" type="button" title="${esc(P.fillHint)}">${P.fillReports}</button></div></div>
     <div class="scroll"><table class="grid pres"><thead>${head}</thead><tbody>${rows}</tbody></table></div>
     <div class="legend">${PLACES.map((k) => `<span><i class="cell ${k}" style="background:${{ office: "rgba(70,211,105,.5)", home: "rgba(127,176,224,.5)", off: "rgba(240,138,130,.5)", leave: "rgba(245,196,0,.5)", sick: "rgba(227,139,255,.5)" }[k]}"></i>${PLACE_CH[k]} = ${P[k]}</span>`).join("")}</div></div>`;
   $("#v-presence").querySelectorAll("td.cell").forEach((c) => c.addEventListener("click", () => cycle(c)));
+  $("#v-presence").querySelectorAll("th.dayh").forEach((h) => h.addEventListener("click", () => fillMany(eds.map((e) => [e.id, h.dataset.day]))));
+  const at = $("#allToday"); if (at) at.addEventListener("click", () => fillMany(eds.map((e) => [e.id, today])));
+  $("#fillReports").addEventListener("click", () => fillMany(M.reports.filter((r) => r.editor_id).map((r) => [r.editor_id, r.report_date])));
+}
+// pose « Bureau » sur chaque (monteur, jour) qui n'a pas encore de présence ; les cases déjà remplies ne bougent pas
+let filling = false;
+async function fillMany(pairs) {
+  if (filling) return; const P = t("p");
+  const has = new Set(M.presence.map((p) => p.editor_id + "|" + p.day));
+  const todo = pairs.filter(([e, d]) => !has.has(e + "|" + d) && d >= M.from && d < M.to);
+  if (!todo.length) { toast(P.nothing); return; }
+  filling = true; let n = 0, err = null;
+  for (const [e, d] of todo) {
+    let r; try { r = await sb.rpc("rh_presence_set", { p_editor: e, p_day: d, p_place: "office", p_note: null }); } catch (x) { r = { error: x }; }
+    if (r.error) { err = r.error.message || String(r.error); break; }
+    M.presence.push({ editor_id: e, day: d, place: "office", note: null }); n++;
+  }
+  filling = false; renderPresence();
+  if (err) toast(P.fail + err, true); else toast(P.done(n));
 }
 async function cycle(cell) {
   if (cell.classList.contains("saving")) return;
