@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta name="robots" content="noindex,nofollow"/>
+  <meta name="theme-color" content="#050607"/>
+  <title>DS Editing — HR</title>
+  <link rel="icon" type="image/png" href="../assets/logo.png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--bg:#050607;--surface:#0F1114;--surface-2:#161A1F;--line:rgba(255,255,255,.09);--line-strong:rgba(255,255,255,.22);--cream:#F5F5F1;--taupe:#9AA3AD;--amber:#DCE3EA;--amber-soft:rgba(220,227,234,.12);--ok:#46D369;--warn:#F5C400;--err:#F08A82;--blue:#7FB0E0;--accent2:#B9C9DA;--chrome:linear-gradient(180deg,#FFFFFF 0%,#E3E7EC 38%,#9BA4AE 72%,#D6DBE0 100%);--glass:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));color-scheme:dark}
+    *{box-sizing:border-box}
+    [hidden]{display:none!important}
+    html,body{margin:0;background:var(--bg);color:var(--cream);font-family:'Geist',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+    body{background:radial-gradient(1200px 700px at 85% -5%,rgba(125,155,195,.16),transparent 60%),radial-gradient(900px 600px at -10% 40%,rgba(160,170,185,.08),transparent 60%),#050607;background-attachment:fixed;line-height:1.45;font-size:15px}
+    a{color:inherit}
+    .mono{font-weight:600;font-size:11px;letter-spacing:.06em;text-transform:uppercase;font-variant-numeric:tabular-nums;color:var(--taupe)}
+    .display{font-weight:600;letter-spacing:-.035em;line-height:1.06;padding:.02em 0 .08em;background:var(--chrome);-webkit-background-clip:text;background-clip:text;color:transparent}
+    button,input,select,textarea{font:inherit}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;border:1px solid rgba(255,255,255,.16);border-radius:999px;height:38px;padding:0 16px;font-size:13px;font-weight:600;letter-spacing:.01em;background:rgba(255,255,255,.04);color:var(--cream);cursor:pointer;white-space:nowrap;transition:border-color .2s,background .2s}
+    .btn:hover{border-color:rgba(220,230,240,.35);background:rgba(255,255,255,.08)}
+    .btn.primary{border-color:transparent;background:linear-gradient(180deg,#FFFFFF,#C9D0D7);color:#0A0B0D}
+    .btn.sm{height:32px;padding:0 12px;font-size:12px}
+    .btn.ic{width:38px;padding:0}
+    .btn:disabled{opacity:.45;cursor:default}
+    .btn svg{width:14px;height:14px;flex:none}
+    .in{background:rgba(255,255,255,.04);color:var(--cream);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:13px;outline:none;width:100%}
+    .in:focus{border-color:rgba(220,227,234,.6);box-shadow:0 0 0 3px rgba(220,227,234,.14)}
+    @keyframes blink{50%{opacity:.2}}
+    header{position:sticky;top:0;z-index:20;background:rgba(8,9,11,.62);-webkit-backdrop-filter:blur(22px) saturate(1.4);backdrop-filter:blur(22px) saturate(1.4);border-bottom:1px solid var(--line)}
+    .hd{display:flex;align-items:center;gap:14px;padding:12px 20px;flex-wrap:wrap}
+    .hd .brand{display:flex;flex-direction:column;justify-content:center;line-height:1.1;min-height:22px;padding-left:12px;border-left:1px solid var(--line)}
+    .hd .right{margin-left:auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    .lv-rec{display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:22px;letter-spacing:-.04em;line-height:1;color:var(--cream);white-space:nowrap;text-decoration:none}
+    .lv-rec i{width:9px;height:9px;border-radius:50%;background:var(--amber);box-shadow:0 0 12px var(--amber);animation:blink 1.6s infinite;margin-right:2px}
+    .lv-rec em{font-style:normal;font-size:11px;font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:var(--taupe);margin-left:2px}
+    .who{font-size:13px;color:var(--taupe);white-space:nowrap}
+    .who b{color:var(--cream);font-weight:500}
+    .tabs{display:flex;gap:4px;margin-left:18px;flex-wrap:wrap}
+    .tab{background:none;border:1px solid transparent;color:var(--taupe);border-radius:999px;padding:8px 14px;font-size:13px;font-weight:500;cursor:pointer}
+    .tab:hover{color:var(--cream)}
+    .tab.on{color:#fff;border-color:rgba(220,230,240,.5);background:var(--amber-soft)}
+    .seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:3px;background:rgba(255,255,255,.04)}
+    .seg button{border:0;background:none;color:var(--taupe);border-radius:999px;padding:6px 11px;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer}
+    .seg button.on{background:rgba(255,255,255,.85);color:#0A0B0D}
+    main{padding:18px 20px 60px;max-width:1500px;margin:0 auto}
+    .top{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:6px 0 16px}
+    .top h1{margin:0;font-size:40px}
+    .monthnav{display:inline-flex;align-items:center;gap:8px}
+    .monthnav b{font-size:18px;font-weight:600;letter-spacing:-.02em;min-width:170px;text-align:center}
+    .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:14px}
+    .stat{background:var(--glass);border:1px solid var(--line);border-radius:22px;padding:14px 18px}
+    .stat .v{font-weight:600;font-size:30px;line-height:1;letter-spacing:-.035em;font-variant-numeric:tabular-nums;margin-top:6px}
+    .stat .v small{font-size:13px;font-weight:500;color:var(--taupe);letter-spacing:0;margin-left:4px}
+    .panel{background:var(--glass);border:1px solid var(--line);border-radius:22px;padding:18px 20px;margin-bottom:14px;min-width:0}
+    .panel .ph{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+    .panel h2{margin:2px 0 0;font-size:20px;font-weight:600;letter-spacing:-.025em}
+    .panel p.lead{margin:4px 0 0;color:var(--taupe);font-size:13px}
+    .scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+    table.grid{width:100%;border-collapse:separate;border-spacing:3px 3px;font-size:13px}
+    table.grid th{font-weight:600;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--taupe);padding:8px 8px;text-align:center;white-space:nowrap}
+    table.grid th.d,table.grid td.d{text-align:left;position:sticky;left:0;background:var(--surface);z-index:1;border-radius:10px;white-space:nowrap}
+    table.grid td{padding:9px 8px;text-align:center;font-variant-numeric:tabular-nums;border-radius:10px;background:rgba(255,255,255,.02);color:var(--taupe)}
+    table.grid td.c{color:var(--cream);font-weight:500}
+    table.grid td.big{color:var(--cream);font-weight:600;font-size:15px}
+    table.grid td.warn{color:var(--warn)}
+    table.grid td.err{color:var(--err)}
+    table.grid tr.t td{font-weight:600;color:var(--accent2);background:none}
+    table.grid tr.t td.d{color:var(--taupe)}
+    .rk{display:inline-flex;min-width:22px;height:22px;align-items:center;justify-content:center;border-radius:999px;border:1px solid var(--line);font-size:11px;font-weight:600;margin-right:8px;color:var(--taupe)}
+    .rk.first{color:#0A0B0D;background:rgba(255,255,255,.85);border-color:transparent}
+    .av{width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;color:#0A0B0D;overflow:hidden;vertical-align:middle;margin-right:8px;flex:none}
+    .av img{width:100%;height:100%;object-fit:cover}
+    /* présence */
+    table.pres{border-spacing:2px 3px}
+    table.pres th{padding:6px 2px;min-width:28px}
+    table.pres th.we,table.pres td.we{background:rgba(255,255,255,.035)}
+    table.pres th.today{color:var(--cream);border-bottom:2px solid var(--amber)}
+    table.pres td.cell{padding:0;width:30px;height:30px;cursor:pointer;font-weight:700;font-size:12px;border:1px solid transparent;user-select:none}
+    table.pres td.cell:hover{border-color:var(--line-strong)}
+    table.pres td.cell.office{background:rgba(70,211,105,.22);color:#9BF0B2}
+    table.pres td.cell.home{background:rgba(127,176,224,.22);color:#B9D8F5}
+    table.pres td.cell.off{background:rgba(240,138,130,.22);color:#FFB8B2}
+    table.pres td.cell.leave{background:rgba(245,196,0,.2);color:#FFE27A}
+    table.pres td.cell.sick{background:rgba(227,139,255,.2);color:#EFC4FF}
+    table.pres td.cell.worked::after{content:"";display:block;width:4px;height:4px;border-radius:50%;background:var(--taupe);margin:-6px auto 2px}
+    table.pres td.cell.saving{opacity:.4}
+    table.pres td.sum{color:var(--cream);font-weight:600;min-width:40px}
+    .legend{display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--taupe);margin-top:10px}
+    .legend span{display:inline-flex;align-items:center;gap:6px}
+    .legend i{width:14px;height:14px;border-radius:4px;display:inline-block}
+    /* journal */
+    .day{margin-bottom:14px}
+    .day h3{margin:0 0 8px;font-size:14px;font-weight:600;color:var(--taupe);letter-spacing:.02em}
+    .rep{display:grid;grid-template-columns:200px 1fr;gap:14px;padding:12px 14px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.02);margin-bottom:6px}
+    .rep .nm{font-weight:600;display:flex;align-items:center}
+    .rep .meta{font-size:12px;color:var(--taupe);margin-top:2px}
+    .rep .body{font-size:13px}
+    .rep .cats{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}
+    .tag{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:500;border:1px solid var(--line);border-radius:999px;padding:3px 9px;color:var(--taupe)}
+    .tag i{width:7px;height:7px;border-radius:50%;display:inline-block}
+    .tag b{color:var(--cream)}
+    .rep .txt{white-space:pre-wrap;color:var(--cream)}
+    .rep .cmt{color:var(--taupe);font-style:italic;margin-top:4px}
+    .empty{padding:40px 16px;text-align:center;color:var(--taupe);font-size:14px}
+    .gate{max-width:380px;margin:90px auto;background:var(--glass);border:1px solid var(--line);border-radius:22px;padding:28px}
+    .gate h1{font-size:28px;margin:0 0 6px}
+    .gate p{color:var(--taupe);font-size:14px;margin:0 0 16px}
+    .gate .in{margin-bottom:10px;padding:12px 14px}
+    .gate .btn{width:100%;height:46px;margin-top:4px;font-size:14px}
+    .gate .msg{font-size:13px;color:var(--err);min-height:18px;margin-top:8px}
+    .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:rgba(20,22,26,.95);border:1px solid var(--line-strong);border-radius:999px;padding:10px 16px;font-size:13px;z-index:50}
+    .toast.bad{color:var(--err)}
+    @media (max-width:720px){.top h1{font-size:30px}.rep{grid-template-columns:1fr}main{padding:14px 12px 60px}}
+  </style>
+</head>
+<body>
+<header><div class="hd">
+  <a class="lv-rec" href="./"><i></i>DS<em>Editing</em></a>
+  <div class="brand"><span class="mono" data-t="kicker"></span></div>
+  <div class="tabs" id="tabs" hidden></div>
+  <div class="right">
+    <span class="who" id="who"></span>
+    <div class="seg" id="langSeg" role="group" aria-label="Language"><button type="button" data-lang="en">English</button><button type="button" data-lang="fr">Français</button></div>
+    <a class="btn" id="statsBtn" href="../prod-admin/" target="_blank" rel="noopener" hidden><span data-t="stats"></span></a>
+    <button class="btn" id="csvBtn" type="button" hidden><span data-t="csv"></span></button>
+    <button class="btn" id="logout" type="button" data-t="logout" hidden></button>
+  </div>
+</div></header>
+
+<main>
+  <div class="gate" id="gate" hidden>
+    <h1 class="display" data-t="login"></h1>
+    <p data-t="loginSub"></p>
+    <input class="in" id="email" type="email" placeholder="email" autocomplete="username"/>
+    <input class="in" id="password" type="password" placeholder="password" autocomplete="current-password"/>
+    <button class="btn primary" id="loginBtn" type="button" data-t="loginBtn"></button>
+    <div class="msg" id="loginMsg"></div>
+  </div>
+  <div class="gate" id="denied" hidden>
+    <h1 class="display" data-t="deniedT"></h1>
+    <p data-t="deniedP"></p>
+    <button class="btn" id="deniedOut" type="button" data-t="logout"></button>
+  </div>
+
+  <div id="app" hidden>
+    <div class="top">
+      <div><h1 class="display" data-t="title"></h1><div class="mono" id="sub"></div></div>
+      <div class="monthnav"><button class="btn ic" id="prevM" type="button" aria-label="previous">‹</button><b id="monthL"></b><button class="btn ic" id="nextM" type="button" aria-label="next">›</button><button class="btn sm" id="todayM" type="button" data-t="thisMonth"></button></div>
+    </div>
+    <section id="v-kpi"></section>
+    <section id="v-presence" hidden></section>
+    <section id="v-daily" hidden></section>
+  </div>
+</main>
+
+<script type="module">
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/+esm";
+
+/* ===== Configuration (clé publique uniquement, comme team/dashboard.html) ===== */
+const SUPABASE_URL = "https://xkanmjlpysxpohsuqvwg.supabase.co";
+const SUPABASE_ANON = "sb_publishable_lIZtV_WtN5NcGSb0dnfaiQ_AgKYBIVa";
+const ALLOWED = ["admin", "hr"];   // rôles admis sur cette page (profiles.role) ; la base refuse les autres de toute façon (rh_month → REFUSE)
+
+const T = {
+  en: { kicker: "HR · Editors", title: "Editors — KPI & presence", stats: "Charts (prod-admin)", csv: "Export CSV", logout: "Log out", login: "HR space", loginSub: "Sign in with your DS Editing email.", loginBtn: "Enter",
+    deniedT: "Restricted access", deniedP: "This space is for HR and admins only.", thisMonth: "This month", tabs: { kpi: "KPI", presence: "Presence", daily: "Daily reports" },
+    loading: "Loading…", err: "Cannot read the month: ", refuse: "Access refused by the database for this account.", migrate: "Waiting for the database update (rh_v1.sql).",
+    s: { presence: "Team presence", index: "Team index", points: "Team points", videos: "Videos done", days: "Reports sent", revs: "Revisions", delivered: "Orders delivered", late: "Delivered late" },
+    k: { title: "KPI per editor", lead: "Contract rules: presence ≥ target of the month, performance index out of 100 = volume + deadlines + internal QC + revision management. Points = finished videos × rate per category (same rule as the daily report).", editor: "Editor", presence: "Presence", present: "Days present", index: "Index /100", sVol: "Volume", sDl: "On time", sQc: "QC pass", sRev: "Rev. mgmt", days: "Days reported", videos: "Videos", points: "Points", perDay: "Pts / day", reels: "Reels", intros: "Intros", podcasts: "Podcasts", revs: "Revisions", revMin: "Rev. min", delivered: "Delivered", late: "Late", qc: "QC rounds", office: "Office", home: "Home", absent: "Absent", total: "Team total", none: "—", target: (p) => `target ${p}%`, of: (a, b) => `${a} / ${b} days`,
+      foot: ["Presence: days marked Office or Home in the Presence tab, plus days with a daily report (a report proves the editor worked). Divided by the days of the month (calendar or business days, see Rules). Red when under the target.", "Index /100: weighted average of 4 scores. Volume = videos done vs the volume target (or vs the best editor when the target is 0). On time = orders delivered on or before the expected date. QC pass = orders delivered without a « needs changes » verdict. Rev. mgmt = 100 − revisions per video. A score without data is left out and the weights are rescaled.", "Days reported: days where the editor sent the daily report (/prod). Revisions: revisions declared in the daily report. QC rounds: « needs changes » verdicts from quality on orders delivered this month.", "Late: orders delivered after the expected date (client date, otherwise the date set by the team, otherwise 5 business days)."],
+      set: { title: "Rules (contract)", presT: "Presence target (%)", basis: "Presence basis", cal: "Calendar days", bus: "Business days (Mon–Fri)", volT: "Volume target (videos / month, 0 = relative to the best editor)", wV: "Weight · volume", wD: "Weight · deadlines", wQ: "Weight · QC", wR: "Weight · revisions", save: "Save rules", saved: "Rules saved", fail: "Not saved: ", sum: (n) => `Weights total ${n} (rescaled to 100)` } },
+    p: { title: "Presence", lead: "Click a cell to cycle: Office → Home → Absent → Leave → Sick → empty. Saved immediately. A small dot = a daily report was sent that day.", editor: "Editor", office: "Office", home: "Home", off: "Absent", leave: "Leave", sick: "Sick", saved: "Saved", fail: "Not saved: ", worked: "report sent", noWork: "no report", pts: "pts" },
+    d: { title: "Daily reports", lead: "What each editor declared, day by day. Newest first.", none: "No report this month.", videos: (n) => `${n} video${n > 1 ? "s" : ""}`, pts: (n) => `${n} pts`, revs: (n, m) => `${n} revision${n > 1 ? "s" : ""}${m ? " · " + m + " min" : ""}`, noDetail: "(no detail written)" },
+    dow: ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"] },
+  fr: { kicker: "RH · Monteurs", title: "Monteurs — KPI & présence", stats: "Graphiques (prod-admin)", csv: "Export CSV", logout: "Déconnexion", login: "Espace RH", loginSub: "Connecte-toi avec ton e-mail DS Editing.", loginBtn: "Entrer",
+    deniedT: "Accès réservé", deniedP: "Cet espace est réservé aux RH et aux admins.", thisMonth: "Ce mois-ci", tabs: { kpi: "KPI", presence: "Présence", daily: "Rapports du jour" },
+    loading: "Lecture en cours…", err: "Lecture du mois impossible : ", refuse: "Accès refusé par la base pour ce compte.", migrate: "En attente de la mise à jour de la base (rh_v1.sql).",
+    s: { presence: "Présence équipe", index: "Index équipe", points: "Points équipe", videos: "Vidéos terminées", days: "Rapports envoyés", revs: "Révisions", delivered: "Commandes livrées", late: "Livrées en retard" },
+    k: { title: "KPI par monteur", lead: "Règles du contrat : présence ≥ cible du mois, index de performance sur 100 = volume + délais + contrôle qualité interne + gestion des révisions. Points = vidéos terminées × barème de la catégorie (même règle que le rapport du jour).", editor: "Monteur", presence: "Présence", present: "Jours présents", index: "Index /100", sVol: "Volume", sDl: "À l'heure", sQc: "QC OK", sRev: "Révisions", days: "Jours déclarés", videos: "Vidéos", points: "Points", perDay: "Pts / jour", reels: "Reels", intros: "Intros", podcasts: "Podcasts", revs: "Révisions", revMin: "Min. révision", delivered: "Livrées", late: "En retard", qc: "Passages QC", office: "Bureau", home: "Maison", absent: "Absent", total: "Total équipe", none: "—", target: (p) => `cible ${p} %`, of: (a, b) => `${a} / ${b} jours`,
+      foot: ["Présence : jours marqués Bureau ou Maison dans l'onglet Présence, plus les jours avec un rapport du jour (un rapport prouve que le monteur a travaillé). Divisé par les jours du mois (calendaires ou ouvrés, voir Règles). Rouge sous la cible.", "Index /100 : moyenne pondérée de 4 scores. Volume = vidéos terminées par rapport à la cible (ou au meilleur monteur si la cible est 0). À l'heure = commandes livrées au plus tard à la date attendue. QC OK = commandes livrées sans verdict « à revoir ». Révisions = 100 − révisions par vidéo. Un score sans donnée est ignoré et les poids sont recalculés.", "Jours déclarés : jours où le monteur a envoyé son rapport du jour (/prod). Révisions : révisions déclarées dans le rapport du jour. Passages QC : verdicts « à revoir » de la qualité sur les commandes livrées ce mois.", "En retard : commandes livrées après la date attendue (date client, sinon date fixée par l'équipe, sinon 5 jours ouvrés)."],
+      set: { title: "Règles (contrat)", presT: "Cible de présence (%)", basis: "Base de présence", cal: "Jours calendaires", bus: "Jours ouvrés (lun–ven)", volT: "Cible de volume (vidéos / mois, 0 = par rapport au meilleur monteur)", wV: "Poids · volume", wD: "Poids · délais", wQ: "Poids · QC", wR: "Poids · révisions", save: "Enregistrer les règles", saved: "Règles enregistrées", fail: "Non enregistré : ", sum: (n) => `Total des poids ${n} (ramené à 100)` } },
+    p: { title: "Présence", lead: "Clique une case pour tourner : Bureau → Maison → Absent → Congé → Malade → vide. Enregistré tout de suite. Petit point = rapport du jour envoyé ce jour-là.", editor: "Monteur", office: "Bureau", home: "Maison", off: "Absent", leave: "Congé", sick: "Malade", saved: "Enregistré", fail: "Non enregistré : ", worked: "rapport envoyé", noWork: "pas de rapport", pts: "pts" },
+    d: { title: "Rapports du jour", lead: "Ce que chaque monteur a déclaré, jour par jour. Le plus récent d'abord.", none: "Aucun rapport ce mois-ci.", videos: (n) => `${n} vidéo${n > 1 ? "s" : ""}`, pts: (n) => `${n} pts`, revs: (n, m) => `${n} révision${n > 1 ? "s" : ""}${m ? " · " + m + " min" : ""}`, noDetail: "(aucun détail écrit)" },
+    dow: ["Di", "Lu", "Ma", "Me", "Je", "Ve", "Sa"] },
+};
+const $ = (s) => document.querySelector(s);
+const params = new URLSearchParams(location.search);
+const ls = { get(k) { try { return localStorage.getItem(k); } catch { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch {} } };
+let lang = params.get("lang") || ls.get("ds_rh_lang") || "en"; if (!T[lang]) lang = "en";
+const t = (k) => T[lang][k];
+const loc = () => (lang === "fr" ? "fr-FR" : "en-GB");
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const nf = (x, max = 1) => Number(x || 0).toLocaleString(loc(), { maximumFractionDigits: max });
+const pad = (n) => String(n).padStart(2, "0");
+const ymd = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const COLORS = ["#FF6A2B", "#5FD39A", "#7FB0E0", "#F5C400", "#E38BFF", "#F08A82", "#7CE0D6", "#FFB86B", "#B6E36B", "#FF8FC7", "#9BA8FF", "#EDE8DC"];
+const color = (name) => COLORS[[...String(name)].reduce((a, c) => a + c.charCodeAt(0), 0) % COLORS.length];
+const avatar = (e) => `<span class="av" style="background:${color(e.name)}">${e.avatar_url ? `<img src="${esc(e.avatar_url)}" alt=""/>` : esc(String(e.name || "?").slice(0, 2).toUpperCase())}</span>`;
+const PLACES = ["office", "home", "off", "leave", "sick"];
+const PLACE_CH = { office: "O", home: "H", off: "A", leave: "L", sick: "S" };
+
+let sb = null, me = null, profile = null, tab = params.get("tab") || "kpi", month = null, M = null, toastT = 0;
+if (!["kpi", "presence", "daily"].includes(tab)) tab = "kpi";
+function applyText() {
+  document.documentElement.lang = lang;
+  document.querySelectorAll("[data-t]").forEach((el) => { const v = t(el.dataset.t); if (typeof v === "string") el.textContent = v; });
+  $("#langSeg").querySelectorAll("[data-lang]").forEach((b) => b.classList.toggle("on", b.dataset.lang === lang));
+}
+function toast(msg, bad) { clearTimeout(toastT); let el = $(".toast"); if (!el) { el = document.createElement("div"); el.className = "toast"; document.body.appendChild(el); } el.textContent = msg; el.classList.toggle("bad", !!bad); el.hidden = false; toastT = setTimeout(() => { el.hidden = true; }, bad ? 5000 : 1800); }
+
+/* ===== mois ===== */
+function monthFromParam() { const m = /^(\d{4})-(\d{2})$/.exec(params.get("m") || ""); const d = m ? new Date(Number(m[1]), Number(m[2]) - 1, 1) : new Date(); return new Date(d.getFullYear(), d.getMonth(), 1); }
+function monthLabel() { return month.toLocaleDateString(loc(), { month: "long", year: "numeric" }); }
+function shiftMonth(n) { month = new Date(month.getFullYear(), month.getMonth() + n, 1); const u = new URL(location.href); u.searchParams.set("m", ymd(month).slice(0, 7)); history.replaceState(null, "", u); load(); }
+const daysInMonth = () => new Date(month.getFullYear(), month.getMonth() + 1, 0).getDate();
+
+/* ===== KPI (calcul côté navigateur sur le mois reçu) ===== */
+function addBusinessDays(date, n) { const d = new Date(date); let k = 0; while (k < n) { d.setDate(d.getDate() + 1); if (d.getDay() !== 0 && d.getDay() !== 6) k++; } return d; }
+const endOfDay = (d) => { const x = new Date(d); x.setHours(23, 59, 59, 0); return x; };
+function target(j) { if (j.requested_deadline) return endOfDay(j.requested_deadline + "T12:00:00"); if (j.delivery_date) return endOfDay(j.delivery_date + "T12:00:00"); return endOfDay(addBusinessDays(j.created_at, 5)); }
+const group = (key) => String(key).split("_")[0];
+const DEFAULTS = { presence_target: 75, presence_basis: "calendar", volume_target: 0, w_volume: 40, w_deadline: 20, w_qc: 25, w_revisions: 15 };
+const settings = () => Object.assign({}, DEFAULTS, M && M.settings ? M.settings : {});
+function basisDays() { const S = settings(), n = daysInMonth(); if (S.presence_basis !== "business") return n; let k = 0; for (let i = 1; i <= n; i++) { const d = new Date(month.getFullYear(), month.getMonth(), i).getDay(); if (d !== 0 && d !== 6) k++; } return k; }
+/* index de performance (cadre de Safa, 20/10) : 4 scores sur 100, pondérés ; un score sans donnée est ignoré et les poids restants sont ramenés à 100 */
+function scores(e, best) {
+  const S = settings(), vt = Number(S.volume_target) || 0;
+  const vol = vt > 0 ? Math.min(100, e.videos / vt * 100) : (best > 0 ? e.videos / best * 100 : null);
+  const dl = e.delivered ? (e.delivered - e.late) / e.delivered * 100 : null;
+  const qc = e.delivered ? (e.delivered - e.qcJobs) / e.delivered * 100 : null;
+  const rev = e.videos ? Math.max(0, 100 - e.revs / e.videos * 100) : null;
+  const parts = [[vol, S.w_volume], [dl, S.w_deadline], [qc, S.w_qc], [rev, S.w_revisions]].filter(([v, w]) => v != null && Number(w) > 0);
+  const wsum = parts.reduce((a, [, w]) => a + Number(w), 0);
+  return { vol, dl, qc, rev, index: wsum ? parts.reduce((a, [v, w]) => a + v * Number(w), 0) / wsum : null };
+}
+function compute() {
+  const from = M.from, to = M.to, inMonth = (iso) => !!iso && iso.slice(0, 10) >= from && iso.slice(0, 10) < to;
+  const mk = (e) => ({ ...e, days: new Set(), presentDays: new Set(), videos: 0, points: 0, groups: { reel: 0, intro: 0, podcast: 0 }, revs: 0, revMin: 0, delivered: 0, late: 0, qc: 0, qcJobs: 0, pres: { office: 0, home: 0, off: 0, leave: 0, sick: 0 } });
+  const rows = new Map(M.editors.map((e) => [e.id, mk(e)]));
+  const tot = mk({ id: "tot", name: t("k").total });
+  const rowOf = (id) => { if (!rows.has(id)) rows.set(id, mk({ id, name: "?", active: false })); return rows.get(id); };
+  for (const r of M.reports) {
+    const row = rowOf(r.editor_id); if (row.name === "?") row.name = r.editor_name || "?";
+    const p = Number(r.points) || 0, v = Number(r.elements) || 0;
+    row.days.add(r.report_date); tot.days.add(r.report_date + "|" + r.editor_id); row.presentDays.add(r.report_date);
+    row.points += p; tot.points += p; row.videos += v; tot.videos += v;
+    for (const c of M.categories) { const done = Number(((r.counts || {})[c.key] || {}).done) || 0; if (!done) continue; const g = group(c.key); if (g in row.groups) { row.groups[g] += done; tot.groups[g] += done; } }
+    const rc = Number(r.rev_count) || 0, rm = Number(r.rev_minutes) || 0; row.revs += rc; tot.revs += rc; row.revMin += rm; tot.revMin += rm;
+  }
+  for (const j of M.jobs) {
+    if (!inMonth(j.delivered_at)) continue;
+    const ids = (j.editor_ids || []).length ? j.editor_ids : [];
+    const late = new Date(j.delivered_at) > target(j), nq = (Number(j.qc_round) || 0) + (j.qc_status === "revisions" ? 1 : 0);
+    for (const id of ids) { const row = rowOf(id); row.delivered++; if (late) row.late++; row.qc += nq; if (nq) row.qcJobs++; }
+    tot.delivered++; if (late) tot.late++; tot.qc += nq; if (nq) tot.qcJobs++;
+  }
+  for (const p of M.presence) { const row = rowOf(p.editor_id); if (p.place in row.pres) { row.pres[p.place]++; tot.pres[p.place]++; } if (p.place === "office" || p.place === "home") row.presentDays.add(p.day); }
+  const list = [...rows.values()].filter((e) => e.active !== false || e.points || e.days.size || e.delivered || Object.values(e.pres).some(Boolean));
+  const basis = basisDays(), best = Math.max(0, ...list.map((e) => e.videos));
+  for (const e of list) { e.present = e.presentDays.size; e.presRate = basis ? e.present / basis * 100 : null; e.sc = scores(e, best); }
+  // total équipe : présence moyenne des monteurs actifs du mois, scores sur les totaux
+  const withPres = list.filter((e) => e.active !== false);
+  tot.present = withPres.reduce((a, e) => a + e.present, 0); tot.presRate = withPres.length && basis ? tot.present / (withPres.length * basis) * 100 : null;
+  tot.sc = scores(tot, best); const vols = list.map((e) => e.sc.vol).filter((v) => v != null); tot.sc.vol = vols.length ? vols.reduce((a, v) => a + v, 0) / vols.length : null;   // volume équipe = moyenne des scores de volume (le total n'a pas de « meilleur monteur »)
+  { const S = settings(), parts = [[tot.sc.vol, S.w_volume], [tot.sc.dl, S.w_deadline], [tot.sc.qc, S.w_qc], [tot.sc.rev, S.w_revisions]].filter(([v, w]) => v != null && Number(w) > 0), ws = parts.reduce((a, [, w]) => a + Number(w), 0); tot.sc.index = ws ? parts.reduce((a, [v, w]) => a + v * Number(w), 0) / ws : null; }
+  list.sort((a, b) => ((b.sc.index ?? -1) - (a.sc.index ?? -1)) || (b.points - a.points) || String(a.name).localeCompare(String(b.name)));
+  return { list, tot, basis };
+}
+
+/* ===== vues ===== */
+function renderTabs() {
+  $("#tabs").hidden = false;
+  $("#tabs").innerHTML = ["kpi", "presence", "daily"].map((k) => `<button type="button" class="tab ${tab === k ? "on" : ""}" data-tab="${k}">${t("tabs")[k]}</button>`).join("");
+  $("#tabs").querySelectorAll("[data-tab]").forEach((b) => b.addEventListener("click", () => { tab = b.dataset.tab; const u = new URL(location.href); tab === "kpi" ? u.searchParams.delete("tab") : u.searchParams.set("tab", tab); history.replaceState(null, "", u); renderTabs(); render(); }));
+}
+function render() {
+  $("#monthL").textContent = monthLabel();
+  ["kpi", "presence", "daily"].forEach((k) => { $("#v-" + k).hidden = tab !== k; });
+  if (!M) return;
+  $("#sub").textContent = `${M.from} → ${M.to}`;
+  if (tab === "kpi") renderKpi(); else if (tab === "presence") renderPresence(); else renderDaily();
+}
+function renderKpi() {
+  const K = t("k"), S = t("s"), ST = settings(), { list, tot, basis } = compute(), tgt = Number(ST.presence_target) || 0;
+  const pct = (v) => v == null ? K.none : nf(v, 0) + " %";
+  const stat = (l, v, s) => `<div class="stat"><div class="mono">${l}</div><div class="v">${v}${s ? `<small>${s}</small>` : ""}</div></div>`;
+  const stats = `<div class="stats">${stat(S.presence, pct(tot.presRate), K.target(tgt))}${stat(S.index, tot.sc.index == null ? K.none : nf(tot.sc.index, 0))}${stat(S.points, nf(tot.points))}${stat(S.videos, nf(tot.videos, 0))}${stat(S.days, nf(tot.days.size, 0))}${stat(S.revs, nf(tot.revs, 0), tot.revMin ? nf(tot.revMin, 0) + " min" : "")}${stat(S.delivered, nf(tot.delivered, 0))}${stat(S.late, nf(tot.late, 0))}</div>`;
+  const td = (v, cls = "", title = "") => `<td class="${cls}"${title ? ` title="${esc(title)}"` : ""}>${v}</td>`;
+  const sc = (v) => td(v == null ? K.none : nf(v, 0), v == null ? "" : v < 50 ? "err" : v < 75 ? "warn" : "c");
+  const row = (e, i, cls) => { const nd = e.days.size, pr = e.presRate, ix = e.sc.index;
+    return `<tr class="${cls}"><td class="d">${cls ? "" : `<span class="rk ${i === 0 && ix != null ? "first" : ""}">${ix != null ? i + 1 : "·"}</span>`}${cls ? "" : avatar(e)}${esc(e.name)}</td>
+      ${td(pct(pr), pr == null ? "" : pr < tgt ? "err" : "c", cls ? "" : K.of(e.present, basis))}${td(ix == null ? K.none : nf(ix, 0), ix == null ? "" : ix < 50 ? "err" : ix < 75 ? "warn" : "big")}${sc(e.sc.vol)}${sc(e.sc.dl)}${sc(e.sc.qc)}${sc(e.sc.rev)}
+      ${td(nd, nd || cls ? "c" : "err")}${td(nf(e.videos, 0), "c")}${td(nf(e.points), "c")}${td(nd ? nf(e.points / nd) : K.none)}${td(e.groups.reel || K.none)}${td(e.groups.intro || K.none)}${td(e.groups.podcast || K.none)}${td(e.revs || K.none, e.revs ? "warn" : "")}${td(e.revMin ? nf(e.revMin, 0) : K.none)}${td(e.delivered || K.none, "c")}${td(e.late || K.none, e.late ? "err" : "")}${td(e.qc || K.none, e.qc ? "warn" : "")}${td(e.pres.office || K.none)}${td(e.pres.home || K.none)}${td((e.pres.off + e.pres.leave + e.pres.sick) || K.none, e.pres.off ? "err" : "")}</tr>`; };
+  const th = (x, extra = "") => `<th ${extra}>${x}</th>`;
+  const ws = ["w_volume", "w_deadline", "w_qc", "w_revisions"].reduce((a, k) => a + (Number(ST[k]) || 0), 0);
+  const num = (k, l) => `<label style="display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--taupe)">${l}<input class="in" type="number" min="0" max="1000" step="1" data-set="${k}" value="${esc(ST[k])}" style="width:120px"/></label>`;
+  const setPanel = `<details class="panel" style="padding:14px 20px"><summary style="cursor:pointer;font-weight:600">${K.set.title}</summary>
+    <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;margin-top:14px">${num("presence_target", K.set.presT)}
+      <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--taupe)">${K.set.basis}<select class="in" data-set="presence_basis" style="width:200px"><option value="calendar" ${ST.presence_basis !== "business" ? "selected" : ""}>${K.set.cal}</option><option value="business" ${ST.presence_basis === "business" ? "selected" : ""}>${K.set.bus}</option></select></label>
+      ${num("volume_target", K.set.volT)}${num("w_volume", K.set.wV)}${num("w_deadline", K.set.wD)}${num("w_qc", K.set.wQ)}${num("w_revisions", K.set.wR)}
+      <button class="btn sm" id="setSave" type="button">${K.set.save}</button><span class="mono" id="setMsg">${ws !== 100 ? K.set.sum(ws) : ""}</span></div></details>`;
+  $("#v-kpi").innerHTML = stats + `<div class="panel"><div class="ph"><div><h2>${K.title}</h2><p class="lead">${K.lead}</p></div></div>
+    <div class="scroll"><table class="grid"><thead>
+      <tr><th class="d" rowspan="2">${K.editor}</th>${th(K.presence, 'rowspan="2"')}${th(K.index, 'rowspan="2"')}${th("Scores /100", 'colspan="4"')}${th(K.days, 'rowspan="2"')}${th(K.videos, 'rowspan="2"')}${th(K.points, 'rowspan="2"')}${th(K.perDay, 'rowspan="2"')}${th(K.reels, 'rowspan="2"')}${th(K.intros, 'rowspan="2"')}${th(K.podcasts, 'rowspan="2"')}${th(K.revs, 'rowspan="2"')}${th(K.revMin, 'rowspan="2"')}${th(K.delivered, 'rowspan="2"')}${th(K.late, 'rowspan="2"')}${th(K.qc, 'rowspan="2"')}${th(K.office, 'rowspan="2"')}${th(K.home, 'rowspan="2"')}${th(K.absent, 'rowspan="2"')}</tr>
+      <tr>${th(K.sVol)}${th(K.sDl)}${th(K.sQc)}${th(K.sRev)}</tr></thead>
+    <tbody>${list.map((e, i) => row(e, i, "")).join("")}${row(tot, 0, "t")}</tbody></table></div>
+    <ul class="legend" style="display:block;padding-left:18px">${K.foot.map((x) => `<li>${esc(x)}</li>`).join("")}</ul></div>` + setPanel;
+  $("#setSave").addEventListener("click", saveSettings);
+}
+async function saveSettings() {
+  const K = t("k").set, data = {}; document.querySelectorAll("[data-set]").forEach((el) => { data[el.dataset.set] = el.tagName === "SELECT" ? el.value : Number(el.value); });
+  const b = $("#setSave"); b.disabled = true;
+  let r; try { r = await sb.rpc("rh_settings_set", { p_data: data }); } catch (e) { r = { error: e }; }
+  b.disabled = false;
+  if (r.error) { toast(K.fail + (r.error.message || r.error), true); return; }
+  M.settings = r.data || data; toast(K.saved); renderKpi(); const d = $("#v-kpi details"); if (d) d.open = true;
+}
+function renderPresence() {
+  const P = t("p"), n = daysInMonth(), today = M.today, DOW = t("dow");
+  const pres = new Map(M.presence.map((p) => [p.editor_id + "|" + p.day, p]));
+  const work = new Map(); for (const r of M.reports) work.set(r.editor_id + "|" + r.report_date, r);
+  const eds = M.editors.filter((e) => e.active !== false || M.presence.some((p) => p.editor_id === e.id));
+  const days = Array.from({ length: n }, (_, i) => { const d = new Date(month.getFullYear(), month.getMonth(), i + 1); return { iso: ymd(d), n: i + 1, we: d.getDay() === 0 || d.getDay() === 6, dow: DOW[d.getDay()] }; });
+  const head = `<tr><th class="d">${P.editor}</th>${days.map((d) => `<th class="${d.we ? "we" : ""} ${d.iso === today ? "today" : ""}"><div>${d.dow}</div><div>${d.n}</div></th>`).join("")}<th>${P.office}</th><th>${P.home}</th><th>${P.off}</th></tr>`;
+  const rows = eds.map((e) => {
+    const sum = { office: 0, home: 0, off: 0 };
+    const cells = days.map((d) => { const p = pres.get(e.id + "|" + d.iso), w = work.get(e.id + "|" + d.iso); if (p) { if (p.place in sum) sum[p.place]++; else sum.off++; }
+      const tip = (w ? `${P.worked} · ${nf(w.elements, 0)} vid · ${nf(w.points)} ${P.pts}` : P.noWork) + (p && p.note ? " · " + p.note : "");
+      return `<td class="cell ${p ? p.place : ""} ${w ? "worked" : ""} ${d.we ? "we" : ""}" data-e="${e.id}" data-d="${d.iso}" title="${esc(e.name)} · ${d.iso} · ${esc(tip)}">${p ? PLACE_CH[p.place] : ""}</td>`; }).join("");
+    return `<tr><td class="d">${avatar(e)}${esc(e.name)}</td>${cells}<td class="sum">${sum.office || ""}</td><td class="sum">${sum.home || ""}</td><td class="sum">${sum.off || ""}</td></tr>`;
+  }).join("");
+  $("#v-presence").innerHTML = `<div class="panel"><div class="ph"><div><h2>${P.title}</h2><p class="lead">${P.lead}</p></div></div>
+    <div class="scroll"><table class="grid pres"><thead>${head}</thead><tbody>${rows}</tbody></table></div>
+    <div class="legend">${PLACES.map((k) => `<span><i class="cell ${k}" style="background:${{ office: "rgba(70,211,105,.5)", home: "rgba(127,176,224,.5)", off: "rgba(240,138,130,.5)", leave: "rgba(245,196,0,.5)", sick: "rgba(227,139,255,.5)" }[k]}"></i>${PLACE_CH[k]} = ${P[k]}</span>`).join("")}</div></div>`;
+  $("#v-presence").querySelectorAll("td.cell").forEach((c) => c.addEventListener("click", () => cycle(c)));
+}
+async function cycle(cell) {
+  if (cell.classList.contains("saving")) return;
+  const P = t("p"), cur = PLACES.find((k) => cell.classList.contains(k)) || "", next = cur ? (PLACES[PLACES.indexOf(cur) + 1] || "") : PLACES[0];
+  const key = cell.dataset.e + "|" + cell.dataset.d, old = M.presence.find((p) => p.editor_id + "|" + p.day === key);
+  cell.classList.add("saving");
+  let r; try { r = await sb.rpc("rh_presence_set", { p_editor: cell.dataset.e, p_day: cell.dataset.d, p_place: next || null, p_note: old ? old.note : null }); } catch (e) { r = { error: e }; }
+  cell.classList.remove("saving");
+  if (r.error) { toast(P.fail + (r.error.message || r.error), true); return; }
+  if (old) { if (next) old.place = next; else M.presence.splice(M.presence.indexOf(old), 1); } else if (next) M.presence.push({ editor_id: cell.dataset.e, day: cell.dataset.d, place: next, note: null });
+  renderPresence(); toast(P.saved);
+}
+function renderDaily() {
+  const D = t("d"), cats = new Map(M.categories.map((c) => [c.key, c]));
+  const byDay = new Map(); for (const r of M.reports) { if (!byDay.has(r.report_date)) byDay.set(r.report_date, []); byDay.get(r.report_date).push(r); }
+  const days = [...byDay.keys()].sort().reverse();
+  const edOf = (r) => M.editors.find((e) => e.id === r.editor_id) || { name: r.editor_name || "?" };
+  const lbl = (c) => (lang === "fr" ? c.fr : c.en) || c.key;
+  const rep = (r) => { const tags = M.categories.map((c) => { const done = Number(((r.counts || {})[c.key] || {}).done) || 0; return done ? `<span class="tag"><i style="background:${esc(c.color)}"></i><b>${done}</b> ${esc(lbl(cats.get(c.key)))}</span>` : ""; }).join("");
+    const rc = Number(r.rev_count) || 0;
+    return `<div class="rep"><div><div class="nm">${avatar(edOf(r))}${esc(edOf(r).name)}</div><div class="meta">${D.videos(Number(r.elements) || 0)} · ${D.pts(nf(r.points))}${rc ? " · " + D.revs(rc, Number(r.rev_minutes) || 0) : ""}</div></div>
+      <div class="body"><div class="cats">${tags}</div><div class="txt">${r.details ? esc(r.details) : `<span style="color:var(--taupe)">${D.noDetail}</span>`}</div>${r.comment ? `<div class="cmt">${esc(r.comment)}</div>` : ""}</div></div>`; };
+  $("#v-daily").innerHTML = `<div class="panel"><div class="ph"><div><h2>${D.title}</h2><p class="lead">${D.lead}</p></div></div>` + (days.length ? days.map((d) => `<div class="day"><h3>${new Date(d + "T12:00:00").toLocaleDateString(loc(), { weekday: "long", day: "2-digit", month: "long" })}</h3>${byDay.get(d).sort((a, b) => Number(b.points) - Number(a.points)).map(rep).join("")}</div>`).join("") : `<div class="empty">${D.none}</div>`) + `</div>`;
+}
+function exportCsv() {
+  const K = t("k"), { list, tot } = compute();
+  const r0 = (v) => v == null ? "" : Math.round(v);
+  const head = [K.editor, K.presence + " %", K.present, K.index, K.sVol, K.sDl, K.sQc, K.sRev, K.days, K.videos, K.points, K.reels, K.intros, K.podcasts, K.revs, K.revMin, K.delivered, K.late, K.qc, K.office, K.home, t("p").off, t("p").leave, t("p").sick];
+  const line = (e) => [e.name, r0(e.presRate), e.present, r0(e.sc.index), r0(e.sc.vol), r0(e.sc.dl), r0(e.sc.qc), r0(e.sc.rev), e.days.size, e.videos, Number(e.points.toFixed(2)), e.groups.reel, e.groups.intro, e.groups.podcast, e.revs, e.revMin, e.delivered, e.late, e.qc, e.pres.office, e.pres.home, e.pres.off, e.pres.leave, e.pres.sick];
+  const csv = [head, ...list.map(line), line(tot)].map((r) => r.map((v) => `"${String(v ?? "").replace(/"/g, '""')}"`).join(";")).join("\n");
+  const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8" })); a.download = `ds-editing-rh-${ymd(month).slice(0, 7)}.csv`; a.click();
+}
+
+/* ===== données ===== */
+async function load() {
+  render(); $("#v-" + tab).innerHTML = `<div class="empty">${t("loading")}</div>`;
+  let r; try { r = await sb.rpc("rh_month", { p_month: ymd(month) }); } catch (e) { r = { error: e }; }
+  if (r.error) { const c = r.error.code, m = String(r.error.message || ""); $("#v-" + tab).innerHTML = `<div class="empty">${esc(c === "PGRST202" ? t("migrate") : /REFUSE/.test(m) ? t("refuse") : t("err") + m)}</div>`; return; }
+  M = r.data; render();
+}
+async function boot() {
+  applyText(); month = monthFromParam();
+  sb = createClient(SUPABASE_URL, SUPABASE_ANON);
+  let { data: { session } } = await sb.auth.getSession();
+  /* ?p=<jeton> : porte nominative (lien magique personnel, décision du 14/10). Même mécanique que team/dashboard.html : base64url de « e-mail \n clé ». */
+  const PORTE = params.get("p");
+  if (PORTE) {
+    try {
+      const [pEmail, pKey] = atob(PORTE.replace(/-/g, "+").replace(/_/g, "/")).split("\n");
+      if (pEmail && pKey) {
+        if (session && String(session.user.email).toLowerCase() !== pEmail.toLowerCase()) { await sb.auth.signOut({ scope: "local" }); session = null; }
+        if (!session) { const r = await sb.auth.signInWithPassword({ email: pEmail, password: pKey }); if (!r.error) session = r.data.session; }
+        if (session) { const u = new URL(location.href); u.searchParams.delete("p"); history.replaceState(null, "", u); }   // le jeton quitte la barre d'adresse (la session est gardée sur l'appareil)
+      }
+    } catch (e) { /* jeton illisible : écran de connexion */ }
+  }
+  if (!session) { $("#gate").hidden = false; return; }
+  me = session.user;
+  const { data: p } = await sb.from("profiles").select("role,display_name,lang").eq("id", me.id).single();
+  profile = p || { role: "", display_name: me.email };
+  $("#who").innerHTML = `<b>${esc(profile.display_name)}</b> · ${esc(profile.role || "?")}`;
+  $("#logout").hidden = false;
+  if (!ALLOWED.includes(profile.role)) { $("#denied").hidden = false; return; }
+  $("#app").hidden = false; $("#csvBtn").hidden = false; $("#statsBtn").hidden = profile.role !== "admin";   // /prod-admin/ a son rideau à code : bouton pour les admins seulement
+  renderTabs(); await load();
+  setInterval(() => { if (document.visibilityState === "visible" && !document.querySelector("td.cell.saving")) load(); }, 120000);
+}
+$("#loginBtn").addEventListener("click", async () => {
+  $("#loginMsg").textContent = "";
+  const { error } = await sb.auth.signInWithPassword({ email: $("#email").value.trim(), password: $("#password").value });
+  if (error) { $("#loginMsg").textContent = error.message; return; }
+  location.reload();
+});
+$("#password").addEventListener("keydown", (e) => { if (e.key === "Enter") $("#loginBtn").click(); });
+const out = async () => { await sb.auth.signOut(); location.replace(location.pathname); };
+$("#logout").addEventListener("click", out); $("#deniedOut").addEventListener("click", out);
+$("#csvBtn").addEventListener("click", exportCsv);
+$("#prevM").addEventListener("click", () => shiftMonth(-1)); $("#nextM").addEventListener("click", () => shiftMonth(1));
+$("#todayM").addEventListener("click", () => { const d = new Date(); month = new Date(d.getFullYear(), d.getMonth(), 1); shiftMonth(0); });
+$("#langSeg").querySelectorAll("[data-lang]").forEach((b) => b.addEventListener("click", () => { if (b.dataset.lang === lang) return; lang = b.dataset.lang; ls.set("ds_rh_lang", lang); const u = new URL(location.href); u.searchParams.set("lang", lang); history.replaceState(null, "", u); applyText(); renderTabs(); render(); }));
+boot();
+</script>
+</body>
+</html>

@@ -2101,6 +2101,7 @@ async function boot() {
   // menu « Espaces » (nav.js) : il ne propose que ce que ce profil peut ouvrir (20/10, QCM prix & accès). Effacé à la déconnexion.
   ls.set("ds_nav_role", canMoney() ? "admin" : canTarifs() ? "price" : "team"); ls.set("ds_nav_recruit", canRecruit() ? "1" : "0");
   renderWho();
+  if (profile.role === "hr") { location.replace("../rh/" + (params.has("lang") ? "?lang=" + encodeURIComponent(params.get("lang")) : "")); return; }   // 20/10 : RH (Safa) → son espace /rh/ (KPI et présence des monteurs) ; isAdmin() l'exclut de tout le reste, aucune requête de production
   if (isSales()) { $("#logout").hidden = false; await bootSales(); return; }   // commercial sans ligne `profiles` : sa vue seulement, aucune requête de production
   $("#logout").hidden = !!OPEN_ACCESS && me.email === OPEN_ACCESS.email; $("#gate").hidden = true; $("#app").hidden = false; $("#live").hidden = false;
   renderToolbar(); await load(true); renderTabs();
