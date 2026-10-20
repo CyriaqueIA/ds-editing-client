@@ -169,18 +169,20 @@ const T = {
   en: { kicker: "HR · Editors", title: "Editors — KPI & presence", stats: "Charts (prod-admin)", csv: "Export CSV", logout: "Log out", login: "HR space", loginSub: "Sign in with your DS Editing email.", loginBtn: "Enter",
     deniedT: "Restricted access", deniedP: "This space is for HR and admins only.", thisMonth: "This month", tabs: { kpi: "KPI", presence: "Presence", daily: "Daily reports" },
     loading: "Loading…", err: "Cannot read the month: ", refuse: "Access refused by the database for this account.", migrate: "Waiting for the database update (rh_v1.sql).",
-    s: { points: "Team points", videos: "Videos done", days: "Reports sent", revs: "Revisions", delivered: "Orders delivered", late: "Delivered late" },
-    k: { title: "KPI per editor", lead: "Points = finished videos × rate per category (same rule as the daily report). Orders come from the production board.", editor: "Editor", days: "Days reported", videos: "Videos", points: "Points", perDay: "Pts / day", reels: "Reels", intros: "Intros", podcasts: "Podcasts", revs: "Revisions", revMin: "Rev. min", delivered: "Delivered", late: "Late", qc: "QC rounds", office: "Office", home: "Home", absent: "Absent", total: "Team total", none: "—",
-      foot: ["Days reported: days where the editor sent the daily report (/prod). An editor with presence but no report is a red flag.", "Revisions: revisions declared in the daily report. QC rounds: « needs changes » verdicts from quality on orders delivered this month.", "Late: orders delivered after the requested date (client date, otherwise the date set by the team, otherwise 5 business days)."] },
+    s: { presence: "Team presence", index: "Team index", points: "Team points", videos: "Videos done", days: "Reports sent", revs: "Revisions", delivered: "Orders delivered", late: "Delivered late" },
+    k: { title: "KPI per editor", lead: "Contract rules: presence ≥ target of the month, performance index out of 100 = volume + deadlines + internal QC + revision management. Points = finished videos × rate per category (same rule as the daily report).", editor: "Editor", presence: "Presence", present: "Days present", index: "Index /100", sVol: "Volume", sDl: "On time", sQc: "QC pass", sRev: "Rev. mgmt", days: "Days reported", videos: "Videos", points: "Points", perDay: "Pts / day", reels: "Reels", intros: "Intros", podcasts: "Podcasts", revs: "Revisions", revMin: "Rev. min", delivered: "Delivered", late: "Late", qc: "QC rounds", office: "Office", home: "Home", absent: "Absent", total: "Team total", none: "—", target: (p) => `target ${p}%`, of: (a, b) => `${a} / ${b} days`,
+      foot: ["Presence: days marked Office or Home in the Presence tab, plus days with a daily report (a report proves the editor worked). Divided by the days of the month (calendar or business days, see Rules). Red when under the target.", "Index /100: weighted average of 4 scores. Volume = videos done vs the volume target (or vs the best editor when the target is 0). On time = orders delivered on or before the expected date. QC pass = orders delivered without a « needs changes » verdict. Rev. mgmt = 100 − revisions per video. A score without data is left out and the weights are rescaled.", "Days reported: days where the editor sent the daily report (/prod). Revisions: revisions declared in the daily report. QC rounds: « needs changes » verdicts from quality on orders delivered this month.", "Late: orders delivered after the expected date (client date, otherwise the date set by the team, otherwise 5 business days)."],
+      set: { title: "Rules (contract)", presT: "Presence target (%)", basis: "Presence basis", cal: "Calendar days", bus: "Business days (Mon–Fri)", volT: "Volume target (videos / month, 0 = relative to the best editor)", wV: "Weight · volume", wD: "Weight · deadlines", wQ: "Weight · QC", wR: "Weight · revisions", save: "Save rules", saved: "Rules saved", fail: "Not saved: ", sum: (n) => `Weights total ${n} (rescaled to 100)` } },
     p: { title: "Presence", lead: "Click a cell to cycle: Office → Home → Absent → Leave → Sick → empty. Saved immediately. A small dot = a daily report was sent that day.", editor: "Editor", office: "Office", home: "Home", off: "Absent", leave: "Leave", sick: "Sick", saved: "Saved", fail: "Not saved: ", worked: "report sent", noWork: "no report", pts: "pts" },
     d: { title: "Daily reports", lead: "What each editor declared, day by day. Newest first.", none: "No report this month.", videos: (n) => `${n} video${n > 1 ? "s" : ""}`, pts: (n) => `${n} pts`, revs: (n, m) => `${n} revision${n > 1 ? "s" : ""}${m ? " · " + m + " min" : ""}`, noDetail: "(no detail written)" },
     dow: ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"] },
   fr: { kicker: "RH · Monteurs", title: "Monteurs — KPI & présence", stats: "Graphiques (prod-admin)", csv: "Export CSV", logout: "Déconnexion", login: "Espace RH", loginSub: "Connecte-toi avec ton e-mail DS Editing.", loginBtn: "Entrer",
     deniedT: "Accès réservé", deniedP: "Cet espace est réservé aux RH et aux admins.", thisMonth: "Ce mois-ci", tabs: { kpi: "KPI", presence: "Présence", daily: "Rapports du jour" },
     loading: "Lecture en cours…", err: "Lecture du mois impossible : ", refuse: "Accès refusé par la base pour ce compte.", migrate: "En attente de la mise à jour de la base (rh_v1.sql).",
-    s: { points: "Points équipe", videos: "Vidéos terminées", days: "Rapports envoyés", revs: "Révisions", delivered: "Commandes livrées", late: "Livrées en retard" },
-    k: { title: "KPI par monteur", lead: "Points = vidéos terminées × barème de la catégorie (même règle que le rapport du jour). Les commandes viennent du tableau de production.", editor: "Monteur", days: "Jours déclarés", videos: "Vidéos", points: "Points", perDay: "Pts / jour", reels: "Reels", intros: "Intros", podcasts: "Podcasts", revs: "Révisions", revMin: "Min. révision", delivered: "Livrées", late: "En retard", qc: "Passages QC", office: "Bureau", home: "Maison", absent: "Absent", total: "Total équipe", none: "—",
-      foot: ["Jours déclarés : jours où le monteur a envoyé son rapport du jour (/prod). Présent mais sans rapport = signal rouge.", "Révisions : révisions déclarées dans le rapport du jour. Passages QC : verdicts « à revoir » de la qualité sur les commandes livrées ce mois.", "En retard : commandes livrées après la date attendue (date client, sinon date fixée par l'équipe, sinon 5 jours ouvrés)."] },
+    s: { presence: "Présence équipe", index: "Index équipe", points: "Points équipe", videos: "Vidéos terminées", days: "Rapports envoyés", revs: "Révisions", delivered: "Commandes livrées", late: "Livrées en retard" },
+    k: { title: "KPI par monteur", lead: "Règles du contrat : présence ≥ cible du mois, index de performance sur 100 = volume + délais + contrôle qualité interne + gestion des révisions. Points = vidéos terminées × barème de la catégorie (même règle que le rapport du jour).", editor: "Monteur", presence: "Présence", present: "Jours présents", index: "Index /100", sVol: "Volume", sDl: "À l'heure", sQc: "QC OK", sRev: "Révisions", days: "Jours déclarés", videos: "Vidéos", points: "Points", perDay: "Pts / jour", reels: "Reels", intros: "Intros", podcasts: "Podcasts", revs: "Révisions", revMin: "Min. révision", delivered: "Livrées", late: "En retard", qc: "Passages QC", office: "Bureau", home: "Maison", absent: "Absent", total: "Total équipe", none: "—", target: (p) => `cible ${p} %`, of: (a, b) => `${a} / ${b} jours`,
+      foot: ["Présence : jours marqués Bureau ou Maison dans l'onglet Présence, plus les jours avec un rapport du jour (un rapport prouve que le monteur a travaillé). Divisé par les jours du mois (calendaires ou ouvrés, voir Règles). Rouge sous la cible.", "Index /100 : moyenne pondérée de 4 scores. Volume = vidéos terminées par rapport à la cible (ou au meilleur monteur si la cible est 0). À l'heure = commandes livrées au plus tard à la date attendue. QC OK = commandes livrées sans verdict « à revoir ». Révisions = 100 − révisions par vidéo. Un score sans donnée est ignoré et les poids sont recalculés.", "Jours déclarés : jours où le monteur a envoyé son rapport du jour (/prod). Révisions : révisions déclarées dans le rapport du jour. Passages QC : verdicts « à revoir » de la qualité sur les commandes livrées ce mois.", "En retard : commandes livrées après la date attendue (date client, sinon date fixée par l'équipe, sinon 5 jours ouvrés)."],
+      set: { title: "Règles (contrat)", presT: "Cible de présence (%)", basis: "Base de présence", cal: "Jours calendaires", bus: "Jours ouvrés (lun–ven)", volT: "Cible de volume (vidéos / mois, 0 = par rapport au meilleur monteur)", wV: "Poids · volume", wD: "Poids · délais", wQ: "Poids · QC", wR: "Poids · révisions", save: "Enregistrer les règles", saved: "Règles enregistrées", fail: "Non enregistré : ", sum: (n) => `Total des poids ${n} (ramené à 100)` } },
     p: { title: "Présence", lead: "Clique une case pour tourner : Bureau → Maison → Absent → Congé → Malade → vide. Enregistré tout de suite. Petit point = rapport du jour envoyé ce jour-là.", editor: "Monteur", office: "Bureau", home: "Maison", off: "Absent", leave: "Congé", sick: "Malade", saved: "Enregistré", fail: "Non enregistré : ", worked: "rapport envoyé", noWork: "pas de rapport", pts: "pts" },
     d: { title: "Rapports du jour", lead: "Ce que chaque monteur a déclaré, jour par jour. Le plus récent d'abord.", none: "Aucun rapport ce mois-ci.", videos: (n) => `${n} vidéo${n > 1 ? "s" : ""}`, pts: (n) => `${n} pts`, revs: (n, m) => `${n} révision${n > 1 ? "s" : ""}${m ? " · " + m + " min" : ""}`, noDetail: "(aucun détail écrit)" },
     dow: ["Di", "Lu", "Ma", "Me", "Je", "Ve", "Sa"] },
@@ -221,16 +223,30 @@ function addBusinessDays(date, n) { const d = new Date(date); let k = 0; while (
 const endOfDay = (d) => { const x = new Date(d); x.setHours(23, 59, 59, 0); return x; };
 function target(j) { if (j.requested_deadline) return endOfDay(j.requested_deadline + "T12:00:00"); if (j.delivery_date) return endOfDay(j.delivery_date + "T12:00:00"); return endOfDay(addBusinessDays(j.created_at, 5)); }
 const group = (key) => String(key).split("_")[0];
+const DEFAULTS = { presence_target: 75, presence_basis: "calendar", volume_target: 0, w_volume: 40, w_deadline: 20, w_qc: 25, w_revisions: 15 };
+const settings = () => Object.assign({}, DEFAULTS, M && M.settings ? M.settings : {});
+function basisDays() { const S = settings(), n = daysInMonth(); if (S.presence_basis !== "business") return n; let k = 0; for (let i = 1; i <= n; i++) { const d = new Date(month.getFullYear(), month.getMonth(), i).getDay(); if (d !== 0 && d !== 6) k++; } return k; }
+/* index de performance (cadre de Safa, 20/10) : 4 scores sur 100, pondérés ; un score sans donnée est ignoré et les poids restants sont ramenés à 100 */
+function scores(e, best) {
+  const S = settings(), vt = Number(S.volume_target) || 0;
+  const vol = vt > 0 ? Math.min(100, e.videos / vt * 100) : (best > 0 ? e.videos / best * 100 : null);
+  const dl = e.delivered ? (e.delivered - e.late) / e.delivered * 100 : null;
+  const qc = e.delivered ? (e.delivered - e.qcJobs) / e.delivered * 100 : null;
+  const rev = e.videos ? Math.max(0, 100 - e.revs / e.videos * 100) : null;
+  const parts = [[vol, S.w_volume], [dl, S.w_deadline], [qc, S.w_qc], [rev, S.w_revisions]].filter(([v, w]) => v != null && Number(w) > 0);
+  const wsum = parts.reduce((a, [, w]) => a + Number(w), 0);
+  return { vol, dl, qc, rev, index: wsum ? parts.reduce((a, [v, w]) => a + v * Number(w), 0) / wsum : null };
+}
 function compute() {
   const from = M.from, to = M.to, inMonth = (iso) => !!iso && iso.slice(0, 10) >= from && iso.slice(0, 10) < to;
-  const mk = (e) => ({ ...e, days: new Set(), videos: 0, points: 0, groups: { reel: 0, intro: 0, podcast: 0 }, revs: 0, revMin: 0, delivered: 0, late: 0, qc: 0, pres: { office: 0, home: 0, off: 0, leave: 0, sick: 0 } });
+  const mk = (e) => ({ ...e, days: new Set(), presentDays: new Set(), videos: 0, points: 0, groups: { reel: 0, intro: 0, podcast: 0 }, revs: 0, revMin: 0, delivered: 0, late: 0, qc: 0, qcJobs: 0, pres: { office: 0, home: 0, off: 0, leave: 0, sick: 0 } });
   const rows = new Map(M.editors.map((e) => [e.id, mk(e)]));
   const tot = mk({ id: "tot", name: t("k").total });
   const rowOf = (id) => { if (!rows.has(id)) rows.set(id, mk({ id, name: "?", active: false })); return rows.get(id); };
   for (const r of M.reports) {
     const row = rowOf(r.editor_id); if (row.name === "?") row.name = r.editor_name || "?";
     const p = Number(r.points) || 0, v = Number(r.elements) || 0;
-    row.days.add(r.report_date); tot.days.add(r.report_date + "|" + r.editor_id);
+    row.days.add(r.report_date); tot.days.add(r.report_date + "|" + r.editor_id); row.presentDays.add(r.report_date);
     row.points += p; tot.points += p; row.videos += v; tot.videos += v;
     for (const c of M.categories) { const done = Number(((r.counts || {})[c.key] || {}).done) || 0; if (!done) continue; const g = group(c.key); if (g in row.groups) { row.groups[g] += done; tot.groups[g] += done; } }
     const rc = Number(r.rev_count) || 0, rm = Number(r.rev_minutes) || 0; row.revs += rc; tot.revs += rc; row.revMin += rm; tot.revMin += rm;
@@ -239,13 +255,20 @@ function compute() {
     if (!inMonth(j.delivered_at)) continue;
     const ids = (j.editor_ids || []).length ? j.editor_ids : [];
     const late = new Date(j.delivered_at) > target(j), nq = (Number(j.qc_round) || 0) + (j.qc_status === "revisions" ? 1 : 0);
-    for (const id of ids) { const row = rowOf(id); row.delivered++; if (late) row.late++; row.qc += nq; }
-    tot.delivered++; if (late) tot.late++; tot.qc += nq;
+    for (const id of ids) { const row = rowOf(id); row.delivered++; if (late) row.late++; row.qc += nq; if (nq) row.qcJobs++; }
+    tot.delivered++; if (late) tot.late++; tot.qc += nq; if (nq) tot.qcJobs++;
   }
-  for (const p of M.presence) { const row = rowOf(p.editor_id); if (p.place in row.pres) { row.pres[p.place]++; tot.pres[p.place]++; } }
+  for (const p of M.presence) { const row = rowOf(p.editor_id); if (p.place in row.pres) { row.pres[p.place]++; tot.pres[p.place]++; } if (p.place === "office" || p.place === "home") row.presentDays.add(p.day); }
   const list = [...rows.values()].filter((e) => e.active !== false || e.points || e.days.size || e.delivered || Object.values(e.pres).some(Boolean));
-  list.sort((a, b) => (b.points - a.points) || (b.videos - a.videos) || String(a.name).localeCompare(String(b.name)));
-  return { list, tot };
+  const basis = basisDays(), best = Math.max(0, ...list.map((e) => e.videos));
+  for (const e of list) { e.present = e.presentDays.size; e.presRate = basis ? e.present / basis * 100 : null; e.sc = scores(e, best); }
+  // total équipe : présence moyenne des monteurs actifs du mois, scores sur les totaux
+  const withPres = list.filter((e) => e.active !== false);
+  tot.present = withPres.reduce((a, e) => a + e.present, 0); tot.presRate = withPres.length && basis ? tot.present / (withPres.length * basis) * 100 : null;
+  tot.sc = scores(tot, best); const vols = list.map((e) => e.sc.vol).filter((v) => v != null); tot.sc.vol = vols.length ? vols.reduce((a, v) => a + v, 0) / vols.length : null;   // volume équipe = moyenne des scores de volume (le total n'a pas de « meilleur monteur »)
+  { const S = settings(), parts = [[tot.sc.vol, S.w_volume], [tot.sc.dl, S.w_deadline], [tot.sc.qc, S.w_qc], [tot.sc.rev, S.w_revisions]].filter(([v, w]) => v != null && Number(w) > 0), ws = parts.reduce((a, [, w]) => a + Number(w), 0); tot.sc.index = ws ? parts.reduce((a, [v, w]) => a + v * Number(w), 0) / ws : null; }
+  list.sort((a, b) => ((b.sc.index ?? -1) - (a.sc.index ?? -1)) || (b.points - a.points) || String(a.name).localeCompare(String(b.name)));
+  return { list, tot, basis };
 }
 
 /* ===== vues ===== */
@@ -262,16 +285,39 @@ function render() {
   if (tab === "kpi") renderKpi(); else if (tab === "presence") renderPresence(); else renderDaily();
 }
 function renderKpi() {
-  const K = t("k"), S = t("s"), { list, tot } = compute();
+  const K = t("k"), S = t("s"), ST = settings(), { list, tot, basis } = compute(), tgt = Number(ST.presence_target) || 0;
+  const pct = (v) => v == null ? K.none : nf(v, 0) + " %";
   const stat = (l, v, s) => `<div class="stat"><div class="mono">${l}</div><div class="v">${v}${s ? `<small>${s}</small>` : ""}</div></div>`;
-  const stats = `<div class="stats">${stat(S.points, nf(tot.points))}${stat(S.videos, nf(tot.videos, 0))}${stat(S.days, nf(tot.days.size, 0))}${stat(S.revs, nf(tot.revs, 0), tot.revMin ? nf(tot.revMin, 0) + " min" : "")}${stat(S.delivered, nf(tot.delivered, 0))}${stat(S.late, nf(tot.late, 0))}</div>`;
-  const td = (v, cls = "") => `<td class="${cls}">${v}</td>`;
-  const row = (e, i, cls) => { const nd = e.days.size; return `<tr class="${cls}"><td class="d">${cls ? "" : `<span class="rk ${i === 0 && e.points > 0 ? "first" : ""}">${e.points > 0 ? i + 1 : "·"}</span>`}${cls ? "" : avatar(e)}${esc(e.name)}</td>${td(nd, nd || cls ? "c" : "err")}${td(nf(e.videos, 0), "c")}${td(nf(e.points), "big")}${td(nd ? nf(e.points / nd) : K.none)}${td(e.groups.reel || K.none)}${td(e.groups.intro || K.none)}${td(e.groups.podcast || K.none)}${td(e.revs || K.none, e.revs ? "warn" : "")}${td(e.revMin ? nf(e.revMin, 0) : K.none)}${td(e.delivered || K.none, "c")}${td(e.late || K.none, e.late ? "err" : "")}${td(e.qc || K.none, e.qc ? "warn" : "")}${td(e.pres.office || K.none)}${td(e.pres.home || K.none)}${td((e.pres.off + e.pres.leave + e.pres.sick) || K.none, e.pres.off ? "err" : "")}</tr>`; };
-  const th = (x) => `<th>${x}</th>`;
+  const stats = `<div class="stats">${stat(S.presence, pct(tot.presRate), K.target(tgt))}${stat(S.index, tot.sc.index == null ? K.none : nf(tot.sc.index, 0))}${stat(S.points, nf(tot.points))}${stat(S.videos, nf(tot.videos, 0))}${stat(S.days, nf(tot.days.size, 0))}${stat(S.revs, nf(tot.revs, 0), tot.revMin ? nf(tot.revMin, 0) + " min" : "")}${stat(S.delivered, nf(tot.delivered, 0))}${stat(S.late, nf(tot.late, 0))}</div>`;
+  const td = (v, cls = "", title = "") => `<td class="${cls}"${title ? ` title="${esc(title)}"` : ""}>${v}</td>`;
+  const sc = (v) => td(v == null ? K.none : nf(v, 0), v == null ? "" : v < 50 ? "err" : v < 75 ? "warn" : "c");
+  const row = (e, i, cls) => { const nd = e.days.size, pr = e.presRate, ix = e.sc.index;
+    return `<tr class="${cls}"><td class="d">${cls ? "" : `<span class="rk ${i === 0 && ix != null ? "first" : ""}">${ix != null ? i + 1 : "·"}</span>`}${cls ? "" : avatar(e)}${esc(e.name)}</td>
+      ${td(pct(pr), pr == null ? "" : pr < tgt ? "err" : "c", cls ? "" : K.of(e.present, basis))}${td(ix == null ? K.none : nf(ix, 0), ix == null ? "" : ix < 50 ? "err" : ix < 75 ? "warn" : "big")}${sc(e.sc.vol)}${sc(e.sc.dl)}${sc(e.sc.qc)}${sc(e.sc.rev)}
+      ${td(nd, nd || cls ? "c" : "err")}${td(nf(e.videos, 0), "c")}${td(nf(e.points), "c")}${td(nd ? nf(e.points / nd) : K.none)}${td(e.groups.reel || K.none)}${td(e.groups.intro || K.none)}${td(e.groups.podcast || K.none)}${td(e.revs || K.none, e.revs ? "warn" : "")}${td(e.revMin ? nf(e.revMin, 0) : K.none)}${td(e.delivered || K.none, "c")}${td(e.late || K.none, e.late ? "err" : "")}${td(e.qc || K.none, e.qc ? "warn" : "")}${td(e.pres.office || K.none)}${td(e.pres.home || K.none)}${td((e.pres.off + e.pres.leave + e.pres.sick) || K.none, e.pres.off ? "err" : "")}</tr>`; };
+  const th = (x, extra = "") => `<th ${extra}>${x}</th>`;
+  const ws = ["w_volume", "w_deadline", "w_qc", "w_revisions"].reduce((a, k) => a + (Number(ST[k]) || 0), 0);
+  const num = (k, l) => `<label style="display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--taupe)">${l}<input class="in" type="number" min="0" max="1000" step="1" data-set="${k}" value="${esc(ST[k])}" style="width:120px"/></label>`;
+  const setPanel = `<details class="panel" style="padding:14px 20px"><summary style="cursor:pointer;font-weight:600">${K.set.title}</summary>
+    <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;margin-top:14px">${num("presence_target", K.set.presT)}
+      <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--taupe)">${K.set.basis}<select class="in" data-set="presence_basis" style="width:200px"><option value="calendar" ${ST.presence_basis !== "business" ? "selected" : ""}>${K.set.cal}</option><option value="business" ${ST.presence_basis === "business" ? "selected" : ""}>${K.set.bus}</option></select></label>
+      ${num("volume_target", K.set.volT)}${num("w_volume", K.set.wV)}${num("w_deadline", K.set.wD)}${num("w_qc", K.set.wQ)}${num("w_revisions", K.set.wR)}
+      <button class="btn sm" id="setSave" type="button">${K.set.save}</button><span class="mono" id="setMsg">${ws !== 100 ? K.set.sum(ws) : ""}</span></div></details>`;
   $("#v-kpi").innerHTML = stats + `<div class="panel"><div class="ph"><div><h2>${K.title}</h2><p class="lead">${K.lead}</p></div></div>
-    <div class="scroll"><table class="grid"><thead><tr><th class="d">${K.editor}</th>${th(K.days)}${th(K.videos)}${th(K.points)}${th(K.perDay)}${th(K.reels)}${th(K.intros)}${th(K.podcasts)}${th(K.revs)}${th(K.revMin)}${th(K.delivered)}${th(K.late)}${th(K.qc)}${th(K.office)}${th(K.home)}${th(K.absent)}</tr></thead>
+    <div class="scroll"><table class="grid"><thead>
+      <tr><th class="d" rowspan="2">${K.editor}</th>${th(K.presence, 'rowspan="2"')}${th(K.index, 'rowspan="2"')}${th("Scores /100", 'colspan="4"')}${th(K.days, 'rowspan="2"')}${th(K.videos, 'rowspan="2"')}${th(K.points, 'rowspan="2"')}${th(K.perDay, 'rowspan="2"')}${th(K.reels, 'rowspan="2"')}${th(K.intros, 'rowspan="2"')}${th(K.podcasts, 'rowspan="2"')}${th(K.revs, 'rowspan="2"')}${th(K.revMin, 'rowspan="2"')}${th(K.delivered, 'rowspan="2"')}${th(K.late, 'rowspan="2"')}${th(K.qc, 'rowspan="2"')}${th(K.office, 'rowspan="2"')}${th(K.home, 'rowspan="2"')}${th(K.absent, 'rowspan="2"')}</tr>
+      <tr>${th(K.sVol)}${th(K.sDl)}${th(K.sQc)}${th(K.sRev)}</tr></thead>
     <tbody>${list.map((e, i) => row(e, i, "")).join("")}${row(tot, 0, "t")}</tbody></table></div>
-    <ul class="legend" style="display:block;padding-left:18px">${K.foot.map((x) => `<li>${esc(x)}</li>`).join("")}</ul></div>`;
+    <ul class="legend" style="display:block;padding-left:18px">${K.foot.map((x) => `<li>${esc(x)}</li>`).join("")}</ul></div>` + setPanel;
+  $("#setSave").addEventListener("click", saveSettings);
+}
+async function saveSettings() {
+  const K = t("k").set, data = {}; document.querySelectorAll("[data-set]").forEach((el) => { data[el.dataset.set] = el.tagName === "SELECT" ? el.value : Number(el.value); });
+  const b = $("#setSave"); b.disabled = true;
+  let r; try { r = await sb.rpc("rh_settings_set", { p_data: data }); } catch (e) { r = { error: e }; }
+  b.disabled = false;
+  if (r.error) { toast(K.fail + (r.error.message || r.error), true); return; }
+  M.settings = r.data || data; toast(K.saved); renderKpi(); const d = $("#v-kpi details"); if (d) d.open = true;
 }
 function renderPresence() {
   const P = t("p"), n = daysInMonth(), today = M.today, DOW = t("dow");
@@ -317,8 +363,9 @@ function renderDaily() {
 }
 function exportCsv() {
   const K = t("k"), { list, tot } = compute();
-  const head = [K.editor, K.days, K.videos, K.points, K.reels, K.intros, K.podcasts, K.revs, K.revMin, K.delivered, K.late, K.qc, K.office, K.home, t("p").off, t("p").leave, t("p").sick];
-  const line = (e) => [e.name, e.days.size, e.videos, Number(e.points.toFixed(2)), e.groups.reel, e.groups.intro, e.groups.podcast, e.revs, e.revMin, e.delivered, e.late, e.qc, e.pres.office, e.pres.home, e.pres.off, e.pres.leave, e.pres.sick];
+  const r0 = (v) => v == null ? "" : Math.round(v);
+  const head = [K.editor, K.presence + " %", K.present, K.index, K.sVol, K.sDl, K.sQc, K.sRev, K.days, K.videos, K.points, K.reels, K.intros, K.podcasts, K.revs, K.revMin, K.delivered, K.late, K.qc, K.office, K.home, t("p").off, t("p").leave, t("p").sick];
+  const line = (e) => [e.name, r0(e.presRate), e.present, r0(e.sc.index), r0(e.sc.vol), r0(e.sc.dl), r0(e.sc.qc), r0(e.sc.rev), e.days.size, e.videos, Number(e.points.toFixed(2)), e.groups.reel, e.groups.intro, e.groups.podcast, e.revs, e.revMin, e.delivered, e.late, e.qc, e.pres.office, e.pres.home, e.pres.off, e.pres.leave, e.pres.sick];
   const csv = [head, ...list.map(line), line(tot)].map((r) => r.map((v) => `"${String(v ?? "").replace(/"/g, '""')}"`).join(";")).join("\n");
   const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8" })); a.download = `ds-editing-rh-${ymd(month).slice(0, 7)}.csv`; a.click();
 }
