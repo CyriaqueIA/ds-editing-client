@@ -1,4 +1,5 @@
--- Version pour le SQL Editor de Supabase : chaque instruction se termine par « ; » (le fichier source ds-editing-os/supabase/ilana_v1.sql garde les séparateurs « -- @@ » de apply.py).
+-- Version pour le SQL Editor de Supabase (chaque instruction finit par « ; » placé AVANT tout commentaire de fin de ligne).
+-- Source de vérité : ds-editing-os/supabase/ilana_v1.sql (séparateurs de apply.py).
 
 -- Ilana, monteuse IA (décisions QCM de Cyriaque du 20/10/2026, artifact S2paovvTtPSrAKG2Gr9DU5).
 -- À coller dans le SQL Editor de Supabase (le mot de passe SQL du Mac est périmé). Blocs séparés par « -- @@ ».
@@ -24,7 +25,7 @@ insert into editors (name, sort, active, is_ai, pilot_ids)
 
 insert into editor_keys (editor_id) select id from editors where name = 'Ilana' on conflict do nothing;
 
-alter table studios add column if not exists ai_ok boolean            -- dernier avis du client sur une monteuse IA (null = jamais répondu);
+alter table studios add column if not exists ai_ok boolean; -- dernier avis du client sur une monteuse IA (null = jamais répondu)
 
 alter table studios add column if not exists ai_ok_at timestamptz;
 
