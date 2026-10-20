@@ -1043,7 +1043,7 @@ function renderBoard() {
           ${isAdmin() ? `<b style="margin-top:8px">${t("deliveryDate")}</b><input class="in" type="date" data-field="delivery_date" data-id="${j.id}" value="${j.delivery_date || ""}"/>${fbHtml(j.id, "delivery_date")}<b style="margin-top:8px">${t("noteQc")}</b><input class="in" data-field="qc_note" data-id="${j.id}" value="${esc(j.qc_note || "")}"/>${fbHtml(j.id, "qc_note")}` : (j.qc_note ? `<b style="margin-top:8px">${t("noteQc")}</b>${esc(j.qc_note)}` : "")}
           ${multi && isEditor() ? "" : `<b style="margin-top:8px">${t("notes")}</b><input class="in" data-field="notes" data-id="${j.id}" value="${esc(j.notes || "")}" ${ed && !(multi && isEditor()) ? "" : "disabled"}/>${fbHtml(j.id, "notes")}`}
           ${multi ? partNotes(j) : reshapeBlock(j)}
-          ${isAdmin() && !LINKED ? amountBlock(j) : ""}
+          ${canMoney() && !LINKED ? amountBlock(j) : ""}
         </div>
       </div>
     </div>`;
