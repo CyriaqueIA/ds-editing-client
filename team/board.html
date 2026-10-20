@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+  <meta name="theme-color" content="#050607"/>
+  <meta name="robots" content="noindex,nofollow"/>
+  <meta name="referrer" content="no-referrer"/>
+  <title>DS Editing — Papan tim</title>
+  <link rel="icon" type="image/png" href="../assets/logo.png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&display=swap" rel="stylesheet"/>
+  <style>
+    /* Vue équipe (lien commun, lecture seule) : même peau que /prod — fond nuit, Geist, ● Rec. Une colonne, téléphone d'abord. */
+    :root{--bg:#050607;--surface:#0F1114;--surface-2:#161A1F;--line:rgba(255,255,255,.09);--line-strong:rgba(255,255,255,.22);--cream:#F5F5F1;--taupe:#9AA3AD;--chrome:#DCE3EA;
+      --ok:#46D369;--warn:#F5C400;--err:#F08A82;--info:#7FB3FF;color-scheme:dark}
+    *{box-sizing:border-box}
+    html,body{margin:0;color:var(--cream);font-family:'Geist',system-ui,sans-serif;-webkit-font-smoothing:antialiased;background:var(--bg)}
+    body{min-height:100vh;display:flex;flex-direction:column;background:radial-gradient(1200px 700px at 85% -5%,rgba(125,155,195,.16),transparent 60%),radial-gradient(900px 600px at -10% 40%,rgba(160,170,190,.08),transparent 55%),var(--bg)}
+    a{color:inherit}
+    button{font:inherit;cursor:pointer}
+    [hidden]{display:none!important}
+    .mono{font-weight:600;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--taupe);font-variant-numeric:tabular-nums}
+    header{position:sticky;top:0;z-index:20;background:rgba(8,9,11,.62);backdrop-filter:blur(22px) saturate(1.4);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top,0px)}
+    .hd{max-width:760px;margin:0 auto;padding:12px max(16px,env(safe-area-inset-right,0px)) 12px max(16px,env(safe-area-inset-left,0px));display:flex;align-items:center;gap:14px}
+    .brand{display:flex;flex-direction:column;align-items:flex-start;gap:4px;text-decoration:none}
+    .lv-rec{display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:22px;letter-spacing:-.04em;line-height:1;color:var(--cream);white-space:nowrap}
+    .lv-rec i{width:9px;height:9px;border-radius:50%;background:var(--chrome);box-shadow:0 0 12px var(--chrome);animation:blink 1.6s infinite;margin-right:2px}
+    .lv-rec em{font-style:normal;font-size:11px;font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:var(--taupe);margin-left:2px}
+    @keyframes blink{50%{opacity:.2}}
+    @media (prefers-reduced-motion:reduce){.lv-rec i{animation:none}}
+    .brand .mono{font-size:10px;color:#B9C9DA}
+    .seg{margin-left:auto;display:flex;padding:3px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.16);border-radius:999px}
+    .seg button{border:0;background:transparent;color:var(--taupe);border-radius:999px;padding:7px 12px;font-size:12px;font-weight:600;white-space:nowrap;transition:.15s}
+    .seg button.on{background:rgba(255,255,255,.9);color:#0A0B0D}
+    .seg button:focus-visible{outline:2px solid var(--chrome);outline-offset:2px}
+    main{flex:1;width:100%;max-width:760px;margin:0 auto;padding:26px max(16px,env(safe-area-inset-right,0px)) 70px max(16px,env(safe-area-inset-left,0px))}
+    h1{margin:0 0 6px;font-size:clamp(30px,6.5vw,44px);font-weight:600;letter-spacing:-.035em;line-height:1;text-wrap:balance}
+    .lead{margin:0;color:var(--taupe);font-size:14px;line-height:1.55;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+    .live{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ok)}
+    .live i{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 10px var(--ok)}
+    .live.off{color:var(--warn)}.live.off i{background:var(--warn);box-shadow:none}
+    .stats{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0 26px}
+    .chip{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.03);font-size:13px;color:var(--taupe)}
+    .chip b{color:var(--cream);font-variant-numeric:tabular-nums;font-size:15px}
+    .chip.has.late b{color:var(--err)}.chip.has.na b{color:var(--warn)}
+    section.ed{margin-bottom:14px;border:1px solid var(--line);border-radius:18px;background:var(--surface);overflow:hidden}
+    .edh{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--line)}
+    .av{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:15px;color:#fff;flex-shrink:0;background-size:cover;background-position:center}
+    .edh .nm{font-weight:600;font-size:16px;letter-spacing:-.01em}
+    .edh .ct{margin-left:auto;font-size:12px;color:var(--taupe);font-variant-numeric:tabular-nums;white-space:nowrap}
+    .edh .ct b{color:var(--cream)}
+    .empty{padding:14px 16px;color:var(--taupe);font-size:13px}
+    .job{border-top:1px solid var(--line)}
+    .job:first-child{border-top:0}
+    .row{width:100%;text-align:left;background:transparent;border:0;color:inherit;padding:13px 16px;display:grid;grid-template-columns:1fr auto;gap:4px 12px;align-items:start}
+    .row:hover{background:rgba(255,255,255,.025)}
+    .row:focus-visible{outline:2px solid var(--chrome);outline-offset:-2px}
+    .row .cl{font-weight:600;font-size:15px;letter-spacing:-.01em;min-width:0;overflow-wrap:anywhere}
+    .row .cl small{display:block;font-weight:400;font-size:13px;color:var(--taupe);margin-top:2px}
+    .row .wk{grid-column:1 / -1;font-size:13px;color:var(--taupe);overflow-wrap:anywhere}
+    .tags{display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0}
+    .tag{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;letter-spacing:.03em;padding:4px 9px;border-radius:999px;border:1px solid var(--line-strong);color:var(--cream);white-space:nowrap;font-variant-numeric:tabular-nums}
+    .tag.ok{color:var(--ok);border-color:rgba(70,211,105,.4);background:rgba(70,211,105,.1)}
+    .tag.warn{color:var(--warn);border-color:rgba(245,196,0,.4);background:rgba(245,196,0,.1)}
+    .tag.err{color:var(--err);border-color:rgba(240,138,130,.5);background:rgba(240,138,130,.12)}
+    .tag.info{color:var(--info);border-color:rgba(127,179,255,.4);background:rgba(127,179,255,.1)}
+    .tag.dim{color:var(--taupe)}
+    .tag.part{color:#0A0B0D;background:var(--chrome);border-color:var(--chrome)}
+    .det{padding:4px 16px 16px;display:grid;gap:10px;font-size:13px;line-height:1.5}
+    .kv{display:grid;grid-template-columns:110px 1fr;gap:4px 12px}
+    .kv b{font-weight:600;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--taupe);padding-top:2px}
+    .kv span{min-width:0;overflow-wrap:anywhere;white-space:pre-wrap}
+    .kv a{color:var(--info);text-decoration:none}
+    .kv a:hover{text-decoration:underline}
+    .kv .path{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;color:var(--cream);background:rgba(255,255,255,.05);padding:6px 8px;border-radius:8px;display:block}
+    .note{border-left:3px solid var(--err);padding:8px 12px;background:rgba(240,138,130,.08);border-radius:0 10px 10px 0;white-space:pre-wrap}
+    .parts{display:grid;gap:6px}
+    .parts div{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.02)}
+    .parts .who{color:var(--taupe);font-size:12px;margin-left:auto}
+    h2{font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--taupe);margin:30px 0 10px}
+    details.done summary{list-style:none;cursor:pointer;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--taupe);margin:30px 0 10px;display:flex;align-items:center;gap:8px}
+    details.done summary::-webkit-details-marker{display:none}
+    details.done summary::after{content:"+";font-size:16px;color:var(--taupe)}
+    details.done[open] summary::after{content:"–"}
+    .dl{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--surface)}
+    .dl .row{cursor:default}
+    .gate{max-width:420px;margin:12vh auto 0;text-align:center;padding:28px 22px;border:1px solid var(--line);border-radius:20px;background:var(--surface)}
+    .gate h1{font-size:24px;margin-bottom:10px}
+    .gate p{color:var(--taupe);font-size:14px;line-height:1.55;margin:0 0 18px}
+    .gate button{background:rgba(255,255,255,.9);color:#0A0B0D;border:0;border-radius:999px;padding:11px 20px;font-weight:600}
+    footer{border-top:1px solid var(--line);padding:16px max(16px,env(safe-area-inset-right,0px)) calc(16px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));text-align:center;color:var(--taupe);font-size:12px}
+    @media (max-width:560px){.row{grid-template-columns:1fr}.tags{flex-direction:row;flex-wrap:wrap;align-items:center;justify-content:flex-start}}
+    @media (max-width:420px){.kv{grid-template-columns:1fr}.kv b{padding-top:6px}}
+  </style>
+</head>
+<body>
+<header>
+  <div class="hd">
+    <a class="brand" href="#" aria-label="DS Editing"><span class="lv-rec"><i></i>DS<em>Rec</em></span><span class="mono" id="sub">Tim editor</span></a>
+    <div class="seg" role="group" aria-label="Bahasa / Language">
+      <button type="button" data-lang="id" id="langId">ID</button>
+      <button type="button" data-lang="en" id="langEn">EN</button>
+    </div>
+  </div>
+</header>
+<main>
+  <div class="gate" id="gate" hidden>
+    <h1 id="gateT"></h1>
+    <p id="gateP"></p>
+    <button type="button" id="retry" hidden></button>
+  </div>
+  <section id="app" hidden>
+    <h1 id="title"></h1>
+    <p class="lead"><span id="leadTxt"></span><span class="live" id="live"><i></i><span id="liveTxt"></span></span></p>
+    <div class="stats" id="stats"></div>
+    <div id="board"></div>
+    <h2 id="queueH"></h2>
+    <div class="dl" id="queue"></div>
+    <details class="done" id="doneWrap"><summary id="doneH"></summary><div class="dl" id="done"></div></details>
+  </section>
+</main>
+<footer id="foot"></footer>
+
+<script>
+(() => {
+  // Même projet et même clé publique que /prod : la base ne rend à ce lien que ce que team_jobs('viewer') autorise (jamais de prix, de contact, de brief).
+  const SB_URL = "https://xkanmjlpysxpohsuqvwg.supabase.co";
+  const SB_KEY = "sb_publishable_lIZtV_WtN5NcGSb0dnfaiQ_AgKYBIVa";
+  const KEY_STORE = "ds_board_key";
+  const BUSINESS_DAYS_DEFAULT = 5;
+  const $ = (s) => document.querySelector(s);
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const safeUrl = (u) => { const s = String(u ?? "").trim(); return /^https?:\/\/[^\s<>"']+$/i.test(s) ? s : ""; };
+  // Second filet (le premier est dans la base, team_jobs 'viewer') : un montant tapé à la main dans un texte libre ne s'affiche jamais ici.
+  const MONEY_SEG = /([$€£]\s*\d|\d\s*k?\s*([€$£]|(usd|eur|idr|chf|gbp)\b)|\bRp\s*\d|invoice|facture|\bSL-20\d\d)/i;
+  const MONEY_TOK = /([$€£]\s*\d[\d.,]*\s*k?|\d[\d.,]*\s*k?\s*([€$£]|(usd|eur|idr|chf|gbp)\b)|\bRp\s*\d[\d.,]*)/gi;
+  // segments « · » qui parlent d'argent ou de facture retirés ; s'il ne reste rien, le texte d'origine avec chaque montant remplacé par « ••• »
+  const scrub = (s) => { const src = String(s ?? "").trim(); if (!src) return ""; const kept = src.split(" · ").filter((x) => !MONEY_SEG.test(x)).join(" · ").trim(); return kept || src.replace(MONEY_TOK, "•••").trim(); };
+  const store = { get(k) { try { return localStorage.getItem(k); } catch { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch {} }, del(k) { try { localStorage.removeItem(k); } catch {} } };
+
+  const T = {
+    id: {
+      sub: "Tim editor", title: "Siapa mengerjakan apa", lead: "Dibaca langsung dari sistem DS Editing. Hanya untuk dilihat.", upd: (t) => `Diperbarui ${t}`, off: "Tidak terhubung",
+      active: "tugas aktif", late: "terlambat", na: "menunggu penugasan", none: "Tidak ada tugas saat ini.",
+      queueH: "Menunggu penugasan", queueNone: "Semua tugas sudah ditugaskan.", doneH: (n) => `Selesai 7 hari terakhir · ${n}`, doneNone: "Belum ada yang selesai minggu ini.",
+      stage: { waiting: "Menunggu file", downloading: "File sedang diunduh", ready: "File siap — mulai", started: "Sedang dikerjakan", half: "50 %", delivered: "Sudah dikirim" },
+      qc: { pending: "Menunggu QC", ok: "QC OK", revisions: "Perlu revisi" }, lateTag: "TERLAMBAT", urgent: "Mendesak",
+      part: { intro: "Intro", corps: "Isi", single: "" }, round: (n) => `putaran ${n}`,
+      deadline: "Tenggat", with: "Bersama", rushes: "File mentah", links: "Tautan", refs: "Referensi", logos: "Logo & font", qcL: "QC", parts: "Bagian", pc: "di PC kantor", noEd: "belum ada editor",
+      tasks: (n) => `<b>${n}</b> tugas`,
+      gate: { badT: "Tautan tidak berlaku", badP: "Tautan ini sudah tidak aktif. Minta tautan baru ke Rania.", tooT: "Terlalu banyak percobaan", tooP: "Coba lagi beberapa menit lagi.", downT: "Tidak bisa terhubung", downP: "Server tidak bisa dihubungi. Periksa koneksi lalu coba lagi.", retry: "Coba lagi" },
+      foot: "Hanya untuk tim DS Editing. Jangan bagikan tautan ini.",
+    },
+    en: {
+      sub: "Editing team", title: "Who is on what", lead: "Read live from the DS Editing system. View only.", upd: (t) => `Updated ${t}`, off: "Offline",
+      active: "active jobs", late: "late", na: "waiting for assignment", none: "No job right now.",
+      queueH: "Waiting for assignment", queueNone: "Every job is assigned.", doneH: (n) => `Done in the last 7 days · ${n}`, doneNone: "Nothing finished this week yet.",
+      stage: { waiting: "Waiting for files", downloading: "Files downloading", ready: "Files ready — start", started: "In progress", half: "50 %", delivered: "Delivered" },
+      qc: { pending: "Waiting for QC", ok: "QC OK", revisions: "Needs changes" }, lateTag: "LATE", urgent: "Urgent",
+      part: { intro: "Intro", corps: "Body", single: "" }, round: (n) => `round ${n}`,
+      deadline: "Deadline", with: "With", rushes: "Footage", links: "Links", refs: "References", logos: "Logo & fonts", qcL: "QC", parts: "Parts", pc: "on the office PC", noEd: "no editor yet",
+      tasks: (n) => `<b>${n}</b> job${n === 1 ? "" : "s"}`,
+      gate: { badT: "Link not valid", badP: "This link no longer works. Ask Rania for a new one.", tooT: "Too many attempts", tooP: "Try again in a few minutes.", downT: "Cannot connect", downP: "The server cannot be reached. Check your connection and try again.", retry: "Try again" },
+      foot: "DS Editing team only. Do not share this link.",
+    },
+  };
+  const LOCALE = { id: "id-ID", en: "en-GB" };
+  const params = new URLSearchParams(location.search);
+  let lang = params.get("lang") || store.get("ds_lang") || "id"; if (!T[lang]) lang = "id";
+  const t = (k) => T[lang][k];
+
+  // ---- clé du lien : ?k= dans l'URL (gardée sur l'appareil), sinon celle gardée
+  const fromUrl = (params.get("k") || "").trim();
+  if (fromUrl) store.set(KEY_STORE, fromUrl);
+  let LINK = fromUrl || store.get(KEY_STORE) || "";
+
+  // ---- état
+  let data = null, lastOk = null, open = new Set(), gateKind = "";
+
+  // ---- dates (règle du dashboard : date souhaitée par le client, sinon date fixée par l'équipe, sinon 5 jours ouvrés après réception)
+  const endOfDay = (x) => { const d = new Date(x); d.setHours(23, 59, 59, 999); return d; };
+  function addBusinessDays(date, n) { const d = new Date(date); let k = 0; while (k < n) { d.setDate(d.getDate() + 1); if (d.getDay() !== 0 && d.getDay() !== 6) k++; } return d; }
+  const target = (j) => j.requested_deadline ? endOfDay(j.requested_deadline + "T12:00:00") : j.delivery_date ? endOfDay(j.delivery_date + "T12:00:00") : endOfDay(addBusinessDays(j.created_at, BUSINESS_DAYS_DEFAULT));
+  const fmtDay = (d) => new Intl.DateTimeFormat(LOCALE[lang], { weekday: "short", day: "numeric", month: "short" }).format(d);
+  const fmtDayLong = (d) => new Intl.DateTimeFormat(LOCALE[lang], { weekday: "long", day: "numeric", month: "long" }).format(d);
+  const fmtTime = (d) => new Intl.DateTimeFormat(LOCALE[lang], { hour: "2-digit", minute: "2-digit" }).format(d);
+
+  // ---- modèle : une commande à parties (Intro / Isi) donne une ligne PAR partie chez son monteur ; sinon une ligne par commande
+  const isDone = (j) => j.qc_status === "ok";
+  const isMulti = (j) => (j.parts_n || 1) > 1 && Array.isArray(j.parts) && j.parts.length > 1;
+  const itemsOf = (j) => isMulti(j) ? j.parts.map((p) => ({ j, p, eds: p.editor_ids || [], names: p.editor_names || [] })) : [{ j, p: null, eds: j.editor_ids || [], names: j.editor_names || [] }];
+  const stageOf = (it) => { const s = it.p || it.j, j = it.j; if (s.delivered_at) return "delivered"; if (s.half_at) return "half"; if (s.started_at) return "started"; if (j.files_downloaded_at && !j.files_purged_at) return "ready"; if (j.download_started_at && !j.files_purged_at) return "downloading"; return "waiting"; };
+  const isLate = (j) => !isDone(j) && !j.delivered_at && target(j) < new Date();
+  const qcTag = (j) => { if (j.qc_status === "revisions") return `<span class="tag err">${t("qc").revisions}${j.qc_round ? " · " + t("round")(j.qc_round + 1) : ""}</span>`; if (j.qc_status === "ok") return `<span class="tag ok">${t("qc").ok}</span>`; if (j.delivered_at) return `<span class="tag warn">${t("qc").pending}</span>`; return ""; };
+  const stageTag = (it) => { const s = stageOf(it); const cls = s === "delivered" ? "ok" : s === "ready" ? "info" : s === "started" || s === "half" ? "" : "dim"; return `<span class="tag ${cls}">${t("stage")[s]}</span>`; };
+  const partTag = (it) => it.p && it.p.part_key !== "single" ? `<span class="tag part">${t("part")[it.p.part_key] || esc(it.p.label)}</span>` : "";
+  const AV = ["linear-gradient(135deg,#FF7A2F,#F0476E)", "linear-gradient(135deg,#7B5CFF,#3D8BFF)", "linear-gradient(135deg,#16A085,#3D8BFF)", "linear-gradient(135deg,#E8A317,#FF7A2F)", "linear-gradient(135deg,#F0476E,#7B5CFF)"];
+  function avatar(e) { if (safeUrl(e.avatar_url)) return `<span class="av" style="background-image:url('${esc(e.avatar_url)}')"></span>`; let h = 0; for (const ch of e.name) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return `<span class="av" style="background:${AV[h % AV.length]}">${esc(e.name.slice(0, 1).toUpperCase())}</span>`; }
+  const linkList = (arr) => (Array.isArray(arr) ? arr : []).map(safeUrl).filter(Boolean).map((u) => { let h = u; try { h = new URL(u).hostname.replace(/^www\./, ""); } catch {} return `<a href="${esc(u)}" target="_blank" rel="noopener noreferrer">${esc(h)}</a>`; }).join(" · ");
+
+  // ---- rendu
+  function rowHtml(it, ctx) {
+    const { j } = it, late = isLate(j), id = `${j.id}:${it.p ? it.p.id : "x"}`, opened = open.has(id);
+    const others = ctx.self ? it.names.filter((n) => n !== ctx.self) : it.names;
+    const dl = `<span class="tag ${late ? "err" : "dim"}">${late ? t("lateTag") + " · " : ""}${fmtDay(target(j))}</span>`;
+    const head = `<button type="button" class="row" data-row="${esc(id)}" aria-expanded="${opened}">
+      <span class="cl">${esc(j.client_name)}<small>${esc(j.project)}</small></span>
+      <span class="tags">${partTag(it)}${j.priority && j.priority !== "normal" ? `<span class="tag err">${t("urgent")}</span>` : ""}${isDone(j) ? qcTag(j) : dl}${isDone(j) ? "" : stageTag(it)}${isDone(j) ? "" : qcTag(j)}</span>
+      ${j.work_to_do ? `<span class="wk">${esc(j.work_to_do)}${ctx.showNames && it.names.length ? ` · ${esc(it.names.join(", "))}` : ""}</span>` : ""}
+    </button>`;
+    if (!opened) return `<div class="job">${head}</div>`;
+    const kv = [];
+    kv.push([t("deadline"), `${fmtDayLong(target(j))}${late ? ` <span class="tag err">${t("lateTag")}</span>` : ""}`]);
+    if (others.length) kv.push([t("with"), esc(others.join(", "))]);
+    if (j.files_path) kv.push([t("rushes"), `<span class="path">${esc(j.files_path)}</span><span style="color:var(--taupe)">${t("pc")}</span>`]);
+    const links = linkList(j.rushes_links); if (links) kv.push([t("links"), links]);
+    const refs = linkList(j.references_links); if (refs) kv.push([t("refs"), refs]);
+    if (j.logos && String(j.logos).trim()) kv.push([t("logos"), esc(j.logos)]);
+    if (j.qc_status === "revisions" || j.qc_note) kv.push([t("qcL"), `${qcTag(j) || ""}${j.qc_note ? `<div class="note">${esc(j.qc_note)}</div>` : ""}`]);
+    let parts = "";
+    if (isMulti(j)) parts = `<div class="kv"><b>${t("parts")}</b><div class="parts">${j.parts.map((p) => `<div><span class="tag part">${t("part")[p.part_key] || esc(p.label)}</span>${stageTag({ j, p })}<span class="who">${(p.editor_names || []).length ? esc(p.editor_names.join(", ")) : t("noEd")}</span></div>`).join("")}</div></div>`;
+    return `<div class="job">${head}<div class="det">${kv.map(([k, v]) => `<div class="kv"><b>${k}</b><span>${v}</span></div>`).join("")}${parts}</div></div>`;
+  }
+  const sortItems = (a, b) => (isDone(a.j) - isDone(b.j)) || (isLate(b.j) - isLate(a.j)) || (target(a.j) - target(b.j));
+
+  function render() {
+    if (!data) return;
+    const L = T[lang];
+    $("#sub").textContent = L.sub; $("#title").textContent = L.title; $("#leadTxt").textContent = L.lead; $("#foot").textContent = L.foot;
+    $("#langId").classList.toggle("on", lang === "id"); $("#langEn").classList.toggle("on", lang === "en");
+    document.documentElement.lang = lang;
+    const live = $("#live"); live.classList.toggle("off", !lastOk); $("#liveTxt").textContent = lastOk ? L.upd(fmtTime(lastOk)) : L.off;
+    const jobs = data.jobs || [], editors = (data.editors || []).filter((e) => e.active !== false);
+    const all = jobs.flatMap(itemsOf);
+    const openItems = all.filter((it) => !isDone(it.j));
+    const naItems = openItems.filter((it) => !it.eds.length);
+    const lateN = jobs.filter(isLate).length;
+    $("#stats").innerHTML = [["", openItems.length, L.active], ["late", lateN, L.late], ["na", naItems.length, L.na]]
+      .map(([cls, n, lab]) => `<span class="chip ${cls} ${n > 0 ? "has" : ""}"><b>${n}</b>${lab}</span>`).join("");
+    // un bloc par monteur actif (ordre de la base), puis les monteurs inconnus de la liste mais présents sur des commandes
+    const byEd = new Map(editors.map((e) => [e.id, { e, items: [] }]));
+    for (const it of openItems) for (const id of it.eds) { if (!byEd.has(id)) { const i = it.eds.indexOf(id); byEd.set(id, { e: { id, name: it.names[i] || "?" }, items: [] }); } byEd.get(id).items.push(it); }
+    $("#board").innerHTML = [...byEd.values()].map(({ e, items }) => `<section class="ed">
+      <div class="edh">${avatar(e)}<span class="nm">${esc(e.name)}</span><span class="ct">${L.tasks(items.length)}</span></div>
+      ${items.length ? items.sort(sortItems).map((it) => rowHtml(it, { self: e.name })).join("") : `<div class="empty">${L.none}</div>`}
+    </section>`).join("");
+    $("#queueH").textContent = L.queueH;
+    $("#queue").innerHTML = naItems.length ? naItems.sort(sortItems).map((it) => rowHtml(it, {})).join("") : `<div class="empty">${L.queueNone}</div>`;
+    const done = jobs.filter(isDone).sort((a, b) => new Date(b.qc_at || b.delivered_at || 0) - new Date(a.qc_at || a.delivered_at || 0));
+    $("#doneH").textContent = L.doneH(done.length);
+    $("#done").innerHTML = done.length ? done.map((j) => rowHtml({ j, p: null, eds: j.editor_ids || [], names: j.editor_names || [] }, { showNames: true })).join("") : `<div class="empty">${L.doneNone}</div>`;
+  }
+  document.addEventListener("click", (ev) => {
+    const b = ev.target.closest("[data-row]"); if (!b) return;
+    const id = b.dataset.row; open.has(id) ? open.delete(id) : open.add(id); render();
+  });
+
+  // ---- écrans d'arrêt
+  function gate(kind) {
+    gateKind = kind; const G = T[lang].gate;
+    $("#app").hidden = true; $("#gate").hidden = false;
+    $("#gateT").textContent = G[kind + "T"]; $("#gateP").textContent = G[kind + "P"];
+    const r = $("#retry"); r.hidden = kind === "bad"; r.textContent = G.retry;
+    $("#sub").textContent = T[lang].sub; $("#foot").textContent = T[lang].foot;
+  }
+
+  // ---- lecture : une seule fonction, la base filtre selon le rôle du lien
+  async function load() {
+    if (!LINK) { gate("bad"); return; }
+    let r, body;
+    try {
+      r = await fetch(`${SB_URL}/rest/v1/rpc/team_jobs`, { method: "POST", headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, "Content-Type": "application/json" }, body: JSON.stringify({ p_key: LINK }) });
+      body = await r.json();
+    } catch { if (!data) gate("down"); else { lastOk = null; render(); } return; }
+    if (!r.ok || !body || typeof body !== "object") { if (!data) gate("down"); else { lastOk = null; render(); } return; }
+    if (body.error) {
+      if (body.error === "LIEN_INVALIDE") { store.del(KEY_STORE); LINK = ""; data = null; gate("bad"); }
+      else if (body.error === "TROP_D_ESSAIS") gate("too");
+      else gate("down");
+      return;
+    }
+    for (const j of body.jobs || []) { j.work_to_do = scrub(j.work_to_do); j.project = scrub(j.project); j.qc_note = scrub(j.qc_note); j.logos = scrub(j.logos); }
+    data = body; lastOk = new Date(); gateKind = "";
+    $("#gate").hidden = true; $("#app").hidden = false;
+    render();
+  }
+
+  document.querySelectorAll("[data-lang]").forEach((b) => b.addEventListener("click", () => { lang = b.dataset.lang; store.set("ds_lang", lang); if (gateKind) gate(gateKind); render(); }));
+  $("#retry").addEventListener("click", () => load());
+  setInterval(load, 60000);
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) load(); });
+  $("#sub").textContent = T[lang].sub; $("#foot").textContent = T[lang].foot;
+  $("#langId").classList.toggle("on", lang === "id"); $("#langEn").classList.toggle("on", lang === "en");
+  load();
+})();
+</script>
+</body>
+</html>
