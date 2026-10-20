@@ -63,6 +63,22 @@
     .empty{color:var(--taupe);font-size:13px;padding:14px 0}
     .gate{max-width:420px;margin:90px auto;text-align:center;color:var(--taupe)}
     #orders{overflow-x:auto;-webkit-overflow-scrolling:touch}
+    /* « Souhaitez-vous retravailler avec <prénom> ? » (20/10) : sous chaque commande livrée, par monteur */
+    tr.fbr td{padding:6px 10px 14px;border-bottom:1px solid var(--line)}
+    .fb{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:10px 14px;background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:14px;font-size:13px}
+    .fb+.fb{margin-top:6px}
+    .fb .q{flex:1 1 260px;min-width:0}
+    .fb .q b{font-weight:600}
+    .fb .ans{display:flex;gap:6px}
+    .fb .ans button{height:34px;padding:0 14px;border-radius:999px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);color:#fff;font:inherit;font-size:12px;font-weight:600;cursor:pointer;transition:border-color .2s,background .2s}
+    .fb .ans button:hover{border-color:rgba(220,230,240,.35)}
+    .fb .ans button.on{background:rgba(255,255,255,.9);color:#0A0B0D;border-color:transparent}
+    .fb .more{flex:1 0 100%;display:flex;gap:8px;align-items:center}
+    .fb .more input{flex:1;min-width:0;height:36px;padding:0 12px;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:10px;color:var(--cream);font:inherit;font-size:13px;outline:none}
+    .fb .more input:focus{border-color:rgba(220,227,234,.6)}
+    .fb .done{color:var(--taupe)}
+    .fb .done b{color:var(--cream);font-weight:600}
+    .fb .err{color:var(--err);flex:1 0 100%}
     @media (max-width:760px){.inv{grid-template-columns:1fr 1fr}.inv>*{grid-column:auto}.hd{flex-wrap:wrap}.hd .right{flex:1 0 100%;flex-wrap:wrap;justify-content:flex-end;gap:6px}.btn{height:36px;padding:0 14px;font-size:12px}}
     @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
   </style>
@@ -89,15 +105,18 @@ const T = {
   fr: { sub: "Espace client", track: "Suivre une commande", new: "Nouvelle commande", gate: "Ce lien n'est pas valide. Utilisez le lien reçu par e-mail ou écrivez à contact@ds-editing.com.", kicker: "Votre espace", lead: "Vos commandes, vos livraisons validées et vos factures, semaine par semaine.",
     cards: ["À payer", "Cette semaine", "Livrées validées"], weekTitle: "Cette semaine", invTitle: "Factures", ordersTitle: "Toutes les commandes", cgv: "Conditions de collaboration",
     weekNote: "Facture émise dimanche à 23 h 50 (heure de Bali), envoyée par e-mail et ajoutée ici.", weekEmpty: "Aucune livraison validée cette semaine pour l'instant.", invEmpty: "Aucune facture pour l'instant.", ordersEmpty: "Aucune commande. Déposez votre première vidéo.",
-    st: { run: "En cours", qc: "Contrôle qualité", ok: "Livré", new: "Reçu" }, badge: { due: "À payer", late: "En retard", paid: "Payée", draft: "En préparation" }, pdf: "PDF", detail: "Détail", cols: ["Commande", "Projet", "Livrables", "Statut", "Montant", "Facture"], review: "Voir la vidéo", week: "Semaine du", to: "au", noPrice: "sur devis", total: "Total de la semaine", invoiced: "Facturé le", issued: "émise le", paidOn: "payée le", pay: "Payer" },
+    st: { run: "En cours", qc: "Contrôle qualité", ok: "Livré", new: "Reçu" }, badge: { due: "À payer", late: "En retard", paid: "Payée", draft: "En préparation" }, pdf: "PDF", detail: "Détail", cols: ["Commande", "Projet", "Livrables", "Statut", "Montant", "Facture"], review: "Voir la vidéo", week: "Semaine du", to: "au", noPrice: "sur devis", total: "Total de la semaine", invoiced: "Facturé le", issued: "émise le", paidOn: "payée le", pay: "Payer",
+    fbQ: (n) => `Souhaitez-vous retravailler avec <b>${n}</b> sur vos prochaines vidéos ?`, fbYes: "Oui", fbNo: "Non", fbPh: "Un mot pour l'équipe (facultatif)", fbSend: "Envoyer", fbSending: "Envoi…", fbDone: (n, a, d) => `${n} : vous avez répondu <b>${a}</b> le ${d}.`, fbEdit: "Modifier", fbErr: "Envoi impossible pour l'instant, réessayez dans un instant." },
   en: { sub: "Client space", track: "Track an order", new: "New order", gate: "This link is not valid. Use the link you received by email or write to contact@ds-editing.com.", kicker: "Your space", lead: "Your orders, approved deliveries and invoices, week by week.",
     cards: ["To pay", "This week", "Approved deliveries"], weekTitle: "This week", invTitle: "Invoices", ordersTitle: "All orders", cgv: "Terms of collaboration",
     weekNote: "Invoice issued Sunday at 11:50 pm (Bali time), emailed and added here.", weekEmpty: "No approved delivery this week yet.", invEmpty: "No invoice yet.", ordersEmpty: "No order yet. Submit your first video.",
-    st: { run: "In progress", qc: "Quality check", ok: "Delivered", new: "Received" }, badge: { due: "To pay", late: "Late", paid: "Paid", draft: "In preparation" }, pdf: "PDF", detail: "Details", cols: ["Order", "Project", "Deliverables", "Status", "Amount", "Invoice"], review: "Watch", week: "Week of", to: "to", noPrice: "on quote", total: "Week total", invoiced: "Invoiced on", issued: "issued", paidOn: "paid on", pay: "Pay" },
+    st: { run: "In progress", qc: "Quality check", ok: "Delivered", new: "Received" }, badge: { due: "To pay", late: "Late", paid: "Paid", draft: "In preparation" }, pdf: "PDF", detail: "Details", cols: ["Order", "Project", "Deliverables", "Status", "Amount", "Invoice"], review: "Watch", week: "Week of", to: "to", noPrice: "on quote", total: "Week total", invoiced: "Invoiced on", issued: "issued", paidOn: "paid on", pay: "Pay",
+    fbQ: (n) => `Would you like to work with <b>${n}</b> again on your next videos?`, fbYes: "Yes", fbNo: "No", fbPh: "A word for the team (optional)", fbSend: "Send", fbSending: "Sending…", fbDone: (n, a, d) => `${n}: you answered <b>${a}</b> on ${d}.`, fbEdit: "Change", fbErr: "We can't send this right now, please try again in a moment." },
 };
 const $ = (s) => document.querySelector(s); const params = new URLSearchParams(location.search);
 const slug = params.get("client") || "", key = params.get("k") || "";
-let lang = params.get("lang") || "fr", data = null; if (!T[lang]) lang = "fr";
+let lang = params.get("lang") || "fr", data = null, sb = null; if (!T[lang]) lang = "fr";
+const fbState = {};   // { "<token>|<monteur>": { answer, open, busy, err } } : choix en cours avant envoi (ou « Modifier »)
 const t = (k) => T[lang][k]; const safeUrl = (u) => /^https?:\/\//i.test(String(u || "").trim()) ? esc(String(u).trim()) : "#"; // seuls les liens http(s) deviennent cliquables
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const loc = () => (lang === "fr" ? "fr-FR" : "en-GB");
@@ -137,12 +156,41 @@ function render() {
   // commandes
   if (!jobs.length) $("#orders").innerHTML = `<div class="empty">${t("ordersEmpty")}</div>`;
   else { const invByJob = {}; for (const i of invoices) invByJob[i.id] = i.number;
-    $("#orders").innerHTML = `<table><thead><tr>${t("cols").map((c) => `<th>${c}</th>`).join("")}</tr></thead><tbody>${jobs.map((j) => { const st = j.qc_ok ? "ok" : j.delivered ? "qc" : j.started ? "run" : "new"; return `<tr><td><span class="tk">${esc(j.token)}</span><small>${fmtDL(j.created_at.slice(0, 10))}</small></td><td><b>${esc(j.project)}</b><small><a href="../suivi.html?token=${j.token}&lang=${lang}" target="_blank" rel="noopener">${lang === "fr" ? "suivi" : "tracking"}</a>${j.frameio_url ? ` · <a href="${safeUrl(j.frameio_url)}" target="_blank" rel="noopener">${t("review")}</a>` : ""}</small></td><td>${esc(j.work_to_do || "")}</td><td><span class="st ${st}">${t("st")[st]}</span></td><td>${j.qc_ok ? money(j.amount, cur) : (j.estimate != null ? `<span style="color:var(--taupe)" title="${lang === "fr" ? "Montant estimé — confirmé à la validation" : "Estimated amount — confirmed at approval"}">≈ ${money(j.estimate, cur)}<small style="display:block">${lang === "fr" ? "estimation" : "estimate"}</small></span>` : "—")}</td><td>${j.invoice_id ? esc(invByJob[j.invoice_id] || "") : (j.qc_ok ? `<span style="color:var(--taupe)">${lang === "fr" ? "dimanche" : "Sunday"}</span>` : "")}</td></tr>`; }).join("")}</tbody></table>`; }
+    $("#orders").innerHTML = `<table><thead><tr>${t("cols").map((c) => `<th>${c}</th>`).join("")}</tr></thead><tbody>${jobs.map((j) => { const st = j.qc_ok ? "ok" : j.delivered ? "qc" : j.started ? "run" : "new"; return `<tr><td><span class="tk">${esc(j.token)}</span><small>${fmtDL(j.created_at.slice(0, 10))}</small></td><td><b>${esc(j.project)}</b><small><a href="../suivi.html?token=${j.token}&lang=${lang}" target="_blank" rel="noopener">${lang === "fr" ? "suivi" : "tracking"}</a>${j.frameio_url ? ` · <a href="${safeUrl(j.frameio_url)}" target="_blank" rel="noopener">${t("review")}</a>` : ""}</small></td><td>${esc(j.work_to_do || "")}</td><td><span class="st ${st}">${t("st")[st]}</span></td><td>${j.qc_ok ? money(j.amount, cur) : (j.estimate != null ? `<span style="color:var(--taupe)" title="${lang === "fr" ? "Montant estimé — confirmé à la validation" : "Estimated amount — confirmed at approval"}">≈ ${money(j.estimate, cur)}<small style="display:block">${lang === "fr" ? "estimation" : "estimate"}</small></span>` : "—")}</td><td>${j.invoice_id ? esc(invByJob[j.invoice_id] || "") : (j.qc_ok ? `<span style="color:var(--taupe)">${lang === "fr" ? "dimanche" : "Sunday"}</span>` : "")}</td></tr>${feedbackRow(j)}`; }).join("")}</tbody></table>`;
+    bindFeedback(); }
+}
+// ---- « Souhaitez-vous retravailler avec <prénom> ? » : une ligne par monteur de la commande livrée, facultatif, modifiable (historique conservé en base)
+function feedbackRow(j) {
+  const eds = Array.isArray(j.editors) ? j.editors.filter(Boolean) : []; if (!j.qc_ok || !eds.length) return "";
+  const prev = (name) => (j.feedback || []).find((f) => f.editor === name) || null;
+  return `<tr class="fbr"><td colspan="6">${eds.map((name) => { const k = `${j.token}|${name}`, s = fbState[k] || {}, p = prev(name);
+    if (p && !s.open) return `<div class="fb" data-fb="${esc(k)}"><span class="q done">${t("fbDone")(esc(name), p.answer ? t("fbYes") : t("fbNo"), fmtDL(String(p.at).slice(0, 10)))}</span><span class="ans"><button type="button" data-edit="${esc(k)}">${t("fbEdit")}</button></span></div>`;
+    return `<div class="fb" data-fb="${esc(k)}"><span class="q">${t("fbQ")(esc(name))}</span><span class="ans"><button type="button" data-ans="1" class="${s.answer === true ? "on" : ""}">${t("fbYes")}</button><button type="button" data-ans="0" class="${s.answer === false ? "on" : ""}">${t("fbNo")}</button></span>
+      ${s.answer != null ? `<span class="more"><input type="text" maxlength="1000" placeholder="${t("fbPh")}" value="${esc(s.comment || "")}" data-comment/><button type="button" class="btn" data-send ${s.busy ? "disabled" : ""}>${s.busy ? t("fbSending") : t("fbSend")}</button></span>` : ""}${s.err ? `<span class="err">${t("fbErr")}</span>` : ""}</div>`; }).join("")}</td></tr>`;
+}
+function bindFeedback() {
+  $("#orders").querySelectorAll("[data-fb]").forEach((box) => {
+    const k = box.dataset.fb, [token, name] = k.split("|");
+    box.querySelectorAll("[data-ans]").forEach((b) => b.addEventListener("click", () => { fbState[k] = { ...(fbState[k] || {}), answer: b.dataset.ans === "1", open: true, err: false }; render(); const inp = $("#orders").querySelector(`[data-fb="${CSS.escape(k)}"] [data-comment]`); if (inp) inp.focus(); }));
+    const ed = box.querySelector("[data-edit]"); if (ed) ed.addEventListener("click", () => { const p = ((data.jobs || []).find((j) => j.token === token) || {}).feedback || []; const prev = p.find((f) => f.editor === name); fbState[k] = { answer: prev ? prev.answer : null, comment: prev && prev.comment || "", open: true }; render(); });
+    const inp = box.querySelector("[data-comment]"); if (inp) inp.addEventListener("input", () => { fbState[k] = { ...(fbState[k] || {}), comment: inp.value }; });
+    const send = box.querySelector("[data-send]"); if (send) send.addEventListener("click", async () => {
+      const s = fbState[k] || {}; if (s.answer == null || s.busy) return;
+      fbState[k] = { ...s, busy: true, err: false }; render();
+      try {
+        const { data: r, error } = await sb.rpc("space_feedback", { p_slug: slug, p_key: key, p_token: token, p_editor_name: name, p_answer: s.answer, p_comment: s.comment || null });
+        if (error || !r) throw error || new Error("no result");
+        const j = (data.jobs || []).find((x) => x.token === token); if (j) { j.feedback = (j.feedback || []).filter((f) => f.editor !== name); j.feedback.push({ editor: name, answer: s.answer, comment: s.comment || null, at: r.at || new Date().toISOString() }); }
+        delete fbState[k];
+      } catch { fbState[k] = { ...s, busy: false, err: true }; }
+      render();
+    });
+  });
 }
 async function boot() {
   applyText();
   if (!slug || !key) { $("#gate").hidden = false; return; }
-  const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
+  sb = createClient(SUPABASE_URL, SUPABASE_ANON);
   const { data: d, error } = await sb.rpc("client_space", { p_slug: slug, p_key: key });
   if (error || !d) { $("#gate").hidden = false; return; }
   try { localStorage.setItem("ds_client_key", key); } catch {} // la page de suivi s'en sert pour afficher le lien de la vidéo

@@ -116,6 +116,8 @@
     .lrow{display:flex;align-items:center;gap:8px}
     .lrow .n{flex:none;width:26px;font-size:12px;font-weight:600;color:var(--c);font-variant-numeric:tabular-nums}
     .lrow .in{padding:10px 12px;font-size:14px}
+    .lrow .pm{flex:none;width:84px;text-align:center;font-variant-numeric:tabular-nums}
+    .ai-tag{font-size:10px;font-weight:700;letter-spacing:.08em;padding:2px 7px;border-radius:999px;background:rgba(127,163,207,.22);color:#B9C9DA;margin-left:6px;vertical-align:2px}
     .rev-card{--c:#7FA3CF}
     .rev{padding:14px;background:var(--surface);border:1px solid var(--line);border-radius:16px;margin-top:10px}
     .rev-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
@@ -167,6 +169,11 @@
 
   <section id="me" hidden>
     <div class="card me"><span class="av" id="meAv"></span><strong id="meName"></strong><button class="ghost sm" id="notMe" type="button" data-t="notMe"></button></div>
+    <div class="card" id="pilotBox" hidden>
+      <label id="pilotTitle"></label>
+      <div class="chips" id="pilots"></div>
+      <p class="hint" id="pilotHint" style="margin-top:10px"></p>
+    </div>
   </section>
 
   <form id="report" hidden novalidate>
@@ -223,6 +230,13 @@
     en: { links: "Frame.io links", linkPh: "Paste this video's Frame.io link", revTitle: "Revisions", revHint: "Fixes after feedback (client or internal). One line per revision.", revAdd: "+ Add a revision", revN: "Revision", revCat: "Video type", revClient: "Client", revPick: "Choose…", revOther: "Other client…", revOtherPh: "Client name", revTime: "Time spent", min: "min", revLink: "Frame.io link", del: "Delete", r1: "revision", rN: "revisions", needLinks: "Paste one Frame.io link for each finished video.", badLink: "Invalid link: it must start with https:// and come from frame.io or f.io.", dupLink: "The same link is used twice.", badRev: "Incomplete revision: type, client, time (1–240 min) and Frame.io link." },
   };
   for (const l of LANGS) Object.assign(T[l], T2[l]);
+  // monteuse IA (Ilana, 20/10) : le pilote humain s'identifie et note ses minutes de pilotage par vidéo terminée
+  const T3 = {
+    id: { pilotTitle: "Siapa yang mengoperasikan {n} hari ini?", pilotHint: "Poin masuk ke {n} untuk statistik; nama kamu dicatat sebagai operator.", pilotMin: "menit", pilotMinT: "Waktu kamu untuk video ini (menit)", needPilot: "Pilih operator dan isi menit untuk setiap video selesai (0–600).", aiTag: "AI" },
+    fr: { pilotTitle: "Qui pilote {n} aujourd'hui ?", pilotHint: "Les points vont à {n} pour la statistique ; ton nom est noté comme pilote.", pilotMin: "min", pilotMinT: "Ton temps sur cette vidéo (minutes)", needPilot: "Choisis le pilote et note les minutes de chaque vidéo terminée (0 à 600).", aiTag: "IA" },
+    en: { pilotTitle: "Who is driving {n} today?", pilotHint: "Points go to {n} for the stats; your name is logged as the pilot.", pilotMin: "min", pilotMinT: "Your time on this video (minutes)", needPilot: "Pick the pilot and enter the minutes for each finished video (0–600).", aiTag: "AI" },
+  };
+  for (const l of LANGS) Object.assign(T[l], T3[l]);
   const LINK_RE = /^https:\/\/([a-z0-9-]+\.)*(frame\.io|f\.io)\/[^\s<>"]+$/i;
   const linkOk = (u) => u.length <= 500 && LINK_RE.test(u);
   const ICONS = {
@@ -260,7 +274,10 @@
   }
   const iconFor = (key) => ICONS[String(key).split("_")[0]] || ICONS.other;
 
-  const state = { editors: [], cats: [], clients: [], me: null, key: null, date: todayISO(), counts: {}, links: {}, revs: [], server: null, draftUsed: false, last: null, token: 0 };
+  const state = { editors: [], cats: [], clients: [], me: null, key: null, date: todayISO(), counts: {}, links: {}, revs: [], server: null, draftUsed: false, last: null, token: 0, pilot: { pilot_id: "", minutes: {} } };
+  const isAi = () => !!(state.me && state.me.is_ai);
+  // pilotes possibles : ceux déclarés sur la fiche (pilot_ids), sinon tous les monteurs humains actifs
+  const pilotsOf = (e) => { const ids = Array.isArray(e.pilot_ids) ? e.pilot_ids : []; const all = state.editors.filter((x) => !x.is_ai); const own = all.filter((x) => ids.includes(x.id)); return own.length ? own : all; };
   const ui = {};
   let sbp = null; // promesse mise en cache : un seul client même si deux appels partent en parallèle
   function client() { if (!sbp) sbp = import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/+esm").then(({ createClient }) => createClient(SB_URL, SB_KEY, { auth: { persistSession: false, autoRefreshToken: false } })); return sbp; }
@@ -290,7 +307,7 @@
     $$("#seg button").forEach((b) => b.classList.toggle("on", b.dataset.l === lang));
     $("#dateText").textContent = fmtDate(state.date);
     for (const c of state.cats) { const u = ui[c.key]; if (!u) continue; u.name.textContent = c[lang] || c.fr; u.minus.setAttribute("aria-label", t.minus); u.plus.setAttribute("aria-label", t.plus); u.input.setAttribute("aria-label", t.count); u.range.setAttribute("aria-label", t.slider); renderLinks(c.key); }
-    renderRevs(); renderSummary(); renderNotice(); renderDone();
+    renderRevs(); renderSummary(); renderNotice(); renderDone(); renderPilots();
   }
   $$("#seg button").forEach((b) => b.addEventListener("click", () => { lang = b.dataset.l; store.set("ds_lang", lang); render(); }));
 
@@ -315,6 +332,7 @@
       const b = document.createElement("button"); b.type = "button"; b.className = "ed"; b.dataset.id = e.id;
       const av = document.createElement("span"); av.className = "av"; setAv(av, e);
       const n = document.createElement("span"); n.textContent = e.name;
+      if (e.is_ai) { const tg = document.createElement("span"); tg.className = "ai-tag"; tg.textContent = T[lang].aiTag; n.appendChild(tg); }
       b.append(av, n); b.addEventListener("click", () => pickEditor(e)); box.appendChild(b);
     }
   }
@@ -329,10 +347,24 @@
     state.me = e;
     $("#who").hidden = true; $("#me").hidden = false; $("#report").hidden = false; $("#done").hidden = true;
     $("#meName").textContent = e.name; setAv($("#meAv"), e);
+    renderPilots();
     loadReport();
   }
+  // ---------- monteuse IA : qui la pilote aujourd'hui (le pilote humain est noté, les points restent à l'IA)
+  function renderPilots() {
+    const box = $("#pilotBox"), t = T[lang]; if (!state.me) { box.hidden = true; return; }
+    box.hidden = !isAi(); if (!isAi()) return;
+    $("#pilotTitle").textContent = t.pilotTitle.replace("{n}", state.me.name); $("#pilotHint").textContent = t.pilotHint.replace("{n}", state.me.name);
+    const chips = $("#pilots"); chips.innerHTML = "";
+    for (const p of pilotsOf(state.me)) {
+      const b = document.createElement("button"); b.type = "button"; b.textContent = p.name; b.classList.toggle("on", state.pilot.pilot_id === p.id);
+      b.addEventListener("click", () => { state.pilot.pilot_id = p.id; chips.classList.remove("bad"); renderPilots(); scheduleDraft(); });
+      chips.appendChild(b);
+    }
+  }
   $("#notMe").addEventListener("click", () => {
-    state.me = null; state.key = null; state.server = null; state.draftUsed = false; store.del("ds_prod_editor"); store.del("ds_prod_key");
+    state.me = null; state.key = null; state.server = null; state.draftUsed = false; state.pilot = { pilot_id: "", minutes: {} }; store.del("ds_prod_editor"); store.del("ds_prod_key");
+    $("#pilotBox").hidden = true;
     $("#who").hidden = false; $("#me").hidden = true; $("#report").hidden = true; $("#done").hidden = true;
     applyValues({ counts: {}, links: {}, revisions: [], details: "", comment: "" }); renderNotice(); window.scrollTo({ top: 0 });
   });
@@ -368,14 +400,17 @@
     const rows = u.links.querySelectorAll(".lrow");
     if (!rows.length && n) { const h = document.createElement("span"); h.className = "lbl"; u.links.appendChild(h); }
     const head = u.links.querySelector(".lbl"); if (head) head.innerHTML = `<b>${t.links}</b>`;
+    const pm = state.pilot.minutes[key] || (state.pilot.minutes[key] = []);
     for (let i = rows.length; i < n; i++) {
       const row = document.createElement("div"); row.className = "lrow";
-      row.innerHTML = `<span class="n">${i + 1}</span><input class="in" type="url" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false"/>`;
-      const inp = row.querySelector("input"); inp.value = arr[i] || "";
+      row.innerHTML = `<span class="n">${i + 1}</span><input class="in" type="url" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false"/>${isAi() ? `<input class="in pm" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" autocomplete="off"/>` : ""}`;
+      const inp = row.querySelector("input[type=url]"); inp.value = arr[i] || "";
       inp.addEventListener("input", () => { arr[i] = inp.value.trim(); inp.classList.remove("bad"); scheduleDraft(); });
+      const m = row.querySelector(".pm");
+      if (m) { m.value = pm[i] == null || pm[i] === "" ? "" : String(pm[i]); m.addEventListener("input", () => { pm[i] = m.value.replace(/[^\d]/g, ""); m.classList.remove("bad"); scheduleDraft(); }); }
       u.links.appendChild(row);
     }
-    u.links.querySelectorAll(".lrow").forEach((row, i) => { if (i >= n) row.remove(); else row.querySelector("input").placeholder = t.linkPh; });
+    u.links.querySelectorAll(".lrow").forEach((row, i) => { if (i >= n) row.remove(); else { row.querySelector("input[type=url]").placeholder = t.linkPh; const m = row.querySelector(".pm"); if (m) { m.placeholder = t.pilotMin; m.title = t.pilotMinT; m.setAttribute("aria-label", t.pilotMinT); } } });
   }
 
   // ---------- révisions : une ligne par révision (type, client, temps, lien)
@@ -419,6 +454,10 @@
     renderSummary(); scheduleDraft();
   }
   function applyValues(v) {
+    const pv = v.pilot || { pilot_id: v.pilot_id || "", minutes: v.pilot_minutes || {} };
+    state.pilot = { pilot_id: String(pv.pilot_id || ""), minutes: {} };
+    for (const c of state.cats) { const a = (pv.minutes || {})[c.key]; state.pilot.minutes[c.key] = Array.isArray(a) ? a.map((x) => (x == null || x === "" ? "" : String(x))) : []; }
+    renderPilots();
     for (const c of state.cats) {
       const x = (v.counts || {})[c.key] || {}, l = (v.links || {})[c.key];
       state.links[c.key] = Array.isArray(l) ? l.map((s) => String(s || "")) : []; if (ui[c.key]) ui[c.key].links.innerHTML = "";
@@ -434,7 +473,7 @@
   let draftTimer = null;
   const draftKey = () => `ds_prod_draft:${state.me.id}:${state.date}`;
   function scheduleDraft() { if (!state.me) return; clearTimeout(draftTimer); draftTimer = setTimeout(saveDraft, 300); }
-  function saveDraft() { if (!state.me) return; store.set(draftKey(), JSON.stringify({ counts: state.counts, links: state.links, revisions: state.revs, details: $("#details").value, comment: $("#comment").value, at: Date.now() })); }
+  function saveDraft() { if (!state.me) return; store.set(draftKey(), JSON.stringify({ counts: state.counts, links: state.links, revisions: state.revs, pilot: state.pilot, details: $("#details").value, comment: $("#comment").value, at: Date.now() })); }
   function readDraft() { try { const raw = store.get(draftKey()); return raw ? JSON.parse(raw) : null; } catch { return null; } }
   $("#details").addEventListener("input", () => { $("#details").classList.remove("bad"); scheduleDraft(); }); $("#comment").addEventListener("input", scheduleDraft);
 
@@ -464,14 +503,17 @@
     // liens Frame.io : un par vidéo terminée, valides, jamais deux fois le même ; révisions complètes
     const links = {}, seen = new Set(); let err = null, first = null;
     const fail = (key, node) => { if (!err) { err = key; first = node; } if (node) node.classList.add("bad"); };
+    const pilot = { pilot_id: state.pilot.pilot_id || null, minutes: {} };
     for (const c of state.cats) {
       const n = state.counts[c.key].done; if (!n) continue;
-      const inputs = ui[c.key].links.querySelectorAll(".lrow input"); links[c.key] = [];
+      const inputs = ui[c.key].links.querySelectorAll(".lrow input[type=url]"), mins = ui[c.key].links.querySelectorAll(".lrow .pm"); links[c.key] = []; pilot.minutes[c.key] = [];
       for (let i = 0; i < n; i++) {
         const u = String(state.links[c.key][i] || "").trim(); links[c.key].push(u);
         if (!u) fail("needLinks", inputs[i]); else if (!linkOk(u)) fail("badLink", inputs[i]); else if (seen.has(u.toLowerCase())) fail("dupLink", inputs[i]); else seen.add(u.toLowerCase());
+        if (isAi()) { const m = String((state.pilot.minutes[c.key] || [])[i] ?? "").trim(); const ok = /^\d{1,3}$/.test(m) && Number(m) <= 600; if (!ok) fail("needPilot", mins[i]); pilot.minutes[c.key].push(ok ? Number(m) : null); }
       }
     }
+    if (isAi() && el > 0 && !pilot.pilot_id) fail("needPilot", $("#pilots"));
     const revisions = [];
     $("#revs").querySelectorAll(".rev").forEach((row, i) => {
       const r = state.revs[i], m = toInt(r.minutes), u = String(r.url || "").trim(), client = String(r.client || "").trim();
@@ -485,14 +527,14 @@
     if (err) { msg.textContent = t[err]; msg.className = "msg err"; if (first) { first.scrollIntoView({ block: "center", behavior: "smooth" }); if (first.focus) first.focus({ preventScroll: true }); } return; }
     btn.disabled = true; msg.textContent = t.saving;
     try {
-      const res = await rpc("prod_submit", { p_key: state.key, p_date: state.date, p_counts: state.counts, p_details: details, p_comment: comment, p_lang: lang, p_links: links, p_revisions: revisions });
+      const res = await rpc("prod_submit", { p_key: state.key, p_date: state.date, p_counts: state.counts, p_details: details, p_comment: comment, p_lang: lang, p_links: links, p_revisions: revisions, p_pilot: isAi() ? pilot : null });
       clearTimeout(draftTimer); store.del(draftKey());
       state.server = { updated_at: new Date().toISOString() }; state.draftUsed = false; state.last = res || { elements: el, in_progress: ip };
       msg.textContent = ""; showDone();
     } catch (err) {
       const m = String((err && err.message) || "");
       msg.textContent = /bad_date/.test(m) ? t.badDate : /bad_editor|bad_key/.test(m) ? t.badEditor : /\bempty\b/.test(m) ? t.empty
-        : /need_links/.test(m) ? t.needLinks : /bad_link/.test(m) ? t.badLink : /dup_link/.test(m) ? t.dupLink : /bad_revision/.test(m) ? t.badRev : t.fail;
+        : /need_links/.test(m) ? t.needLinks : /bad_link/.test(m) ? t.badLink : /dup_link/.test(m) ? t.dupLink : /bad_revision/.test(m) ? t.badRev : /need_pilot/.test(m) ? t.needPilot : t.fail;
       msg.className = "msg err";
     } finally { btn.disabled = false; if (msg.textContent === t.saving) msg.textContent = ""; }
   }

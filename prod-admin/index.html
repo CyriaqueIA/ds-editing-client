@@ -323,6 +323,7 @@
     <section id="v-overview"></section>
     <section id="v-editors" hidden></section>
     <section id="v-reports" hidden></section>
+    <section id="v-ai" hidden></section>
     <section id="v-settings" hidden></section>
   </div>
 </main>
@@ -335,7 +336,7 @@ import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 const OPEN_ACCESS = null; // 14/10 : accès libre FERMÉ (liens magiques ?p= distribués aux 5 + télé). Pour le rouvrir un jour : remettre { email, password } du compte partagé et lever son bannissement en base.
 const SUPABASE_URL = "https://xkanmjlpysxpohsuqvwg.supabase.co";
 const SUPABASE_ANON = "sb_publishable_lIZtV_WtN5NcGSb0dnfaiQ_AgKYBIVa";
-const TABS = ["overview", "editors", "reports", "settings"];
+const TABS = ["overview", "editors", "reports", "ai", "settings"];   // « ai » : IA vs humains (admins connectés seulement, RPC editor_kpis)
 const PERIODS = ["today", "week", "month", "lastMonth", "d30"];
 // Colonnes de l'export CSV : format de l'ancien outil (libellés français fixes, séparateur « ; », BOM UTF-8, CRLF)
 const CSV_KEYS = ["reel_en", "reel_fr", "intro_fr", "intro_en", "podcast_fr", "podcast_en"];
@@ -374,6 +375,23 @@ const T2 = {
   id: { rv: { stat: "Revisi", sub: (m) => `${m} koreksi`, clients: "Klien", clientsT: "Revisi per klien", client: "Klien", count: "Revisi", time: "Waktu", pts: "Poin", per: "rata-rata / revisi", label: "Revisi", links: "Tautan Frame.io", none: "Tidak ada revisi pada periode ini." }, set2: { prod: "Baru", rev: "Revisi", note2: "Revisi: poin per koreksi (waktu dicatat terpisah, tidak mengubah poin)." } },
 };
 for (const l of Object.keys(T)) Object.assign(T[l], T2[l]);
+// Ilana, monteuse IA (20/10) : onglet « IA vs humains » + pastille IA
+const T3 = {
+  fr: { tabs: { ai: "IA vs humains" }, ai: { kicker: "Monteuse IA", title: "Ilana vs humains", sub: "Chiffres du dashboard (commandes) et de /prod (déclarations), sur la période choisie. Les humains sont ramenés à une moyenne par monteur actif.", need: "Connexion admin requise pour cet onglet.", loading: "Calcul…", aiCol: "IA", humanAvg: "Humains · moyenne / monteur", humanTot: "Humains · total",
+    m: { assigned: "Commandes attribuées", delivered: "Livrées", approved: "Qualité OK", revRate: "Taux de retours", avgHours: "Délai moyen (h)", yes: "Clients « oui »", no: "Clients « non »", yesRate: "Taux de « oui »", points: "Points /prod", elements: "Vidéos déclarées", pilot: "Minutes de pilotage", perVideo: "Pilotage / vidéo" },
+    verdict: { small: (n, k) => `Échantillon : ${n} / ${k} vidéos Qualité OK. On ne conclut pas avant ${k}.`, win: "Les clients disent « oui » à Ilana au moins autant qu'aux humains : succès du test (critère principal). Décision à prendre avec Sajid.", lose: "Les clients disent « oui » à Ilana moins qu'aux humains : pas concluant. Décision à prendre avec Sajid.", noFb: "Pas encore de réponses clients comparables." },
+    tbl: { editor: "Monteur", byPilot: "Pilotes" }, fb: "Réponses clients", fbNone: "Aucune réponse client sur la période.", fbCols: ["Date", "Client", "Commande", "Monteur", "Réponse", "Commentaire"], yes: "Oui", no: "Non", aiTag: "IA" } },
+  en: { tabs: { ai: "AI vs humans" }, ai: { kicker: "AI editor", title: "Ilana vs humans", sub: "Numbers from the dashboard (orders) and /prod (reports) over the selected period. Humans are shown as an average per active editor.", need: "Admin sign-in required for this tab.", loading: "Computing…", aiCol: "AI", humanAvg: "Humans · average / editor", humanTot: "Humans · total",
+    m: { assigned: "Orders assigned", delivered: "Delivered", approved: "QC OK", revRate: "Revision rate", avgHours: "Average lead time (h)", yes: "Clients “yes”", no: "Clients “no”", yesRate: "“Yes” rate", points: "/prod points", elements: "Videos reported", pilot: "Piloting minutes", perVideo: "Piloting / video" },
+    verdict: { small: (n, k) => `Sample: ${n} / ${k} QC-OK videos. No conclusion before ${k}.`, win: "Clients say “yes” to Ilana at least as often as to humans: the test passes (main criterion). Decision with Sajid.", lose: "Clients say “yes” to Ilana less often than to humans: not conclusive. Decision with Sajid.", noFb: "No comparable client answers yet." },
+    tbl: { editor: "Editor", byPilot: "Pilots" }, fb: "Client answers", fbNone: "No client answer over the period.", fbCols: ["Date", "Client", "Order", "Editor", "Answer", "Comment"], yes: "Yes", no: "No", aiTag: "AI" } },
+  id: { tabs: { ai: "AI vs manusia" }, ai: { kicker: "Editor AI", title: "Ilana vs manusia", sub: "Angka dari dashboard (pesanan) dan /prod (laporan) pada periode terpilih. Manusia ditampilkan sebagai rata-rata per editor aktif.", need: "Masuk admin diperlukan untuk tab ini.", loading: "Menghitung…", aiCol: "AI", humanAvg: "Manusia · rata-rata / editor", humanTot: "Manusia · total",
+    m: { assigned: "Pesanan ditugaskan", delivered: "Terkirim", approved: "QC OK", revRate: "Tingkat revisi", avgHours: "Rata-rata waktu (jam)", yes: "Klien “ya”", no: "Klien “tidak”", yesRate: "Tingkat “ya”", points: "Poin /prod", elements: "Video dilaporkan", pilot: "Menit operator", perVideo: "Operator / video" },
+    verdict: { small: (n, k) => `Sampel: ${n} / ${k} video QC OK. Belum ada kesimpulan sebelum ${k}.`, win: "Klien menjawab “ya” untuk Ilana setidaknya sama seringnya dengan manusia: uji berhasil (kriteria utama). Keputusan bersama Sajid.", lose: "Klien menjawab “ya” untuk Ilana lebih jarang daripada manusia: belum meyakinkan. Keputusan bersama Sajid.", noFb: "Belum ada jawaban klien yang bisa dibandingkan." },
+    tbl: { editor: "Editor", byPilot: "Operator" }, fb: "Jawaban klien", fbNone: "Tidak ada jawaban klien pada periode ini.", fbCols: ["Tanggal", "Klien", "Pesanan", "Editor", "Jawaban", "Komentar"], yes: "Ya", no: "Tidak", aiTag: "AI" } },
+};
+for (const l of Object.keys(T)) { Object.assign(T[l].tabs, T3[l].tabs); T[l].ai = T3[l].ai; }
+const AI_SAMPLE = 20;   // q41 : 20 vidéos Qualité OK avant de conclure
 const $ = (s) => document.querySelector(s);
 const params = new URLSearchParams(location.search);
 const store = { get: (k) => { try { return localStorage.getItem(k); } catch { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch {} } };
@@ -408,7 +426,8 @@ const linksOf = (r) => { const out = []; const l = r.links || {}; for (const c o
 const safeUrl = (u) => (/^https:\/\/([a-z0-9-]+\.)*(frame\.io|f\.io)\//i.test(String(u || "")) ? String(u) : "");
 const fmtMin = (m) => { m = Math.round(Number(m) || 0); const h = Math.floor(m / 60), r = m % 60; return h ? `${h} h${r ? " " + pad(r) : ""}` : `${m} min`; };
 const edKey = (r) => r.editor_id || ("name:" + r.editor_name);
-const edInfo = (r) => { const e = r.editor_id ? editors.find((x) => x.id === r.editor_id) : null; return { id: r.editor_id, name: (e && e.name) || r.editor_name || "?", avatar_url: e ? e.avatar_url : null }; };
+const edInfo = (r) => { const e = r.editor_id ? editors.find((x) => x.id === r.editor_id) : null; return { id: r.editor_id, name: (e && e.name) || r.editor_name || "?", avatar_url: e ? e.avatar_url : null, is_ai: !!(e && e.is_ai) }; };
+const aiTag = (e) => (e && e.is_ai ? `<span class="tag lt" style="margin-left:6px;color:#B9C9DA;border-color:rgba(127,163,207,.5)">${t("ai.aiTag")}</span>` : "");
 const ICONS = { chev: `<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`,
   dl: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></svg>`,
   trash: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>`,
@@ -472,7 +491,8 @@ function applyText() {
   document.querySelectorAll("#langSeg button").forEach((b) => b.classList.toggle("on", b.dataset.lang === lang));
 }
 function renderTabs() {
-  $("#tabs").innerHTML = TABS.map((k) => `<button type="button" class="tab ${tab === k ? "on" : ""}" data-tab="${k}">${t("tabs." + k)}</button>`).join("");
+  if (tab === "ai" && !isAdmin()) tab = "overview";
+  $("#tabs").innerHTML = TABS.filter((k) => k !== "ai" || isAdmin()).map((k) => `<button type="button" class="tab ${tab === k ? "on" : ""}" data-tab="${k}">${t("tabs." + k)}</button>`).join("");
   $("#tabs").querySelectorAll("[data-tab]").forEach((b) => b.addEventListener("click", () => { tab = b.dataset.tab; const u = new URL(location.href); u.searchParams.set("tab", tab); history.replaceState(null, "", u); renderTabs(); render(); }));
 }
 function renderToolbar() {
@@ -487,7 +507,49 @@ function renderToolbar() {
 }
 function render() {
   TABS.forEach((k) => { $("#v-" + k).hidden = k !== tab; });
-  if (tab === "overview") renderOverview(); else if (tab === "editors") renderEditors(); else if (tab === "reports") renderReports(); else renderSettings();
+  if (tab === "overview") renderOverview(); else if (tab === "editors") renderEditors(); else if (tab === "reports") renderReports(); else if (tab === "ai") renderAi(); else renderSettings();
+}
+
+/* ===== IA vs humains (Ilana, 20/10) : RPC editor_kpis, admins connectés ===== */
+let aiReq = 0;
+async function renderAi() {
+  const A = t("ai"), box = $("#v-ai");
+  if (!isAdmin()) { box.innerHTML = `<div class="panel"><div class="empty">${A.need}</div></div>`; return; }
+  const req = ++aiReq; box.innerHTML = `<div class="panel"><div class="empty">${A.loading}</div></div>`;
+  const { data, error } = await sb.rpc("editor_kpis", { p_from: period.from, p_to: period.to });
+  if (req !== aiReq || tab !== "ai") return;
+  if (error || !data) { box.innerHTML = `<div class="panel"><p class="msg err" style="margin:0;font-size:13px">${t("loadErr")} ${esc(error ? error.message : "?")}</p></div>`; return; }
+  const ai = data.ai || {}, hu = data.human || {}, hn = Math.max(1, Number(hu.n) || 0);
+  const num = (x) => Number(x) || 0, pct = (a, b) => (num(b) ? Math.round((num(a) / num(b)) * 100) + " %" : "—"), avg = (x) => nf(num(x) / hn);
+  const rows = [
+    ["assigned", nf(num(ai.assigned), 0), avg(hu.assigned), nf(num(hu.assigned), 0)],
+    ["delivered", nf(num(ai.delivered), 0), avg(hu.delivered), nf(num(hu.delivered), 0)],
+    ["approved", nf(num(ai.approved), 0), avg(hu.approved), nf(num(hu.approved), 0)],
+    ["revRate", pct(ai.with_revisions, ai.delivered), pct(hu.with_revisions, hu.delivered), pct(hu.with_revisions, hu.delivered)],
+    ["avgHours", ai.avg_hours == null ? "—" : nf(ai.avg_hours), hu.avg_hours == null ? "—" : nf(hu.avg_hours), hu.avg_hours == null ? "—" : nf(hu.avg_hours)],
+    ["yes", nf(num(ai.yes), 0), avg(hu.yes), nf(num(hu.yes), 0)],
+    ["no", nf(num(ai.no), 0), avg(hu.no), nf(num(hu.no), 0)],
+    ["yesRate", pct(ai.yes, num(ai.yes) + num(ai.no)), pct(hu.yes, num(hu.yes) + num(hu.no)), pct(hu.yes, num(hu.yes) + num(hu.no))],
+    ["points", nf(num(ai.points)), avg(hu.points), nf(num(hu.points))],
+    ["elements", nf(num(ai.elements), 0), avg(hu.elements), nf(num(hu.elements), 0)],
+    ["pilot", fmtMin(ai.pilot_minutes), "—", "—"],
+    ["perVideo", num(ai.elements) ? fmtMin(num(ai.pilot_minutes) / num(ai.elements)) : "—", "—", "—"],
+  ];
+  // verdict (q39 critère principal, q41 échantillon de 20 Qualité OK)
+  const aiAns = num(ai.yes) + num(ai.no), huAns = num(hu.yes) + num(hu.no);
+  let verdict = A.verdict.small(num(ai.approved), AI_SAMPLE);
+  if (num(ai.approved) >= AI_SAMPLE) verdict = (!aiAns || !huAns) ? A.verdict.noFb : (num(ai.yes) / aiAns >= num(hu.yes) / huAns ? A.verdict.win : A.verdict.lose);
+  const eds = (data.editors || []);
+  const edRow = (e) => `<tr><td class="d">${esc(e.name)}${aiTag(e)}</td><td class="c">${nf(num(e.assigned), 0)}</td><td class="c">${nf(num(e.delivered), 0)}</td><td class="c">${nf(num(e.approved), 0)}</td><td>${pct(e.with_revisions, e.delivered)}</td><td>${e.avg_hours == null ? "—" : nf(e.avg_hours)}</td><td class="c">${nf(num(e.yes), 0)} / ${nf(num(e.no), 0)}</td><td>${pct(e.yes, num(e.yes) + num(e.no))}</td><td>${nf(num(e.points))}</td><td>${e.is_ai ? fmtMin(e.pilot_minutes) + (e.by_pilot && Object.keys(e.by_pilot).length ? ` · ${esc(Object.entries(e.by_pilot).map(([n, m]) => `${n} ${fmtMin(m)}`).join(", "))}` : "") : "—"}</td></tr>`;
+  const fb = data.feedback || [];
+  box.innerHTML = `<div class="panel"><div class="ph"><div><div class="mono">${A.kicker}</div><h2>${A.title}</h2></div></div><p class="note" style="margin-top:0">${A.sub}</p>
+      <div class="scroll"><table class="grid"><thead><tr><th class="d"></th><th>${A.aiCol}</th><th>${A.humanAvg}</th><th>${A.humanTot}</th></tr></thead><tbody>
+      ${rows.map(([k, a, b, c]) => `<tr><td class="d">${A.m[k]}</td><td class="c">${a}</td><td class="c">${b}</td><td>${c}</td></tr>`).join("")}</tbody></table></div>
+      <p class="note" style="margin-bottom:0"><b>${esc(verdict)}</b></p></div>
+    <div class="panel"><div class="ph"><div><div class="mono">${t("tabs.editors")}</div><h2>${A.tbl.editor}</h2></div></div>
+      <div class="scroll"><table class="grid"><thead><tr><th class="d">${A.tbl.editor}</th><th>${A.m.assigned}</th><th>${A.m.delivered}</th><th>${A.m.approved}</th><th>${A.m.revRate}</th><th>${A.m.avgHours}</th><th>${A.yes} / ${A.no}</th><th>${A.m.yesRate}</th><th>${A.m.points}</th><th>${A.m.pilot} · ${A.tbl.byPilot}</th></tr></thead><tbody>${eds.map(edRow).join("")}</tbody></table></div></div>
+    <div class="panel"><div class="ph"><div><div class="mono">${A.fb}</div><h2>${A.fb}</h2></div></div>
+      ${fb.length ? `<div class="scroll"><table class="grid"><thead><tr>${A.fbCols.map((c, i) => `<th class="${i === 0 ? "d" : ""}">${c}</th>`).join("")}</tr></thead><tbody>${fb.map((f) => `<tr><td class="d">${fmtDT(f.at)}</td><td class="c">${esc(f.studio || "?")}</td><td>${esc(f.token || "")} · ${esc(f.project || "")}</td><td class="c">${esc(f.editor)}</td><td><span class="tag" style="color:${f.answer ? "var(--ok)" : "var(--err)"}">${f.answer ? A.yes : A.no}</span></td><td style="text-align:left">${esc(f.comment || "")}</td></tr>`).join("")}</tbody></table></div>` : `<div class="empty">${A.fbNone}</div>`}</div>`;
 }
 
 /* ===== vue d'ensemble ===== */
@@ -576,7 +638,7 @@ function renderEditors() {
   $("#v-editors").innerHTML = `<div class="cards">` + A.eds.map((e, i) => {
     const pct = leader ? Math.round((e.points / leader) * 100) : 0, nd = e.days.size;
     const segs = catsAll().filter((c) => e.cats.has(c.key)).map((c) => `<i style="width:${((e.cats.get(c.key).points / (e.points || 1)) * 100).toFixed(1)}%;background:${esc(c.color)}"></i>`).join("");
-    return `<div class="card" data-editor="${esc(e.key)}"><div class="top2">${avatar(e)}<div><div class="nm">${esc(e.name)}</div><div class="meta">${E.days(nd)} · ${nf(nd ? e.points / nd : 0)} ${E.perDay}</div></div><span class="rank ${i === 0 ? "first" : ""}">#${i + 1}</span></div>
+    return `<div class="card" data-editor="${esc(e.key)}"><div class="top2">${avatar(e)}<div><div class="nm">${esc(e.name)}${aiTag(e)}</div><div class="meta">${E.days(nd)} · ${nf(nd ? e.points / nd : 0)} ${E.perDay}</div></div><span class="rank ${i === 0 ? "first" : ""}">#${i + 1}</span></div>
       <div class="kv"><div><div class="mono">${E.points}</div><div class="v">${nf(e.points)}</div></div><div><div class="mono">${E.elements}</div><div class="v">${nf(e.elements, 0)}</div></div></div>
       <div><div class="vs"><span>${E.vs}</span><span>${pct}%</span></div><div class="bar"><div class="fill" style="width:${pct}%">${segs}</div></div></div>
       <div class="pills">${["reel", "intro", "podcast"].map((g) => `<span class="tag">${E.groups[g]} <b>${nf(e.groups[g] || 0, 0)}</b></span>`).join("")}${e.revs ? `<span class="tag">${t("rv.label")} <b>${nf(e.revs, 0)}</b> · ${fmtMin(e.revMin)}</span>` : ""}</div>
@@ -615,7 +677,7 @@ function renderReports() {
 /* ===== paramètres : équipe + barème ===== */
 function renderSettings() {
   const S = t("set"), admin = isAdmin();
-  const row = (e) => `<div class="edrow ${e.active === false ? "off" : ""}" data-ed="${e.id}">${avatar(e, true)}<input class="in" value="${esc(e.name)}" data-name="${e.id}" ${admin ? "" : "readonly"} aria-label="${S.namePh}"/>
+  const row = (e) => `<div class="edrow ${e.active === false ? "off" : ""}" data-ed="${e.id}">${avatar(e, true)}<input class="in" value="${esc(e.name)}${e.is_ai ? ` · ${t("ai.aiTag")} (${esc((e.pilot_ids || []).map((id) => (editors.find((x) => x.id === id) || {}).name).filter(Boolean).join(", "))})` : ""}" data-name="${e.id}" ${admin && !e.is_ai ? "" : "readonly"} aria-label="${S.namePh}"/>
       <button type="button" class="btn ic sm" data-photo="${e.id}" title="${S.photo}" ${admin ? "" : "disabled"}>${ICONS.photo}</button>
       <button type="button" class="tog ${e.active === false ? "" : "on"}" data-toggle="${e.id}" ${admin ? "" : "disabled"}><i></i>${e.active === false ? S.off : S.on}</button>
       ${edKeys[e.id] ? `<span class="lk2"><button type="button" class="btn sm" data-link="${e.id}" title="${S.linkT}">${S.link}</button><button type="button" class="btn sm" data-renew="${e.id}" title="${S.renewT}">↻</button></span>` : ""}
@@ -697,7 +759,7 @@ function exportCsv() {
 /* ===== données ===== */
 async function loadCats() { const { data, error } = await sb.from("prod_categories").select("*").order("sort"); if (error) throw error; cats = data || []; }
 async function loadEditors() {
-  const { data, error } = await sb.from("editors").select("id,name,avatar_url,active,sort").order("sort"); if (error) throw error; editors = data || [];
+  const { data, error } = await sb.from("editors").select("id,name,avatar_url,active,sort,is_ai,pilot_ids").order("sort"); if (error) throw error; editors = data || [];
   const k = await sb.from("editor_keys").select("editor_id,report_key"); edKeys = Object.fromEntries((k.data || []).map((x) => [x.editor_id, x.report_key])); // vide pour les rôles qui n'y ont pas droit
 }
 async function loadReports() { const { data, error } = await sb.from("prod_reports").select("*").order("report_date", { ascending: false }).limit(5000); if (error) throw error; reports = data || []; }
