@@ -76,6 +76,8 @@
     .kv a:hover{text-decoration:underline}
     .kv .path{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;color:var(--cream);background:rgba(255,255,255,.05);padding:6px 8px;border-radius:8px;display:block}
     .note{border-left:3px solid var(--err);padding:8px 12px;background:rgba(240,138,130,.08);border-radius:0 10px 10px 0;white-space:pre-wrap}
+    /* brief du client et style maison : texte libre, retours à la ligne gardés, lisible d'un bloc */
+    .kv .brief{display:block;padding:8px 12px;border-left:3px solid var(--line-strong);background:rgba(255,255,255,.03);border-radius:0 10px 10px 0;color:var(--cream);font-size:13px;line-height:1.55;white-space:pre-wrap}
     .parts{display:grid;gap:6px}
     .parts div{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.02)}
     .parts .who{color:var(--taupe);font-size:12px;margin-left:auto}
@@ -125,7 +127,10 @@
 
 <script>
 (() => {
-  // Même projet et même clé publique que /prod : la base ne rend à ce lien que ce que team_jobs('viewer') autorise (jamais de prix, de contact, de brief).
+  // Même projet et même clé publique que /prod : la base ne rend à ce lien que ce que team_jobs('viewer') autorise.
+  // Depuis brief_monteurs_v1.sql (20/10) le lien voit le brief du client (description, style maison du studio, document de brief, dossier Drive) :
+  // c'est le travail du monteur. Jamais : notes internes, contact, e-mail, prix, frame.io. Tant que la migration n'est pas appliquée, ces clés
+  // sont absentes et les lignes correspondantes ne s'affichent simplement pas.
   const SB_URL = "https://xkanmjlpysxpohsuqvwg.supabase.co";
   const SB_KEY = "sb_publishable_lIZtV_WtN5NcGSb0dnfaiQ_AgKYBIVa";
   const KEY_STORE = "ds_board_key";
@@ -149,6 +154,7 @@
       qc: { pending: "Menunggu QC", ok: "QC OK", revisions: "Perlu revisi" }, lateTag: "TERLAMBAT", urgent: "Mendesak",
       part: { intro: "Intro", corps: "Isi", single: "" }, round: (n) => `putaran ${n}`,
       deadline: "Tenggat", with: "Bersama", rushes: "File mentah", links: "Tautan", refs: "Referensi", logos: "Logo & font", qcL: "QC", parts: "Bagian", pc: "di PC kantor", noEd: "belum ada editor",
+      brief: "Brief", house: "Gaya rumah", palette: "Palet", cta: "CTA", briefDoc: "Dokumen brief", folder: "Folder Drive",
       tasks: (n) => `<b>${n}</b> tugas`,
       gate: { badT: "Tautan tidak berlaku", badP: "Tautan ini sudah tidak aktif. Minta tautan baru ke Rania.", tooT: "Terlalu banyak percobaan", tooP: "Coba lagi beberapa menit lagi.", downT: "Tidak bisa terhubung", downP: "Server tidak bisa dihubungi. Periksa koneksi lalu coba lagi.", retry: "Coba lagi" },
       foot: "Hanya untuk tim DS Editing. Jangan bagikan tautan ini.",
@@ -161,6 +167,7 @@
       qc: { pending: "Waiting for QC", ok: "QC OK", revisions: "Needs changes" }, lateTag: "LATE", urgent: "Urgent",
       part: { intro: "Intro", corps: "Body", single: "" }, round: (n) => `round ${n}`,
       deadline: "Deadline", with: "With", rushes: "Footage", links: "Links", refs: "References", logos: "Logo & fonts", qcL: "QC", parts: "Parts", pc: "on the office PC", noEd: "no editor yet",
+      brief: "Brief", house: "House style", palette: "Palette", cta: "CTA", briefDoc: "Brief document", folder: "Drive folder",
       tasks: (n) => `<b>${n}</b> job${n === 1 ? "" : "s"}`,
       gate: { badT: "Link not valid", badP: "This link no longer works. Ask Rania for a new one.", tooT: "Too many attempts", tooP: "Try again in a few minutes.", downT: "Cannot connect", downP: "The server cannot be reached. Check your connection and try again.", retry: "Try again" },
       foot: "DS Editing team only. Do not share this link.",
@@ -212,6 +219,14 @@
     </button>`;
     if (!opened) return `<div class="job">${head}</div>`;
     const kv = [];
+    // le brief d'abord, juste sous le travail à faire : description du client, style maison du studio, palette / CTA (si la base les renvoie), liens
+    if (j.description && String(j.description).trim()) kv.push([t("brief"), `<span class="brief">${esc(j.description)}</span>`]);
+    if (j.house_style && String(j.house_style).trim()) kv.push([t("house"), `<span class="brief">${esc(j.house_style)}</span>`]);
+    const det = j.details && typeof j.details === "object" ? j.details : {};   // 'viewer' ne reçoit pas details aujourd'hui : rien ne s'affiche, rien ne casse
+    if (det.palette && String(det.palette).trim()) kv.push([t("palette"), esc(det.palette)]);
+    if (det.cta_reseaux && String(det.cta_reseaux).trim()) kv.push([t("cta"), esc(det.cta_reseaux)]);
+    const briefDoc = safeUrl(j.brief_url); if (briefDoc) kv.push([t("briefDoc"), `<a href="${esc(briefDoc)}" target="_blank" rel="noopener noreferrer">${esc(briefDoc.replace(/^https?:\/\//i, "").slice(0, 60))}</a>`]);
+    const folder = safeUrl(j.folder_url); if (folder) kv.push([t("folder"), `<a href="${esc(folder)}" target="_blank" rel="noopener noreferrer">${esc(folder.replace(/^https?:\/\//i, "").slice(0, 60))}</a>`]);
     kv.push([t("deadline"), `${fmtDayLong(target(j))}${late ? ` <span class="tag err">${t("lateTag")}</span>` : ""}`]);
     if (others.length) kv.push([t("with"), esc(others.join(", "))]);
     if (j.files_path) kv.push([t("rushes"), `<span class="path">${esc(j.files_path)}</span><span style="color:var(--taupe)">${t("pc")}</span>`]);
@@ -281,7 +296,7 @@
       else gate("down");
       return;
     }
-    for (const j of body.jobs || []) { j.work_to_do = scrub(j.work_to_do); j.project = scrub(j.project); j.qc_note = scrub(j.qc_note); j.logos = scrub(j.logos); }
+    for (const j of body.jobs || []) { j.work_to_do = scrub(j.work_to_do); j.project = scrub(j.project); j.qc_note = scrub(j.qc_note); j.logos = scrub(j.logos); j.description = scrub(j.description); j.house_style = scrub(j.house_style); }
     data = body; lastOk = new Date(); gateKind = "";
     $("#gate").hidden = true; $("#app").hidden = false;
     render();

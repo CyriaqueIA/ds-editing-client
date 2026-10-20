@@ -326,6 +326,10 @@
     .detail .bf .tx{display:block;white-space:pre-wrap;font-size:14px;line-height:1.5;word-break:break-word}
     .detail .bf .wk2{display:block;font-weight:600;margin-bottom:6px}
     .detail .bf .links{margin-top:8px}
+    /* brief client éditable (admin / dispatch / qualité) et style maison : texte libre, retours à la ligne gardés */
+    .detail textarea.in.brief{min-height:96px;resize:vertical;line-height:1.5;white-space:pre-wrap}
+    .detail .hs{display:block;white-space:pre-wrap;word-break:break-word;color:var(--cream)}
+    .detail .help{display:block;font-size:11px;color:var(--taupe);margin-top:4px;line-height:1.4}
     body.lk-editor #edbar,body.lk-editor #stats,body.lk-editor .toolbar .search,body.lk-editor #tvBtn,body.lk-editor #prodBtn,body.lk-editor .edcell{display:none}
     @media (min-width:1181px){body.lk-editor .job{grid-template-columns:92px 1.3fr 200px 1.3fr 160px 150px 40px}}
     /* ---- lot C : commande à parties (Intro / Corps) : sous-lignes par partie, panneau d'assemblage, état « À assembler » ---- */
@@ -543,7 +547,8 @@ const T = {
       setTitle: "PC du bureau", setHint: "Réglages de l'agent qui télécharge les rushes sur le PC de Bali. Pris en compte à son prochain passage.", cleanup: "Nettoyage après Qualité OK (jours)", alertPct: "Alerte disque à partir de (%)", pct: (n) => `${n} %`, destRoot: "Dossier racine des rushes (lecture seule)",
       destHint: "Non modifiable ici : changer de dossier ne déplace pas les rushes déjà téléchargés et fausserait leurs chemins. À faire avec l'équipe technique, sur le PC du bureau.", saved: "enregistré", bad: (a, b) => `Valeur attendue : entre ${a} et ${b}`, missing: "Réglages introuvables : l'agent du PC du bureau n'est pas encore configuré." },
     steps: { dl: "Fichiers", start: "Commencé", half: "50 %", done: "Livré" }, qc: { pending: "Qualité : en attente", ok: "Qualité : OK", revisions: "Qualité : à revoir" },
-    wanted: "Date souhaitée", noDate: "sans date", late: "EN RETARD", team: "équipe", delivered: "livré", unassigned: "À attribuer", noEditor: "Aucun monteur", brief: "Brief", files: "Fichiers", frame: "frame.io", empty: "Aucune commande dans cette vue.", received: "Reçu", frameioPh: "Lien frame.io de livraison", noteQc: "Note qualité", notes: "Notes internes", deliveryDate: "Livraison fixée par l'équipe", rushes: "Rushes", email: "E-mail client", contact: "Contact",
+    wanted: "Date souhaitée", noDate: "sans date", late: "EN RETARD", team: "équipe", delivered: "livré", unassigned: "À attribuer", noEditor: "Aucun monteur", brief: "Brief", files: "Fichiers", frame: "frame.io", empty: "Aucune commande dans cette vue.", received: "Reçu", frameioPh: "Lien frame.io de livraison", noteQc: "Note qualité", notes: "Notes internes · jamais vues par les monteurs", notesHelp: "Réservé à l'équipe (dispatch, qualité, admin). Ce que le monteur doit savoir va dans le brief.", deliveryDate: "Livraison fixée par l'équipe", rushes: "Rushes", email: "E-mail client", contact: "Contact",
+    briefL: "Brief client · envoyé aux monteurs", briefPh: "Ce que le monteur doit faire : ton, musique, captions, hook, à éviter…", houseStyle: "Style maison", houseStyleL: "Style maison (ajouté à chaque brief de ce client, vu par les monteurs)", houseStyleHint: "Rythme, typographie, couleurs, interdits… Texte libre, relu par les monteurs sur chaque commande de ce client.", houseStyleMissing: "Colonne studios.house_style absente : appliquer supabase/brief_monteurs_v1.sql.",
     parts: { intro: "Intro", corps: "Corps", single: "Commande", partFrame: "Lien frame.io de cette partie (interne)", partNotes: "Notes · ",
       asmTag: "À assembler", asmT: "À assembler", asmP: "Les deux parties sont livrées : colle-les ensemble, pose le lien frame.io FINAL, puis livre la commande.", finalPh: "Lien frame.io FINAL de la commande", finalBtn: "Livré (finale)", finalOk: "✓ Livré, la qualité est prévenue",
       revisions: "À revoir : le dispatch relivre la finale ; corrige ta partie si on te le demande.",
@@ -609,7 +614,8 @@ const T = {
       setTitle: "Office PC", setHint: "Settings of the agent that downloads the footage on the Bali PC. Applied on its next pass.", cleanup: "Clean-up after QC OK (days)", alertPct: "Disk alert from (%)", pct: (n) => `${n}%`, destRoot: "Footage root folder (read-only)",
       destHint: "Not editable here: changing the folder does not move footage already downloaded and would break its paths. To be done with the tech team, on the office PC.", saved: "saved", bad: (a, b) => `Expected value: between ${a} and ${b}`, missing: "Settings not found: the office PC agent is not configured yet." },
     steps: { dl: "Files", start: "Started", half: "50%", done: "Delivered" }, qc: { pending: "QC: pending", ok: "QC: OK", revisions: "QC: revisions" },
-    wanted: "Requested date", noDate: "no date", late: "LATE", team: "team", delivered: "delivered", unassigned: "Unassigned", noEditor: "No editor", brief: "Brief", files: "Files", frame: "frame.io", empty: "No order in this view.", received: "Received", frameioPh: "frame.io delivery link", noteQc: "QC note", notes: "Internal notes", deliveryDate: "Delivery set by the team", rushes: "Footage", email: "Client email", contact: "Contact",
+    wanted: "Requested date", noDate: "no date", late: "LATE", team: "team", delivered: "delivered", unassigned: "Unassigned", noEditor: "No editor", brief: "Brief", files: "Files", frame: "frame.io", empty: "No order in this view.", received: "Received", frameioPh: "frame.io delivery link", noteQc: "QC note", notes: "Internal notes · never shown to editors", notesHelp: "Team only (dispatch, QC, admin). Anything the editor must know goes in the brief.", deliveryDate: "Delivery set by the team", rushes: "Footage", email: "Client email", contact: "Contact",
+    briefL: "Client brief · sent to editors", briefPh: "What the editor must do: tone, music, captions, hook, what to avoid…", houseStyle: "House style", houseStyleL: "House style (added to every brief of this client, shown to editors)", houseStyleHint: "Pacing, typography, colours, no-gos… Free text, read by the editors on every order of this client.", houseStyleMissing: "Column studios.house_style missing: apply supabase/brief_monteurs_v1.sql.",
     parts: { intro: "Intro", corps: "Body", single: "Order", partFrame: "frame.io link of this part (internal)", partNotes: "Notes · ",
       asmTag: "To assemble", asmT: "To assemble", asmP: "Both parts are delivered: put them together, paste the FINAL frame.io link, then deliver the order.", finalPh: "FINAL frame.io link of the order", finalBtn: "Delivered (final)", finalOk: "✓ Delivered, QC has been notified",
       revisions: "Needs changes: dispatch redelivers the final; fix your part if you are asked to.",
@@ -1041,11 +1047,11 @@ function renderBoard() {
       <div class="detail">
         ${isEditor() && LINKED ? briefBlock(j) : ""}${filesBlock(j)}
         <div><b>${t("rushes")}</b><div class="lk">${(j.rushes_links || []).map((u) => `<a href="${safeUrl(u)}" target="_blank" rel="noopener">${esc(u)}</a>`).join("\n") || "—"}</div></div>
-        <div${isEditor() && LINKED ? " hidden" : ""}>${isAdmin() ? `<b>${t("contact")}</b>${esc(j.contact || "—")}<br/><b style="margin-top:8px">${t("email")}</b>${esc(j.email || "—")}` : ""}${j.description ? `${isAdmin() ? "<br/>" : ""}<b style="margin-top:8px">Brief</b><span style="white-space:pre-wrap">${esc(j.description)}</span>` : ""}</div>
+        <div${isEditor() && LINKED ? " hidden" : ""}>${isAdmin() ? `<b>${t("contact")}</b>${esc(j.contact || "—")}<br/><b style="margin-top:8px">${t("email")}</b>${esc(j.email || "—")}<br/>` : ""}${briefField(j)}${houseStyleOf(j) ? `<b style="margin-top:8px">${t("houseStyle")}</b><span class="hs">${esc(houseStyleOf(j))}</span>` : ""}</div>
         <div>
           ${multi ? "" : `<b>${t("frame")}</b><input class="in" data-field="frameio_url" data-id="${j.id}" value="${esc(j.frameio_url || "")}" placeholder="${t("frameioPh")}" ${ed && !(isEditor() && j.qc_status === "ok") ? "" : "disabled"} ${isEditor() && j.qc_status === "ok" ? `title="${esc(t("errs").QC_OK_VERROUILLE)}"` : ""}/>${fbHtml(j.id, "frameio_url")}${ed && !j.delivered_at && !FRAME_OK(j.frameio_url) ? `<span class="fb warn">${t("needFrame")}</span>` : ""}`}
           ${isAdmin() ? `<b style="margin-top:8px">${t("deliveryDate")}</b><input class="in" type="date" data-field="delivery_date" data-id="${j.id}" value="${j.delivery_date || ""}"/>${fbHtml(j.id, "delivery_date")}<b style="margin-top:8px">${t("noteQc")}</b><input class="in" data-field="qc_note" data-id="${j.id}" value="${esc(j.qc_note || "")}"/>${fbHtml(j.id, "qc_note")}` : (j.qc_note ? `<b style="margin-top:8px">${t("noteQc")}</b>${esc(j.qc_note)}` : "")}
-          ${multi && isEditor() ? "" : `<b style="margin-top:8px">${t("notes")}</b><input class="in" data-field="notes" data-id="${j.id}" value="${esc(j.notes || "")}" ${ed && !(multi && isEditor()) ? "" : "disabled"}/>${fbHtml(j.id, "notes")}`}
+          ${multi && isEditor() ? "" : `<b style="margin-top:8px">${t("notes")}</b><input class="in" data-field="notes" data-id="${j.id}" value="${esc(j.notes || "")}" ${ed && !(multi && isEditor()) ? "" : "disabled"}/>${fbHtml(j.id, "notes")}<span class="help">${esc(t("notesHelp"))}</span>`}
           ${multi ? partNotes(j) : reshapeBlock(j)}
           ${canMoney() && !LINKED ? amountBlock(j) : ""}
         </div>
@@ -1055,11 +1061,23 @@ function renderBoard() {
   wireBoard();
   flashUntil.forEach((until, id) => { setTimeout(() => { if ((flashUntil.get(id) || 0) <= Date.now()) { flashUntil.delete(id); const el = document.querySelector(`.job[data-id="${id}"]`); if (el) el.classList.remove("flash"); } }, Math.max(0, until - Date.now()) + 20); });
 }
+/* ---- Brief monteurs (20/10, brief_monteurs_v1.sql). Style maison du client : clé house_style posée par team_jobs sur chaque commande (tous rôles,
+   une fois la migration appliquée), sinon lu dans `studios` (chargé par loadAdmin pour les comptes nominatifs admin / dispatch / qualité, ou par
+   loadStudiosLite pour un lien). Rien des deux → vide, rien ne s'affiche. */
+const houseStyleOf = (j) => { const own = j && j.house_style; if (own && String(own).trim()) return String(own).trim(); const s = studios.find((x) => x.id === j.studio_id); return s && s.house_style ? String(s.house_style).trim() : ""; };
+// Brief client (jobs.description) : éditable par admin / dispatch / qualité en session nominative (écriture directe RLS) ; en lecture pour les autres.
+// Par lien personnel, team_update n'accepte pas `description` (lot_b_liens.sql) : on n'ouvre pas un champ que la base refuserait.
+function briefField(j) {
+  const editable = isAdmin() && !LINKED;
+  if (editable) return `<b style="margin-top:8px">${t("briefL")}</b><textarea class="in brief" rows="5" data-field="description" data-id="${j.id}" placeholder="${esc(t("briefPh"))}">${esc(j.description || "")}</textarea>${fbHtml(j.id, "description")}`;
+  return j.description ? `<b style="margin-top:8px">${t("briefL")}</b><span style="white-space:pre-wrap">${esc(j.description)}</span>` : "";
+}
 // monteur (lien) : le brief d'abord, en grand ; contact et montants ne sont de toute façon jamais envoyés par la base
 function briefBlock(j) {
   const L = t("lk"), link = (u) => `<a href="${safeUrl(u)}" target="_blank" rel="noopener noreferrer">${esc(u)}</a>`, refs = (j.references_links || []).filter(Boolean);
   const depBy = j.details && j.details.deposited_by ? `<span class="tx" style="color:var(--taupe)">${esc(t("newOrder").by(j.details.deposited_by))}</span>` : "";
-  return `<div class="bf"><b>${L.brief}</b>${depBy}${j.work_to_do ? `<span class="wk2">${esc(j.work_to_do)}</span>` : ""}<span class="tx">${esc(j.description || "—")}</span>${j.brief_url ? `<div class="links"><a href="${safeUrl(j.brief_url)}" target="_blank" rel="noopener noreferrer">${t("brief")}</a></div>` : ""}${refs.length ? `<div class="links"><b>${L.refs}</b>${refs.map(link).join("")}</div>` : ""}${j.logos ? `<div style="margin-top:8px"><b>${L.logos}</b><span class="tx">${esc(j.logos)}</span></div>` : ""}</div>`;
+  const hs = houseStyleOf(j);
+  return `<div class="bf"><b>${L.brief}</b>${depBy}${j.work_to_do ? `<span class="wk2">${esc(j.work_to_do)}</span>` : ""}<span class="tx">${esc(j.description || "—")}</span>${hs ? `<div style="margin-top:10px"><b>${t("houseStyle")}</b><span class="tx">${esc(hs)}</span></div>` : ""}${j.brief_url ? `<div class="links"><a href="${safeUrl(j.brief_url)}" target="_blank" rel="noopener noreferrer">${t("brief")}</a></div>` : ""}${refs.length ? `<div class="links"><b>${L.refs}</b>${refs.map(link).join("")}</div>` : ""}${j.logos ? `<div style="margin-top:8px"><b>${L.logos}</b><span class="tx">${esc(j.logos)}</span></div>` : ""}</div>`;
 }
 function amountBlock(j) {
   const s = studios.find((x) => x.id === j.studio_id); const cur = s ? s.currency : "EUR";
@@ -1660,7 +1678,9 @@ function renderTarifs() {
       <label>${t("currency")}<select class="in" data-studio="currency"><option ${s.currency === "EUR" ? "selected" : ""}>EUR</option><option ${s.currency === "USD" ? "selected" : ""}>USD</option></select></label>
       <label>${t("tvaL")}<select class="in" data-studio="tva">${["ue", "hors_ue", "us", "none"].map((v) => `<option value="${v}" ${s.tva === v ? "selected" : ""}>${v}</option>`).join("")}</select></label>
       <label style="grid-column:1/-1">${t("billingAddress")}<textarea class="in" rows="3" data-studio="billing_address">${esc(s.billing_address || "")}</textarea></label>
-    </div></div>` + newClientPanel() + agentPanel();
+    </div></div>
+    <div class="panel"><h3>${t("houseStyle")}</h3><p style="font-size:12px;color:var(--taupe);margin:0 0 10px">${esc(t("houseStyleHint"))}</p>
+      <label style="display:block">${esc(t("houseStyleL"))}<textarea class="in" rows="5" data-studio="house_style" style="margin-top:6px">${esc(s.house_style || "")}</textarea></label></div>` + newClientPanel() + agentPanel();
   wireNewClient(); wireAgentPanel(); updDupWarn();
   $("#tarifStudio").addEventListener("change", (e) => { tarifStudio = e.target.value; renderTarifs(); });
   $("#admin").querySelectorAll("[data-key]").forEach((i) => i.addEventListener("change", async () => {
@@ -1668,7 +1688,7 @@ function renderTarifs() {
     const { error } = await sb.from("price_grids").upsert({ studio_id: s.id, item_key: i.dataset.key, unit_price: v }, { onConflict: "studio_id,item_key" });
     if (error) { alert(error.message); return; } $("#tarifMsg").textContent = "✓ " + t("saved"); setTimeout(() => { $("#tarifMsg").textContent = ""; }, 1500); await loadAdmin(); updDupWarn();
   }));
-  $("#admin").querySelectorAll("[data-studio]").forEach((i) => i.addEventListener("change", async () => { const { error } = await sb.from("studios").update({ [i.dataset.studio]: i.value || null }).eq("id", s.id); if (error) alert(error.message); else { $("#tarifMsg").textContent = "✓ " + t("saved"); await loadAdmin(); } }));
+  $("#admin").querySelectorAll("[data-studio]").forEach((i) => i.addEventListener("change", async () => { const { error } = await sb.from("studios").update({ [i.dataset.studio]: i.value || null }).eq("id", s.id); if (error) alert(i.dataset.studio === "house_style" && /house_style/.test(error.message || "") ? t("houseStyleMissing") : error.message); else { $("#tarifMsg").textContent = "✓ " + t("saved"); await loadAdmin(); } }));
   $("#recalcAll").addEventListener("click", async () => { const list = jobs.filter((j) => j.studio_id === s.id && j.qc_status === "ok" && !j.invoice_id); for (const j of list) await sb.rpc("price_job_team",{ p_job: j.id }); await load(false); $("#tarifMsg").textContent = `✓ ${list.length}`; });
 }
 function renderFactures() {
@@ -1686,6 +1706,14 @@ function renderFactures() {
   $("#admin").querySelectorAll("[data-cancel]").forEach((b) => b.addEventListener("click", async () => { if (!confirm(t("cancel") + " ?")) return; const { error } = await sb.from("invoices").update({ status: "annulee" }).eq("id", b.dataset.cancel); if (error) alert(error.message); await loadAdmin(); renderFactures(); }));
   $("#admin").querySelectorAll("[data-del]").forEach((b) => b.addEventListener("click", async () => { await sb.from("extra_lines").delete().eq("id", b.dataset.del); await loadAdmin(); renderFactures(); }));
   $("#xAdd").addEventListener("click", async () => { const label = $("#xLabel").value.trim(), price = Number($("#xPrice").value); if (!label || !(price >= 0)) return; const { error } = await sb.from("extra_lines").insert({ studio_id: $("#xStudio").value, label, qty: Number($("#xQty").value) || 1, unit_price: price, offered: $("#xOff").checked, created_by: profile.display_name }); if (error) alert(error.message); await loadAdmin(); renderFactures(); });
+}
+// Studios en lecture légère (lien dispatch / qualité : politique studios_team). Tolérant : si la colonne house_style n'existe pas encore (400), on relit sans elle.
+async function loadStudiosLite() {
+  try {
+    let r = await sb.from("studios").select("id,name,currency,house_style").order("name");
+    if (r.error && /house_style/.test(r.error.message || "")) r = await sb.from("studios").select("id,name,currency").order("name");
+    if (!r.error && Array.isArray(r.data)) studios = r.data;
+  } catch (e) { console.warn(e); }
 }
 async function loadAdmin() {
   if (!isAdmin() || LINKED) return;
@@ -1977,6 +2005,7 @@ async function load(first, keepPop, pre) {
     const r = pre || await teamLoad(); if (!r) return;
     rows = r.jobs; eds = r.editors; myEditor = r.editor || null; agentOk = "agent" in r; agent = r.agent || null; agentSettings = r.agent_settings || null;
     if (isEditor()) rows.forEach((j) => { if (!known.has(j.id)) openIds.add(j.id); });   // monteur : le détail (brief d'abord) s'ouvre tout seul sur une nouvelle commande
+    if (first && isAdmin() && !studios.length) await loadStudiosLite();   // lien dispatch / qualité : style maison des clients en secours (team_jobs le porte déjà après brief_monteurs_v1)
   } else {
     const [{ data: rr, error }, { data: ee }] = await Promise.all([
       fetchJobs(),

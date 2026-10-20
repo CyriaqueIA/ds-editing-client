@@ -137,6 +137,13 @@
     .add{margin-top:8px;background:rgba(255,255,255,.04);border:1px dashed var(--line-strong);color:var(--taupe);border-radius:999px;padding:11px 16px;cursor:pointer;font:inherit;font-size:13px;font-weight:600;width:100%;transition:border-color .2s,color .2s,background .2s}
     .chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 4px}
     .chip{border:1px solid var(--line-strong);background:rgba(255,255,255,.04);color:var(--cream);border-radius:999px;padding:7px 12px;font:inherit;font-size:13px;cursor:pointer;transition:border-color .2s,background .2s}
+    /* brief structuré : puces à choix unique (même allure que les niveaux .lv), champ libre conditionnel, un bloc par livrable */
+    .chips.sel .chip.on{color:#0A0B0D;background:rgba(255,255,255,.85);border-color:transparent}
+    .chips.bad .chip,.yn.bad button{border-color:var(--err)}
+    .in[hidden]{display:none}
+    .dlv{margin-top:14px;padding:14px 16px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
+    .dlv h4{margin:0;font-size:15px;font-weight:600;letter-spacing:-.01em}
+    .dlv label.f{margin-top:12px}
     .swatches{display:flex;gap:6px;margin-top:8px;min-height:18px}
     .swatches i{width:22px;height:22px;border-radius:6px;border:1px solid var(--line-strong)}
     .brandkit{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:22px}
@@ -436,23 +443,26 @@
       <div class="kh" style="margin-top:22px"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 5h14M12 5v14M9 19h6"/></svg><span data-i="bk.font"></span></div>
       <div class="fontpick" id="fontpick"><button type="button" data-font="own" data-i="bk.fontOwn"></button><button type="button" data-font="team" data-i="bk.fontTeam"></button></div>
       <input class="in" id="fontName" data-ph="ph.font" style="margin-top:10px"/>
-      <label class="f" data-i="f.references"><small data-i="f.referencesSmall"></small></label>
-      <div class="links" id="references"></div>
-      <button type="button" class="add" data-add="references" data-i="add.link"></button>
+      <!-- Les vidéos d'inspiration (#references) vivent désormais à l'étape 05 — Brief (« 2 vidéos que vous aimez ») : une seule liste, lue par le monteur. -->
     </section>
 
-    <!-- 5. Brief -->
-    <section class="card panel" data-step="4">
+    <!-- 5. Brief structuré (décision Cyriaque, 20/10/2026) : un bloc « Direction » commun, puis UN bloc par type de livrable commandé
+         (épisode / VSL 16:9, reels 9:16, miniature), affiché seulement si ce type est dans la commande. La page continue d'envoyer
+         `description` = texte lisible assemblé (briefText) — le robot, le Google Doc, le mail et la vue équipe le lisent tel quel —
+         ET details.brief = l'objet structuré (briefData). Obligatoire pour un client ; dépôt interne (?by=) : affiché, jamais bloquant. -->
+    <section class="card panel" data-step="4" id="briefPanel">
       <h2 data-i="s5.title"></h2>
       <p class="hint" data-i="s5.hint"></p>
-      <label class="f" for="description" data-i="f.description"></label>
-      <div class="chips" id="chips"></div>
-      <textarea class="in" id="description" name="description" data-ph="ph.description"></textarea>
-      <div class="row">
-        <div>
-          <label class="f" for="deadline" data-i="f.deadline"><small data-i="f.deadlineSmall"></small></label>
-          <input class="in" id="deadline" name="deadline" type="date"/>
-        </div>
+      <div class="block">
+        <h3 data-i="br.dirT"></h3><p class="sub" data-i="br.dirSub"></p>
+        <label class="f" data-i="br.tone"></label>
+        <div class="chips sel" data-brsel="tone"></div>
+        <input class="in" data-brin="toneFree" data-ph="br.toneFreePh" style="margin-top:10px" hidden/>
+        <label class="f" data-i="br.music"></label>
+        <div class="chips sel" data-brsel="music"></div>
+        <label class="f" data-i="br.captions"></label>
+        <div class="chips sel" data-brsel="captions"></div>
+        <input class="in" data-brin="captionsStyle" data-ph="br.captionsStylePh" style="margin-top:10px" hidden/>
       </div>
       <div class="cta-block">
         <div class="kh"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg><span data-i="cta.title"></span></div>
@@ -460,6 +470,54 @@
         <div class="yn" id="ctaYN"><button type="button" data-cta="yes" data-i="cta.yes"></button><button type="button" data-cta="no" data-i="cta.no"></button></div>
         <input class="in" id="ctaNets" data-ph="ph.ctaNets" style="margin-top:10px;display:none"/>
         <div class="cta-ex"><span data-i="cta.examples"></span><span id="ctaChips"></span></div>
+      </div>
+      <div class="block">
+        <label class="f" for="brAvoid" data-i="br.avoid"></label>
+        <input class="in" id="brAvoid" data-brin="avoid" data-ph="br.avoidPh"/>
+        <label class="check" for="brAvoidNone"><input type="checkbox" id="brAvoidNone"/><span data-i="br.avoidNone"></span></label>
+        <label class="f" data-i="br.likes"><small data-i="br.likesSmall"></small></label>
+        <div class="links" id="references"></div>
+        <button type="button" class="add" data-add="references" data-i="add.link"></button>
+      </div>
+      <div class="block" id="dlvWrap" hidden>
+        <h3 data-i="br.dlvT"></h3><p class="sub" data-i="br.dlvSub"></p>
+        <div class="dlv" id="dlvEp" hidden>
+          <h4 id="dlvEpT"></h4>
+          <label class="f" data-i="br.dur"></label>
+          <div class="chips sel" data-brsel="ep.dur"></div>
+          <input class="in" type="number" min="1" max="600" inputmode="numeric" data-brin="ep.durMin" data-ph="br.epDurMinPh" style="margin-top:10px;max-width:220px" hidden/>
+          <label class="f" data-i="br.hook"></label>
+          <div class="chips sel" data-brsel="ep.hook"></div>
+          <input class="in" data-brin="ep.hookTc" data-ph="br.hookTcPh" style="margin-top:10px" hidden/>
+          <label class="f" data-i="br.capSpec"></label>
+          <input class="in" data-brin="ep.captions" data-ph="br.capSpecPh"/>
+        </div>
+        <div class="dlv" id="dlvReel" hidden>
+          <h4 data-i="br.reel"></h4>
+          <label class="f" data-i="br.dur"></label>
+          <div class="chips sel" data-brsel="reel.dur"></div>
+          <input class="in" data-brin="reel.durOther" data-ph="br.reelDurPh" style="margin-top:10px;max-width:220px" hidden/>
+          <label class="f" data-i="br.hook"></label>
+          <div class="chips sel" data-brsel="reel.hook"></div>
+          <input class="in" data-brin="reel.hookTc" data-ph="br.hookTcPh" style="margin-top:10px" hidden/>
+          <label class="f" data-i="br.capSpec"></label>
+          <input class="in" data-brin="reel.captions" data-ph="br.capSpecPh"/>
+        </div>
+        <div class="dlv" id="dlvThumb" hidden>
+          <h4 data-i="br.thumb"></h4>
+          <label class="f" data-i="br.thumbTxt"></label>
+          <input class="in" data-brin="thumb" data-ph="br.thumbPh"/>
+        </div>
+      </div>
+      <div class="block">
+        <label class="f" for="brief_free" data-i="f.brief_free"></label>
+        <textarea class="in" id="brief_free" name="brief_free" data-ph="ph.brief_free" style="min-height:96px"></textarea>
+      </div>
+      <div class="row">
+        <div>
+          <label class="f" for="deadline" data-i="f.deadline"><small data-i="f.deadlineSmall"></small></label>
+          <input class="in" id="deadline" name="deadline" type="date"/>
+        </div>
       </div>
       <div class="row">
         <div>
@@ -580,7 +638,7 @@ const I18N = {
     "cta.title":"Veux-tu un CTA vers tes réseaux sociaux dans l'épisode ?","cta.sub":"Survole un exemple pour voir à quoi ressemble le CTA à l'écran.","cta.yes":"Oui","cta.no":"Non","cta.examples":"Voir des exemples","cta.soon":"Aperçu bientôt","ph.ctaNets":"Tes réseaux : @instagram, chaîne YouTube, TikTok…","cta.unit":"CTA réseaux sociaux",
     "bk.logo":"Ton logo ici","bk.logoSub":"PNG, SVG ou JPG. Facultatif.","bk.logoDrop":"Glisse ton logo ici","bk.palette":"Ta palette graphique ici","bk.paletteSub":"Une capture de ta palette, ou tes codes couleur en dessous.","bk.paletteDrop":"Glisse ta palette ici","bk.font":"Une police d'écriture spécifique à utiliser ?","bk.fontOwn":"J'ai une police spécifique","bk.fontTeam":"Laisser l'équipe artistique décider","ph.font":"Nom de la police, ou un lien","bk.teamFont":"l'équipe artistique décide","bk.file":"fichier joint",
     "f.rushes":"Liens des rushes","f.logos":"Logos et polices","f.logosSmall":"liens Drive ou WeTransfer","f.logosSent":"Vous les avez déjà, rien de nouveau",
-    "f.references":"Les vidéos dont on doit s'inspirer","f.referencesSmall":"colle les liens de vidéos que tu adores, on reprend leur style : rythme, sous-titres, habillage","add.link":"+ Ajouter un lien","ph.link":"https://…",
+    "add.link":"+ Ajouter un lien","ph.link":"https://…",
     /* Verdict d'un lien de rushes (client/links.js). Dire ce qui ne va pas ET quoi faire : jamais culpabiliser.
        {site} = le nom du service lu dans le lien (Spotify, Frame.io…). */
     lk:{page:"Ce lien est une page {site}, pas un fichier. Colle plutôt le dossier Drive, WeTransfer ou Dropbox qui contient tes rushes.",
@@ -589,17 +647,29 @@ const I18N = {
       drive:"Lien Google Drive non reconnu. Renvoie le lien de partage du fichier ou du dossier (« Partager » → « Copier le lien »).",
       dropbox:"Ce lien Dropbox n'est pas un lien de partage. Renvoie celui créé avec « Partager ».",
       manual:"{site} : on ne sait pas le télécharger automatiquement, on le récupérera à la main. Un dossier Drive, WeTransfer ou Dropbox arrive plus vite chez le monteur.",
-      move:"Déplacer vers les vidéos d'inspiration"},
-    "s5.title":"Votre brief","s5.hint":"Plus c'est précis, plus le premier montage est juste. Cliquez sur une puce pour insérer une rubrique.",
-    "f.description":"Description et détails","ph.description":"Objectif, audience, ton, ce qu'il faut garder ou couper, durée visée…",
-    chips:["Objectif :","Ton :","À garder :","À couper :","Durée visée :"],
+      move:"Déplacer vers les vidéos que vous aimez (étape 05 — Brief)"},
+    "s5.title":"Votre brief","s5.hint":"Plus c'est précis, plus le premier montage est juste. Une réponse par ligne, deux vidéos que vous aimez, et c'est parti.",
+    // Brief structuré (20/10) : libellés des champs (clés plates, data-i), options des puces (brOpt) et mots du texte assemblé (brX)
+    "br.dirT":"Direction","br.dirSub":"Le cadre commun à toutes les vidéos de cette commande.",
+    "br.tone":"Ton et style","br.toneFreePh":"Décrivez le ton en quelques mots",
+    "br.music":"Musique","br.captions":"Captions (sous-titres à l'écran)","br.captionsStylePh":"Style des captions, facultatif : police, couleur, position…",
+    "br.avoid":"À éviter","br.avoidPh":"Ex. pas de zooms, pas d'emojis, ne pas couper les silences…","br.avoidNone":"Rien de particulier",
+    "br.likes":"2 vidéos que vous aimez","br.likesSmall":"deux liens minimum : on reprend leur rythme, leurs sous-titres, leur habillage",
+    "br.dlvT":"Par livrable","br.dlvSub":"Un bloc par type de vidéo commandé : il n'apparaît que si vous l'avez choisi.",
+    "br.reel":"Reels 9:16","br.thumb":"Miniature","br.dur":"Durée cible","br.epDurMinPh":"minutes","br.reelDurPh":"Ex. 90 s",
+    "br.hook":"Hook (ouverture)","br.hookTcPh":"Ex. 02:10, 14:30","br.capSpec":"Captions spécifiques","br.capSpecPh":"Facultatif, si différentes de la direction",
+    "br.thumbTxt":"Texte et consigne de la miniature","br.thumbPh":"Ex. « 3 erreurs qui tuent ton podcast », visage à gauche, fond sombre",
+    "f.brief_free":"Autres précisions","ph.brief_free":"Facultatif : tout ce qui aide le monteur",
+    brOpt:{tone:{cine:"Cinématique",dyn:"Dynamique",sobre:"Sobre",fun:"Fun",autre:"Autre"},music:{editor:"Oui, au choix du monteur",provided:"Oui, je la fournis (lien dans les rushes)",none:"Non"},captions:{word:"Oui, mot à mot",sentence:"Oui, par phrases",none:"Non"},
+      epDur:{full:"Complet",cut:"Coupé à…"},reelDur:{s30:"30 s",s45:"45 s",s60:"60 s",other:"Autre"},hook:{editor:"Le monteur ouvre sur le moment fort",tc:"Voici mes timecodes"},ep:{podcast:"Épisode 16:9",vsl:"VSL 16:9",facecam:"Face cam 16:9",other:"Vidéo 16:9"}},
+    brX:{tone:"Ton et style",music:"Musique",captions:"Captions",cta:"CTA",avoid:"À éviter",likes:"Vidéos aimées",dur:"durée",hook:"hook",capt:"captions",thumb:"Miniature — texte",free:"Autres précisions",yes:"oui",no:"non",none:"non",editor:"au choix du monteur",provided:"fournie par le client",word:"mot à mot",sentence:"par phrases",style:"style",full:"complet",cut:"coupé à {n} min",tc:"timecodes {tc}",nothing:"rien de particulier"},
     "f.palette":"Palette de couleurs","f.paletteSmall":"codes hex","ph.palette":"ex. #E02B20, #0A0A0B, #FFFFFF",
     "f.deadline":"Deadline souhaitée","f.deadlineSmall":"on vous confirme la date à réception",
     "f.email":"Ton e-mail","f.emailSmall":"confirmation de commande, suivi et facture","ph.email":"toi@studio.com",
     "f.contactName":"Contact pour ce projet","ph.contactName":"Prénom et nom","f.contactHow":"WhatsApp","ph.contactHow":"+33 6…",
     "f.autres":"Autre chose à nous dire ?","ph.autres":"Facultatif",
     "s6.title":"Récapitulatif","s6.hint":"Vérifiez, puis envoyez. Vous pouvez revenir en arrière.",
-    recap:{projet:"Projet",commande:"Commande",autre_demande:"Autre demande",rushes:"Rushes",logos:"Logos et polices",references:"Vidéos d\'inspiration",description:"Brief",palette:"Palette",deadline:"Deadline souhaitée",contact:"Contact",email:"E-mail",autres:"Autres infos",prix:"Prix"},
+    recap:{projet:"Projet",commande:"Commande",autre_demande:"Autre demande",rushes:"Rushes",logos:"Logos et polices",references:"Vidéos que vous aimez",description:"Brief",palette:"Palette",deadline:"Deadline souhaitée",contact:"Contact",email:"E-mail",autres:"Autres infos",prix:"Prix"},
     "r.logo":"Logo","r.font":"Police","r.shot":"Capture",
     quote:"Sur devis", quoteLong:"Sur devis, confirmé par notre équipe à réception.",
     "btn.prev":"Retour","btn.next":"Continuer","btn.send":"Envoyer à DS Editing","btn.sending":"Envoi…",
@@ -608,7 +678,9 @@ const I18N = {
     // Seuls les fichiers joints (logo, palette) vivent en mémoire et sont à redéposer : le texte le dit.
     "stale.text":"Une nouvelle version de ce formulaire est disponible. Rafraîchissez la page pour continuer : vos choix sont conservés sur cet appareil, seuls vos fichiers joints (logo, palette) sont à redéposer.","stale.btn":"Rafraîchir la page",
     units:{episode:["épisode","épisodes"],reel_basique:["reel standard","reels standard"],reel_signature:["reel premium","reels premium"],miniature:["miniature","miniatures"],trailer:["trailer","trailers"]},
-    err:{projet:"Donnez un nom au projet.",reel0:"Indiquez au moins un reel (étape 03 — Extras).",produit0:"Choisissez ce que vous nous confiez, à l'étape 01 — Produit.",produit:"Votre commande est encore vide : choisissez un produit à l'étape 01 — Produit et sa formule à l'étape 02 — Formule, ou un de vos packs à l'étape 01 sous « Vos vidéos ».",noVideo:"Il manque la vidéo : les extras s'ajoutent à un épisode ou à un pack. Choisissez votre épisode à l'étape 02 — Formule, ou un de vos packs à l'étape 01 — Produit. On garde le reste de votre sélection.",formule:"Choisissez une formule ou un pack à l'étape 02 — Formule.",rushes:"Ajoutez au moins un lien de rushes.",rushesBad:"Un de vos liens de rushes n'est pas un fichier téléchargeable (étape 04 — Fichiers) : corrigez-le, ou déplacez-le vers les vidéos d'inspiration.",description:"Décrivez ce que vous attendez, même en trois lignes.",contact:"Indiquez un contact et un moyen de le joindre.",email:"Indiquez un e-mail valide, c'est là qu'arrivent la confirmation et le suivi.",send:"L'envoi a échoué. Réessayez, ou écrivez-nous sur WhatsApp.",terms:"Cochez les conditions de collaboration pour envoyer la commande.",
+    err:{projet:"Donnez un nom au projet.",reel0:"Indiquez au moins un reel (étape 03 — Extras).",produit0:"Choisissez ce que vous nous confiez, à l'étape 01 — Produit.",produit:"Votre commande est encore vide : choisissez un produit à l'étape 01 — Produit et sa formule à l'étape 02 — Formule, ou un de vos packs à l'étape 01 sous « Vos vidéos ».",noVideo:"Il manque la vidéo : les extras s'ajoutent à un épisode ou à un pack. Choisissez votre épisode à l'étape 02 — Formule, ou un de vos packs à l'étape 01 — Produit. On garde le reste de votre sélection.",formule:"Choisissez une formule ou un pack à l'étape 02 — Formule.",rushes:"Ajoutez au moins un lien de rushes.",rushesBad:"Un de vos liens de rushes n'est pas un fichier téléchargeable (étape 04 — Fichiers) : corrigez-le, ou déplacez-le vers les vidéos que vous aimez.",contact:"Indiquez un contact et un moyen de le joindre.",
+      brTone:"Choisissez un ton et un style (étape 05 — Brief).",brMusic:"Musique : au choix du monteur, fournie, ou non (étape 05 — Brief).",brCaptions:"Captions : mot à mot, par phrases, ou non (étape 05 — Brief).",brCta:"CTA de fin : répondez oui ou non (étape 05 — Brief).",brAvoid:"Dites-nous ce qu'il faut éviter, ou cochez « Rien de particulier » (étape 05 — Brief).",brLikes:"Collez au moins deux liens de vidéos que vous aimez (étape 05 — Brief).",
+      brEpDur:"Durée cible de la vidéo 16:9 : complète, ou coupée à combien de minutes (étape 05 — Brief).",brEpHook:"Hook de la vidéo 16:9 : au choix du monteur, ou vos timecodes (étape 05 — Brief).",brReelDur:"Durée cible des reels : 30, 45, 60 s ou autre (étape 05 — Brief).",brReelHook:"Hook des reels : au choix du monteur, ou vos timecodes (étape 05 — Brief).",brThumb:"Donnez le texte de la miniature (étape 05 — Brief).",email:"Indiquez un e-mail valide, c'est là qu'arrivent la confirmation et le suivi.",send:"L'envoi a échoué. Réessayez, ou écrivez-nous sur WhatsApp.",terms:"Cochez les conditions de collaboration pour envoyer la commande.",
       key:"Ouvrez cet espace depuis votre lien personnel ou l'Espace client pour envoyer votre commande.",keyLink:"Aller à l'Espace client",bad_key:"Votre accès n'est pas reconnu pour ce studio. Ouvrez cet espace depuis votre lien personnel ou l'Espace client.",bad_email:"L'e-mail n'est pas valide. Corrigez-le à l'étape Brief.",no_project:"Donnez un nom au projet, à l'étape Produit.",no_rushes:"Aucun lien de rushes valide. Collez au moins un lien complet (https://…) à l'étape Fichiers.",rate_limit:"Beaucoup de commandes viennent d'être envoyées depuis cet espace. Réessayez dans une heure, ou écrivez-nous sur WhatsApp."},
     "team.note":"Dépôt interne par {n} pour le compte du client. L'e-mail saisi à l'étape Brief recevra les mails automatiques (confirmation, suivi, facture) : mets le tien si le client ne doit rien recevoir.",
     "s6.terms":"J'accepte les conditions de collaboration DS Editing : facture hebdomadaire, paiement à réception, pénalité de 20 % par semaine de retard.","s6.termsLink":"Lire les conditions","ok.space":"Ouvrir mon espace (commandes, factures)",
@@ -652,31 +724,44 @@ const I18N = {
     "cta.title":"Do you want a CTA to your socials in the episode?","cta.sub":"Hover an example to see what the CTA looks like on screen.","cta.yes":"Yes","cta.no":"No","cta.examples":"See examples","cta.soon":"Preview soon","ph.ctaNets":"Your socials: @instagram, YouTube channel, TikTok…","cta.unit":"Social media CTA",
     "bk.logo":"Your logo here","bk.logoSub":"PNG, SVG or JPG. Optional.","bk.logoDrop":"Drop your logo here","bk.palette":"Your colour palette here","bk.paletteSub":"A screenshot of your palette, or your colour codes below.","bk.paletteDrop":"Drop your palette here","bk.font":"A specific font to use?","bk.fontOwn":"I have a specific font","bk.fontTeam":"Let the art team decide","ph.font":"Font name, or a link","bk.teamFont":"art team decides","bk.file":"file attached",
     "f.rushes":"Raw footage links","f.logos":"Logos & fonts","f.logosSmall":"Drive or WeTransfer links","f.logosSent":"You already have them, nothing new",
-    "f.references":"The videos we should take after","f.referencesSmall":"paste links to videos you love, we'll match their style: pacing, captions, graphics","add.link":"+ Add a link","ph.link":"https://…",
+    "add.link":"+ Add a link","ph.link":"https://…",
     lk:{page:"This is a {site} page, not a file. Paste the Drive, WeTransfer or Dropbox folder that holds your footage instead.",
       unknown:"We don't know this host ({site}): we'll fetch your files by hand. A Drive, WeTransfer or Dropbox folder reaches the editor faster.",
       bad:"This link is incomplete. It must start with https:// and point to your footage.",
       drive:"Google Drive link not recognised. Send the file or folder share link (“Share” → “Copy link”).",
       dropbox:"This Dropbox link isn't a share link. Send the one created with “Share”.",
       manual:"{site}: we can't download it automatically, we'll fetch it by hand. A Drive, WeTransfer or Dropbox folder reaches the editor faster.",
-      move:"Move to the inspiration videos"},
-    "s5.title":"Your brief","s5.hint":"The more precise, the better the first cut. Click a chip to insert a section.",
-    "f.description":"Description & details","ph.description":"Goal, audience, tone, what to keep or cut, target length…",
-    chips:["Goal:","Tone:","Keep:","Cut:","Target length:"],
+      move:"Move to the videos you love (step 05 — Brief)"},
+    "s5.title":"Your brief","s5.hint":"The more precise, the better the first cut. One answer per line, two videos you love, and off we go.",
+    "br.dirT":"Direction","br.dirSub":"The common frame for every video in this order.",
+    "br.tone":"Tone & style","br.toneFreePh":"Describe the tone in a few words",
+    "br.music":"Music","br.captions":"Captions (on-screen subtitles)","br.captionsStylePh":"Caption style, optional: font, colour, position…",
+    "br.avoid":"Avoid","br.avoidPh":"e.g. no zooms, no emojis, don't cut the silences…","br.avoidNone":"Nothing in particular",
+    "br.likes":"2 videos you love","br.likesSmall":"two links minimum: we match their pacing, captions and graphics",
+    "br.dlvT":"Per deliverable","br.dlvSub":"One block per type of video ordered: it only shows if you picked it.",
+    "br.reel":"Reels 9:16","br.thumb":"Thumbnail","br.dur":"Target length","br.epDurMinPh":"minutes","br.reelDurPh":"e.g. 90 s",
+    "br.hook":"Hook (opening)","br.hookTcPh":"e.g. 02:10, 14:30","br.capSpec":"Specific captions","br.capSpecPh":"Optional, if different from the direction",
+    "br.thumbTxt":"Thumbnail text and instructions","br.thumbPh":"e.g. “3 mistakes that kill your podcast”, face on the left, dark background",
+    "f.brief_free":"Anything else","ph.brief_free":"Optional: anything that helps the editor",
+    brOpt:{tone:{cine:"Cinematic",dyn:"Dynamic",sobre:"Clean",fun:"Fun",autre:"Other"},music:{editor:"Yes, editor's choice",provided:"Yes, I provide it (link in the footage)",none:"No"},captions:{word:"Yes, word by word",sentence:"Yes, by sentence",none:"No"},
+      epDur:{full:"Full length",cut:"Cut down to…"},reelDur:{s30:"30 s",s45:"45 s",s60:"60 s",other:"Other"},hook:{editor:"The editor opens on the strongest moment",tc:"Here are my timecodes"},ep:{podcast:"Episode 16:9",vsl:"VSL 16:9",facecam:"Face cam 16:9",other:"Video 16:9"}},
+    brX:{tone:"Tone & style",music:"Music",captions:"Captions",cta:"CTA",avoid:"Avoid",likes:"Liked videos",dur:"length",hook:"hook",capt:"captions",thumb:"Thumbnail — text",free:"Other notes",yes:"yes",no:"no",none:"no",editor:"editor's choice",provided:"provided by the client",word:"word by word",sentence:"by sentence",style:"style",full:"full length",cut:"cut down to {n} min",tc:"timecodes {tc}",nothing:"nothing in particular"},
     "f.palette":"Colour palette","f.paletteSmall":"hex codes","ph.palette":"e.g. #E02B20, #0A0A0B, #FFFFFF",
     "f.deadline":"Desired deadline","f.deadlineSmall":"we confirm the date on receipt",
     "f.email":"Your email","f.emailSmall":"order confirmation, tracking and invoice","ph.email":"you@studio.com",
     "f.contactName":"Contact for this project","ph.contactName":"First and last name","f.contactHow":"WhatsApp","ph.contactHow":"+1…",
     "f.autres":"Anything else?","ph.autres":"Optional",
     "s6.title":"Summary","s6.hint":"Check, then send. You can go back.",
-    recap:{projet:"Project",commande:"Order",autre_demande:"Other request",rushes:"Footage",logos:"Logos & fonts",references:"Inspiration videos",description:"Brief",palette:"Palette",deadline:"Desired deadline",contact:"Contact",email:"Email",autres:"Other info",prix:"Price"},
+    recap:{projet:"Project",commande:"Order",autre_demande:"Other request",rushes:"Footage",logos:"Logos & fonts",references:"Videos you love",description:"Brief",palette:"Palette",deadline:"Desired deadline",contact:"Contact",email:"Email",autres:"Other info",prix:"Price"},
     "r.logo":"Logo","r.font":"Font","r.shot":"Screenshot",
     quote:"On quote", quoteLong:"On quote, confirmed by our team on receipt.",
     "btn.prev":"Back","btn.next":"Continue","btn.send":"Send to DS Editing","btn.sending":"Sending…",
     saved:"Draft saved on this device", empty:"Your order will appear here",
     "stale.text":"A newer version of this form is available. Refresh the page to continue: your choices are kept on this device, only your attached files (logo, palette) need to be dropped again.","stale.btn":"Refresh the page",
     units:{episode:["episode","episodes"],reel_basique:["standard reel","standard reels"],reel_signature:["premium reel","premium reels"],miniature:["thumbnail","thumbnails"],trailer:["trailer","trailers"]},
-    err:{projet:"Give the project a name.",reel0:"Add at least one reel (step 03 — Extras).",produit0:"Choose what you're sending us, in step 01 — Product.",produit:"Your order is still empty: pick a product in step 01 — Product and its package in step 02 — Package, or one of your packs in step 01 under “Your videos”.",noVideo:"The video itself is missing: extras come on top of an episode or a pack. Pick your episode in step 02 — Package, or one of your packs in step 01 — Product. We keep the rest of your selection.",formule:"Choose a package or a pack in step 02 — Package.",rushes:"Add at least one footage link.",rushesBad:"One of your footage links isn't a downloadable file (step 04 — Files): fix it, or move it to the inspiration videos.",description:"Describe what you expect, even in three lines.",contact:"Give us a contact and a way to reach them.",email:"Enter a valid email, that's where the confirmation and tracking go.",send:"Sending failed. Try again, or message us on WhatsApp.",terms:"Tick the terms of collaboration to send the order.",
+    err:{projet:"Give the project a name.",reel0:"Add at least one reel (step 03 — Extras).",produit0:"Choose what you're sending us, in step 01 — Product.",produit:"Your order is still empty: pick a product in step 01 — Product and its package in step 02 — Package, or one of your packs in step 01 under “Your videos”.",noVideo:"The video itself is missing: extras come on top of an episode or a pack. Pick your episode in step 02 — Package, or one of your packs in step 01 — Product. We keep the rest of your selection.",formule:"Choose a package or a pack in step 02 — Package.",rushes:"Add at least one footage link.",rushesBad:"One of your footage links isn't a downloadable file (step 04 — Files): fix it, or move it to the videos you love.",contact:"Give us a contact and a way to reach them.",
+      brTone:"Pick a tone and style (step 05 — Brief).",brMusic:"Music: editor's choice, provided, or none (step 05 — Brief).",brCaptions:"Captions: word by word, by sentence, or none (step 05 — Brief).",brCta:"End CTA: answer yes or no (step 05 — Brief).",brAvoid:"Tell us what to avoid, or tick “Nothing in particular” (step 05 — Brief).",brLikes:"Paste at least two links to videos you love (step 05 — Brief).",
+      brEpDur:"Target length of the 16:9 video: full, or cut down to how many minutes (step 05 — Brief).",brEpHook:"Hook of the 16:9 video: editor's choice, or your timecodes (step 05 — Brief).",brReelDur:"Target length of the reels: 30, 45, 60 s or other (step 05 — Brief).",brReelHook:"Hook of the reels: editor's choice, or your timecodes (step 05 — Brief).",brThumb:"Give us the thumbnail text (step 05 — Brief).",email:"Enter a valid email, that's where the confirmation and tracking go.",send:"Sending failed. Try again, or message us on WhatsApp.",terms:"Tick the terms of collaboration to send the order.",
       key:"Open this space from your personal link or the Client space to send your order.",keyLink:"Go to the Client space",bad_key:"Your access isn't recognised for this studio. Open this space from your personal link or the Client space.",bad_email:"The email isn't valid. Fix it in the Brief step.",no_project:"Give the project a name, in the Product step.",no_rushes:"No valid footage link. Paste at least one full link (https://…) in the Files step.",rate_limit:"A lot of orders were just sent from this space. Try again in an hour, or message us on WhatsApp."},
     "team.note":"Internal order placed by {n} on behalf of the client. The email entered in the Brief step receives the automatic emails (confirmation, tracking, invoice): use yours if the client must not receive anything.",
     "s6.terms":"I accept the DS Editing terms of collaboration: weekly invoice, payment on receipt, 20% penalty per week late.","s6.termsLink":"Read the terms","ok.space":"Open my space (orders, invoices)",
@@ -911,7 +996,7 @@ function applyText() {
   $("#teamNote").textContent = BY ? String(t("team.note")).replace("{n}", BY) : "";
   document.title = "DS Editing — " + (lang === "fr" ? "Nouveau projet" : "New project");
   if (orderToken) $("#trackLink").href = trackHref();
-  renderSteps(); renderThumbs(); renderQty(); renderChips(); renderLinks("rushes"); renderLinks("references"); renderBrandkit(); renderCTA(); rerender();
+  renderSteps(); renderThumbs(); renderQty(); renderLinks("rushes"); renderLinks("references"); renderBrandkit(); renderCTA(); rerender();
 }
 // Un seul point de re-rendu des choix : toute carte repasse par là, donc aucune classe « on » ne peut rester collée.
 function rerender() {
@@ -919,7 +1004,7 @@ function rerender() {
   // une prestation sans prix chez ce client n'a pas de bloc : on ne propose jamais une ligne non facturable
   $("#miniatureBlock").hidden = !cardShown("miniature"); $("#trailerBlock").hidden = !cardShown("trailer");
   $("#pMiniature").textContent = unitPriceTxt("miniature"); $("#pTrailer").textContent = unitPriceTxt("trailer");
-  renderQty(); renderNav(); wirePreviews();
+  renderQty(); renderBrief(); renderNav(); wirePreviews();   // le brief suit la commande : ses blocs « par livrable » apparaissent avec les types commandés
 }
 $("#langBtn").addEventListener("click", () => { lang = lang === "fr" ? "en" : "fr"; langTouched = true; applyText(); });
 
@@ -1152,13 +1237,108 @@ function setQty(k, v) {
   else draft.qty[k] = Math.min(maxQty(k), Math.max(minQty(k), v || 0));
   save(); rerender();
 }
-function renderChips() {
-  $("#chips").innerHTML = t("chips").map((c) => `<button type="button" class="chip">${c}</button>`).join("");
-  $("#chips").querySelectorAll(".chip").forEach((b) => b.addEventListener("click", () => { const ta = $("#description"); const sep = ta.value && !ta.value.endsWith("\n") ? "\n" : ""; ta.value += sep + b.textContent + " "; ta.focus(); draft.description = ta.value; save(); }));
+/* ---------------- brief structuré (20/10/2026, décision Cyriaque) ----------------
+   Un bloc « Direction » commun (ton, musique, captions, CTA, à éviter, 2 vidéos aimées) puis UN bloc par type de livrable
+   commandé (vidéo 16:9, reels 9:16, miniature). Le monteur choisit les moments par défaut (hook « editor » pré-coché).
+   État : draft.brief (brouillon local, comme le reste). Sortie : briefText() = `description` lisible, briefData() = details.brief. */
+const BR_DEF = () => ({ tone: "", toneFree: "", music: "", captions: "", captionsStyle: "", avoid: "", avoidNone: false, ep: { dur: "", durMin: "", hook: "editor", hookTc: "", captions: "" }, reel: { dur: "", durOther: "", hook: "editor", hookTc: "", captions: "" }, thumb: "" });
+{
+  const old = draft.brief && typeof draft.brief === "object" ? draft.brief : {};
+  draft.brief = Object.assign(BR_DEF(), old, { ep: Object.assign(BR_DEF().ep, old.ep || {}), reel: Object.assign(BR_DEF().reel, old.reel || {}) });
+  if (draft.description && !draft.brief_free) draft.brief_free = draft.description;   // brouillon d'avant le brief structuré : le texte libre n'est pas perdu
+  delete draft.description;
+}
+const BR_OPTS = { tone: ["cine", "dyn", "sobre", "fun", "autre"], music: ["editor", "provided", "none"], captions: ["word", "sentence", "none"], "ep.dur": ["full", "cut"], "ep.hook": ["editor", "tc"], "reel.dur": ["s30", "s45", "s60", "other"], "reel.hook": ["editor", "tc"] };
+const BR_FOCUS = { "tone:autre": "toneFree", "ep.dur:cut": "ep.durMin", "ep.hook:tc": "ep.hookTc", "reel.dur:other": "reel.durOther", "reel.hook:tc": "reel.hookTc" };
+const brGet = (path) => path.split(".").reduce((o, k) => (o == null ? undefined : o[k]), draft.brief);
+const brSet = (path, v) => { const ks = path.split("."); let o = draft.brief; for (const k of ks.slice(0, -1)) { if (!o[k] || typeof o[k] !== "object") o[k] = {}; o = o[k]; } o[ks[ks.length - 1]] = v; save(); };
+const brStr = (path) => String(brGet(path) ?? "").trim();
+const brOptLabel = (sel, k) => { const O = t("brOpt"); const m = sel === "ep.dur" ? O.epDur : sel === "reel.dur" ? O.reelDur : /\.hook$/.test(sel) ? O.hook : O[sel]; return (m && m[k]) || k; };
+// Quels livrables sont dans la commande : un bloc du brief par type présent
+const packHasReel = (k) => { const o = offerOf(k); return !!o && !!o.bundle_parts && Object.entries(o.bundle_parts).some(([pk, n]) => Number(n) > 0 && (famOf(pk) === "reel" || /reel/i.test(pk))); };
+const hasEpisode = () => !reelsOnly() && (!!draft.offre || Object.keys(moreQty()).some(isVideoKey));
+const hasReels = () => REELS.some((k) => (draft.qty[k] || 0) > 0) || Object.keys(moreQty()).some((k) => famOf(k) === "reel" || packHasReel(k));
+const hasThumb = () => (draft.qty.miniature || 0) > 0;
+const epTitle = () => { const E = t("brOpt").ep; return E[draft.produit] || E.other; };
+const validUrls = (k) => linkList(k).filter((u) => /^https?:\/\/[^\s/]+\.[^\s]+$/i.test(u));
+const brShow = (sel, on) => { const el = document.querySelector(sel); if (el) el.hidden = !on; };
+function renderBrief() {
+  const b = draft.brief;
+  document.querySelectorAll("[data-brsel]").forEach((box) => {
+    const sel = box.dataset.brsel, cur = brGet(sel);
+    box.innerHTML = BR_OPTS[sel].map((k) => `<button type="button" class="chip ${cur === k ? "on" : ""}" data-br="${sel}" data-v="${k}" aria-pressed="${cur === k}">${esc(brOptLabel(sel, k))}</button>`).join("");
+  });
+  // valeurs des champs libres : jamais écrasées sous les doigts (champ en cours de saisie laissé tel quel)
+  document.querySelectorAll("[data-brin]").forEach((el) => { const v = String(brGet(el.dataset.brin) ?? ""); if (document.activeElement !== el && el.value !== v) el.value = v; });
+  brShow("[data-brin='toneFree']", b.tone === "autre"); brShow("[data-brin='captionsStyle']", !!b.captions && b.captions !== "none");
+  brShow("[data-brin='ep.durMin']", b.ep.dur === "cut"); brShow("[data-brin='ep.hookTc']", b.ep.hook === "tc");
+  brShow("[data-brin='reel.durOther']", b.reel.dur === "other"); brShow("[data-brin='reel.hookTc']", b.reel.hook === "tc");
+  $("#brAvoidNone").checked = !!b.avoidNone; $("#brAvoid").disabled = !!b.avoidNone;
+  const ep = hasEpisode(), rl = hasReels(), th = hasThumb();
+  $("#dlvEp").hidden = !ep; $("#dlvEpT").textContent = epTitle(); $("#dlvReel").hidden = !rl; $("#dlvThumb").hidden = !th; $("#dlvWrap").hidden = !(ep || rl || th);
+}
+// puces à choix unique : re-clic = on décoche (sauf le hook, qui a toujours une valeur : le monteur choisit par défaut)
+$("#briefPanel").addEventListener("click", (e) => {
+  const btn = e.target.closest("[data-br]"); if (!btn) return;
+  const sel = btn.dataset.br, v = btn.dataset.v;
+  brSet(sel, brGet(sel) === v && !/\.hook$/.test(sel) ? "" : v); renderBrief();
+  const f = BR_FOCUS[sel + ":" + v]; if (f && brGet(sel) === v) { const el = document.querySelector(`[data-brin='${f}']`); if (el) el.focus(); }
+});
+document.querySelectorAll("[data-brin]").forEach((el) => el.addEventListener("input", () => { brSet(el.dataset.brin, el.value); el.classList.remove("bad"); }));
+$("#brAvoidNone").addEventListener("change", () => { brSet("avoidNone", $("#brAvoidNone").checked); renderBrief(); });
+// Le texte lisible envoyé dans `description` : une ligne par réponse, un bloc par livrable, puis les précisions libres.
+function briefText() {
+  const b = draft.brief, X = t("brX"), O = t("brOpt"), sep = lang === "fr" ? " : " : ": ", L = (k, v) => `${k}${sep}${v}`;
+  const lines = [];
+  if (b.tone) lines.push(L(X.tone, b.tone === "autre" ? (brStr("toneFree") || O.tone.autre) : O.tone[b.tone]));
+  if (b.music) lines.push(L(X.music, X[b.music]));
+  if (b.captions) lines.push(L(X.captions, X[b.captions] + (b.captions !== "none" && brStr("captionsStyle") ? ` (${X.style}${sep}${brStr("captionsStyle")})` : "")));
+  if (draft.cta === "yes" || draft.cta === "no") lines.push(L(X.cta, draft.cta === "yes" ? X.yes + ((draft.ctaNets || "").trim() ? " — " + draft.ctaNets.trim() : "") : X.no));
+  if (b.avoidNone) lines.push(L(X.avoid, X.nothing)); else if (brStr("avoid")) lines.push(L(X.avoid, brStr("avoid")));
+  const likes = validUrls("references"); if (likes.length) lines.push(L(X.likes, likes.join(", ")));
+  const hookTxt = (h) => (h.hook === "tc" && String(h.hookTc || "").trim() ? X.tc.replace("{tc}", String(h.hookTc).trim()) : X.editor);
+  const dl = [];
+  if (hasEpisode()) { const e = b.ep, p = []; if (e.dur) p.push(L(X.dur, e.dur === "cut" ? X.cut.replace("{n}", String(e.durMin || "?")) : X.full)); p.push(L(X.hook, hookTxt(e))); if (brStr("ep.captions")) p.push(L(X.capt, brStr("ep.captions"))); dl.push(`${epTitle()} — ${p.join(" · ")}`); }
+  if (hasReels()) { const r = b.reel, p = []; if (r.dur) p.push(L(X.dur, r.dur === "other" ? (brStr("reel.durOther") || "?") : O.reelDur[r.dur])); p.push(L(X.hook, hookTxt(r))); if (brStr("reel.captions")) p.push(L(X.capt, brStr("reel.captions"))); dl.push(`${t("br.reel")} — ${p.join(" · ")}`); }
+  if (hasThumb() && brStr("thumb")) dl.push(L(X.thumb, brStr("thumb")));
+  const free = String(draft.brief_free || "").trim();
+  return [lines.join("\n"), dl.join("\n"), free ? L(X.free, free) : ""].filter(Boolean).join("\n\n");
+}
+// L'objet structuré envoyé dans details.brief (clés stables, indépendantes de la langue)
+function briefData() {
+  const b = draft.brief;
+  const out = { tone: b.tone || "", tone_free: b.tone === "autre" ? brStr("toneFree") : "", music: b.music || "", captions: b.captions || "", captions_style: brStr("captionsStyle"),
+    cta: draft.cta || "", cta_reseaux: draft.cta === "yes" ? String(draft.ctaNets || "").trim() : "", avoid: b.avoidNone ? "none" : brStr("avoid"), likes: validUrls("references"), free: String(draft.brief_free || "").trim() };
+  if (hasEpisode()) out.episode = { type: draft.produit || "", dur: b.ep.dur || "", dur_min: b.ep.dur === "cut" ? (Number(b.ep.durMin) || null) : null, hook: b.ep.hook || "editor", hook_tc: b.ep.hook === "tc" ? brStr("ep.hookTc") : "", captions: brStr("ep.captions") };
+  if (hasReels()) out.reels = { dur: b.reel.dur === "other" ? brStr("reel.durOther") : String(b.reel.dur || "").replace(/^s/, ""), hook: b.reel.hook || "editor", hook_tc: b.reel.hook === "tc" ? brStr("reel.hookTc") : "", captions: brStr("reel.captions") };
+  if (hasThumb()) out.thumbnail = { text: brStr("thumb") };
+  return out;
+}
+/* Ce qui manque au brief, pour un client (dépôt interne ?by= : rien n'est bloquant, Putu n'a pas toujours l'info).
+   Renvoie { msg, sel } : le message (il nomme l'étape 05 — Brief) et l'élément à marquer / faire défiler. */
+function briefError() {
+  if (BY) return null;
+  const e = t("err"), b = draft.brief, bad = (sel, msg) => ({ sel, msg });
+  if (!b.tone || (b.tone === "autre" && !brStr("toneFree"))) return bad(b.tone === "autre" ? "[data-brin='toneFree']" : "[data-brsel='tone']", e.brTone);
+  if (!b.music) return bad("[data-brsel='music']", e.brMusic);
+  if (!b.captions) return bad("[data-brsel='captions']", e.brCaptions);
+  if (draft.cta !== "yes" && draft.cta !== "no") return bad("#ctaYN", e.brCta);
+  if (!b.avoidNone && !brStr("avoid")) return bad("#brAvoid", e.brAvoid);
+  if (validUrls("references").length < 2) return bad("#references input", e.brLikes);
+  if (hasEpisode()) {
+    if (!b.ep.dur || (b.ep.dur === "cut" && !(Number(b.ep.durMin) > 0))) return bad(b.ep.dur === "cut" ? "[data-brin='ep.durMin']" : "[data-brsel='ep.dur']", e.brEpDur);
+    if (!b.ep.hook || (b.ep.hook === "tc" && !brStr("ep.hookTc"))) return bad(b.ep.hook === "tc" ? "[data-brin='ep.hookTc']" : "[data-brsel='ep.hook']", e.brEpHook);
+  }
+  if (hasReels()) {
+    if (!b.reel.dur || (b.reel.dur === "other" && !brStr("reel.durOther"))) return bad(b.reel.dur === "other" ? "[data-brin='reel.durOther']" : "[data-brsel='reel.dur']", e.brReelDur);
+    if (!b.reel.hook || (b.reel.hook === "tc" && !brStr("reel.hookTc"))) return bad(b.reel.hook === "tc" ? "[data-brin='reel.hookTc']" : "[data-brsel='reel.hook']", e.brReelHook);
+  }
+  if (hasThumb() && !brStr("thumb")) return bad("[data-brin='thumb']", e.brThumb);
+  return null;
 }
 /* Les deux listes de liens. « rushes » passe par le filtre client/links.js : un lien qu'on ne peut pas
-   télécharger est dit SOUS SON CHAMP, à la saisie, et bloque l'étape 04 (validate). « references » reste
-   permissif : on n'y télécharge rien, donc tout lien y est bon à prendre pour le monteur. */
+   télécharger est dit SOUS SON CHAMP, à la saisie, et bloque l'étape 04 (validate). « references » (étape 05 — Brief,
+   « 2 vidéos que vous aimez ») reste permissif : on n'y télécharge rien, donc tout lien y est bon à prendre pour le monteur. */
 function renderLinks(key) {
   const list = (draft[key] && draft[key].length ? draft[key] : [""]);
   const check = key === "rushes";
@@ -1310,7 +1490,7 @@ $("#modal").addEventListener("click", (e) => { if (e.target.id === "modal") clos
 document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModal(); });
 
 /* ---------------- données ---------------- */
-["projet", "autre_demande", "description", "palette", "deadline", "contactName", "contactHow", "email", "autres"].forEach((id) => {
+["projet", "autre_demande", "brief_free", "palette", "deadline", "contactName", "contactHow", "email", "autres"].forEach((id) => {
   const el = $("#" + id); el.value = draft[id] || "";
   el.addEventListener("input", () => { draft[id] = el.value; save(); if (id === "palette") swatches(); });
 });
@@ -1378,7 +1558,7 @@ function values() {
   return {
     projet: draft.projet || "", commande: commande(), autre_demande: draft.autre_demande || "",
     rushes: links("rushes"), logos: [FILES.logo ? `${lbl("r.logo")}${FILES.logo.name} (${t("bk.file")})` : "", draft.font === "team" ? `${lbl("r.font")}${t("bk.teamFont")}` : (draft.fontName ? `${lbl("r.font")}${draft.fontName}` : "")].filter(Boolean).join("\n"), references: links("references"),
-    description: draft.description || "", palette: [draft.palette || "", FILES.palette ? `${lbl("r.shot")}${FILES.palette.name} (${t("bk.file")})` : ""].filter(Boolean).join("\n"), deadline: draft.deadline || "",
+    description: briefText(), palette: [draft.palette || "", FILES.palette ? `${lbl("r.shot")}${FILES.palette.name} (${t("bk.file")})` : ""].filter(Boolean).join("\n"), deadline: draft.deadline || "",
     contact: [draft.contactName, draft.contactHow].filter(Boolean).join(" — "), email: draft.email || "", autres: draft.autres || "",
   };
 }
@@ -1447,7 +1627,7 @@ document.addEventListener("visibilitychange", () => { if (document.visibilitySta
 
 /* ---------------- navigation & validation ---------------- */
 function validate(s) {
-  const e = t("err"); const v = values(); document.querySelectorAll(".in.bad").forEach((x) => x.classList.remove("bad"));
+  const e = t("err"); const v = values(); document.querySelectorAll(".in.bad,.chips.bad,.yn.bad").forEach((x) => x.classList.remove("bad"));   // jamais .lk.bad : c'est le verdict d'un lien de rushes
   if (s === 0) {
     if (!v.projet.trim()) { $("#projet").classList.add("bad"); return e.projet; }
     // le produit est exigé à la sortie de l'étape 01 : on ne découvre plus deux étapes plus loin qu'il manque
@@ -1472,13 +1652,16 @@ function validate(s) {
     if (b >= 0) { const inp = $("#rushes").querySelectorAll("input")[b]; if (inp) inp.classList.add("bad"); linkNote(b); return e.rushesBad; }
   }
   // dernier verrou avant l'envoi : jamais une commande sans vidéo ni un lien mort, même en revenant en arrière
-  if (s === 5) { if (!hasVideo()) return e.noVideo; if (badRush() >= 0) return e.rushesBad; if (!$("#terms").checked) { $("#terms").focus(); return e.terms; } }
-  if (s === 4) { if (v.description.trim().length < 10) { $("#description").classList.add("bad"); return e.description; } if (!draft.contactName || !draft.contactHow) { $("#contactName").classList.add("bad"); $("#contactHow").classList.add("bad"); return e.contact; } if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(draft.email || "")) { $("#email").classList.add("bad"); return e.email; } }
+  // dernier verrou avant l'envoi : le brief aussi (un client peut revenir en arrière et retirer une réponse) ; le message nomme l'étape 05 — Brief
+  if (s === 5) { if (!hasVideo()) return e.noVideo; if (badRush() >= 0) return e.rushesBad; const be = briefError(); if (be) return be.msg; if (!$("#terms").checked) { $("#terms").focus(); return e.terms; } }
+  /* Étape 05 — Brief structuré : chaque réponse de la direction, puis chaque bloc de livrable présent, est exigée d'un client ;
+     en dépôt interne (?by=) briefError() ne renvoie rien. Contact et e-mail restent exigés de tout le monde (c'est là qu'arrivent les mails). */
+  if (s === 4) { const be = briefError(); if (be) { const el = document.querySelector(be.sel); if (el) el.classList.add("bad"); return be.msg; } if (!draft.contactName || !draft.contactHow) { $("#contactName").classList.add("bad"); $("#contactHow").classList.add("bad"); return e.contact; } if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(draft.email || "")) { $("#email").classList.add("bad"); return e.email; } }
   return "";
 }
 function go(s) { step = s; $("#msg").textContent = ""; if (step === 5) renderRecap(); renderSteps(); renderNav(); window.scrollTo({ top: 0, behavior: "smooth" }); }
 $("#prev").addEventListener("click", () => go(step === 2 && reelsOnly() ? 0 : Math.max(0, step - 1)));   // reels seuls : 02 sautée dans les deux sens
-$("#next").addEventListener("click", async () => { const err = validate(step); if (err) { $("#msg").textContent = err; const bad = document.querySelector(".in.bad"); if (bad) { if (bad.scrollIntoView) bad.scrollIntoView({ behavior: "smooth", block: "center" }); bad.focus(); } return; } if (step < 5) return go(step === 0 && reelsOnly() ? 2 : step + 1); await submit(); });   // reels seuls : 02 — Formule sautée
+$("#next").addEventListener("click", async () => { const err = validate(step); if (err) { $("#msg").textContent = err; const bad = document.querySelector(".in.bad,.chips.bad,.yn.bad"); if (bad) { if (bad.scrollIntoView) bad.scrollIntoView({ behavior: "smooth", block: "center" }); if (bad.classList.contains("in")) bad.focus(); } return; } if (step < 5) return go(step === 0 && reelsOnly() ? 2 : step + 1); await submit(); });   // reels seuls : 02 — Formule sautée
 
 /* ---------------- envoi : la commande est écrite directement en base (RPC create_order), le moteur fait l'accueil ---------------- */
 // Appel d'une RPC Supabase avec la clé publique. Erreur métier → e.code (bad_key, no_rushes…) ; base injoignable → e.offline.
@@ -1543,6 +1726,7 @@ function order() {
 
     autre_demande: autreDemande(v), palette: v.palette, logos: v.logos,
     cta: draft.cta || "", cta_reseaux: draft.cta === "yes" ? (draft.ctaNets || "") : "", font: draft.font === "team" ? "team" : (draft.fontName || ""), autres: v.autres,
+    brief: briefData(),   // brief structuré (20/10) ; `description` ci-dessous en est le texte lisible (briefText via values())
   };
   if (BY) details.deposited_by = BY;   // dépôt interne : affiché sur la commande dans le dashboard équipe
   if (reelsOnly()) details.reels_only = true;   // produit « Reel » : commande sans épisode
