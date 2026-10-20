@@ -86,14 +86,22 @@
     pop.className = "dsnav-pop";
     // On compare sur le chemin seul : un espace ouvert avec ?k=… ou ?tab=… reste « tu es ici ».
     var here = location.pathname.replace(/index\.html$/, "").replace(/\/+$/, "/") || "/";
-    ESPACES.filter(allowed).forEach(function (e) {
-      var a = document.createElement("a");
-      a.textContent = e[0];
-      a.href = BASE + e[1];
-      var cible = (BASE + e[1]).replace(/index\.html$/, "").replace(/\/+$/, "/") || "/";
-      if (cible === here) { a.setAttribute("aria-current", "page"); a.removeAttribute("href"); }
-      pop.appendChild(a);
-    });
+    // La liste est (re)construite à CHAQUE ouverture : le dashboard pose ds_nav_role après le chargement de la page (session async),
+    // donc un filtre figé au montage serait faux à la première connexion.
+    function fill() {
+      pop.textContent = "";
+      ESPACES.filter(allowed).forEach(function (e) {
+        var a = document.createElement("a");
+        a.textContent = e[0];
+        a.href = BASE + e[1];
+        var cible = (BASE + e[1]).replace(/index\.html$/, "").replace(/\/+$/, "/") || "/";
+        if (cible === here) { a.setAttribute("aria-current", "page"); a.removeAttribute("href"); }
+        pop.appendChild(a);
+      });
+    }
+    fill();
+    d.addEventListener("toggle", function () { if (d.open) fill(); });
+    window.DS_NAV_REFRESH = fill;
     d.appendChild(pop);
 
     // Refermer au clic dehors ou sur Échap, sinon le menu reste ouvert derrière la page.
