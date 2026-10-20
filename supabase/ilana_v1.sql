@@ -1,3 +1,5 @@
+-- Version pour le SQL Editor de Supabase : chaque instruction se termine par « ; » (le fichier source ds-editing-os/supabase/ilana_v1.sql garde les séparateurs « -- @@ » de apply.py).
+
 -- Ilana, monteuse IA (décisions QCM de Cyriaque du 20/10/2026, artifact S2paovvTtPSrAKG2Gr9DU5).
 -- À coller dans le SQL Editor de Supabase (le mot de passe SQL du Mac est périmé). Blocs séparés par « -- @@ ».
 --
@@ -11,47 +13,46 @@
 --    (admins) et le récap Telegram du vendredi (robot ds-editing-ops, clé service).
 -- Règle maison : grant explicite pour toute nouvelle RPC / table (audit du 30/09).
 
-alter table editors add column if not exists is_ai boolean not null default false
--- @@
-alter table editors add column if not exists pilot_ids uuid[] not null default '{}'   -- monteurs humains qui pilotent cette IA
--- @@
+alter table editors add column if not exists is_ai boolean not null default false;
+
+alter table editors add column if not exists pilot_ids uuid[] not null default '{}'   -- monteurs humains qui pilotent cette IA;
+
 insert into editors (name, sort, active, is_ai, pilot_ids)
   values ('Ilana', 14, true, true, (select coalesce(array_agg(id order by sort), '{}') from editors where name in ('Rafi', 'Ferdi')))
   on conflict (name) do update set is_ai = true, active = true,
-    pilot_ids = case when cardinality(editors.pilot_ids) = 0 then excluded.pilot_ids else editors.pilot_ids end
--- @@
-insert into editor_keys (editor_id) select id from editors where name = 'Ilana' on conflict do nothing
--- @@
-alter table studios add column if not exists ai_ok boolean            -- dernier avis du client sur une monteuse IA (null = jamais répondu)
--- @@
-alter table studios add column if not exists ai_ok_at timestamptz
--- @@
+    pilot_ids = case when cardinality(editors.pilot_ids) = 0 then excluded.pilot_ids else editors.pilot_ids end;
+
+insert into editor_keys (editor_id) select id from editors where name = 'Ilana' on conflict do nothing;
+
+alter table studios add column if not exists ai_ok boolean            -- dernier avis du client sur une monteuse IA (null = jamais répondu);
+
+alter table studios add column if not exists ai_ok_at timestamptz;
 
 -- ───────────── 2. /prod : pilote + minutes de pilotage par vidéo terminée (IA seulement)
-alter table prod_reports add column if not exists pilot_id uuid references editors(id)
--- @@
-alter table prod_reports add column if not exists pilot_minutes jsonb not null default '{}'::jsonb   -- { "reel_fr": [25, 40], … } une valeur par terminé
--- @@
-alter table prod_reports add column if not exists pilot_total int not null default 0
--- @@
+alter table prod_reports add column if not exists pilot_id uuid references editors(id);
+
+alter table prod_reports add column if not exists pilot_minutes jsonb not null default '{}'::jsonb   -- { "reel_fr": [25, 40], … } une valeur par terminé;
+
+alter table prod_reports add column if not exists pilot_total int not null default 0;
+
 create or replace function prod_editors() returns jsonb language sql stable security definer set search_path = public as $$
   select case when now() < prod_enroll_until()
     then (select coalesce(jsonb_agg(jsonb_build_object('id', e.id, 'name', e.name, 'avatar_url', e.avatar_url, 'is_ai', e.is_ai, 'pilot_ids', e.pilot_ids) order by e.sort, e.name), '[]'::jsonb) from editors e where e.active)
     else '[]'::jsonb end
-$$
--- @@
+$$;
+
 create or replace function prod_me(p_key text) returns jsonb language sql stable security definer set search_path = public as $$
   select jsonb_build_object('id', e.id, 'name', e.name, 'avatar_url', e.avatar_url, 'is_ai', e.is_ai, 'pilot_ids', e.pilot_ids)
   from editor_keys k join editors e on e.id = k.editor_id where k.report_key = p_key and length(coalesce(p_key, '')) >= 16 and e.active
-$$
--- @@
+$$;
+
 create or replace function prod_get_report(p_key text, p_date date) returns jsonb language sql stable security definer set search_path = public as $$
   select jsonb_build_object('counts', r.counts, 'links', r.links, 'revisions', r.revisions, 'details', r.details, 'comment', r.comment, 'points', r.points, 'updated_at', r.updated_at,
     'pilot_id', r.pilot_id, 'pilot_minutes', r.pilot_minutes)
   from editor_keys k join prod_reports r on r.editor_id = k.editor_id
   where k.report_key = p_key and length(coalesce(p_key, '')) >= 16 and r.report_date = p_date
-$$
--- @@
+$$;
+
 -- Nouvelle signature (9 arguments, p_pilot) : l'ancienne à 8 arguments reste en place jusqu'à la mise en ligne de /prod, puis ilana_v1b.sql la supprime.
 create or replace function prod_submit(p_key text, p_date date, p_counts jsonb, p_details text, p_comment text, p_lang text, p_links jsonb, p_revisions jsonb, p_pilot jsonb) returns jsonb
 language plpgsql security definer set search_path = public as $$
@@ -125,12 +126,12 @@ begin
     pilot_id = excluded.pilot_id, pilot_minutes = excluded.pilot_minutes, pilot_total = excluded.pilot_total
   returning id into v_id;
   return jsonb_build_object('id', v_id, 'points', v_points + v_rpts, 'elements', v_elems, 'in_progress', v_prog, 'rev_count', v_rcount, 'rev_minutes', v_rmin, 'pilot_total', v_ptot);
-end $$
--- @@
-revoke execute on function prod_submit(text, date, jsonb, text, text, text, jsonb, jsonb, jsonb) from public
--- @@
-grant execute on function prod_submit(text, date, jsonb, text, text, text, jsonb, jsonb, jsonb) to anon, authenticated
--- @@
+end $$;
+
+revoke execute on function prod_submit(text, date, jsonb, text, text, text, jsonb, jsonb, jsonb) from public;
+
+grant execute on function prod_submit(text, date, jsonb, text, text, text, jsonb, jsonb, jsonb) to anon, authenticated;
+
 create or replace function prod_stats_public() returns jsonb language sql stable security definer set search_path = public as $$
   select jsonb_build_object(
     'cats', (select coalesce(jsonb_agg(to_jsonb(c) order by c.sort), '[]'::jsonb) from prod_categories c),
@@ -141,8 +142,7 @@ create or replace function prod_stats_public() returns jsonb language sql stable
         'links', r.links, 'revisions', r.revisions, 'rev_count', r.rev_count, 'rev_minutes', r.rev_minutes, 'rev_points', r.rev_points,
         'pilot_id', r.pilot_id, 'pilot_minutes', r.pilot_minutes, 'pilot_total', r.pilot_total) order by r.report_date desc), '[]'::jsonb)
       from prod_reports r where r.report_date >= current_date - 400))
-$$
--- @@
+$$;
 
 -- ───────────── 3. Espace client : « Souhaitez-vous retravailler avec <prénom> ? »
 create table if not exists editor_feedback (
@@ -156,28 +156,28 @@ create table if not exists editor_feedback (
   lang text,
   created_at timestamptz not null default now(),
   notified_at timestamptz                         -- ligne Telegram envoyée par le robot (poll.mjs)
-)
--- @@
-create index if not exists editor_feedback_job_idx on editor_feedback(job_id, editor_name, created_at desc)
--- @@
-create index if not exists editor_feedback_editor_idx on editor_feedback(editor_id, created_at desc)
--- @@
-alter table editor_feedback enable row level security
--- @@
-revoke all on editor_feedback from anon, authenticated
--- @@
-grant select on editor_feedback to authenticated
--- @@
-grant update, delete on editor_feedback to authenticated
--- @@
-drop policy if exists editor_feedback_read_team on editor_feedback
--- @@
-create policy editor_feedback_read_team on editor_feedback for select to authenticated using (my_role() in ('admin', 'dispatcher', 'qc'))
--- @@
-drop policy if exists editor_feedback_admin on editor_feedback
--- @@
-create policy editor_feedback_admin on editor_feedback for all to authenticated using (my_role() = 'admin') with check (my_role() = 'admin')
--- @@
+);
+
+create index if not exists editor_feedback_job_idx on editor_feedback(job_id, editor_name, created_at desc);
+
+create index if not exists editor_feedback_editor_idx on editor_feedback(editor_id, created_at desc);
+
+alter table editor_feedback enable row level security;
+
+revoke all on editor_feedback from anon, authenticated;
+
+grant select on editor_feedback to authenticated;
+
+grant update, delete on editor_feedback to authenticated;
+
+drop policy if exists editor_feedback_read_team on editor_feedback;
+
+create policy editor_feedback_read_team on editor_feedback for select to authenticated using (my_role() in ('admin', 'dispatcher', 'qc'));
+
+drop policy if exists editor_feedback_admin on editor_feedback;
+
+create policy editor_feedback_admin on editor_feedback for all to authenticated using (my_role() = 'admin') with check (my_role() = 'admin');
+
 -- Le client répond depuis son espace (lien slug + clé), sur une commande livrée, pour un monteur de la commande. Pas de compte, pas de mot de passe.
 create or replace function space_feedback(p_slug text, p_key text, p_token text, p_editor_name text, p_answer boolean, p_comment text) returns jsonb
 language plpgsql security definer set search_path = public as $$
@@ -196,12 +196,12 @@ begin
     values (j.id, s.id, e.id, p_editor_name, p_answer, nullif(left(trim(coalesce(p_comment, '')), 1000), ''), s.lang) returning id into v_id;
   if e.id is not null and e.is_ai then update studios set ai_ok = p_answer, ai_ok_at = now() where id = s.id; end if;
   return jsonb_build_object('ok', true, 'id', v_id, 'answer', p_answer, 'at', now());
-end $$
--- @@
-revoke execute on function space_feedback(text, text, text, text, boolean, text) from public
--- @@
-grant execute on function space_feedback(text, text, text, text, boolean, text) to anon, authenticated
--- @@
+end $$;
+
+revoke execute on function space_feedback(text, text, text, text, boolean, text) from public;
+
+grant execute on function space_feedback(text, text, text, text, boolean, text) to anon, authenticated;
+
 -- client_space : même corps qu'estimation_v1.sql + 'editors' (prénoms des monteurs de la commande) + 'feedback' (dernière réponse par monteur)
 create or replace function client_space(p_slug text, p_key text) returns jsonb language sql stable security definer as $$
   select jsonb_build_object(
@@ -228,10 +228,9 @@ create or replace function client_space(p_slug text, p_key text) returns jsonb l
     'extra_lines', coalesce((select jsonb_agg(jsonb_build_object('label', e.label, 'qty', e.qty, 'unit_price', e.unit_price, 'offered', e.offered, 'created_at', e.created_at)) from extra_lines e where e.studio_id = s.id and e.invoice_id is null), '[]'::jsonb)
   )
   from studios s where s.slug = p_slug and s.access_token = p_key
-$$
--- @@
-grant execute on function client_space(text, text) to anon, authenticated
--- @@
+$$;
+
+grant execute on function client_space(text, text) to anon, authenticated;
 
 -- ───────────── 4. Indicateurs par monteur + IA vs humains (admins connectés ; le robot passe avec la clé service)
 create or replace function editor_kpis(p_from date, p_to date) returns jsonb language plpgsql stable security definer set search_path = public as $$
@@ -273,9 +272,8 @@ begin
         from editor_feedback f join jobs j on j.id = f.job_id left join studios s on s.id = f.studio_id where f.created_at >= v_from and f.created_at < v_to), '[]'::jsonb)
   ) into v_out;
   return v_out;
-end $$
--- @@
-revoke execute on function editor_kpis(date, date) from public
--- @@
-grant execute on function editor_kpis(date, date) to authenticated, service_role
--- @@
+end $$;
+
+revoke execute on function editor_kpis(date, date) from public;
+
+grant execute on function editor_kpis(date, date) to authenticated, service_role;
