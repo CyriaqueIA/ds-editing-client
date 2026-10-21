@@ -94,11 +94,28 @@
     /* Suppression d'une commande (21/10) : bouton discret en bas du détail, fenêtre de confirmation sur le modèle « Nouvelle commande » */
     .btn.del{height:32px;padding:0 12px;font-size:12px;color:var(--err);border-color:rgba(240,138,130,.35);margin-top:12px}
     .btn.del:hover{background:rgba(240,138,130,.1);border-color:rgba(240,138,130,.6);color:var(--err)}
-    .delm .box{width:min(520px,100%)}
-    .delm .who{font-size:13px;line-height:1.5;margin:0 0 12px}
+    .delm{align-items:center;padding:16px}
+    .delm .box{width:min(480px,100%);padding:22px 22px 18px;border-radius:22px;background:linear-gradient(180deg,rgba(240,138,130,.08),rgba(240,138,130,0) 42%),var(--surface-2)}
+    .delm .bh{margin-bottom:10px}
+    .delm .k{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--err)}
+    .delm .k::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--err);box-shadow:0 0 0 4px rgba(240,138,130,.18)}
+    .delm .bh .btn.x{width:32px;height:32px;padding:0;border-radius:50%;font-size:12px}
+    .delm .ttl{display:block;font-size:24px;font-weight:600;letter-spacing:-.035em;line-height:1.1;margin:0 0 14px;padding-bottom:.06em;background:var(--chrome);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .delm .who{display:grid;gap:4px;padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:var(--surface);margin:0 0 14px;font-size:13px;line-height:1.45;box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}
+    .delm .who .cl{font-weight:600;color:var(--cream)}
+    .delm .who .cl i{font-style:normal;color:var(--taupe);margin:0 2px}
+    .delm .who .tk{font-weight:600;color:var(--accent2);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+    .delm .who .tk small{font-size:12px;font-weight:400;color:var(--taupe);margin-left:6px}
+    .delm .hint{margin:0 0 10px}
+    .delm .only{display:flex;gap:8px;align-items:flex-start;font-size:12px;color:var(--taupe);line-height:1.45;padding:10px 12px;border:1px dashed var(--line-strong);border-radius:12px;background:rgba(255,255,255,.03);margin:0 0 16px}
+    .delm .only::before{content:"";flex:none;width:14px;height:14px;margin-top:1px;border-radius:50%;border:1.5px solid var(--taupe);background:radial-gradient(circle at 50% 38%,var(--taupe) 0 1px,transparent 1.5px),linear-gradient(var(--taupe),var(--taupe)) 50% 62%/1.5px 5px no-repeat}
     .delm .acts{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;margin-top:6px}
+    .btn.danger{background:var(--err);border-color:transparent;color:#17090A;box-shadow:0 6px 18px rgba(240,138,130,.22)}
+    .btn.danger:hover{background:#F6A39C;border-color:transparent;color:#17090A}
+    .btn.danger:disabled{opacity:.55;cursor:default;box-shadow:none}
     .delm .msg{font-size:12px;min-height:16px;margin-top:8px;color:var(--err)}
     .delm .msg.ok{color:var(--ok)}
+    @media(max-width:560px){.delm .acts .btn{flex:1 1 auto;justify-content:center}}
     body.tv .btn.del{display:none}
     @media(max-width:560px){.ordm .st{grid-template-columns:1fr}.ordm .st .btn{justify-content:center}}
     .toolbar .search{margin-left:auto;width:240px}
@@ -521,11 +538,12 @@
   <!-- Suppression d'une commande (21/10) : confirmation ; la base refuse tout ce qui est commencé ou facturé (supabase/suppression_commande_v1.sql) -->
   <div class="ordm delm" id="delm" hidden role="dialog" aria-modal="true" aria-labelledby="delT">
     <div class="box">
-      <div class="bh"><b id="delT"></b><button type="button" class="btn ghost" id="delX" aria-label="Fermer">✕</button></div>
-      <p class="who" id="delWho"></p>
+      <div class="bh"><span class="k" id="delK"></span><button type="button" class="btn ghost x" id="delX" aria-label="Fermer">✕</button></div>
+      <b class="ttl" id="delT"></b>
+      <div class="who" id="delWho"></div>
       <p class="hint" id="delH"></p>
-      <p class="hint" id="delO"></p>
-      <div class="acts"><button type="button" class="btn ghost" id="delCancel"></button><button type="button" class="btn" id="delGo"></button></div>
+      <p class="only" id="delO"></p>
+      <div class="acts"><button type="button" class="btn ghost" id="delCancel"></button><button type="button" class="btn danger" id="delGo"></button></div>
       <div class="msg" id="delMsg" role="status"></div>
     </div>
   </div>
@@ -555,7 +573,7 @@ const T = {
     all: "Tous", tasks: (n) => `${n} tâche${n > 1 ? "s" : ""}`, stats: ["Reçues aujourd'hui", "En cours", "En retard", "À contrôler", "Livrées cette semaine"],
     filters: { all: "Tout", na: "À attribuer", ready: "Fichiers prêts, à démarrer", late: "En retard", qc: "À contrôler", asm: "À assembler", done: "Livrées" }, search: "Rechercher…",
     newOrder: { btn: "+ Nouvelle commande", title: "Déposer une commande pour un client", hint: "Choisis le client : son espace de dépôt s'ouvre avec son code d'accès déjà rempli. Tu remplis le brief, les formats attendus et les liens de rushes à sa place. L'e-mail saisi dans le brief reçoit les mails automatiques (confirmation, suivi, facture) : mets le tien si le client ne doit rien recevoir.", search: "Rechercher un client…", depot: "Déposer une commande", space: "Espace client", loading: "Lecture des clients…", empty: "Aucun client trouvé.", err: "Lecture des clients impossible :", by: (n) => `Déposée par l'équipe (${n})` },
-    del: { btn: "Supprimer la commande", title: "Supprimer cette commande ?", hint: "Définitif : la commande disparaît du dashboard, de l'espace client et de la vue équipe. Si les rushes sont déjà sur le PC du bureau, le dossier est effacé au prochain passage. Une copie reste dans le journal (jobs_deleted) pour la recréer à la main.", only: "Possible seulement tant que rien n'est commencé : aucune étape cochée, qualité en attente, pas de facture.", go: "Supprimer définitivement", cancel: "Annuler", busy: "Suppression…", done: "Commande supprimée", noFn: "Fonction absente en base : appliquer supabase/suppression_commande_v1.sql." },
+    delJob: { k: "Commande · suppression", btn: "Supprimer la commande", title: "Supprimer cette commande ?", hint: "Définitif : la commande disparaît du dashboard, de l'espace client et de la vue équipe. Si les rushes sont déjà sur le PC du bureau, le dossier est effacé au prochain passage. Une copie reste dans le journal (jobs_deleted) pour la recréer à la main.", only: "Possible seulement tant que rien n'est commencé : aucune étape cochée, qualité en attente, pas de facture.", go: "Supprimer définitivement", cancel: "Annuler", busy: "Suppression…", done: "Commande supprimée", noFn: "Fonction absente en base : appliquer supabase/suppression_commande_v1.sql." },
     dl: { waiting: "En attente", running: "Téléchargement en cours", ready: "Fichiers prêts", error: "Erreur", abandon: "Abandonné", partial: "Rushes reçus", access: "Accès demandé au client", purged: "Nettoyé",
       tips: { waiting: "Le PC du bureau n'a pas encore commencé le téléchargement.", running: "Le PC du bureau télécharge les rushes.", ready: "Les rushes sont sur le PC du bureau.", partial: "Les rushes sont sur le PC du bureau, mais certains liens n'ont pas pu être téléchargés : ne rien supprimer, récupérer ces liens à la main.", access: "Le lien est privé : un e-mail a demandé au client d'ouvrir l'accès.", purged: "Le dossier a été supprimé du PC du bureau après la livraison." },
       nTry: (n, m) => `essai ${n}/${m}`, nFiles: (n) => `${n} fichier${n > 1 ? "s" : ""}`, nFailed: (n) => `${n} lien${n > 1 ? "s" : ""} en échec`, since: (d) => `depuis ${d}`, pcOn: (k) => `PC Bali occupé sur ${k}`, pcOff: "PC hors ligne", manual: "à télécharger à la main", nManual: (n) => `${n} lien${n > 1 ? "s" : ""} à la main`,
@@ -623,7 +641,7 @@ const T = {
     all: "All", tasks: (n) => `${n} task${n > 1 ? "s" : ""}`, stats: ["Received today", "In progress", "Late", "To review", "Delivered this week"],
     filters: { all: "All", na: "To assign", ready: "Files ready, to start", late: "Late", qc: "To review", asm: "To assemble", done: "Delivered" }, search: "Search…",
     newOrder: { btn: "+ New order", title: "Place an order for a client", hint: "Pick the client: their drop space opens with their access code already filled in. You fill in the brief, the expected formats and the footage links on their behalf. The email entered in the brief receives the automatic emails (confirmation, tracking, invoice): use yours if the client must not receive anything.", search: "Search a client…", depot: "Place an order", space: "Client space", loading: "Loading clients…", empty: "No client found.", err: "Could not read clients:", by: (n) => `Placed by the team (${n})` },
-    del: { btn: "Delete order", title: "Delete this order?", hint: "Permanent: the order disappears from the dashboard, the client space and the team board. If the footage is already on the office PC, the folder is removed on the next run. A copy stays in the log (jobs_deleted) to recreate it by hand.", only: "Only possible while nothing has started: no step ticked, QC pending, no invoice.", go: "Delete permanently", cancel: "Cancel", busy: "Deleting…", done: "Order deleted", noFn: "Function missing in the database: apply supabase/suppression_commande_v1.sql." },
+    delJob: { k: "Order · deletion", btn: "Delete order", title: "Delete this order?", hint: "Permanent: the order disappears from the dashboard, the client space and the team board. If the footage is already on the office PC, the folder is removed on the next run. A copy stays in the log (jobs_deleted) to recreate it by hand.", only: "Only possible while nothing has started: no step ticked, QC pending, no invoice.", go: "Delete permanently", cancel: "Cancel", busy: "Deleting…", done: "Order deleted", noFn: "Function missing in the database: apply supabase/suppression_commande_v1.sql." },
     dl: { waiting: "Waiting", running: "Downloading", ready: "Files ready", error: "Error", abandon: "Gave up", partial: "Footage received", access: "Access requested from client", purged: "Cleaned up",
       tips: { waiting: "The office PC has not started the download yet.", running: "The office PC is downloading the footage.", ready: "The footage is on the office PC.", partial: "The footage is on the office PC, but some links could not be downloaded: delete nothing, fetch those links by hand.", access: "The link is private: an email asked the client to open access.", purged: "The folder was removed from the office PC after delivery." },
       nTry: (n, m) => `attempt ${n}/${m}`, nFiles: (n) => `${n} file${n > 1 ? "s" : ""}`, nFailed: (n) => `${n} failed link${n > 1 ? "s" : ""}`, since: (d) => `since ${d}`, pcOn: (k) => `Bali PC busy on ${k}`, pcOff: "PC offline", manual: "download by hand", nManual: (n) => `${n} link${n > 1 ? "s" : ""} by hand`,
@@ -1026,9 +1044,9 @@ const canDelete = (j) => !!profile && isAdmin() && !isEditor() && !j.started_at 
 let delId = null;
 function openDelete(id) {
   const j = jobs.find((x) => x.id === id); if (!j || !canDelete(j)) return;
-  const D = t("del"); delId = id;
-  $("#delT").textContent = D.title; $("#delH").textContent = D.hint; $("#delO").textContent = D.only;
-  $("#delWho").innerHTML = `<b>${esc(j.client_name)}</b> · ${esc(j.project)}<br/><span style="color:var(--taupe)">${esc(j.token)}${j.work_to_do ? " · " + esc(j.work_to_do) : ""}</span>`;
+  const D = t("delJob"); delId = id;
+  $("#delK").textContent = D.k; $("#delT").textContent = D.title; $("#delH").textContent = D.hint; $("#delO").textContent = D.only;
+  $("#delWho").innerHTML = `<span class="cl">${esc(j.client_name)} <i>·</i> ${esc(j.project)}</span><span class="tk">${esc(j.token)}${j.work_to_do ? `<small>· ${esc(j.work_to_do)}</small>` : ""}</span>`;
   $("#delCancel").textContent = D.cancel; $("#delGo").textContent = D.go; $("#delGo").disabled = false;
   const m = $("#delMsg"); m.textContent = ""; m.classList.remove("ok");
   $("#delm").hidden = false; $("#delCancel").focus();
@@ -1040,7 +1058,7 @@ $("#delm").addEventListener("click", (e) => { if (e.target === $("#delm")) close
 document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("#delm").hidden) closeDelete(); });
 $("#delGo").addEventListener("click", async () => {
   if (!delId) return;
-  const D = t("del"), id = delId, b = $("#delGo"), m = $("#delMsg");
+  const D = t("delJob"), id = delId, b = $("#delGo"), m = $("#delMsg");
   b.disabled = true; m.classList.remove("ok"); m.textContent = D.busy;
   let r; try { r = LINKED ? await sb.rpc("team_job_delete", { p_key: LINK, p_job: id }) : await sb.rpc("job_delete", { p_job: id }); } catch (e) { r = { error: e }; }
   const linkErr = !r.error && r.data && r.data.error ? String(r.data.error) : "";
@@ -1111,7 +1129,7 @@ function renderBoard() {
           ${multi && isEditor() ? "" : `<b style="margin-top:8px">${t("notes")}</b><input class="in" data-field="notes" data-id="${j.id}" value="${esc(j.notes || "")}" ${ed && !(multi && isEditor()) ? "" : "disabled"}/>${fbHtml(j.id, "notes")}<span class="help">${esc(t("notesHelp"))}</span>`}
           ${multi ? partNotes(j) : reshapeBlock(j)}
           ${canMoney() && !LINKED ? amountBlock(j) : ""}
-          ${canDelete(j) ? `<button type="button" class="btn ghost del" data-deljob="${j.id}">${t("del").btn}</button>` : ""}
+          ${canDelete(j) ? `<button type="button" class="btn ghost del" data-deljob="${j.id}">${t("delJob").btn}</button>` : ""}
         </div>
       </div>
     </div>`;
