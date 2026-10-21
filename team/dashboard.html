@@ -1047,7 +1047,7 @@ function renderBoard() {
       <div class="detail">
         ${isEditor() && LINKED ? briefBlock(j) : ""}${filesBlock(j)}
         <div><b>${t("rushes")}</b><div class="lk">${(j.rushes_links || []).map((u) => `<a href="${safeUrl(u)}" target="_blank" rel="noopener">${esc(u)}</a>`).join("\n") || "—"}</div></div>
-        <div${isEditor() && LINKED ? " hidden" : ""}>${isAdmin() ? `<b>${t("contact")}</b>${esc(j.contact || "—")}<br/><b style="margin-top:8px">${t("email")}</b>${esc(j.email || "—")}<br/>` : ""}${briefField(j)}${houseStyleOf(j) ? `<b style="margin-top:8px">${t("houseStyle")}</b><span class="hs">${esc(houseStyleOf(j))}</span>` : ""}</div>
+        <div${isEditor() && LINKED ? " hidden" : ""}>${isAdmin() ? `<b>${t("contact")}</b>${esc(j.contact || "—")}<br/><b style="margin-top:8px">${t("email")}</b>${esc(j.email || "—")}<br/>` : ""}${briefField(j)}${houseStyleField(j)}</div>
         <div>
           ${multi ? "" : `<b>${t("frame")}</b><input class="in" data-field="frameio_url" data-id="${j.id}" value="${esc(j.frameio_url || "")}" placeholder="${t("frameioPh")}" ${ed && !(isEditor() && j.qc_status === "ok") ? "" : "disabled"} ${isEditor() && j.qc_status === "ok" ? `title="${esc(t("errs").QC_OK_VERROUILLE)}"` : ""}/>${fbHtml(j.id, "frameio_url")}${ed && !j.delivered_at && !FRAME_OK(j.frameio_url) ? `<span class="fb warn">${t("needFrame")}</span>` : ""}`}
           ${isAdmin() ? `<b style="margin-top:8px">${t("deliveryDate")}</b><input class="in" type="date" data-field="delivery_date" data-id="${j.id}" value="${j.delivery_date || ""}"/>${fbHtml(j.id, "delivery_date")}<b style="margin-top:8px">${t("noteQc")}</b><input class="in" data-field="qc_note" data-id="${j.id}" value="${esc(j.qc_note || "")}"/>${fbHtml(j.id, "qc_note")}` : (j.qc_note ? `<b style="margin-top:8px">${t("noteQc")}</b>${esc(j.qc_note)}` : "")}
@@ -1071,6 +1071,13 @@ function briefField(j) {
   const editable = isAdmin() && !LINKED;
   if (editable) return `<b style="margin-top:8px">${t("briefL")}</b><textarea class="in brief" rows="5" data-field="description" data-id="${j.id}" placeholder="${esc(t("briefPh"))}">${esc(j.description || "")}</textarea>${fbHtml(j.id, "description")}`;
   return j.description ? `<b style="margin-top:8px">${t("briefL")}</b><span style="white-space:pre-wrap">${esc(j.description)}</span>` : "";
+}
+// Style maison du client, éditable depuis la commande par admin / dispatch (Putu) / qualité en session nominative (RLS studios_house_style_team) :
+// Putu n'a pas l'onglet Tarifs (jamais de prix), c'est donc ICI qu'il écrit le style maison. Vaut pour TOUTES les commandes du client.
+function houseStyleField(j) {
+  const hs = houseStyleOf(j);
+  if (isAdmin() && !LINKED && j.studio_id) return `<b style="margin-top:8px">${t("houseStyleL")}</b><textarea class="in brief" rows="3" data-house="${j.studio_id}" placeholder="${esc(t("houseStyleHint"))}">${esc(hs)}</textarea><span style="font-size:12px;color:var(--taupe)" data-housemsg="${j.studio_id}"></span>`;
+  return hs ? `<b style="margin-top:8px">${t("houseStyle")}</b><span class="hs">${esc(hs)}</span>` : "";
 }
 // monteur (lien) : le brief d'abord, en grand ; contact et montants ne sont de toute façon jamais envoyés par la base
 function briefBlock(j) {
@@ -1133,6 +1140,12 @@ function wireBoard() {
     let v = i.value.trim() || null;
     if (v && i.dataset.field === "frameio_url") v = normFrame(v);
     await update(i.dataset.id, { [i.dataset.field]: v }, false, i.dataset.field);
+  }));
+  B.querySelectorAll("[data-house]").forEach((i) => i.addEventListener("change", async () => {
+    const sid = i.dataset.house, v = i.value.trim() || null;
+    const { error } = await sb.from("studios").update({ house_style: v }).eq("id", sid);
+    B.querySelectorAll(`[data-housemsg="${sid}"]`).forEach((m) => { m.textContent = error ? "✖ " + error.message : "✓ " + t("saved"); });
+    if (!error) { const s = studios.find((x) => x.id === sid); if (s) s.house_style = v; jobs.forEach((x) => { if (x.studio_id === sid) x.house_style = v; }); B.querySelectorAll(`[data-house="${sid}"]`).forEach((o) => { if (o !== i) o.value = v || ""; }); }
   }));
   wirePartActions(B);
   if (isAdmin()) B.querySelectorAll("[data-eds].can").forEach((el) => el.addEventListener("click", (ev) => { ev.stopPropagation(); openPop(el); }));
