@@ -1011,23 +1011,53 @@ function renderToolbar() {
 /* ---- Nouvelle commande pour un client (19/10). L'équipe (admin, dispatch, qualité) ouvre l'espace de dépôt de n'importe quel studio,
    code d'accès déjà rempli : Putu dépose ainsi à la main les rushes, le brief et les formats de The Move Miami. La commande passe par
    la RPC create_order comme une commande client (source « espace »), avec details.deposited_by = qui l'a déposée (paramètre ?by=).
-   Lecture de studios.access_token : politique RLS studios_team (admin/dispatcher/qc) — un monteur ne voit ni le bouton ni les codes. */
+   Lecture de studios.access_token : politique RLS studios_team (admin/dispatcher/qc) — un monteur ne voit ni le bouton ni les codes.
+   21/10 (studio_codes_v1.sql) : le code client (access_token) ne sort plus de la base pour l'équipe. Le bouton « Déposer » demande à la base une
+   CLÉ INTERNE personnelle (RPC depot_internal_key : une par personne et par client, révocable sans toucher au code du client) ; le dépôt ouvert
+   avec cette clé n'affiche jamais de prix, même en retouchant l'adresse. « Espace client » (avec le code, donc avec les prix) reste réservé à
+   qui voit les prix (RPC studio_access_code). Avant la migration (PGRST202) : ancien chemin, code lu dans la table. */
+const STUDIO_COLS = "id,slug,name,lang,currency,tva,house_style,form_client,contact_name,billing_name,billing_address,billing_email,attention,address_confirmed,invoice_period,slash_customer_id,brand_color,logo_url,city,country,ai_ok,ai_ok_at,created_at";   // tout studios SAUF access_token / access_pin (droits de colonne, 21/10)
+const missingRpc = (r) => !!(r && r.error && r.error.code === "PGRST202");
+async function studioCode(id) {   // code client : seulement pour qui voit les prix ; secours avant migration : colonne lue directement
+  const r = await sb.rpc("studio_access_code", { p_studio: id });
+  if (!missingRpc(r)) return r.error ? null : r.data;
+  const q = await sb.from("studios").select("access_token").eq("id", id).single(); return q.error ? null : q.data.access_token;
+}
+async function depotKey(id) {   // { key, internal } : clé interne personnelle ; secours avant migration : le code client + np=1 (ancien chemin)
+  const r = await sb.rpc("depot_internal_key", { p_studio: id });
+  if (!missingRpc(r)) return r.error ? null : { key: r.data, internal: true };
+  const k = await studioCode(id); return k ? { key: k, internal: false } : null;
+}
+const clientUrl = (page, s, key) => `../client/${page}.html?client=${encodeURIComponent(s.slug)}&${page === "depot" && key.internal ? "ik" : "k"}=${encodeURIComponent(key.key || key)}&lang=${s.lang === "en" ? "en" : "fr"}`;
+async function openClientPage(page, s) {
+  const w = window.open("", "_blank");   // ouvert AVANT l'attente réseau, sinon Safari bloque la fenêtre
+  const by = encodeURIComponent((profile && profile.display_name) || (me && me.email) || "");
+  const key = page === "depot" ? await depotKey(s.id) : await studioCode(s.id);
+  if (!key) { if (w) w.close(); alert(t("newOrder").err); return; }
+  let u = clientUrl(page, s, key);
+  if (page === "depot") u += `${by ? `&by=${by}` : ""}${!key.internal && !canMoney() ? "&np=1" : ""}`;   // np=1 : seulement sur l'ancien chemin (avant migration)
+  if (w) w.location = u; else window.open(u, "_blank");
+}
 let studiosCache = null, ordQ = "";
 async function openOrders() {
   const O = t("newOrder"); $("#ordT").textContent = O.title; $("#ordH").textContent = O.hint; $("#ordQ").placeholder = O.search; $("#ordQ").value = ordQ; $("#ordm").hidden = false;
   if (!studiosCache) {
     $("#ordL").innerHTML = `<p class="hint">${esc(O.loading)}</p>`;
-    const { data, error } = await sb.from("studios").select("slug,name,lang,access_token").order("name");
+    const { data, error } = await sb.from("studios").select("id,slug,name,lang").order("name");
     if (error) { $("#ordL").innerHTML = `<p class="hint">${esc(O.err)} ${esc(error.message)}</p>`; return; }
-    studiosCache = (data || []).filter((s) => s.access_token);
+    studiosCache = data || [];
   }
   renderOrders(); $("#ordQ").focus();
 }
 function renderOrders() {
   const O = t("newOrder"); const by = encodeURIComponent((profile && profile.display_name) || (me && me.email) || "");
   const list = (studiosCache || []).filter((s) => !ordQ || `${s.name} ${s.slug}`.toLowerCase().includes(ordQ));
-  const url = (page, s) => `../client/${page}.html?client=${encodeURIComponent(s.slug)}&k=${encodeURIComponent(s.access_token)}&lang=${s.lang === "en" ? "en" : "fr"}${page === "depot" && by ? `&by=${by}` : ""}${page === "depot" && !canMoney() ? "&np=1" : ""}`;   // np=1 (20/10, QCM q8) : dépôt interne SANS prix pour qui n'a pas les prix (Putu)
-  $("#ordL").innerHTML = (list.length ? list.map((s) => `<div class="st"><div class="nm">${esc(s.name)}<small class="mono">${esc(s.slug)} · ${esc((s.lang || "fr").toUpperCase())}</small></div><a class="btn ghost" href="${url("espace", s)}" target="_blank" rel="noopener noreferrer">${esc(O.space)}</a><a class="btn" href="${url("depot", s)}" target="_blank" rel="noopener noreferrer">${esc(O.depot)}</a></div>`).join("") : `<p class="hint">${esc(O.empty)}</p>`);
+  // 21/10 : plus de lien tout fait avec le code dans l'adresse. « Espace client » (code → prix) seulement pour qui voit les prix ; « Déposer » = clé interne (jamais de prix).
+  const canSpace = canTarifs();
+  $("#ordL").innerHTML = (list.length ? list.map((s) => `<div class="st"><div class="nm">${esc(s.name)}<small class="mono">${esc(s.slug)} · ${esc((s.lang || "fr").toUpperCase())}</small></div>${canSpace ? `<button type="button" class="btn ghost" data-ord-space="${s.id}">${esc(O.space)}</button>` : ""}<button type="button" class="btn" data-ord-depot="${s.id}">${esc(O.depot)}</button></div>`).join("") : `<p class="hint">${esc(O.empty)}</p>`);
+  const byId = (id) => (studiosCache || []).find((s) => s.id === id);
+  $("#ordL").querySelectorAll("[data-ord-space]").forEach((b) => b.addEventListener("click", () => openClientPage("espace", byId(b.dataset.ordSpace))));
+  $("#ordL").querySelectorAll("[data-ord-depot]").forEach((b) => b.addEventListener("click", () => openClientPage("depot", byId(b.dataset.ordDepot))));
 }
 const closeOrders = () => { $("#ordm").hidden = true; };
 $("#ordX").addEventListener("click", closeOrders);
@@ -1236,7 +1266,7 @@ async function renderGrille() {
   if (!canGrille()) { $("#admin").innerHTML = ""; return; }
   const G = t("grille");
   $("#admin").innerHTML = `<div class="panel"><p style="margin:0;color:var(--taupe)">${G.loading}</p></div>`;
-  const [o, pg, st, gi] = await Promise.all([sb.from("offers").select("item_key,label_fr,label_en,family,sort,active").eq("active", true).order("sort"), sb.from("price_grids").select("*"), sb.from("studios").select("*").order("name"), sb.from("price_grids_internal").select("*")]);
+  const [o, pg, st, gi] = await Promise.all([sb.from("offers").select("item_key,label_fr,label_en,family,sort,active").eq("active", true).order("sort"), sb.from("price_grids").select("*"), sb.from("studios").select(STUDIO_COLS).order("name"), sb.from("price_grids_internal").select("*")]);
   if (tab !== "grille" || !canGrille()) return;
   const bad = o.error || pg.error || st.error;
   if (bad) { $("#admin").innerHTML = `<div class="panel"><p style="margin:0;color:var(--err)">${G.err}${esc(bad.message)}</p></div>`; return; }
@@ -1753,10 +1783,10 @@ function renderTarifs() {
   if (!tarifStudio && studios.length) tarifStudio = studios[0].id;
   const s = studios.find((x) => x.id === tarifStudio); if (!s) { $("#admin").innerHTML = newClientPanel() + agentPanel(); wireNewClient(); wireAgentPanel(); return; }
   const g = Object.fromEntries(grids.filter((x) => x.studio_id === s.id).map((x) => [x.item_key, x.unit_price]));
-  const spaceUrl = `${location.origin}${location.pathname.replace(/team\/dashboard\.html$/, "")}client/espace.html?client=${s.slug}&k=${s.access_token}`;
+  const spaceUrl = "#";   // 21/10 : le code client est demandé à la base après le rendu (fillSpaceLink), il n'est plus dans la ligne studios
   $("#admin").innerHTML = `<div class="panel">
       <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><label style="font-size:12px;color:var(--taupe)">${t("clientSel")}</label><select class="in" id="tarifStudio" style="width:auto">${studios.map((x) => `<option value="${x.id}" ${x.id === s.id ? "selected" : ""}>${esc(x.name)}</option>`).join("")}</select>
-        <span class="badge">${s.currency} · ${s.lang}</span><a class="btn ghost" href="${spaceUrl}" target="_blank" rel="noopener">${t("space")} ↗</a><button type="button" class="btn ghost" id="recalcAll">${t("recalcAll")}</button><span id="tarifMsg" style="font-size:12px;color:var(--ok)"></span></div>
+        <span class="badge">${s.currency} · ${s.lang}</span><a class="btn ghost" id="spaceLink" href="${spaceUrl}" target="_blank" rel="noopener">${t("space")} ↗</a><button type="button" class="btn ghost" id="recalcAll">${t("recalcAll")}</button><span id="tarifMsg" style="font-size:12px;color:var(--ok)"></span></div>
       <p style="font-size:12px;color:var(--taupe);margin:10px 0 12px">${t("tarifsHint")}</p>
       <div class="dupwarn" id="dupWarn" role="status" hidden>${esc(t("dupWarn"))}</div>
       ${groupsFromOffers().map(([gk, ks]) => `<h4 style="margin:14px 0 6px;font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--taupe)">${esc(famLabel(gk))}</h4><div class="grid">${ks.map((k) => `<label>${esc(offerLabel(k))}<input class="in" type="number" step="0.01" min="0" data-key="${k}" value="${g[k] ?? ""}" placeholder="—"/></label>`).join("")}</div>${gk === "bundles" || gk === "bundle" ? `<p style="font-size:12px;color:var(--taupe);margin:6px 0 0">${t("bundleHelp")}</p>` : ""}`).join("")}
@@ -1772,6 +1802,7 @@ function renderTarifs() {
     <div class="panel"><h3>${t("houseStyle")}</h3><p style="font-size:12px;color:var(--taupe);margin:0 0 10px">${esc(t("houseStyleHint"))}</p>
       <label style="display:block">${esc(t("houseStyleL"))}<textarea class="in" rows="5" data-studio="house_style" style="margin-top:6px">${esc(s.house_style || "")}</textarea></label></div>` + newClientPanel() + agentPanel();
   wireNewClient(); wireAgentPanel(); updDupWarn();
+  studioCode(s.id).then((k) => { const a = $("#spaceLink"); if (a && k) a.href = `${location.origin}${location.pathname.replace(/team\/dashboard\.html$/, "")}client/espace.html?client=${encodeURIComponent(s.slug)}&k=${encodeURIComponent(k)}`; else if (a) a.hidden = true; });
   $("#tarifStudio").addEventListener("change", (e) => { tarifStudio = e.target.value; renderTarifs(); });
   $("#admin").querySelectorAll("[data-key]").forEach((i) => i.addEventListener("change", async () => {
     const v = i.value === "" ? null : Number(i.value);
@@ -1807,7 +1838,7 @@ async function loadStudiosLite() {
 }
 async function loadAdmin() {
   if (!isAdmin() || LINKED) return;
-  const [a, b, c, d, e, f, g, h, m, n, o] = await Promise.all([sb.from("studios").select("*").order("name"), sb.from("price_grids").select("*"), sb.from("invoices").select("*").order("period_end", { ascending: false }).limit(300), sb.from("extra_lines").select("*").order("created_at", { ascending: false }).limit(200),
+  const [a, b, c, d, e, f, g, h, m, n, o] = await Promise.all([sb.from("studios").select(STUDIO_COLS).order("name"), sb.from("price_grids").select("*"), sb.from("invoices").select("*").order("period_end", { ascending: false }).limit(300), sb.from("extra_lines").select("*").order("created_at", { ascending: false }).limit(200),
     sb.from("booking_settings").select("*").eq("id", 1), sb.from("bookings").select("*").order("starts_at", { ascending: false }).limit(400),
     sb.from("candidates").select("*").order("application_score", { ascending: false, nullsFirst: false }).limit(500), sb.from("interview_bookings").select("*").order("starts_at", { ascending: false }).limit(400),
     sb.from("interview_settings").select("*").eq("id", 1), sb.from("scoring_grids").select("*").order("created_at", { ascending: false }).limit(60),

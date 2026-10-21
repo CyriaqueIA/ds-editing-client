@@ -951,12 +951,14 @@ const t = (k) => (I18N[lang][k] ?? k);
 // Commande directe : la clé d'accès du studio vient du lien personnel (?k=…) ou de l'Espace client (mémorisée par client/index.html)
 const SB_URL = "https://xkanmjlpysxpohsuqvwg.supabase.co";
 const SB_KEY = "sb_publishable_lIZtV_WtN5NcGSb0dnfaiQ_AgKYBIVa"; // clé publique
-const accessKey = (params.get("k") || (() => { try { return localStorage.getItem("ds_client_key"); } catch { return null; } })() || "").trim();
+// ?ik= (21/10, studio_codes_v1.sql) : clé INTERNE de l'équipe (dashboard « Déposer une commande »), jamais le code du client. Même circuit,
+// mais la base répond « internal » et ne renvoie aucun prix : la page passe d'elle-même en mode sans prix (NO_PRICE), quoi qu'il y ait dans l'adresse.
+const accessKey = (params.get("k") || params.get("ik") || (() => { try { return localStorage.getItem("ds_client_key"); } catch { return null; } })() || "").trim();
 // Dépôt interne (19/10) : ouvert depuis le dashboard équipe (« + Nouvelle commande »), ?by=<prénom> = qui dépose pour le compte du client.
 // Même circuit que le client (create_order), seule trace : details.deposited_by + un bandeau. Sans ?by, rien ne change pour le client.
 const BY = (params.get("by") || "").trim().slice(0, 60);
 // Dépôt interne SANS prix (20/10, QCM prix & accès q8) : ?np=1 posé par le dashboard pour qui n'a pas les prix (Putu). Aucun montant, aucun total, aucune promo à l'écran.
-const NO_PRICE = BY !== "" && params.get("np") === "1";
+let NO_PRICE = BY !== "" && params.get("np") === "1";   // let : passe aussi à true quand la base répond « clé interne » (client_slug.internal)
 if (NO_PRICE) document.documentElement.classList.add("np");
 let studio = null;      // { slug, name, lang } retrouvé depuis la clé (RPC client_slug)
 let langTouched = false; // la langue choisie à la main l'emporte sur celle du studio
@@ -1799,6 +1801,7 @@ if (!accessKey) { accessWarn = keyMsg("key"); renderNav(); }
 else rpc("client_slug", { p_key: accessKey }).then((d) => {
   if (!d || !d.slug || (slug && d.slug !== slug)) { accessWarn = keyMsg("bad_key"); renderNav(); return; }
   studio = d;
+  if (d.internal === true && !NO_PRICE) { NO_PRICE = true; document.documentElement.classList.add("np"); }   // clé interne : aucun prix, décidé par la base
   if (d.currency) cur = String(d.currency).toUpperCase(); // devise du studio : source principale (client_slug répond toujours)
   rpc("client_prices", { p_slug: d.slug, p_k: accessKey }).then(applyAvail).catch(() => {}); // échec ou vide : tout reste affiché
   rpc("client_bundle_promos", { p_slug: d.slug, p_k: accessKey }).then(applyPromos).catch(() => {}); // échec ou vide : aucune promo affichée
