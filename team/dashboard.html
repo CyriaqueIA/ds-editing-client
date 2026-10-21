@@ -587,6 +587,8 @@ const T = {
       destHint: "Non modifiable ici : changer de dossier ne déplace pas les rushes déjà téléchargés et fausserait leurs chemins. À faire avec l'équipe technique, sur le PC du bureau.", saved: "enregistré", bad: (a, b) => `Valeur attendue : entre ${a} et ${b}`, missing: "Réglages introuvables : l'agent du PC du bureau n'est pas encore configuré." },
     steps: { dl: "Fichiers", start: "Commencé", half: "50 %", done: "Livré" }, qc: { pending: "Qualité : en attente", ok: "Qualité : OK", revisions: "Qualité : à revoir" },
     wanted: "Date souhaitée", noDate: "sans date", late: "EN RETARD", team: "équipe", delivered: "livré", unassigned: "À attribuer", noEditor: "Aucun monteur", brief: "Brief", files: "Fichiers", frame: "frame.io", empty: "Aucune commande dans cette vue.", received: "Reçu", frameioPh: "Lien frame.io de livraison", noteQc: "Note qualité", notes: "Notes internes · jamais vues par les monteurs", notesHelp: "Réservé à l'équipe (dispatch, qualité, admin). Ce que le monteur doit savoir va dans le brief.", deliveryDate: "Livraison fixée par l'équipe", rushes: "Rushes", email: "E-mail client", contact: "Contact",
+    // Option « J'ai déjà mon brief » (21/10) : document déposé par le client, lu par le robot des 10 min ; drapeaux à vérifier par Putu
+    ownBrief: { tag: "Brief fourni par le client", read: "lu automatiquement le", notRead: "lecture automatique en attente (robot des 10 min)", files: "Fichiers du brief", missing: "Non précisé dans le brief (choix du monteur)", flags: { delai_court: "Délai court", quantite: "Quantité du brief ≠ commande", a_lire_a_la_main: "Brief à lire à la main" } },
     briefL: "Brief client · envoyé aux monteurs", briefPh: "Ce que le monteur doit faire : ton, musique, captions, hook, à éviter…", houseStyle: "Style maison", houseStyleL: "Style maison (ajouté à chaque brief de ce client, vu par les monteurs)", houseStyleHint: "Rythme, typographie, couleurs, interdits… Texte libre, relu par les monteurs sur chaque commande de ce client.", houseStyleMissing: "Colonne studios.house_style absente : appliquer supabase/brief_monteurs_v1.sql.",
     parts: { intro: "Intro", corps: "Corps", single: "Commande", partFrame: "Lien frame.io de cette partie (interne)", partNotes: "Notes · ",
       asmTag: "À assembler", asmT: "À assembler", asmP: "Les deux parties sont livrées : colle-les ensemble, pose le lien frame.io FINAL, puis livre la commande.", finalPh: "Lien frame.io FINAL de la commande", finalBtn: "Livré (finale)", finalOk: "✓ Livré, la qualité est prévenue",
@@ -655,6 +657,7 @@ const T = {
       destHint: "Not editable here: changing the folder does not move footage already downloaded and would break its paths. To be done with the tech team, on the office PC.", saved: "saved", bad: (a, b) => `Expected value: between ${a} and ${b}`, missing: "Settings not found: the office PC agent is not configured yet." },
     steps: { dl: "Files", start: "Started", half: "50%", done: "Delivered" }, qc: { pending: "QC: pending", ok: "QC: OK", revisions: "QC: revisions" },
     wanted: "Requested date", noDate: "no date", late: "LATE", team: "team", delivered: "delivered", unassigned: "Unassigned", noEditor: "No editor", brief: "Brief", files: "Files", frame: "frame.io", empty: "No order in this view.", received: "Received", frameioPh: "frame.io delivery link", noteQc: "QC note", notes: "Internal notes · never shown to editors", notesHelp: "Team only (dispatch, QC, admin). Anything the editor must know goes in the brief.", deliveryDate: "Delivery set by the team", rushes: "Footage", email: "Client email", contact: "Contact",
+    ownBrief: { tag: "Brief provided by the client", read: "read automatically on", notRead: "automatic reading pending (10-min robot)", files: "Brief files", missing: "Not specified in the brief (editor's choice)", flags: { delai_court: "Short deadline", quantite: "Brief quantity ≠ order", a_lire_a_la_main: "Brief to read by hand" } },
     briefL: "Client brief · sent to editors", briefPh: "What the editor must do: tone, music, captions, hook, what to avoid…", houseStyle: "House style", houseStyleL: "House style (added to every brief of this client, shown to editors)", houseStyleHint: "Pacing, typography, colours, no-gos… Free text, read by the editors on every order of this client.", houseStyleMissing: "Column studios.house_style missing: apply supabase/brief_monteurs_v1.sql.",
     parts: { intro: "Intro", corps: "Body", single: "Order", partFrame: "frame.io link of this part (internal)", partNotes: "Notes · ",
       asmTag: "To assemble", asmT: "To assemble", asmP: "Both parts are delivered: put them together, paste the FINAL frame.io link, then deliver the order.", finalPh: "FINAL frame.io link of the order", finalBtn: "Delivered (final)", finalOk: "✓ Delivered, QC has been notified",
@@ -1151,6 +1154,7 @@ function renderBoard() {
       ${multi ? partsBlock(j) : ""}
       <div class="detail">
         ${isEditor() && LINKED ? briefBlock(j) : ""}${filesBlock(j)}
+        ${ownBriefBlock(j)}
         <div><b>${t("rushes")}</b><div class="lk">${(j.rushes_links || []).map((u) => `<a href="${safeUrl(u)}" target="_blank" rel="noopener">${esc(u)}</a>`).join("\n") || "—"}</div></div>
         <div${isEditor() && LINKED ? " hidden" : ""}>${isAdmin() ? `<b>${t("contact")}</b>${esc(j.contact || "—")}<br/><b style="margin-top:8px">${t("email")}</b>${esc(j.email || "—")}<br/>` : ""}${briefField(j)}${houseStyleField(j)}</div>
         <div>
@@ -1173,6 +1177,20 @@ function renderBoard() {
 const houseStyleOf = (j) => { const own = j && j.house_style; if (own && String(own).trim()) return String(own).trim(); const s = studios.find((x) => x.id === j.studio_id); return s && s.house_style ? String(s.house_style).trim() : ""; };
 // Brief client (jobs.description) : éditable par admin / dispatch / qualité en session nominative (écriture directe RLS) ; en lecture pour les autres.
 // Par lien personnel, team_update n'accepte pas `description` (lot_b_liens.sql) : on n'ouvre pas un champ que la base refuserait.
+/* Option « J'ai déjà mon brief » (21/10) : le client a déposé son propre document (details.brief_mode = 'own'). Le robot des
+   10 min (ds-editing-ops/depots/brief-robot.mjs) l'a lu → brief FR/EN/ID dans `description`, liens signés 30 jours dans
+   details.brief_files[].url, drapeaux dans details.brief_flags. `lite` (monteur par lien) : seulement les fichiers. */
+function ownBriefBlock(j, lite = false) {
+  const d = j.details && typeof j.details === "object" ? j.details : {};
+  if (d.brief_mode !== "own") return "";
+  const L = t("ownBrief"), files = Array.isArray(d.brief_files) ? d.brief_files : [], links = Array.isArray(d.brief_links) ? d.brief_links : [];
+  const fl = files.map((f) => (f && f.url ? `<a href="${safeUrl(f.url)}" target="_blank" rel="noopener noreferrer">${esc(f.name || f.path || "fichier")}</a>` : `<span>${esc((f && (f.name || f.path)) || "fichier")}</span>`))
+    .concat(links.map((u) => `<a href="${safeUrl(u)}" target="_blank" rel="noopener noreferrer">${esc(u)}</a>`)).join("\n");
+  if (lite) return `<div class="links"><b>${L.files}</b>${fl || "—"}</div>`;
+  const flags = (Array.isArray(d.brief_flags) ? d.brief_flags : []).map((f) => `<span class="badge err">${esc(L.flags[f] || f)}</span>`).join(" ");
+  const missing = Array.isArray(d.brief_missing) && d.brief_missing.length ? `<span class="help">${L.missing} : ${esc(d.brief_missing.join(" · "))}</span>` : "";
+  return `<div><b>${L.tag}</b><span class="badge ${d.brief_read_at ? "ok" : "warn"}">${d.brief_read_at ? `${L.read} ${fmtDT(d.brief_read_at)}` : L.notRead}</span> ${flags}${missing}<b style="margin-top:8px">${L.files}</b><div class="lk">${fl || "—"}</div></div>`;
+}
 function briefField(j) {
   const editable = isAdmin() && !LINKED;
   if (editable) return `<b style="margin-top:8px">${t("briefL")}</b><textarea class="in brief" rows="5" data-field="description" data-id="${j.id}" placeholder="${esc(t("briefPh"))}">${esc(j.description || "")}</textarea>${fbHtml(j.id, "description")}`;
@@ -1190,7 +1208,7 @@ function briefBlock(j) {
   const L = t("lk"), link = (u) => `<a href="${safeUrl(u)}" target="_blank" rel="noopener noreferrer">${esc(u)}</a>`, refs = (j.references_links || []).filter(Boolean);
   const depBy = j.details && j.details.deposited_by ? `<span class="tx" style="color:var(--taupe)">${esc(t("newOrder").by(j.details.deposited_by))}</span>` : "";
   const hs = houseStyleOf(j);
-  return `<div class="bf"><b>${L.brief}</b>${depBy}${j.work_to_do ? `<span class="wk2">${esc(j.work_to_do)}</span>` : ""}<span class="tx">${esc(j.description || "—")}</span>${hs ? `<div style="margin-top:10px"><b>${t("houseStyle")}</b><span class="tx">${esc(hs)}</span></div>` : ""}${j.brief_url ? `<div class="links"><a href="${safeUrl(j.brief_url)}" target="_blank" rel="noopener noreferrer">${t("brief")}</a></div>` : ""}${refs.length ? `<div class="links"><b>${L.refs}</b>${refs.map(link).join("")}</div>` : ""}${j.logos ? `<div style="margin-top:8px"><b>${L.logos}</b><span class="tx">${esc(j.logos)}</span></div>` : ""}</div>`;
+  return `<div class="bf"><b>${L.brief}</b>${depBy}${j.work_to_do ? `<span class="wk2">${esc(j.work_to_do)}</span>` : ""}<span class="tx">${esc(j.description || "—")}</span>${hs ? `<div style="margin-top:10px"><b>${t("houseStyle")}</b><span class="tx">${esc(hs)}</span></div>` : ""}${j.brief_url ? `<div class="links"><a href="${safeUrl(j.brief_url)}" target="_blank" rel="noopener noreferrer">${t("brief")}</a></div>` : ""}${ownBriefBlock(j, true)}${refs.length ? `<div class="links"><b>${L.refs}</b>${refs.map(link).join("")}</div>` : ""}${j.logos ? `<div style="margin-top:8px"><b>${L.logos}</b><span class="tx">${esc(j.logos)}</span></div>` : ""}</div>`;
 }
 function amountBlock(j) {
   const s = studios.find((x) => x.id === j.studio_id); const cur = s ? s.currency : "EUR";
