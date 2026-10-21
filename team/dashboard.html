@@ -91,6 +91,15 @@
     .ordm .st .nm small{color:var(--taupe);font-weight:400;margin-left:8px;font-size:12px}
     .ordm .by{font-size:12px;color:var(--taupe);margin-top:10px}
     body.tv .ordm,body.tv .chip.newo{display:none}
+    /* Suppression d'une commande (21/10) : bouton discret en bas du détail, fenêtre de confirmation sur le modèle « Nouvelle commande » */
+    .btn.del{height:32px;padding:0 12px;font-size:12px;color:var(--err);border-color:rgba(240,138,130,.35);margin-top:12px}
+    .btn.del:hover{background:rgba(240,138,130,.1);border-color:rgba(240,138,130,.6);color:var(--err)}
+    .delm .box{width:min(520px,100%)}
+    .delm .who{font-size:13px;line-height:1.5;margin:0 0 12px}
+    .delm .acts{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;margin-top:6px}
+    .delm .msg{font-size:12px;min-height:16px;margin-top:8px;color:var(--err)}
+    .delm .msg.ok{color:var(--ok)}
+    body.tv .btn.del{display:none}
     @media(max-width:560px){.ordm .st{grid-template-columns:1fr}.ordm .st .btn{justify-content:center}}
     .toolbar .search{margin-left:auto;width:240px}
 
@@ -509,6 +518,17 @@
       <div id="ordL"></div>
     </div>
   </div>
+  <!-- Suppression d'une commande (21/10) : confirmation ; la base refuse tout ce qui est commencé ou facturé (supabase/suppression_commande_v1.sql) -->
+  <div class="ordm delm" id="delm" hidden role="dialog" aria-modal="true" aria-labelledby="delT">
+    <div class="box">
+      <div class="bh"><b id="delT"></b><button type="button" class="btn ghost" id="delX" aria-label="Fermer">✕</button></div>
+      <p class="who" id="delWho"></p>
+      <p class="hint" id="delH"></p>
+      <p class="hint" id="delO"></p>
+      <div class="acts"><button type="button" class="btn ghost" id="delCancel"></button><button type="button" class="btn" id="delGo"></button></div>
+      <div class="msg" id="delMsg" role="status"></div>
+    </div>
+  </div>
 </main>
 
 <div class="admmodal" id="admModal" hidden role="dialog" aria-modal="true" aria-labelledby="admT">
@@ -535,6 +555,7 @@ const T = {
     all: "Tous", tasks: (n) => `${n} tâche${n > 1 ? "s" : ""}`, stats: ["Reçues aujourd'hui", "En cours", "En retard", "À contrôler", "Livrées cette semaine"],
     filters: { all: "Tout", na: "À attribuer", ready: "Fichiers prêts, à démarrer", late: "En retard", qc: "À contrôler", asm: "À assembler", done: "Livrées" }, search: "Rechercher…",
     newOrder: { btn: "+ Nouvelle commande", title: "Déposer une commande pour un client", hint: "Choisis le client : son espace de dépôt s'ouvre avec son code d'accès déjà rempli. Tu remplis le brief, les formats attendus et les liens de rushes à sa place. L'e-mail saisi dans le brief reçoit les mails automatiques (confirmation, suivi, facture) : mets le tien si le client ne doit rien recevoir.", search: "Rechercher un client…", depot: "Déposer une commande", space: "Espace client", loading: "Lecture des clients…", empty: "Aucun client trouvé.", err: "Lecture des clients impossible :", by: (n) => `Déposée par l'équipe (${n})` },
+    del: { btn: "Supprimer la commande", title: "Supprimer cette commande ?", hint: "Définitif : la commande disparaît du dashboard, de l'espace client et de la vue équipe. Si les rushes sont déjà sur le PC du bureau, le dossier est effacé au prochain passage. Une copie reste dans le journal (jobs_deleted) pour la recréer à la main.", only: "Possible seulement tant que rien n'est commencé : aucune étape cochée, qualité en attente, pas de facture.", go: "Supprimer définitivement", cancel: "Annuler", busy: "Suppression…", done: "Commande supprimée", noFn: "Fonction absente en base : appliquer supabase/suppression_commande_v1.sql." },
     dl: { waiting: "En attente", running: "Téléchargement en cours", ready: "Fichiers prêts", error: "Erreur", abandon: "Abandonné", partial: "Rushes reçus", access: "Accès demandé au client", purged: "Nettoyé",
       tips: { waiting: "Le PC du bureau n'a pas encore commencé le téléchargement.", running: "Le PC du bureau télécharge les rushes.", ready: "Les rushes sont sur le PC du bureau.", partial: "Les rushes sont sur le PC du bureau, mais certains liens n'ont pas pu être téléchargés : ne rien supprimer, récupérer ces liens à la main.", access: "Le lien est privé : un e-mail a demandé au client d'ouvrir l'accès.", purged: "Le dossier a été supprimé du PC du bureau après la livraison." },
       nTry: (n, m) => `essai ${n}/${m}`, nFiles: (n) => `${n} fichier${n > 1 ? "s" : ""}`, nFailed: (n) => `${n} lien${n > 1 ? "s" : ""} en échec`, since: (d) => `depuis ${d}`, pcOn: (k) => `PC Bali occupé sur ${k}`, pcOff: "PC hors ligne", manual: "à télécharger à la main", nManual: (n) => `${n} lien${n > 1 ? "s" : ""} à la main`,
@@ -556,7 +577,7 @@ const T = {
       finalDone: "Livré (finale)", reopen: "Rouvrir l'assemblage", wait: (a, b) => `Assemblage : ${a} / ${b} partie${b > 1 ? "s" : ""} livrée${b > 1 ? "s" : ""}`, bar: (n) => `${n} commande${n > 1 ? "s" : ""} à assembler`, derived: "Calculé d'après les parties : coche dans la partie.", noEd: "À attribuer", final: "Lien final" },
     needFrame: "Colle d'abord le lien frame.io de livraison : « Livré » reste bloqué sans lui.", locked: "Étape déjà cochée : seule la qualité ou un admin peut la corriger.", redeliver: "Relivrer", redeliverTip: "Corrige le lien frame.io si besoin, puis relivre pour un nouveau contrôle qualité.", redelivered: "✓ Relivré, la qualité est prévenue", round: (n) => `${n}e passage`, savedOk: "✓ Enregistré",
     lk: { editor: "Monteur", dispatcher: "Dispatch", qc: "Qualité", badT: "Lien invalide ou coupé", badP: "Ce lien ne fonctionne plus. Demande-en un nouveau à l'équipe DS Editing.", tooT: "Trop d'essais", tooP: "Réessaie dans quelques minutes.", downT: "Service indisponible", downP: "Impossible de joindre le serveur. Vérifie ta connexion puis réessaie.", byeT: "Lien retiré de cet appareil", byeP: "Rouvre ton lien personnel pour revenir à tes commandes.", retry: "Réessayer", offT: "Accès désactivé", offP: "Ton accès est désactivé pour le moment. Reviens plus tard ou demande à l'équipe DS Editing.", who: (n) => `Connecté avec le lien de ${n}`, queue: (n) => `À attribuer · ${n}`, others: "Autres commandes", brief: "Brief", refs: "Références", logos: "Logos" },
-    errs: { FRAMEIO_REQUIS: "Lien frame.io manquant ou invalide (il doit commencer par https://).", ETAPE_VERROUILLEE: "Étape déjà cochée : seule la qualité ou un admin peut la corriger.", QC_OK_VERROUILLE: "Qualité déjà validée : le lien frame.io ne peut plus être modifié (voir avec l'équipe qualité).", REFUSE: "Action refusée pour ton profil.", CHAMP_INTERDIT: "Modification non autorisée pour ton profil.", LIEN_INVALIDE: "Ce lien ne fonctionne plus : demande-en un nouveau.", TROP_D_ESSAIS: "Trop d'essais : réessaie dans quelques minutes.", REOUVERTURE_REFUSEE: "On ne rouvre l'assemblage qu'après un « à revoir » de la qualité.", LIVRAISON_FIGEE: "Commande livrée : après un « à revoir », rouvre d'abord l'assemblage avant de rouvrir une partie.", PARTIE_DEJA_COMMENCEE: "Impossible : une étape est déjà cochée ou un lien déjà posé sur cette commande.", COMMANDE_TERMINEE: "Impossible : la commande est terminée (qualité OK).", PAS_UNE_PARTIE_UNIQUE: "Cette commande est déjà coupée en parties.", PAS_DEUX_PARTIES: "Cette commande n'est pas coupée en Intro / Corps.", ACTION_INCONNUE: "Action inconnue.", JOB_A_PARTIES: "Cette commande est découpée en parties : coche l'étape dans la partie concernée.", PARTIES_NON_LIVREES: "Toutes les parties doivent être livrées avant de livrer la commande.", MONTEUR_INCONNU: "Monteur inconnu.", MONTEUR_DESACTIVE: "Ton accès est désactivé pour le moment." },
+    errs: { FRAMEIO_REQUIS: "Lien frame.io manquant ou invalide (il doit commencer par https://).", ETAPE_VERROUILLEE: "Étape déjà cochée : seule la qualité ou un admin peut la corriger.", QC_OK_VERROUILLE: "Qualité déjà validée : le lien frame.io ne peut plus être modifié (voir avec l'équipe qualité).", REFUSE: "Action refusée pour ton profil.", CHAMP_INTERDIT: "Modification non autorisée pour ton profil.", LIEN_INVALIDE: "Ce lien ne fonctionne plus : demande-en un nouveau.", TROP_D_ESSAIS: "Trop d'essais : réessaie dans quelques minutes.", REOUVERTURE_REFUSEE: "On ne rouvre l'assemblage qu'après un « à revoir » de la qualité.", LIVRAISON_FIGEE: "Commande livrée : après un « à revoir », rouvre d'abord l'assemblage avant de rouvrir une partie.", PARTIE_DEJA_COMMENCEE: "Impossible : une étape est déjà cochée ou un lien déjà posé sur cette commande.", COMMANDE_TERMINEE: "Impossible : la commande est terminée (qualité OK).", PAS_UNE_PARTIE_UNIQUE: "Cette commande est déjà coupée en parties.", PAS_DEUX_PARTIES: "Cette commande n'est pas coupée en Intro / Corps.", ACTION_INCONNUE: "Action inconnue.", JOB_A_PARTIES: "Cette commande est découpée en parties : coche l'étape dans la partie concernée.", PARTIES_NON_LIVREES: "Toutes les parties doivent être livrées avant de livrer la commande.", MONTEUR_INCONNU: "Monteur inconnu.", MONTEUR_DESACTIVE: "Ton accès est désactivé pour le moment.", COMMANDE_COMMENCEE: "Impossible : une étape est déjà cochée, la qualité a tranché ou un lien est posé. On ne supprime qu'une commande pas commencée.", COMMANDE_FACTUREE: "Impossible : cette commande est déjà sur une facture.", INTROUVABLE: "Commande introuvable (déjà supprimée ?)." },
     tabs: { prod: "Production", equipe: "Équipe", tarifs: "Tarifs", factures: "Factures", rdv: "Rendez-vous", recrut: "Recrutement", grille: "Grille", rituels: "Rituels" },
     gh: { notYou: "Ce n'est pas vous ?", sharedFallback: "Vue d'équipe indisponible avec ce compte : connecte-toi avec ton compte nominatif.", morning: "Rituels du matin", prios: "3 priorités du jour", week: "7 derniers jours", tz: "heure de Bali", loading: "Lecture en cours…", retry: "Réessayer",
       rit: { bilan_veille: "Relire le bilan de la veille", agenda_jour: "Vérifier l'agenda et les rendez-vous du jour", relances_jour: "Préparer les relances du jour", nouveaux_contacts: "Repérer les nouveaux contacts à traiter", crm_a_jour: "Vérifier que le CRM est à jour" },
@@ -602,6 +623,7 @@ const T = {
     all: "All", tasks: (n) => `${n} task${n > 1 ? "s" : ""}`, stats: ["Received today", "In progress", "Late", "To review", "Delivered this week"],
     filters: { all: "All", na: "To assign", ready: "Files ready, to start", late: "Late", qc: "To review", asm: "To assemble", done: "Delivered" }, search: "Search…",
     newOrder: { btn: "+ New order", title: "Place an order for a client", hint: "Pick the client: their drop space opens with their access code already filled in. You fill in the brief, the expected formats and the footage links on their behalf. The email entered in the brief receives the automatic emails (confirmation, tracking, invoice): use yours if the client must not receive anything.", search: "Search a client…", depot: "Place an order", space: "Client space", loading: "Loading clients…", empty: "No client found.", err: "Could not read clients:", by: (n) => `Placed by the team (${n})` },
+    del: { btn: "Delete order", title: "Delete this order?", hint: "Permanent: the order disappears from the dashboard, the client space and the team board. If the footage is already on the office PC, the folder is removed on the next run. A copy stays in the log (jobs_deleted) to recreate it by hand.", only: "Only possible while nothing has started: no step ticked, QC pending, no invoice.", go: "Delete permanently", cancel: "Cancel", busy: "Deleting…", done: "Order deleted", noFn: "Function missing in the database: apply supabase/suppression_commande_v1.sql." },
     dl: { waiting: "Waiting", running: "Downloading", ready: "Files ready", error: "Error", abandon: "Gave up", partial: "Footage received", access: "Access requested from client", purged: "Cleaned up",
       tips: { waiting: "The office PC has not started the download yet.", running: "The office PC is downloading the footage.", ready: "The footage is on the office PC.", partial: "The footage is on the office PC, but some links could not be downloaded: delete nothing, fetch those links by hand.", access: "The link is private: an email asked the client to open access.", purged: "The folder was removed from the office PC after delivery." },
       nTry: (n, m) => `attempt ${n}/${m}`, nFiles: (n) => `${n} file${n > 1 ? "s" : ""}`, nFailed: (n) => `${n} failed link${n > 1 ? "s" : ""}`, since: (d) => `since ${d}`, pcOn: (k) => `Bali PC busy on ${k}`, pcOff: "PC offline", manual: "download by hand", nManual: (n) => `${n} link${n > 1 ? "s" : ""} by hand`,
@@ -623,7 +645,7 @@ const T = {
       finalDone: "Delivered (final)", reopen: "Reopen assembly", wait: (a, b) => `Assembly: ${a} / ${b} part${b > 1 ? "s" : ""} delivered`, bar: (n) => `${n} order${n > 1 ? "s" : ""} to assemble`, derived: "Computed from the parts: tick it in the part.", noEd: "Unassigned", final: "Final link" },
     needFrame: "Paste the frame.io delivery link first: “Delivered” stays blocked without it.", locked: "Step already ticked: only QC or an admin can fix it.", redeliver: "Redeliver", redeliverTip: "Fix the frame.io link if needed, then redeliver for a new quality check.", redelivered: "✓ Redelivered, QC has been notified", round: (n) => `${n}${[11, 12, 13].includes(n % 100) ? "th" : ({ 1: "st", 2: "nd", 3: "rd" })[n % 10] || "th"} pass`, savedOk: "✓ Saved",
     lk: { editor: "Editor", dispatcher: "Dispatch", qc: "Quality", badT: "Invalid or disabled link", badP: "This link no longer works. Ask the DS Editing team for a new one.", tooT: "Too many attempts", tooP: "Try again in a few minutes.", downT: "Service unavailable", downP: "Cannot reach the server. Check your connection and try again.", byeT: "Link removed from this device", byeP: "Open your personal link again to get back to your orders.", retry: "Try again", offT: "Access disabled", offP: "Your access is disabled for now. Come back later or ask the DS Editing team.", who: (n) => `Signed in with ${n}'s link`, queue: (n) => `To assign · ${n}`, others: "Other orders", brief: "Brief", refs: "References", logos: "Logos" },
-    errs: { FRAMEIO_REQUIS: "frame.io link missing or invalid (it must start with https://).", ETAPE_VERROUILLEE: "Step already ticked: only QC or an admin can fix it.", QC_OK_VERROUILLE: "QC already approved: the frame.io link can no longer be changed (ask the QC team).", REFUSE: "Action refused for your profile.", CHAMP_INTERDIT: "Change not allowed for your profile.", LIEN_INVALIDE: "This link no longer works: ask for a new one.", TROP_D_ESSAIS: "Too many attempts: try again in a few minutes.", REOUVERTURE_REFUSEE: "The assembly can only be reopened after a QC « needs changes ».", LIVRAISON_FIGEE: "Order delivered: after a « needs changes », reopen the assembly first before reopening a part.", PARTIE_DEJA_COMMENCEE: "Not possible: a step is already ticked or a link already set on this order.", COMMANDE_TERMINEE: "Not possible: the order is finished (QC OK).", PAS_UNE_PARTIE_UNIQUE: "This order is already split into parts.", PAS_DEUX_PARTIES: "This order is not split into Intro / Body.", ACTION_INCONNUE: "Unknown action.", JOB_A_PARTIES: "This order is split into parts: tick the step in the relevant part.", PARTIES_NON_LIVREES: "All parts must be delivered before delivering the order.", MONTEUR_INCONNU: "Unknown editor.", MONTEUR_DESACTIVE: "Your access is disabled for now." },
+    errs: { FRAMEIO_REQUIS: "frame.io link missing or invalid (it must start with https://).", ETAPE_VERROUILLEE: "Step already ticked: only QC or an admin can fix it.", QC_OK_VERROUILLE: "QC already approved: the frame.io link can no longer be changed (ask the QC team).", REFUSE: "Action refused for your profile.", CHAMP_INTERDIT: "Change not allowed for your profile.", LIEN_INVALIDE: "This link no longer works: ask for a new one.", TROP_D_ESSAIS: "Too many attempts: try again in a few minutes.", REOUVERTURE_REFUSEE: "The assembly can only be reopened after a QC « needs changes ».", LIVRAISON_FIGEE: "Order delivered: after a « needs changes », reopen the assembly first before reopening a part.", PARTIE_DEJA_COMMENCEE: "Not possible: a step is already ticked or a link already set on this order.", COMMANDE_TERMINEE: "Not possible: the order is finished (QC OK).", PAS_UNE_PARTIE_UNIQUE: "This order is already split into parts.", PAS_DEUX_PARTIES: "This order is not split into Intro / Body.", ACTION_INCONNUE: "Unknown action.", JOB_A_PARTIES: "This order is split into parts: tick the step in the relevant part.", PARTIES_NON_LIVREES: "All parts must be delivered before delivering the order.", MONTEUR_INCONNU: "Unknown editor.", MONTEUR_DESACTIVE: "Your access is disabled for now.", COMMANDE_COMMENCEE: "Not possible: a step is already ticked, QC has decided or a link is set. Only an order that has not started can be deleted.", COMMANDE_FACTUREE: "Not possible: this order is already on an invoice.", INTROUVABLE: "Order not found (already deleted?)." },
     tabs: { prod: "Production", equipe: "Team", tarifs: "Pricing", factures: "Invoices", rdv: "Appointments", recrut: "Recruitment", grille: "Grid", rituels: "Routines" },
     gh: { notYou: "Not you?", sharedFallback: "Team view unavailable with this account: sign in with your personal account.", morning: "Morning routines", prios: "Today's 3 priorities", week: "Last 7 days", tz: "Bali time", loading: "Loading…", retry: "Retry",
       rit: { bilan_veille: "Read yesterday's recap", agenda_jour: "Check today's agenda and appointments", relances_jour: "Prepare today's follow-ups", nouveaux_contacts: "Spot the new contacts to handle", crm_a_jour: "Check the CRM is up to date" },
@@ -995,6 +1017,41 @@ $("#ordm").addEventListener("click", (e) => { if (e.target === $("#ordm")) close
 $("#ordQ").addEventListener("input", (e) => { ordQ = e.target.value.trim().toLowerCase(); renderOrders(); });
 document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("#ordm").hidden) closeOrders(); });
 
+/* ---- Suppression d'une commande (21/10, supabase/suppression_commande_v1.sql). Droit : admin / dispatch / qualité, par compte nominatif
+   (RPC job_delete) ou par lien perso (RPC team_job_delete, Putu et Rania) ; jamais un monteur. Seulement une commande PAS commencée : aucune
+   étape cochée (commande ou partie), qualité en attente, aucun lien frame.io, pas de facture. Le bouton n'apparaît que dans ce cas, et la base
+   refuse de toute façon (COMMANDE_COMMENCEE / COMMANDE_FACTUREE). Définitif + journal jobs_deleted ; rushes du PC effacés au prochain passage. */
+const canDelete = (j) => !!profile && isAdmin() && !isEditor() && !j.started_at && !j.half_at && !j.delivered_at && j.qc_status === "pending" && !j.invoice_id
+  && !(j.qc_round > 0) && !j.parts_ready_at && !String(j.frameio_url || "").trim() && !partsOf(j).some((p) => p.started_at || p.half_at || p.delivered_at || String(p.frameio_url || "").trim());
+let delId = null;
+function openDelete(id) {
+  const j = jobs.find((x) => x.id === id); if (!j || !canDelete(j)) return;
+  const D = t("del"); delId = id;
+  $("#delT").textContent = D.title; $("#delH").textContent = D.hint; $("#delO").textContent = D.only;
+  $("#delWho").innerHTML = `<b>${esc(j.client_name)}</b> · ${esc(j.project)}<br/><span style="color:var(--taupe)">${esc(j.token)}${j.work_to_do ? " · " + esc(j.work_to_do) : ""}</span>`;
+  $("#delCancel").textContent = D.cancel; $("#delGo").textContent = D.go; $("#delGo").disabled = false;
+  const m = $("#delMsg"); m.textContent = ""; m.classList.remove("ok");
+  $("#delm").hidden = false; $("#delCancel").focus();
+}
+const closeDelete = () => { $("#delm").hidden = true; delId = null; };
+$("#delX").addEventListener("click", closeDelete);
+$("#delCancel").addEventListener("click", closeDelete);
+$("#delm").addEventListener("click", (e) => { if (e.target === $("#delm")) closeDelete(); });
+document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("#delm").hidden) closeDelete(); });
+$("#delGo").addEventListener("click", async () => {
+  if (!delId) return;
+  const D = t("del"), id = delId, b = $("#delGo"), m = $("#delMsg");
+  b.disabled = true; m.classList.remove("ok"); m.textContent = D.busy;
+  let r; try { r = LINKED ? await sb.rpc("team_job_delete", { p_key: LINK, p_job: id }) : await sb.rpc("job_delete", { p_job: id }); } catch (e) { r = { error: e }; }
+  const linkErr = !r.error && r.data && r.data.error ? String(r.data.error) : "";
+  const err = r.error ? (r.error.code === "PGRST202" ? D.noFn : errText(r.error)) : (linkErr ? errText({ message: linkErr }) : "");
+  if (err) { m.textContent = err; b.disabled = false; if (linkErr) linkProblem(linkErr); return; }
+  m.classList.add("ok"); m.textContent = "✓ " + D.done;
+  jobs = jobs.filter((x) => x.id !== id); openIds.delete(id); renderStats(); renderBoard();
+  setTimeout(() => { if (delId === id) closeDelete(); }, 900);
+  await load(false);
+});
+
 function visible() {
   return byEditor(jobs).filter((j) => {
     if (filter === "na" && !isUnassigned(j)) return false;
@@ -1054,6 +1111,7 @@ function renderBoard() {
           ${multi && isEditor() ? "" : `<b style="margin-top:8px">${t("notes")}</b><input class="in" data-field="notes" data-id="${j.id}" value="${esc(j.notes || "")}" ${ed && !(multi && isEditor()) ? "" : "disabled"}/>${fbHtml(j.id, "notes")}<span class="help">${esc(t("notesHelp"))}</span>`}
           ${multi ? partNotes(j) : reshapeBlock(j)}
           ${canMoney() && !LINKED ? amountBlock(j) : ""}
+          ${canDelete(j) ? `<button type="button" class="btn ghost del" data-deljob="${j.id}">${t("del").btn}</button>` : ""}
         </div>
       </div>
     </div>`;
@@ -1093,6 +1151,7 @@ function amountBlock(j) {
 function wireBoard() {
   const B = $("#board");
   B.querySelectorAll("[data-recalc]").forEach((b) => b.addEventListener("click", async () => { const { error } = await sb.rpc("price_job_team",{ p_job: b.dataset.recalc }); if (error) alert(error.message); await load(false); }));
+  B.querySelectorAll("[data-deljob]").forEach((b) => b.addEventListener("click", (ev) => { ev.stopPropagation(); openDelete(b.dataset.deljob); }));
   B.querySelectorAll("[data-more]").forEach((b) => b.addEventListener("click", () => { const on = b.closest(".job").classList.toggle("open"); on ? openIds.add(b.dataset.more) : openIds.delete(b.dataset.more); }));
   B.querySelectorAll("[data-copy]").forEach((b) => b.addEventListener("click", async () => {
     const j = jobs.find((x) => x.id === b.dataset.copy); if (!j || !j.files_path) return;
