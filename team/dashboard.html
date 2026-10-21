@@ -2045,9 +2045,12 @@ async function saveRecruitAv() {
 }
 
 /* ===== données ===== */
-// monteur : lecture par jobs_visible() (contact et e-mail du client masqués par la base) ; PGRST202 = SQL du lot A pas encore appliqué -> table directe
+// TOUT LE MONDE lit par jobs_visible() (21/10, jobs_money_v1.sql) : la base masque contact + e-mail pour un monteur, et les montants
+// (amount, amount_override, lines, pricing_missing) pour tout rôle autre que admin — avant, Putu lisait jobs.amount par l'API alors que
+// l'écran le lui cachait. Après la migration, `from("jobs").select("*")` est refusé (42501) ; on ne le garde qu'en secours si la RPC manque (PGRST202).
 async function fetchJobs() {
-  if (isEditor()) { const r = await sb.rpc("jobs_visible").order("created_at", { ascending: false }).limit(400); if (!(r.error && r.error.code === "PGRST202")) return r; }
+  const r = await sb.rpc("jobs_visible").order("created_at", { ascending: false }).limit(400);
+  if (!(r.error && r.error.code === "PGRST202")) return r;
   return sb.from("jobs").select("*").order("created_at", { ascending: false }).limit(400);
 }
 // lien personnel : une seule fonction renvoie tout ce que ce lien a le droit de voir (supabase/lot_b_liens.sql)
