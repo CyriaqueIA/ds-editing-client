@@ -45,7 +45,7 @@
     .intro h1{margin:18px 0 8px;font-size:clamp(34px,6vw,58px)}
     .intro p{margin:0;color:var(--taupe);max-width:60ch;font-size:15px;line-height:1.55}
 
-    .steps{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin:26px 0 22px}
+    .steps{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin:26px 0 22px}
     .step{padding:10px 10px 8px;border:1px solid var(--line);border-radius:14px;background:var(--surface);position:relative;overflow:hidden;cursor:pointer;transition:border-color .2s}
     .step .n{font-family:'Geist',system-ui,sans-serif;font-weight:600;font-size:10px;letter-spacing:.06em;font-variant-numeric:tabular-nums;color:var(--taupe)}
     .step .t{font-size:12px;margin-top:3px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -53,7 +53,8 @@
     .step.active{border-color:var(--line-strong)}
     .step.active::after,.step.done::after{width:100%}
     .step.done .n{color:var(--ok)}
-    @media (max-width:640px){.steps{grid-template-columns:repeat(3,1fr)}}
+    .step.skip{opacity:.38;cursor:default}   /* brief fourni : 05 Fichiers et 06 Brief sautées */
+    @media (max-width:640px){.steps{grid-template-columns:repeat(4,1fr)}}
 
     .card{background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.09);border-radius:var(--radius);padding:22px;margin-bottom:16px;-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
     .card h2{margin:0 0 4px;font-size:22px;font-weight:600;letter-spacing:-.02em}
@@ -154,6 +155,14 @@
     .drop{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:82px;border:1px dashed var(--line-strong);border-radius:14px;background:rgba(255,255,255,.03);cursor:pointer;color:var(--taupe);font-size:13px;text-align:center;padding:12px;transition:border-color .2s,background .2s,color .2s}
     .drop .up{color:var(--accent-blue)}
     .drop.over{border-color:rgba(220,230,240,.5);background:var(--amber-soft);color:var(--cream)}
+    /* Étape 04 — Votre brief : zone de dépôt du document du client + liste des fichiers retenus (en mémoire jusqu'à l'envoi) */
+    .drop.wide{min-height:120px;margin-top:18px}
+    .drop .ks{font-size:12px;color:var(--taupe)}
+    .bfiles{display:grid;gap:6px;margin-top:10px}
+    .bf{display:flex;align-items:center;gap:10px;padding:8px 12px;border:1px solid var(--line);border-radius:10px;font-size:13px;background:var(--surface)}
+    .bf span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .bf small{color:var(--taupe);font-variant-numeric:tabular-nums}
+    .bf button{background:none;border:0;color:var(--taupe);font-size:18px;line-height:1;cursor:pointer;padding:0 4px}
     .drop.has{border-style:solid;border-color:rgba(220,227,234,.5);background:var(--surface);color:var(--cream)}
     .drop img{max-height:56px;max-width:80%;object-fit:contain;border-radius:6px}
     .cta-block{margin:22px 0 4px;padding-top:18px;border-top:1px solid var(--line)}
@@ -321,7 +330,7 @@
       .hd .client{min-width:0;flex:0 1 auto}
       .hd .client span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:120px}
       .lang{margin-left:0;flex:none;min-height:44px;min-width:44px}
-      .steps{grid-template-columns:repeat(3,minmax(0,1fr))}
+      .steps{grid-template-columns:repeat(4,minmax(0,1fr))}
       .row,.choices.two,.choices.three,.brandkit,.recap,.next{grid-template-columns:minmax(0,1fr)}
       .fontpick{grid-template-columns:minmax(0,1fr)}
       .links .l{min-width:0}
@@ -420,7 +429,31 @@
     </section>
 
     <!-- 4. Fichiers -->
+    <!-- 4. Votre brief (QCM du 21/10/2026) : deux cases. « J'ai déjà mon brief » = dépôt du document (fichiers et/ou liens) + e-mail
+         + case de responsabilité, puis Envoi direct : 05 — Fichiers et 06 — Brief sont sautées. Les liens de rushes doivent être
+         dans le brief : le robot des 10 min (ds-editing-ops/depots/brief-robot.mjs) lit le document, sort le brief FR/EN/ID, les
+         liens et la date, et pose des drapeaux pour Putu. « Je n'ai pas de brief » = parcours guidé habituel. Même écran en dépôt interne (?by=). -->
     <section class="card panel" data-step="3">
+      <h2 data-i="s4b.title"></h2>
+      <p class="hint" data-i="s4b.hint"></p>
+      <div class="choices two" id="briefMode"></div>
+      <div id="ownWrap" hidden>
+        <label class="drop wide" id="dropBrief"><input type="file" multiple accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.webp,.gif,.txt,.md,application/pdf,image/*" hidden id="briefFile"/><span class="up"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 15V4M7 9l5-5 5 5M4 15v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4"/></svg></span><span class="dl" data-i="own.drop"></span><span class="ks" data-i="own.dropSub"></span></label>
+        <div class="bfiles" id="briefFiles"></div>
+        <label class="f" data-i="own.links"></label>
+        <p class="ks" data-i="own.linksSmall"></p>
+        <div class="links" id="briefLinks"></div>
+        <button type="button" class="add" data-add="briefLinks" data-i="add.link"></button>
+        <p class="note" data-i="own.rushNote"></p>
+        <label class="f" for="emailOwn" data-i="f.email"></label>
+        <p class="ks" data-i="f.emailSmall"></p>
+        <input class="in" id="emailOwn" type="email" data-ph="ph.email" autocomplete="email"/>
+        <label class="terms" for="briefAck"><input type="checkbox" id="briefAck"/><span data-i="own.ack"></span></label>
+      </div>
+    </section>
+
+    <!-- 5. Fichiers (parcours guidé) -->
+    <section class="card panel" data-step="4">
       <h2 data-i="s4.title"></h2>
       <p class="hint" data-i="s4.hint"></p>
       <label class="f" data-i="f.rushes"></label>
@@ -443,14 +476,14 @@
       <div class="kh" style="margin-top:22px"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 5h14M12 5v14M9 19h6"/></svg><span data-i="bk.font"></span></div>
       <div class="fontpick" id="fontpick"><button type="button" data-font="own" data-i="bk.fontOwn"></button><button type="button" data-font="team" data-i="bk.fontTeam"></button></div>
       <input class="in" id="fontName" data-ph="ph.font" style="margin-top:10px"/>
-      <!-- Les vidéos d'inspiration (#references) vivent désormais à l'étape 05 — Brief (« 2 vidéos que vous aimez ») : une seule liste, lue par le monteur. -->
+      <!-- Les vidéos d'inspiration (#references) vivent désormais à l'étape 06 — Brief (« 2 vidéos que vous aimez ») : une seule liste, lue par le monteur. -->
     </section>
 
     <!-- 5. Brief structuré (décision Cyriaque, 20/10/2026) : un bloc « Direction » commun, puis UN bloc par type de livrable commandé
          (épisode / VSL 16:9, reels 9:16, miniature), affiché seulement si ce type est dans la commande. La page continue d'envoyer
          `description` = texte lisible assemblé (briefText) — le robot, le Google Doc, le mail et la vue équipe le lisent tel quel —
          ET details.brief = l'objet structuré (briefData). Obligatoire pour un client ; dépôt interne (?by=) : affiché, jamais bloquant. -->
-    <section class="card panel" data-step="4" id="briefPanel">
+    <section class="card panel" data-step="5" id="briefPanel">
       <h2 data-i="s5.title"></h2>
       <p class="hint" data-i="s5.hint"></p>
       <div class="block">
@@ -535,8 +568,8 @@
       <input class="in" id="autres" name="autres" data-ph="ph.autres"/>
     </section>
 
-    <!-- 6. Récap -->
-    <section class="card panel" data-step="5">
+    <!-- 7. Récap -->
+    <section class="card panel" data-step="6">
       <h2 data-i="s6.title"></h2>
       <p class="hint" data-i="s6.hint"></p>
       <div class="recap" id="recap"></div>
@@ -604,8 +637,16 @@ const CTA_EXAMPLES = (window.DS_PREVIEWS && window.DS_PREVIEWS.cta && window.DS_
 const I18N = {
   fr: {
     tagline:"Espace client", kicker:"Nouveau projet", title:"Envoyez-nous<br/>votre prochaine vidéo",
-    intro:"Six étapes, cinq minutes. Choisissez, collez vos liens, dites-nous ce que vous voulez. Vous recevez un lien de relecture frame.io dès que le premier montage est prêt.",
-    steps:["Produit","Formule","Extras","Fichiers","Brief","Envoi"],
+    intro:"Sept étapes, cinq minutes. Choisissez, collez vos liens, dites-nous ce que vous voulez. Vous recevez un lien de relecture frame.io dès que le premier montage est prêt.",
+    steps:["Produit","Formule","Extras","Votre brief","Fichiers","Brief","Envoi"],
+    // Étape 04 — Votre brief (QCM du 21/10/2026) : brief fourni par le client, ou parcours guidé
+    "s4b.title":"Votre brief","s4b.hint":"Vous avez déjà un brief complet ? Déposez-le et passez directement à l'envoi. Sinon, on vous guide en deux étapes.",
+    bm:{own:["J'ai déjà mon brief","Un document complet : format, structure, sous-titres, liens des rushes, date de livraison. Je le dépose, notre robot le lit, et je passe directement à l'envoi."],guided:["Je n'ai pas de brief","Guidez-moi : je colle mes liens de rushes et je réponds à quelques questions (étapes 05 et 06)."]},
+    "own.drop":"Glissez votre brief ici, ou cliquez","own.dropSub":"PDF, Word, image ou capture. 25 Mo max par fichier, plusieurs fichiers possibles.",
+    "own.links":"Ou un lien vers votre brief","own.linksSmall":"Google Doc, Notion… pensez à autoriser l'accès à toute personne disposant du lien.",
+    "own.rushNote":"Les liens de vos rushes (Google Drive, WeTransfer, Dropbox) doivent être écrits dans le brief : notre robot les lit et lance le téléchargement.",
+    "own.ack":"Mon brief est complet. DS Editing monte à partir de ce document. Ce qui n'y est pas = choix du monteur. La date de livraison écrite dans le brief fait foi.",
+    "own.inBrief":"dans le brief","own.recap":"Brief fourni : {n}","own.uploading":"Envoi du brief…","own.remove":"Retirer",
     "s1.title":"Votre projet","s1.hint":"Un nom, un produit. Le reste vient après.",
     "f.projet":"Nom du projet ou de l'épisode","ph.projet":"Ex. Épisode 12 — Dr Weber",
     "f.produit":"Ce que vous nous confiez","f.episodes":"Nombre d'épisodes",
@@ -647,7 +688,7 @@ const I18N = {
       drive:"Lien Google Drive non reconnu. Renvoie le lien de partage du fichier ou du dossier (« Partager » → « Copier le lien »).",
       dropbox:"Ce lien Dropbox n'est pas un lien de partage. Renvoie celui créé avec « Partager ».",
       manual:"{site} : on ne sait pas le télécharger automatiquement, on le récupérera à la main. Un dossier Drive, WeTransfer ou Dropbox arrive plus vite chez le monteur.",
-      move:"Déplacer vers les vidéos que vous aimez (étape 05 — Brief)"},
+      move:"Déplacer vers les vidéos que vous aimez (étape 06 — Brief)"},
     "s5.title":"Votre brief","s5.hint":"Plus c'est précis, plus le premier montage est juste. Une réponse par ligne, deux vidéos que vous aimez, et c'est parti.",
     // Brief structuré (20/10) : libellés des champs (clés plates, data-i), options des puces (brOpt) et mots du texte assemblé (brX)
     "br.dirT":"Direction","br.dirSub":"Le cadre commun à toutes les vidéos de cette commande.",
@@ -678,9 +719,10 @@ const I18N = {
     // Seuls les fichiers joints (logo, palette) vivent en mémoire et sont à redéposer : le texte le dit.
     "stale.text":"Une nouvelle version de ce formulaire est disponible. Rafraîchissez la page pour continuer : vos choix sont conservés sur cet appareil, seuls vos fichiers joints (logo, palette) sont à redéposer.","stale.btn":"Rafraîchir la page",
     units:{episode:["épisode","épisodes"],reel_basique:["reel standard","reels standard"],reel_signature:["reel premium","reels premium"],miniature:["miniature","miniatures"],trailer:["trailer","trailers"]},
-    err:{projet:"Donnez un nom au projet.",reel0:"Indiquez au moins un reel (étape 03 — Extras).",produit0:"Choisissez ce que vous nous confiez, à l'étape 01 — Produit.",produit:"Votre commande est encore vide : choisissez un produit à l'étape 01 — Produit et sa formule à l'étape 02 — Formule, ou un de vos packs à l'étape 01 sous « Vos vidéos ».",noVideo:"Il manque la vidéo : les extras s'ajoutent à un épisode ou à un pack. Choisissez votre épisode à l'étape 02 — Formule, ou un de vos packs à l'étape 01 — Produit. On garde le reste de votre sélection.",formule:"Choisissez une formule ou un pack à l'étape 02 — Formule.",rushes:"Ajoutez au moins un lien de rushes.",rushesBad:"Un de vos liens de rushes n'est pas un fichier téléchargeable (étape 04 — Fichiers) : corrigez-le, ou déplacez-le vers les vidéos que vous aimez.",contact:"Indiquez un contact et un moyen de le joindre.",
-      brTone:"Choisissez un ton et un style (étape 05 — Brief).",brMusic:"Musique : au choix du monteur, fournie, ou non (étape 05 — Brief).",brCaptions:"Captions : mot à mot, par phrases, ou non (étape 05 — Brief).",brCta:"CTA de fin : répondez oui ou non (étape 05 — Brief).",brAvoid:"Dites-nous ce qu'il faut éviter, ou cochez « Rien de particulier » (étape 05 — Brief).",brLikes:"Collez au moins deux liens de vidéos que vous aimez (étape 05 — Brief).",
-      brEpDur:"Durée cible de la vidéo 16:9 : complète, ou coupée à combien de minutes (étape 05 — Brief).",brEpHook:"Hook de la vidéo 16:9 : au choix du monteur, ou vos timecodes (étape 05 — Brief).",brReelDur:"Durée cible des reels : 30, 45, 60 s ou autre (étape 05 — Brief).",brReelHook:"Hook des reels : au choix du monteur, ou vos timecodes (étape 05 — Brief).",brThumb:"Donnez le texte de la miniature (étape 05 — Brief).",email:"Indiquez un e-mail valide, c'est là qu'arrivent la confirmation et le suivi.",send:"L'envoi a échoué. Réessayez, ou écrivez-nous sur WhatsApp.",terms:"Cochez les conditions de collaboration pour envoyer la commande.",
+    err:{bmode:"Choisissez : j'ai déjà mon brief, ou guidez-moi (étape 04 — Votre brief).",bfiles:"Déposez votre brief : un fichier ou un lien (étape 04 — Votre brief).",no_brief:"Déposez votre brief : un fichier ou un lien (étape 04 — Votre brief).",back:"Cochez la case : votre brief est complet et fait foi (étape 04 — Votre brief).",upload:"L'envoi du brief a échoué. Réessayez, ou écrivez-nous sur WhatsApp.",bigfile:"Un fichier dépasse 25 Mo : déposez-le sur Google Drive et collez le lien.",badtype:"Format non accepté : PDF, Word, image ou texte.",
+      projet:"Donnez un nom au projet.",reel0:"Indiquez au moins un reel (étape 03 — Extras).",produit0:"Choisissez ce que vous nous confiez, à l'étape 01 — Produit.",produit:"Votre commande est encore vide : choisissez un produit à l'étape 01 — Produit et sa formule à l'étape 02 — Formule, ou un de vos packs à l'étape 01 sous « Vos vidéos ».",noVideo:"Il manque la vidéo : les extras s'ajoutent à un épisode ou à un pack. Choisissez votre épisode à l'étape 02 — Formule, ou un de vos packs à l'étape 01 — Produit. On garde le reste de votre sélection.",formule:"Choisissez une formule ou un pack à l'étape 02 — Formule.",rushes:"Ajoutez au moins un lien de rushes.",rushesBad:"Un de vos liens de rushes n'est pas un fichier téléchargeable (étape 05 — Fichiers) : corrigez-le, ou déplacez-le vers les vidéos que vous aimez.",contact:"Indiquez un contact et un moyen de le joindre.",
+      brTone:"Choisissez un ton et un style (étape 06 — Brief).",brMusic:"Musique : au choix du monteur, fournie, ou non (étape 06 — Brief).",brCaptions:"Captions : mot à mot, par phrases, ou non (étape 06 — Brief).",brCta:"CTA de fin : répondez oui ou non (étape 06 — Brief).",brAvoid:"Dites-nous ce qu'il faut éviter, ou cochez « Rien de particulier » (étape 06 — Brief).",brLikes:"Collez au moins deux liens de vidéos que vous aimez (étape 06 — Brief).",
+      brEpDur:"Durée cible de la vidéo 16:9 : complète, ou coupée à combien de minutes (étape 06 — Brief).",brEpHook:"Hook de la vidéo 16:9 : au choix du monteur, ou vos timecodes (étape 06 — Brief).",brReelDur:"Durée cible des reels : 30, 45, 60 s ou autre (étape 06 — Brief).",brReelHook:"Hook des reels : au choix du monteur, ou vos timecodes (étape 06 — Brief).",brThumb:"Donnez le texte de la miniature (étape 06 — Brief).",email:"Indiquez un e-mail valide, c'est là qu'arrivent la confirmation et le suivi.",send:"L'envoi a échoué. Réessayez, ou écrivez-nous sur WhatsApp.",terms:"Cochez les conditions de collaboration pour envoyer la commande.",
       key:"Ouvrez cet espace depuis votre lien personnel ou l'Espace client pour envoyer votre commande.",keyLink:"Aller à l'Espace client",bad_key:"Votre accès n'est pas reconnu pour ce studio. Ouvrez cet espace depuis votre lien personnel ou l'Espace client.",bad_email:"L'e-mail n'est pas valide. Corrigez-le à l'étape Brief.",no_project:"Donnez un nom au projet, à l'étape Produit.",no_rushes:"Aucun lien de rushes valide. Collez au moins un lien complet (https://…) à l'étape Fichiers.",rate_limit:"Beaucoup de commandes viennent d'être envoyées depuis cet espace. Réessayez dans une heure, ou écrivez-nous sur WhatsApp."},
     "team.note":"Dépôt interne par {n} pour le compte du client. L'e-mail saisi à l'étape Brief recevra les mails automatiques (confirmation, suivi, facture) : mets le tien si le client ne doit rien recevoir.",
     "s6.terms":"J'accepte les conditions de collaboration DS Editing : facture hebdomadaire, paiement à réception, pénalité de 20 % par semaine de retard.","s6.termsLink":"Lire les conditions","ok.space":"Ouvrir mon espace (commandes, factures)",
@@ -691,8 +733,15 @@ const I18N = {
   },
   en: {
     tagline:"Client space", kicker:"New project", title:"Send us<br/>your next video",
-    intro:"Six steps, five minutes. Choose, paste your links, tell us what you want. You get a frame.io review link as soon as the first cut is ready.",
-    steps:["Product","Package","Extras","Files","Brief","Send"],
+    intro:"Seven steps, five minutes. Choose, paste your links, tell us what you want. You get a frame.io review link as soon as the first cut is ready.",
+    steps:["Product","Package","Extras","Your brief","Files","Brief","Send"],
+    "s4b.title":"Your brief","s4b.hint":"Already have a complete brief? Drop it and go straight to sending. Otherwise, we guide you in two steps.",
+    bm:{own:["I already have my brief","One complete document: format, structure, captions, footage links, delivery date. I drop it, our robot reads it, and I go straight to sending."],guided:["I don't have a brief","Guide me: I paste my footage links and answer a few questions (steps 05 and 06)."]},
+    "own.drop":"Drop your brief here, or click","own.dropSub":"PDF, Word, image or screenshot. 25 MB max per file, several files allowed.",
+    "own.links":"Or a link to your brief","own.linksSmall":"Google Doc, Notion… make sure anyone with the link can open it.",
+    "own.rushNote":"Your footage links (Google Drive, WeTransfer, Dropbox) must be written in the brief: our robot reads them and starts the download.",
+    "own.ack":"My brief is complete. DS Editing edits from this document. Anything not in it = editor's choice. The delivery date written in the brief is binding.",
+    "own.inBrief":"in the brief","own.recap":"Brief provided: {n}","own.uploading":"Uploading the brief…","own.remove":"Remove",
     "s1.title":"Your project","s1.hint":"A name, a product. The rest comes next.",
     "f.projet":"Project or episode name","ph.projet":"e.g. Episode 12 — Dr Weber",
     "f.produit":"What you're sending us","f.episodes":"Number of episodes",
@@ -731,7 +780,7 @@ const I18N = {
       drive:"Google Drive link not recognised. Send the file or folder share link (“Share” → “Copy link”).",
       dropbox:"This Dropbox link isn't a share link. Send the one created with “Share”.",
       manual:"{site}: we can't download it automatically, we'll fetch it by hand. A Drive, WeTransfer or Dropbox folder reaches the editor faster.",
-      move:"Move to the videos you love (step 05 — Brief)"},
+      move:"Move to the videos you love (step 06 — Brief)"},
     "s5.title":"Your brief","s5.hint":"The more precise, the better the first cut. One answer per line, two videos you love, and off we go.",
     "br.dirT":"Direction","br.dirSub":"The common frame for every video in this order.",
     "br.tone":"Tone & style","br.toneFreePh":"Describe the tone in a few words",
@@ -759,9 +808,10 @@ const I18N = {
     saved:"Draft saved on this device", empty:"Your order will appear here",
     "stale.text":"A newer version of this form is available. Refresh the page to continue: your choices are kept on this device, only your attached files (logo, palette) need to be dropped again.","stale.btn":"Refresh the page",
     units:{episode:["episode","episodes"],reel_basique:["standard reel","standard reels"],reel_signature:["premium reel","premium reels"],miniature:["thumbnail","thumbnails"],trailer:["trailer","trailers"]},
-    err:{projet:"Give the project a name.",reel0:"Add at least one reel (step 03 — Extras).",produit0:"Choose what you're sending us, in step 01 — Product.",produit:"Your order is still empty: pick a product in step 01 — Product and its package in step 02 — Package, or one of your packs in step 01 under “Your videos”.",noVideo:"The video itself is missing: extras come on top of an episode or a pack. Pick your episode in step 02 — Package, or one of your packs in step 01 — Product. We keep the rest of your selection.",formule:"Choose a package or a pack in step 02 — Package.",rushes:"Add at least one footage link.",rushesBad:"One of your footage links isn't a downloadable file (step 04 — Files): fix it, or move it to the videos you love.",contact:"Give us a contact and a way to reach them.",
-      brTone:"Pick a tone and style (step 05 — Brief).",brMusic:"Music: editor's choice, provided, or none (step 05 — Brief).",brCaptions:"Captions: word by word, by sentence, or none (step 05 — Brief).",brCta:"End CTA: answer yes or no (step 05 — Brief).",brAvoid:"Tell us what to avoid, or tick “Nothing in particular” (step 05 — Brief).",brLikes:"Paste at least two links to videos you love (step 05 — Brief).",
-      brEpDur:"Target length of the 16:9 video: full, or cut down to how many minutes (step 05 — Brief).",brEpHook:"Hook of the 16:9 video: editor's choice, or your timecodes (step 05 — Brief).",brReelDur:"Target length of the reels: 30, 45, 60 s or other (step 05 — Brief).",brReelHook:"Hook of the reels: editor's choice, or your timecodes (step 05 — Brief).",brThumb:"Give us the thumbnail text (step 05 — Brief).",email:"Enter a valid email, that's where the confirmation and tracking go.",send:"Sending failed. Try again, or message us on WhatsApp.",terms:"Tick the terms of collaboration to send the order.",
+    err:{bmode:"Choose: I already have my brief, or guide me (step 04 — Your brief).",bfiles:"Drop your brief: a file or a link (step 04 — Your brief).",no_brief:"Drop your brief: a file or a link (step 04 — Your brief).",back:"Tick the box: your brief is complete and binding (step 04 — Your brief).",upload:"Uploading the brief failed. Try again, or message us on WhatsApp.",bigfile:"A file is over 25 MB: put it on Google Drive and paste the link.",badtype:"Format not accepted: PDF, Word, image or text.",
+      projet:"Give the project a name.",reel0:"Add at least one reel (step 03 — Extras).",produit0:"Choose what you're sending us, in step 01 — Product.",produit:"Your order is still empty: pick a product in step 01 — Product and its package in step 02 — Package, or one of your packs in step 01 under “Your videos”.",noVideo:"The video itself is missing: extras come on top of an episode or a pack. Pick your episode in step 02 — Package, or one of your packs in step 01 — Product. We keep the rest of your selection.",formule:"Choose a package or a pack in step 02 — Package.",rushes:"Add at least one footage link.",rushesBad:"One of your footage links isn't a downloadable file (step 05 — Files): fix it, or move it to the videos you love.",contact:"Give us a contact and a way to reach them.",
+      brTone:"Pick a tone and style (step 06 — Brief).",brMusic:"Music: editor's choice, provided, or none (step 06 — Brief).",brCaptions:"Captions: word by word, by sentence, or none (step 06 — Brief).",brCta:"End CTA: answer yes or no (step 06 — Brief).",brAvoid:"Tell us what to avoid, or tick “Nothing in particular” (step 06 — Brief).",brLikes:"Paste at least two links to videos you love (step 06 — Brief).",
+      brEpDur:"Target length of the 16:9 video: full, or cut down to how many minutes (step 06 — Brief).",brEpHook:"Hook of the 16:9 video: editor's choice, or your timecodes (step 06 — Brief).",brReelDur:"Target length of the reels: 30, 45, 60 s or other (step 06 — Brief).",brReelHook:"Hook of the reels: editor's choice, or your timecodes (step 06 — Brief).",brThumb:"Give us the thumbnail text (step 06 — Brief).",email:"Enter a valid email, that's where the confirmation and tracking go.",send:"Sending failed. Try again, or message us on WhatsApp.",terms:"Tick the terms of collaboration to send the order.",
       key:"Open this space from your personal link or the Client space to send your order.",keyLink:"Go to the Client space",bad_key:"Your access isn't recognised for this studio. Open this space from your personal link or the Client space.",bad_email:"The email isn't valid. Fix it in the Brief step.",no_project:"Give the project a name, in the Product step.",no_rushes:"No valid footage link. Paste at least one full link (https://…) in the Files step.",rate_limit:"A lot of orders were just sent from this space. Try again in an hour, or message us on WhatsApp."},
     "team.note":"Internal order placed by {n} on behalf of the client. The email entered in the Brief step receives the automatic emails (confirmation, tracking, invoice): use yours if the client must not receive anything.",
     "s6.terms":"I accept the DS Editing terms of collaboration: weekly invoice, payment on receipt, 20% penalty per week late.","s6.termsLink":"Read the terms","ok.space":"Open my space (orders, invoices)",
@@ -967,7 +1017,9 @@ let accessWarn = "";    // avertissement d'accès (pas de clé, clé non reconnu
 const clientLabel = () => (studio && studio.name) || (client && client.client) || (slug ? slug.split("-").filter(Boolean).map(cap).join(" ") : "Demo");
 const KEY = "ds-depot-" + (slug || "demo");
 let step = 0;
+const LAST = 6;                                      // 7 étapes (0 à 6) depuis l'étape 04 — Votre brief (21/10/2026)
 const draft = Object.assign({ qty: {}, episodes: 1 }, load());
+const ownBrief = () => draft.briefMode === "own";    // brief fourni par le client : 05 — Fichiers et 06 — Brief sautées
 /* Brouillon relu : on le remet d'aplomb avant le premier rendu. Un brouillon d'avant cette version portait
    formule / bundle / single_cam / multicam / facecam séparément — donc potentiellement DEUX épisodes :
    on le convertit en un seul (`draft.offre`), et on efface les anciens champs pour de bon. */
@@ -1012,8 +1064,9 @@ $("#langBtn").addEventListener("click", () => { lang = lang === "fr" ? "en" : "f
 
 /* ---------------- rendus ---------------- */
 function renderSteps() {
-  $("#steps").innerHTML = t("steps").map((s, i) => `<div class="step ${i === step ? "active" : ""} ${i < step ? "done" : ""}" data-go="${i}"><div class="n">0${i + 1}</div><div class="t">${s}</div></div>`).join("");
-  document.querySelectorAll(".step[data-go]").forEach((el) => el.addEventListener("click", () => { const g = +el.dataset.go; if (g < step) go(g); }));
+  const skip = (i) => ownBrief() && (i === 4 || i === 5);   // brief fourni : 05 — Fichiers et 06 — Brief grisées, jamais ouvertes
+  $("#steps").innerHTML = t("steps").map((s, i) => `<div class="step ${i === step ? "active" : ""} ${i < step && !skip(i) ? "done" : ""} ${skip(i) ? "skip" : ""}" data-go="${i}"><div class="n">0${i + 1}</div><div class="t">${s}</div></div>`).join("");
+  document.querySelectorAll(".step[data-go]").forEach((el) => el.addEventListener("click", () => { const g = +el.dataset.go; if (g < step && !skip(g)) go(g); }));
   document.querySelectorAll(".panel").forEach((p) => p.classList.toggle("active", +p.dataset.step === step));
 }
 // priceTxt vide = aucune pastille de prix (une carte sans prix dans la grille du client reste muette)
@@ -1317,7 +1370,7 @@ function briefData() {
   return out;
 }
 /* Ce qui manque au brief, pour un client (dépôt interne ?by= : rien n'est bloquant, Putu n'a pas toujours l'info).
-   Renvoie { msg, sel } : le message (il nomme l'étape 05 — Brief) et l'élément à marquer / faire défiler. */
+   Renvoie { msg, sel } : le message (il nomme l'étape 06 — Brief) et l'élément à marquer / faire défiler. */
 function briefError() {
   if (BY) return null;
   const e = t("err"), b = draft.brief, bad = (sel, msg) => ({ sel, msg });
@@ -1339,7 +1392,7 @@ function briefError() {
   return null;
 }
 /* Les deux listes de liens. « rushes » passe par le filtre client/links.js : un lien qu'on ne peut pas
-   télécharger est dit SOUS SON CHAMP, à la saisie, et bloque l'étape 04 (validate). « references » (étape 05 — Brief,
+   télécharger est dit SOUS SON CHAMP, à la saisie, et bloque l'étape 04 (validate). « references » (étape 06 — Brief,
    « 2 vidéos que vous aimez ») reste permissif : on n'y télécharge rien, donc tout lien y est bon à prendre pour le monteur. */
 function renderLinks(key) {
   const list = (draft[key] && draft[key].length ? draft[key] : [""]);
@@ -1422,11 +1475,11 @@ function priceText() {
 }
 function renderNav() {
   $("#prev").style.visibility = step === 0 ? "hidden" : "visible";
-  $("#next").textContent = step === 5 ? t("btn.send") : t("btn.next");
+  $("#next").textContent = step === LAST ? t("btn.send") : t("btn.next");
   /* La barre collante ne porte PLUS l'addition pendant le parcours : le client voyait le total du paquet
      monter dès son premier clic, alors que la règle maison est le prix à l'unité. Elle dit ce qu'il a choisi
      et que son brouillon est gardé. Le total chiffré n'apparaît qu'au récap, après les lignes à l'unité. */
-  const c = commande(), tot = step === 5 ? orderTotal() : undefined;
+  const c = commande(), tot = step === LAST ? orderTotal() : undefined;
   const totTxt = tot === undefined || NO_PRICE ? "" : `${esc(tot === null ? t("quote") : money(tot, cur))} · `;
   $("#summary").innerHTML = c ? `<b>${esc(c)}</b><br/>${totTxt}${t("saved")}` : `${t("empty")}<br/>${t("saved")}`;
   $("#keyWarn").innerHTML = accessWarn;                                // visible à chaque étape, pas seulement à la première
@@ -1522,6 +1575,73 @@ document.querySelectorAll("[data-file]").forEach((inp) => {
   ["dragleave", "drop"].forEach((ev) => zone.addEventListener(ev, (e) => { e.preventDefault(); zone.classList.remove("over"); }));
   zone.addEventListener("drop", (e) => takeFile(k, e.dataTransfer.files[0]));
 });
+
+/* ---------------- Étape 04 — Votre brief (QCM du 21/10/2026) ----------------
+   Deux cases. « J'ai déjà mon brief » (draft.briefMode = "own") : le client dépose son document (fichiers et/ou liens), donne
+   son e-mail, coche qu'il en répond, puis passe directement à l'Envoi : 05 — Fichiers et 06 — Brief sont sautées. Les liens de
+   rushes DOIVENT être dans le brief : le robot des 10 min (ds-editing-ops/depots/brief-robot.mjs) les lit, sort le brief FR/EN/ID
+   et la date, et pose des drapeaux pour Putu (délai court, quantité ≠ commande, à lire à la main). Les fichiers vivent en mémoire
+   (comme logo et palette) : à redéposer après un rechargement. Le téléversement se fait à l'envoi (uploadBriefFiles). */
+const OWN_FILES = [];                 // { name, size, type, file }
+let BRIEF_UPLOADED = [];              // posé par submit() : [{ path, name, size, type }] → details.brief_files
+const OWN_MAX = 25 * 1024 * 1024;     // = file_size_limit du bucket « briefs »
+const OWN_TYPES = { pdf: "application/pdf", doc: "application/msword", docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document", png: "image/png", jpg: "image/jpeg", jpeg: "image/jpeg", webp: "image/webp", gif: "image/gif", txt: "text/plain", md: "text/markdown" };
+const ownType = (f) => OWN_TYPES[(f.name.split(".").pop() || "").toLowerCase()] || "";
+const ownLinks = () => linkList("briefLinks").filter((u) => /^https?:\/\//i.test(u));
+function renderOwn() {
+  const B = t("bm");
+  $("#briefMode").innerHTML = ["own", "guided"].map((k) => `<div class="c ${draft.briefMode === k ? "on" : ""}" data-bm="${k}" role="button" tabindex="0"><div class="top"><span class="name">${esc(B[k][0])}</span></div><span class="desc">${esc(B[k][1])}</span></div>`).join("");
+  $("#briefMode").querySelectorAll("[data-bm]").forEach((c) => {
+    const pick = () => { draft.briefMode = c.dataset.bm; save(); $("#msg").textContent = ""; renderOwn(); renderSteps(); };
+    c.addEventListener("click", pick); c.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(); } });
+  });
+  $("#ownWrap").hidden = !ownBrief();
+  $("#briefFiles").innerHTML = OWN_FILES.map((f, i) => `<div class="bf"><span>${esc(f.name)}</span><small>${(f.size / 1048576).toFixed(1)} Mo</small><button type="button" data-ownrm="${i}" aria-label="${esc(t("own.remove"))}">×</button></div>`).join("");
+  $("#briefFiles").querySelectorAll("[data-ownrm]").forEach((b) => b.addEventListener("click", () => { OWN_FILES.splice(+b.dataset.ownrm, 1); renderOwn(); }));
+  $("#emailOwn").value = draft.email || "";
+  $("#briefAck").checked = !!draft.briefAck;
+}
+function takeOwn(files) {
+  const e = t("err");
+  for (const f of Array.from(files || [])) {
+    if (!f) continue;
+    if (f.size > OWN_MAX) { $("#msg").textContent = e.bigfile; continue; }
+    if (!ownType(f)) { $("#msg").textContent = e.badtype; continue; }
+    if (OWN_FILES.some((x) => x.name === f.name && x.size === f.size)) continue;
+    OWN_FILES.push({ name: f.name, size: f.size, type: ownType(f), file: f });
+  }
+  renderOwn();
+}
+{
+  const z = $("#dropBrief"), inp = $("#briefFile");
+  inp.addEventListener("change", () => { takeOwn(inp.files); inp.value = ""; });
+  ["dragenter", "dragover"].forEach((ev) => z.addEventListener(ev, (e) => { e.preventDefault(); z.classList.add("over"); }));
+  ["dragleave", "drop"].forEach((ev) => z.addEventListener(ev, (e) => { e.preventDefault(); z.classList.remove("over"); }));
+  z.addEventListener("drop", (e) => takeOwn(e.dataTransfer.files));
+}
+$("#emailOwn").addEventListener("input", () => { draft.email = $("#emailOwn").value; $("#email").value = draft.email; save(); });   // même e-mail qu'à l'étape 06
+$("#briefAck").addEventListener("change", () => { draft.briefAck = $("#briefAck").checked; save(); });
+function ownError() {
+  const e = t("err");
+  if (!OWN_FILES.length && !ownLinks().length) { const i = $("#briefLinks input"); if (i) i.classList.add("bad"); return e.bfiles; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(draft.email || "")) { $("#emailOwn").classList.add("bad"); return e.email; }
+  if (!draft.briefAck) { $("#briefAck").focus(); return e.back; }
+  return null;
+}
+// nom de fichier accepté par la politique du bucket (« slug/identifiant/nom », sans « / »), lisible sur le PC de Bali
+const safeFile = (n) => String(n).normalize("NFKD").replace(/[̀-ͯ]/g, "").replace(/[^\w.\- ()]+/g, "_").replace(/\s+/g, " ").trim().slice(0, 150) || "brief";
+async function uploadBriefFiles() {
+  const id = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(36).slice(2)).replace(/-/g, "").toLowerCase().slice(0, 24);
+  const out = [];
+  for (const f of OWN_FILES) {
+    const p = `${orderSlug()}/${id}/${safeFile(f.name)}`;
+    const r = await fetch(`${SB_URL}/storage/v1/object/briefs/${p.split("/").map(encodeURIComponent).join("/")}`, { method: "POST", headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY, "Content-Type": f.type, "x-upsert": "false" }, body: f.file });
+    if (!r.ok) throw Object.assign(new Error("upload " + r.status), { code: "upload" });
+    out.push({ path: p, name: f.name, size: f.size, type: f.type });
+  }
+  return out;
+}
+renderLinks("briefLinks"); renderOwn();
 $("#fontpick").querySelectorAll("button").forEach((b) => b.addEventListener("click", () => { draft.font = b.dataset.font; save(); renderBrandkit(); if (draft.font === "own") $("#fontName").focus(); }));
 function renderCTA() {
   $("#ctaYN").querySelectorAll("button").forEach((b) => b.classList.toggle("on", draft.cta === b.dataset.cta));
@@ -1557,12 +1677,17 @@ swatches();
 const lbl = (k) => t(k) + (lang === "fr" ? " : " : ": ");
 function values() {
   const links = (k) => (draft[k] || []).filter(Boolean).join("\n");
-  return {
+  const v = {
     projet: draft.projet || "", commande: commande(), autre_demande: draft.autre_demande || "",
     rushes: links("rushes"), logos: [FILES.logo ? `${lbl("r.logo")}${FILES.logo.name} (${t("bk.file")})` : "", draft.font === "team" ? `${lbl("r.font")}${t("bk.teamFont")}` : (draft.fontName ? `${lbl("r.font")}${draft.fontName}` : "")].filter(Boolean).join("\n"), references: links("references"),
     description: briefText(), palette: [draft.palette || "", FILES.palette ? `${lbl("r.shot")}${FILES.palette.name} (${t("bk.file")})` : ""].filter(Boolean).join("\n"), deadline: draft.deadline || "",
     contact: [draft.contactName, draft.contactHow].filter(Boolean).join(" — "), email: draft.email || "", autres: draft.autres || "",
   };
+  if (ownBrief()) {   // brief fourni : rien n'est demandé aux étapes 05 et 06, le document fait foi (le robot remplit le reste)
+    const names = OWN_FILES.map((f) => f.name).concat(ownLinks());
+    Object.assign(v, { rushes: t("own.inBrief"), logos: "", references: "", palette: "", deadline: t("own.inBrief"), contact: "", description: String(t("own.recap")).replace("{n}", names.join(", ")) });
+  }
+  return v;
 }
 function save() { try { localStorage.setItem(KEY, JSON.stringify(draft)); } catch {} }
 function load() { try { return JSON.parse(localStorage.getItem(KEY) || "{}"); } catch { return {}; } }
@@ -1648,22 +1773,32 @@ function validate(s) {
   /* Étape 04 — Fichiers. Avant, on ne vérifiait que « champ non vide » : c'est par là que le lien Spotify de
      Mediacast est entré (13/10/2026), que le robot s'est cassé les dents six fois et que 156 Go de rushes
      ont été jetés. Un lien qui n'est pas un fichier ne passe plus l'étape. */
-  if (s === 3) {
+  // Étape 04 — Votre brief : un choix obligatoire ; brief fourni = fichier ou lien, e-mail valide, case de responsabilité cochée
+  if (s === 3) { if (!draft.briefMode) return e.bmode; if (ownBrief()) { const oe = ownError(); if (oe) return oe; } }
+  if (s === 4 && !ownBrief()) {
     if (!v.rushes) { $("#rushes input").classList.add("bad"); return e.rushes; }
     const b = badRush();
     if (b >= 0) { const inp = $("#rushes").querySelectorAll("input")[b]; if (inp) inp.classList.add("bad"); linkNote(b); return e.rushesBad; }
   }
   // dernier verrou avant l'envoi : jamais une commande sans vidéo ni un lien mort, même en revenant en arrière
-  // dernier verrou avant l'envoi : le brief aussi (un client peut revenir en arrière et retirer une réponse) ; le message nomme l'étape 05 — Brief
-  if (s === 5) { if (!hasVideo()) return e.noVideo; if (badRush() >= 0) return e.rushesBad; const be = briefError(); if (be) return be.msg; if (!$("#terms").checked) { $("#terms").focus(); return e.terms; } }
+  // dernier verrou avant l'envoi : le brief aussi (un client peut revenir en arrière et retirer une réponse) ; le message nomme l'étape 06 — Brief
+  if (s === LAST) {
+    if (!hasVideo()) return e.noVideo;
+    if (ownBrief()) { const oe = ownError(); if (oe) return oe; }                       // brief fourni : le document, l'e-mail et la case font foi
+    else { if (badRush() >= 0) return e.rushesBad; const be = briefError(); if (be) return be.msg; }
+    if (!$("#terms").checked) { $("#terms").focus(); return e.terms; }
+  }
   /* Étape 05 — Brief structuré : chaque réponse de la direction, puis chaque bloc de livrable présent, est exigée d'un client ;
      en dépôt interne (?by=) briefError() ne renvoie rien. Contact et e-mail restent exigés de tout le monde (c'est là qu'arrivent les mails). */
-  if (s === 4) { const be = briefError(); if (be) { const el = document.querySelector(be.sel); if (el) el.classList.add("bad"); return be.msg; } if (!draft.contactName || !draft.contactHow) { $("#contactName").classList.add("bad"); $("#contactHow").classList.add("bad"); return e.contact; } if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(draft.email || "")) { $("#email").classList.add("bad"); return e.email; } }
+  if (s === 5) { const be = briefError(); if (be) { const el = document.querySelector(be.sel); if (el) el.classList.add("bad"); return be.msg; } if (!draft.contactName || !draft.contactHow) { $("#contactName").classList.add("bad"); $("#contactHow").classList.add("bad"); return e.contact; } if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(draft.email || "")) { $("#email").classList.add("bad"); return e.email; } }
   return "";
 }
-function go(s) { step = s; $("#msg").textContent = ""; if (step === 5) renderRecap(); renderSteps(); renderNav(); window.scrollTo({ top: 0, behavior: "smooth" }); }
-$("#prev").addEventListener("click", () => go(step === 2 && reelsOnly() ? 0 : Math.max(0, step - 1)));   // reels seuls : 02 sautée dans les deux sens
-$("#next").addEventListener("click", async () => { const err = validate(step); if (err) { $("#msg").textContent = err; const bad = document.querySelector(".in.bad,.chips.bad,.yn.bad"); if (bad) { if (bad.scrollIntoView) bad.scrollIntoView({ behavior: "smooth", block: "center" }); if (bad.classList.contains("in")) bad.focus(); } return; } if (step < 5) return go(step === 0 && reelsOnly() ? 2 : step + 1); await submit(); });   // reels seuls : 02 — Formule sautée
+function go(s) { step = s; $("#msg").textContent = ""; if (step === LAST) renderRecap(); renderSteps(); renderNav(); window.scrollTo({ top: 0, behavior: "smooth" }); }
+// Sauts : reels seuls → 02 — Formule sautée ; brief fourni (étape 04) → 05 — Fichiers et 06 — Brief sautées, dans les deux sens
+function nextStep() { if (step === 0 && reelsOnly()) return 2; if (step === 3 && ownBrief()) return LAST; return step + 1; }
+function prevStep() { if (step === 2 && reelsOnly()) return 0; if (step === LAST && ownBrief()) return 3; return Math.max(0, step - 1); }
+$("#prev").addEventListener("click", () => go(prevStep()));
+$("#next").addEventListener("click", async () => { const err = validate(step); if (err) { $("#msg").textContent = err; const bad = document.querySelector(".in.bad,.chips.bad,.yn.bad"); if (bad) { if (bad.scrollIntoView) bad.scrollIntoView({ behavior: "smooth", block: "center" }); if (bad.classList.contains("in")) bad.focus(); } return; } if (step < LAST) return go(nextStep()); await submit(); });
 
 /* ---------------- envoi : la commande est écrite directement en base (RPC create_order), le moteur fait l'accueil ---------------- */
 // Appel d'une RPC Supabase avec la clé publique. Erreur métier → e.code (bad_key, no_rushes…) ; base injoignable → e.offline.
@@ -1728,13 +1863,18 @@ function order() {
 
     autre_demande: autreDemande(v), palette: v.palette, logos: v.logos,
     cta: draft.cta || "", cta_reseaux: draft.cta === "yes" ? (draft.ctaNets || "") : "", font: draft.font === "team" ? "team" : (draft.fontName || ""), autres: v.autres,
-    brief: briefData(),   // brief structuré (20/10) ; `description` ci-dessous en est le texte lisible (briefText via values())
+    brief: ownBrief() ? {} : briefData(),   // brief structuré (20/10) ; `description` ci-dessous en est le texte lisible (briefText via values())
   };
   if (BY) details.deposited_by = BY;   // dépôt interne : affiché sur la commande dans le dashboard équipe
+  if (ownBrief()) {   // brief fourni par le client (QCM 21/10) : le robot des 10 min lit les fichiers et remplit description / brief / rushes / date
+    details.brief_mode = "own"; details.brief_files = BRIEF_UPLOADED; details.brief_links = ownLinks();
+    details.brief_ack = { accepted_at: new Date().toISOString(), text: String(t("own.ack")).slice(0, 300) };
+  }
   if (reelsOnly()) details.reels_only = true;   // produit « Reel » : commande sans épisode
   // Le brief du monteur annonce le nombre RÉEL de reels à produire (inclus compris), la facture non.
   const brief = Object.assign({}, details, { units: N, reels: n(q.reel_basique), reels_signature: n(q.reel_signature), single_cam: k === "single_cam_4k" ? String(N) : "", multicam: k === "multicam_4k" ? String(N) : "" });
-  return { project: v.projet.trim(), email: v.email.trim(), contact: v.contact, lang, work_to_do: workToDo(brief), details, rushes_links: linkList("rushes"), references_links: linkList("references"), logos: v.logos, description: v.description, deadline: v.deadline, terms_accepted: $("#terms").checked, terms_text: t("s6.terms") };
+  const own = ownBrief();   // brief fourni : rushes, références, logos et date vides ici, lus par le robot dans le document
+  return { project: v.projet.trim(), email: v.email.trim(), contact: v.contact, lang, work_to_do: workToDo(brief), details, rushes_links: own ? [] : linkList("rushes"), references_links: own ? [] : linkList("references"), logos: own ? "" : v.logos, description: v.description, deadline: own ? "" : v.deadline, terms_accepted: $("#terms").checked, terms_text: t("s6.terms") };
 }
 const orderSlug = () => slug || (studio && studio.slug) || "";
 const trackHref = () => `../suivi.html?token=${encodeURIComponent(orderToken)}&lang=${lang}`;
@@ -1755,6 +1895,9 @@ async function submit() {
      Contrôle cassé ou injoignable → checkStale() rend false et la commande part : fail-open. */
   if (await checkStale()) { btn.textContent = t("btn.send"); return; }
   try {
+    // Brief fourni : les fichiers partent d'abord dans le bucket privé « briefs » (clé publique, INSERT seulement), puis la commande
+    // les référence (details.brief_files). Un nouvel identifiant de dossier à chaque essai : jamais d'écrasement.
+    if (ownBrief()) { btn.textContent = t("own.uploading"); BRIEF_UPLOADED = await uploadBriefFiles(); btn.textContent = t("btn.sending"); }
     const res = await rpc("create_order", { p_slug: orderSlug(), p_key: accessKey, p_order: order() });
     if (!res || !res.token) throw Object.assign(new Error("no_token"), { code: "send" });
     done(String(res.token));
@@ -1762,7 +1905,7 @@ async function submit() {
     // Pas de repli vers les anciens formulaires Google (supprimés du circuit le 29/09) : le brouillon reste enregistré, le client réessaie.
     if (e.offline) return fail(esc(t("err").send));
     if (e.code === "bad_key") return fail(keyMsg("bad_key"));
-    fail(esc(["bad_email", "no_project", "no_rushes", "terms", "rate_limit"].includes(e.code) ? t("err")[e.code] : t("err").send));
+    fail(esc(["bad_email", "no_project", "no_rushes", "no_brief", "upload", "terms", "rate_limit"].includes(e.code) ? t("err")[e.code] : t("err").send));
   }
 }
 /* repli : même circuit que le formulaire Google, sans serveur (seulement si la base est injoignable et que le studio a un formulaire) */
