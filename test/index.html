@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta name="robots" content="noindex,nofollow"/>
+  <meta name="theme-color" content="#050607"/>
+  <title>DS Editing — Written test</title>
+  <link rel="icon" type="image/png" href="../assets/logo.png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--bg:#050607;--surface:#0F1114;--surface-2:#161A1F;--line:rgba(255,255,255,.09);--line-strong:rgba(255,255,255,.22);--cream:#F5F5F1;--taupe:#9AA3AD;--amber:#DCE3EA;--amber-soft:rgba(220,227,234,.12);--ok:#46D369;--err:#F08A82;--warn:#F5C400;--accent2:#B9C9DA;--chrome:linear-gradient(180deg,#FFFFFF 0%,#E3E7EC 38%,#9BA4AE 72%,#D6DBE0 100%);--chrome2:linear-gradient(95deg,#B9C9DA 0%,#7FA3CF 45%,#E6ECF2 100%);--glass:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));color-scheme:dark}
+    *{box-sizing:border-box}
+    [hidden]{display:none!important}
+    html,body{margin:0;background:var(--bg);color:var(--cream);font-family:'Geist',system-ui,sans-serif;font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+    body{min-height:100vh;display:flex;flex-direction:column;background:radial-gradient(1200px 700px at 85% -5%,rgba(125,155,195,.16),transparent 60%),radial-gradient(900px 600px at -10% 40%,rgba(160,170,185,.08),transparent 60%),#050607;background-attachment:fixed}
+    a{color:inherit}
+    button{font:inherit}
+    .mono{font-family:'Geist',system-ui,sans-serif;font-weight:600;font-size:11px;letter-spacing:.06em;text-transform:uppercase;font-variant-numeric:tabular-nums;color:var(--taupe)}
+    .display{font-family:'Geist',system-ui,sans-serif;font-weight:600;letter-spacing:-.035em;text-transform:none;line-height:1.02;padding-bottom:.08em;background:var(--chrome);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .display em,.display .ac{font-style:normal;background:var(--chrome2);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .lv-rec{display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:22px;letter-spacing:-.04em;line-height:1;color:var(--cream);white-space:nowrap}
+    .lv-rec i{width:9px;height:9px;border-radius:50%;background:var(--amber);box-shadow:0 0 12px var(--amber);animation:blink 1.6s infinite;margin-right:2px}
+    .lv-rec em{font-style:normal;font-size:11px;font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:var(--taupe);margin-left:2px}
+    @keyframes blink{50%{opacity:.2}}
+    header{position:sticky;top:0;z-index:10;background:rgba(8,9,11,.62);-webkit-backdrop-filter:blur(22px) saturate(1.4);backdrop-filter:blur(22px) saturate(1.4);border-bottom:1px solid var(--line)}
+    .hd{max-width:760px;margin:0 auto;padding:14px 16px;display:flex;align-items:center;gap:12px}
+    .hd .brand{padding-left:12px;border-left:1px solid var(--line)}
+    main{flex:1;width:100%;max-width:760px;margin:0 auto;padding:36px 16px 80px}
+    h1{font-size:clamp(34px,6vw,54px);margin:14px 0 8px}
+    .lead{margin:0 0 22px;color:var(--taupe);line-height:1.55}
+    .card{background:var(--glass);border:1px solid var(--line);border-radius:22px;padding:24px;margin-top:18px;-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+    .btn{border:1px solid transparent;border-radius:999px;height:50px;padding:0 24px;font-size:15px;font-weight:600;letter-spacing:-.01em;cursor:pointer;background:linear-gradient(180deg,#FFFFFF,#C9D0D7);color:#0A0B0D;box-shadow:inset 0 1px 0 #fff,0 8px 30px rgba(180,200,225,.18);display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;text-decoration:none;transition:background .2s,border-color .2s}
+    .btn:hover{background:linear-gradient(180deg,#fff,#E4E8EC)}
+    .btn.ghost{background:rgba(255,255,255,.06);color:#fff;border-color:rgba(255,255,255,.16);box-shadow:none;-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)}
+    .btn.ghost:hover{border-color:rgba(220,230,240,.35);background:rgba(255,255,255,.08)}
+    .btn:disabled,.btn[disabled]{opacity:.45;cursor:default}
+    .btn:focus-visible,.day:focus-visible,.slot:focus-visible{outline:2px solid rgba(220,227,234,.6);outline-offset:2px}
+    .actions{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:16px}
+    /* infos pratiques */
+    .facts{display:grid;gap:14px;margin:0;padding:0;list-style:none}
+    .facts li{display:grid;grid-template-columns:96px minmax(0,1fr);gap:12px;align-items:start}
+    .facts .k{padding-top:2px}
+    .facts b{font-weight:600}
+    .facts small{display:block;color:var(--taupe);font-size:13px;margin-top:2px}
+    .facts a{color:var(--accent2)}
+    @media (max-width:560px){.facts li{grid-template-columns:1fr;gap:2px}}
+    /* choix du jour / créneau */
+    h2{margin:0 0 12px;font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--taupe)}
+    h2 b{color:var(--cream);letter-spacing:0;text-transform:none;font-size:15px}
+    .days{display:flex;gap:6px;overflow-x:auto;padding:2px 2px 8px;scrollbar-width:thin;scroll-snap-type:x proximity}
+    .day{flex:none;width:62px;padding:9px 0 8px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.03);color:var(--cream);text-align:center;cursor:pointer;transition:border-color .15s,background .15s;scroll-snap-align:start}
+    .day small{display:block;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--taupe)}
+    .day b{display:block;font-size:22px;font-weight:600;letter-spacing:-.03em;line-height:1.1;margin:2px 0;font-variant-numeric:tabular-nums}
+    .day:hover{border-color:rgba(220,230,240,.35)}
+    .day.on{border-color:rgba(220,230,240,.5);background:var(--amber-soft)}
+    .day:disabled{opacity:.32;cursor:default;border-color:var(--line)}
+    .slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;margin-top:8px}
+    .slot{min-height:52px;border-radius:999px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.04);color:var(--cream);font-size:15px;font-weight:600;letter-spacing:-.01em;cursor:pointer;transition:border-color .15s,background .15s;font-variant-numeric:tabular-nums;line-height:1.15;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6px 10px}
+    .slot small{font-size:10px;font-weight:500;color:var(--taupe)}
+    .slot:hover{border-color:rgba(220,230,240,.5);background:var(--amber-soft)}
+    .slot.on{border-color:rgba(220,230,240,.6);background:rgba(255,255,255,.88);color:#0A0B0D}
+    .slot.on small{color:#3b4148}
+    .slot.cur{border-style:dashed}
+    .note{margin-top:14px;font-size:12px;color:var(--taupe)}
+    .note b{color:var(--cream);font-weight:500}
+    .empty{padding:26px 10px;text-align:center;color:var(--taupe);border:1px dashed var(--line);border-radius:14px}
+    .notice{margin:0 0 14px;padding:10px 14px;border-radius:12px;font-size:13px;border:1px solid rgba(245,196,0,.4);background:rgba(245,196,0,.1)}
+    .err{margin:0;padding:12px 16px;border-radius:14px;border:1px solid rgba(240,138,130,.5);background:rgba(240,138,130,.12);color:var(--cream)}
+    .confirm{margin-top:16px;display:flex;align-items:center;gap:12px 16px;flex-wrap:wrap;padding:14px 16px;border-radius:14px;border:1px solid rgba(220,230,240,.35);background:rgba(220,227,234,.08)}
+    .confirm .w{flex:1 1 220px;font-weight:600;letter-spacing:-.01em}
+    .confirm .w small{display:block;font-weight:400;color:var(--taupe);font-size:12px}
+    /* confirmation */
+    .done{text-align:center;padding:6px 0 0}
+    .check{width:64px;height:64px;border-radius:50%;background:rgba(70,211,105,.14);border:1px solid rgba(70,211,105,.45);display:flex;align-items:center;justify-content:center;margin:0 auto 12px}
+    .check svg{width:30px;height:30px;stroke:var(--ok);stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
+    .done h2.display{font-size:clamp(28px,5vw,38px);text-transform:none;letter-spacing:-.035em;margin:0 0 8px;color:transparent;font-weight:600}
+    .when{font-size:19px;font-weight:600;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+    .when small{display:block;font-size:13px;font-weight:400;color:var(--taupe);margin-top:4px}
+    .done .actions{justify-content:center}
+    .spin{width:28px;height:28px;border-radius:50%;border:2px solid rgba(255,255,255,.14);border-top-color:var(--amber);animation:spin .8s linear infinite;margin:40px auto 14px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .center{text-align:center;color:var(--taupe)}
+    footer{padding:18px;text-align:center}
+    @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+    /* test écrit */
+    .q{padding:18px 0;border-top:1px solid var(--line)}
+    .q:first-child{border-top:0;padding-top:0}
+    .q .n{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--taupe);margin-bottom:6px}
+    .q .t{margin:0 0 10px;font-weight:500;white-space:pre-line}
+    .opt{display:flex;gap:12px;align-items:flex-start;padding:10px 12px;border:1px solid var(--line);border-radius:14px;margin-top:6px;cursor:pointer;background:rgba(255,255,255,.03)}
+    .opt:hover{border-color:rgba(220,230,240,.35)}
+    .opt input{margin-top:3px;accent-color:#E3E7EC}
+    .opt b{font-weight:600;min-width:18px}
+    .in{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.16);border-radius:14px;color:var(--cream);font:inherit;padding:12px 14px;outline:none}
+    .in:focus{border-color:rgba(220,230,240,.5)}
+    textarea.in{min-height:120px;resize:vertical}
+    .timer{position:sticky;top:62px;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 16px;border-radius:14px;border:1px solid var(--line);background:rgba(15,17,20,.92);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);margin-bottom:14px;font-variant-numeric:tabular-nums}
+    .timer b{font-size:20px;letter-spacing:-.02em}
+    .timer.warn b{color:var(--warn)}
+    .timer.over b{color:var(--err)}
+    .miss{border-color:rgba(240,138,130,.6)!important}
+  </style>
+</head>
+<body>
+<header><div class="hd"><span class="lv-rec"><i></i>DS<em>Editing</em></span><span class="mono brand">Careers</span></div></header>
+<main>
+  <div class="mono" id="kicker">Written test</div>
+  <h1 class="display" id="title">Your <em>written test</em></h1>
+  <p class="lead" id="lead"></p>
+  <div id="app" aria-live="polite"><div class="spin"></div><div class="center">Loading your test…</div></div>
+</main>
+<footer class="mono">DS Editing · Bali</footer>
+
+<script type="module">
+/* ============================================================
+   Test écrit (recrutement) — page publique en anglais, ouverte par le lien personnel ?t=<jeton> (le même jeton que la fiche candidat).
+   Données : Supabase, RPC anonymes test_open / test_submit (ds-editing-os/supabase/recruitment_v4_test.sql).
+   Le corrigé reste en base : la page ne reçoit que l'énoncé. Le chrono (15 min) démarre au clic « Start », côté base.
+   Une remise en retard est acceptée et marquée « late » : l'équipe tranche dans la fiche. Un test remis ne se refait pas.
+   ============================================================ */
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+const SUPABASE_URL = "https://xkanmjlpysxpohsuqvwg.supabase.co";
+const SUPABASE_ANON = "sb_publishable_lIZtV_WtN5NcGSb0dnfaiQ_AgKYBIVa";   // clé publique : les règles sont dans les RPC + RLS
+
+const ERR = {
+  bad_token: "This link is not valid. Please check that you copied the whole link from our message, or reply to it and we will help you.",
+  not_sent: "This test link is not active. If you think this is a mistake, please reply to our message.",
+  expired: "This link has expired (it was valid for 7 days). Please reply to our message and we will send you a new one.",
+  already_done: "You have already submitted this test. Thank you! We will get back to you soon.",
+  not_started: "Please start the test first.",
+  no_test: "The test is not available right now. Please try again later or reply to our message.",
+  offline: "The test page is not responding right now. Please try again in a few minutes, or write to contact@ds-editing.com.",
+};
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const token = (new URLSearchParams(location.search).get("t") || "").trim();
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON, { auth: { persistSession: false, autoRefreshToken: false } });
+async function rpc(name, args) { const { data, error } = await sb.rpc(name, args); if (error) throw error; return data; }
+const codeOf = (e) => { const m = String((e && (e.message || e.details)) || "").match(/[a-z_]+/); return m ? m[0] : "offline"; };
+const app = $("#app");
+const S = { test: null, answers: {}, sending: false, timer: 0, skew: 0 };
+const KEY = () => "ds_test_" + token.slice(0, 12);
+try { Object.assign(S.answers, JSON.parse(localStorage.getItem(KEY()) || "{}")); } catch {}   // brouillon gardé sur l'appareil (rechargement de page)
+const save = () => { try { localStorage.setItem(KEY(), JSON.stringify(S.answers)); } catch {} };
+
+function showError(code) { app.innerHTML = `<p class="err">${esc(ERR[code] || ERR.offline)}</p>`; $("#lead").textContent = ""; }
+function intro(t) {
+  $("#lead").textContent = `Hi ${t.first_name}, thank you for applying to DS Editing.`;
+  app.innerHTML = `<div class="card">
+    <h2>Before you start</h2>
+    <ul class="facts">
+      <li><span class="k mono">Time</span><div><b>${esc(t.time_limit_min)} minutes</b><small>The clock starts when you click Start. It cannot be paused.</small></div></li>
+      <li><span class="k mono">Questions</span><div><b>${t.questions.length} questions</b><small>Questions 1 to 7: choose one letter. Questions 8 to 10: write your answer.</small></div></li>
+      <li><span class="k mono">Rules</span><div><b>On your own, in one go</b><small>All examples are fictional. You do not need to prepare anything. One submission only.</small></div></li>
+    </ul>
+    <div class="actions"><button type="button" class="btn" id="start">Start the test</button></div></div>`;
+  $("#start").addEventListener("click", start);
+}
+async function start() {
+  $("#start").disabled = true;
+  try { S.test = await rpc("test_open", { p_token: token, p_start: true }); S.skew = Date.now() - new Date(S.test.now).getTime(); form(); }
+  catch (e) { showError(codeOf(e)); }
+}
+function form() {
+  const t = S.test;
+  $("#lead").textContent = "Answer every question. Your answers are saved on this device until you submit.";
+  const q = (x, i) => {
+    const n = `<div class="n">Question ${i + 1} · 10 points</div><p class="t">${esc(x.text)}</p>`;
+    if (x.type === "choice") return `<div class="q" data-q="${x.id}">${n}${x.options.map((o) => `<label class="opt"><input type="radio" name="${x.id}" value="${esc(o.k)}" ${S.answers[x.id] === o.k ? "checked" : ""}/><b>${esc(o.k)}.</b><span>${esc(o.text)}</span></label>`).join("")}</div>`;
+    if (x.type === "text") return `<div class="q" data-q="${x.id}">${n}<textarea class="in" name="${x.id}" maxlength="2000" placeholder="${esc(x.placeholder || "")}">${esc(S.answers[x.id] || "")}</textarea></div>`;
+    return `<div class="q" data-q="${x.id}">${n}<input class="in" name="${x.id}" maxlength="200" placeholder="${esc(x.placeholder || "")}" value="${esc(S.answers[x.id] || "")}"/></div>`;
+  };
+  app.innerHTML = `<div class="timer" id="timer"><span class="mono">Time left</span><b id="left">--:--</b></div>
+    <div class="card" id="form">${t.questions.map(q).join("")}
+      <p class="note" id="miss" hidden></p>
+      <div class="actions"><button type="button" class="btn" id="send">Submit my answers</button><span class="note" id="msg"></span></div></div>`;
+  app.querySelectorAll("input,textarea").forEach((el) => el.addEventListener("input", () => { S.answers[el.name] = el.value; save(); }));
+  app.querySelectorAll("input[type=radio]").forEach((el) => el.addEventListener("change", () => { S.answers[el.name] = el.value; save(); }));
+  $("#send").addEventListener("click", submit);
+  tick(); S.timer = setInterval(tick, 1000);
+}
+function tick() {
+  const t = S.test, end = new Date(t.deadline).getTime(), left = Math.round((end - (Date.now() - S.skew)) / 1000), el = $("#left"), box = $("#timer");
+  if (!el) return;
+  const a = Math.abs(left), mm = String(Math.floor(a / 60)).padStart(2, "0"), ss = String(a % 60).padStart(2, "0");
+  el.textContent = (left < 0 ? "-" : "") + mm + ":" + ss;
+  box.classList.toggle("warn", left >= 0 && left <= 120); box.classList.toggle("over", left < 0);
+  if (left < 0 && !box.dataset.said) { box.dataset.said = "1"; $("#msg").textContent = "Time is over: please submit now. Late answers are still recorded."; }
+}
+async function submit() {
+  if (S.sending) return;
+  const missing = S.test.questions.filter((x) => !String(S.answers[x.id] || "").trim());
+  app.querySelectorAll(".q").forEach((d) => d.classList.toggle("miss", missing.some((x) => x.id === d.dataset.q)));
+  const m = $("#miss");
+  if (missing.length && !m.dataset.warned) { m.dataset.warned = "1"; m.hidden = false; m.textContent = `${missing.length} question${missing.length > 1 ? "s are" : " is"} still empty (${missing.map((x, i) => "Q" + (S.test.questions.indexOf(x) + 1)).join(", ")}). Click Submit again to send anyway.`; return; }
+  S.sending = true; $("#send").disabled = true; $("#msg").textContent = "Sending…";
+  try {
+    const r = await rpc("test_submit", { p_token: token, p_answers: S.answers });
+    clearInterval(S.timer); try { localStorage.removeItem(KEY()); } catch {}
+    $("#lead").textContent = "";
+    app.innerHTML = `<div class="card done"><div class="check"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7"/></svg></div>
+      <h2 class="display">Test submitted!</h2>
+      <p class="lead" style="margin:0">Thank you${S.test.first_name ? ", " + esc(S.test.first_name) : ""}. We will review your answers and get back to you${r && r.late_minutes ? " (your answers arrived a little after the time limit, which we will take into account)" : ""}.</p></div>`;
+  } catch (e) { S.sending = false; $("#send").disabled = false; const c = codeOf(e); if (c === "already_done") { clearInterval(S.timer); showError(c); } else $("#msg").textContent = ERR[c] || ERR.offline; }
+}
+async function load() {
+  if (token.length < 16) { showError("bad_token"); return; }
+  try {
+    const t = await rpc("test_open", { p_token: token, p_start: false });
+    S.test = t; S.skew = Date.now() - new Date(t.now).getTime();
+    if (t.started_at) form(); else intro(t);   // chrono déjà parti (rechargement) : on reprend le formulaire, le brouillon est sur l'appareil
+  } catch (e) { showError(codeOf(e)); }
+}
+load();
+</script>
+</body>
+</html>

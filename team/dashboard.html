@@ -624,7 +624,7 @@ const T = {
       blocked: "Dates bloquées (une par ligne)", blockedHint: "2026-10-03 · 2026-12-24/2027-01-02 · 2026-10-06T14:00/2026-10-06T16:00 (heure de Paris)", save: "Enregistrer", saved: "enregistré", badRange: "Plage invalide : le début doit précéder la fin",
       listTitle: "Rendez-vous", upcoming: "À venir", past: "Passés", cols: ["Date (Paris)", "Nom", "Studio", "E-mail", "Téléphone", "Notes", "Statut", "E-mails"],
       status: { confirmed: "Confirmé", done: "Fait", cancelled: "Annulé", no_show: "Absent" }, none: "Aucun rendez-vous", confirm: "confirmation", reminder: "rappel", local: "chez vous", missing: "Réglages introuvables : appliquer supabase/bookings_v1.sql." },
-    rc: { listTitle: "Candidats", hint: "Triés par note de candidature. Rien n'est envoyé d'ici : on copie le lien d'invitation et on l'envoie à la main, après validation de Cyriaque.",
+    rc: { listTitle: "Candidats", hint: "Triés par note de candidature. Rien n'est envoyé d'ici : on copie le lien du test ou de l'invitation et on l'envoie à la main (SEEK ou e-mail). Depuis le 22/10, Safa décide des lots.",
       allRoles: "Tous les postes", allStatus: "Tous les statuts", roles: { video_editor: "Video Editor", accountant_hr: "Accountant & HR Admin" },
       status: { new: "Nouveau", scored: "Noté", test_sent: "Test envoyé", test_received: "Test reçu", invited: "Invité", interview_booked: "Entretien réservé", interview_done: "Entretien fait", editing_test: "Test montage", hired: "Embauché", rejected: "Refusé" },
       cols: ["Candidature", "Test", "Candidat", "Poste", "Ville", "Statut", "Entretien (Bali)"], none: "Aucun candidat dans cette vue.", noScore: "—", openHint: "Ouvrir la fiche", close: "Fermer",
@@ -632,6 +632,7 @@ const T = {
       appScore: "Note de candidature", testScore: "Note du test écrit", grid: (n) => n ? `grille v${n}` : "grille non précisée", breakdownApp: "Détail de la candidature", breakdownTest: "Détail du test écrit", noBreakdown: "Pas encore de détail.",
       cCrit: "Critère", cPts: "Points", cProof: "Preuve", screening: "Réponses de présélection", noScreening: "Aucune réponse enregistrée.", juryNotes: "Notes du jury", agentNotes: "Notes de l'agent (lecture seule)", saveNotes: "Enregistrer les notes", saved: "enregistré",
       statusL: "Statut", copyInvite: "Copier le lien d'invitation", copied: "Lien copié", copyFail: "Copie impossible : sélectionner le lien à la main", inviteConfirm: "Le statut passera à « Invité » et le lien deviendra actif. Aucun message n'est envoyé : tu colles le lien dans ton message. Continuer ?", inviteOff: "Lien inactif à ce stade du parcours", linkLabel: "Lien",
+      copyTest: "Copier le lien du test écrit", testConfirm: "Le statut passera à « Test envoyé » et le lien du test (15 min, 10 questions) sera actif 7 jours. Aucun message n'est envoyé : tu colles le lien dans ton message au candidat. Continuer ?", testOff: "Lien du test inactif à ce stade (déjà passé, ou test déjà reçu)", q9Grade: "Q9 (réponse rédigée) · ta note", q9Save: "Enregistrer la note", testMeta: (m) => `Correction automatique ${m.auto_score} / ${m.auto_max} · ${m.minutes} min${m.late_minutes ? ` · en retard de ${m.late_minutes} min` : ""} · Q9 à noter à la main (barème : +3 rythme de l'intro, +3 taille des sous-titres, +3 musique sous la voix à 12:30, +1 anglais clair en 3-5 phrases)`,
       regen: "Nouveau lien", regenConfirm: "L'ancien lien cessera de fonctionner. Continuer ?", rejectConfirm: "Marquer ce candidat « Refusé » ? Son créneau d'entretien sera libéré.", hireConfirm: "Marquer ce candidat « Embauché » ?",
       interview: "Entretien", noInterview: "Pas de créneau réservé.", juror: "Juré", unassigned: "À attribuer", changes: (n) => `${n} modification${n > 1 ? "s" : ""}`,
       ivTitle: "Entretiens à venir", ivPast: "Entretiens passés et annulés", ivCols: ["Date (Bali)", "Candidat", "Poste", "Juré", "Statut", "Contact"], ivNone: "Aucun entretien.", bk: { confirmed: "Confirmé", done: "Fait", cancelled: "Annulé", no_show: "Absent" },
@@ -693,7 +694,7 @@ const T = {
       blocked: "Blocked dates (one per line)", blockedHint: "2026-10-03 · 2026-12-24/2027-01-02 · 2026-10-06T14:00/2026-10-06T16:00 (Paris time)", save: "Save", saved: "saved", badRange: "Invalid range: start must be before end",
       listTitle: "Appointments", upcoming: "Upcoming", past: "Past", cols: ["Date (Paris)", "Name", "Studio", "Email", "Phone", "Notes", "Status", "Emails"],
       status: { confirmed: "Confirmed", done: "Done", cancelled: "Cancelled", no_show: "No-show" }, none: "No appointment", confirm: "confirmation", reminder: "reminder", local: "your time", missing: "Settings not found: apply supabase/bookings_v1.sql." },
-    rc: { listTitle: "Candidates", hint: "Sorted by application score. Nothing is sent from here: copy the invitation link and send it by hand, once Cyriaque has approved.",
+    rc: { listTitle: "Candidates", hint: "Sorted by application score. Nothing is sent from here: copy the test link or the invitation link and send it by hand (SEEK message or e-mail). Since 22/10, Safa decides the batches.",
       allRoles: "All roles", allStatus: "All statuses", roles: { video_editor: "Video Editor", accountant_hr: "Accountant & HR Admin" },
       status: { new: "New", scored: "Scored", test_sent: "Test sent", test_received: "Test received", invited: "Invited", interview_booked: "Interview booked", interview_done: "Interview done", editing_test: "Editing test", hired: "Hired", rejected: "Rejected" },
       cols: ["Application", "Test", "Candidate", "Role", "City", "Status", "Interview (Bali)"], none: "No candidate in this view.", noScore: "—", openHint: "Open the file", close: "Close",
@@ -701,6 +702,7 @@ const T = {
       appScore: "Application score", testScore: "Written test score", grid: (n) => n ? `grid v${n}` : "grid not specified", breakdownApp: "Application breakdown", breakdownTest: "Written test breakdown", noBreakdown: "No breakdown yet.",
       cCrit: "Criterion", cPts: "Points", cProof: "Evidence", screening: "Screening answers", noScreening: "No answer recorded.", juryNotes: "Jury notes", agentNotes: "Agent notes (read-only)", saveNotes: "Save notes", saved: "saved",
       statusL: "Status", copyInvite: "Copy invitation link", copied: "Link copied", copyFail: "Copy failed: select the link by hand", inviteConfirm: "The status will change to “Invited” and the link becomes active. No message is sent: you paste the link into your own message. Continue?", inviteOff: "Link inactive at this stage", linkLabel: "Link",
+      copyTest: "Copy written test link", testConfirm: "The status will change to “Test sent” and the test link (15 min, 10 questions) becomes active for 7 days. No message is sent: you paste the link into your own message to the candidate. Continue?", testOff: "Test link inactive at this stage (already past, or test already received)", q9Grade: "Q9 (written answer) · your score", q9Save: "Save score", testMeta: (m) => `Auto-graded ${m.auto_score} / ${m.auto_max} · ${m.minutes} min${m.late_minutes ? ` · late by ${m.late_minutes} min` : ""} · Q9 to grade by hand (rubric: +3 intro pace, +3 subtitle size, +3 music under the voice at 12:30, +1 clear English in 3-5 sentences)`,
       regen: "New link", regenConfirm: "The old link will stop working. Continue?", rejectConfirm: "Mark this candidate “Rejected”? Their interview slot will be released.", hireConfirm: "Mark this candidate “Hired”?",
       interview: "Interview", noInterview: "No slot booked.", juror: "Juror", unassigned: "To assign", changes: (n) => `${n} change${n > 1 ? "s" : ""}`,
       ivTitle: "Upcoming interviews", ivPast: "Past and cancelled interviews", ivCols: ["Date (Bali)", "Candidate", "Role", "Juror", "Status", "Contact"], ivNone: "No interview.", bk: { confirmed: "Confirmed", done: "Done", cancelled: "Cancelled", no_show: "No-show" },
@@ -1965,6 +1967,10 @@ const rcPretty = (k) => String(k).replace(/_/g, " ");
 const rcInviteUrl = (c) => new URL("../entretien/?t=" + encodeURIComponent(c.invite_token), location.href).href;
 const rcCanInvite = (c) => RC_STATUS.indexOf(c.status) < RC_STATUS.indexOf("invited");
 const rcLinkLive = (c) => c.status === "invited" || c.status === "interview_booked";
+// test écrit en ligne (22/10, recruitment_v4_test.sql) : même jeton, page ../test/ ; actif au seul statut « test_sent »
+const rcTestUrl = (c) => new URL("../test/?t=" + encodeURIComponent(c.invite_token), location.href).href;
+const rcCanTest = (c) => c.status === "new" || c.status === "scored";
+const rcTestLive = (c) => c.status === "test_sent";
 const rcBooking = (c) => interviewsAll.find((b) => b.candidate_id === c.id && b.status === "confirmed") || null;
 const rcHref = (u, label) => u ? `<a href="${esc(/^https?:\/\//i.test(u) ? u : "https://" + u)}" target="_blank" rel="noopener">${esc(label || u)}</a>` : "—";
 const rcDate = (d) => d ? new Date(d).toLocaleDateString(loc(), { day: "2-digit", month: "short", year: "numeric" }) : "—";
@@ -1982,6 +1988,8 @@ function rcTable(obj, weights) {
 function rcFiche(c) {
   const R = t("rc"), tz = rcTz(), bk = rcBooking(c), grid = scoringGrids.find((g) => g.job_role === c.job_role && g.version === c.application_grid_version);
   const live = rcLinkLive(c), can = rcCanInvite(c);
+  const tLive = rcTestLive(c), tCan = rcCanTest(c), tBdAll = c.test_breakdown || {}, tMeta = tBdAll._meta || null, tQ9 = tBdAll.q9 && typeof tBdAll.q9 === "object" ? tBdAll.q9 : null;
+  const tBd = Object.fromEntries(Object.entries(tBdAll).filter(([k]) => k !== "_meta"));
   const scr = (v) => v == null ? "—" : `${v} / 100`;
   const kv = (k, v) => `<em>${k}</em><span>${v}</span>`;
   const screening = Object.entries(c.screening || {}).map(([k, v]) => kv(esc(rcPretty(k)), esc(v && typeof v === "object" ? JSON.stringify(v) : v))).join("");
@@ -1998,7 +2006,12 @@ function rcFiche(c) {
     </div>
     <div class="rc-cols">
       <div><h4>${R.breakdownApp} · ${scr(c.application_score)} · ${esc(R.grid(c.application_grid_version))}</h4>${rcTable(c.application_breakdown, grid && grid.weights)}</div>
-      <div><h4>${R.breakdownTest} · ${scr(c.test_score)}</h4>${rcTable(c.test_breakdown, null)}</div>
+      <div><h4>${R.breakdownTest} · ${scr(c.test_score)}</h4>
+        <div class="rc-acts" style="margin:0 0 10px"><button type="button" class="btn" id="rcCopyTest" ${tLive || tCan ? "" : `disabled title="${esc(R.testOff)}"`}>${R.copyTest}</button><span id="rcTestMsg" role="status" style="font-size:12px;color:var(--ok)"></span></div>
+        ${tLive ? `<input class="in" id="rcTestLink" readonly aria-label="${R.linkLabel}" style="margin-bottom:10px;font-size:12px" value="${esc(rcTestUrl(c))}"/>` : ""}
+        ${tMeta ? `<p class="hint" style="margin:0 0 8px">${esc(R.testMeta(tMeta))}</p>` : ""}
+        ${tQ9 ? `<div class="rc-kv" style="margin-bottom:8px"><em>${R.q9Grade}</em><span><input class="in" type="number" min="0" max="10" id="rcQ9" style="width:90px;display:inline-block" value="${tQ9.score ?? ""}"/> / 10 <button type="button" class="btn ghost" id="rcQ9Save">${R.q9Save}</button> <span id="rcQ9Msg" style="font-size:12px;color:var(--ok)"></span></span></div>` : ""}
+        ${rcTable(tBd, null)}</div>
     </div>
     <div class="rc-cols">
       <div><h4>${R.screening}</h4>${screening ? `<div class="rc-kv">${screening}</div>` : `<p class="hint" style="margin:0">${R.noScreening}</p>`}</div>
@@ -2089,6 +2102,25 @@ function wireRecruit() {
     }
     const ok = await copyText(rcInviteUrl(c)); await loadAdmin(); renderRecruit();
     const m = $("#rcMsg"); if (m) { m.style.color = ok ? "var(--ok)" : "var(--err)"; m.textContent = ok ? "✓ " + R.copied : R.copyFail; }
+  });
+  const ct = $("#rcCopyTest"); if (ct) ct.addEventListener("click", async () => {
+    const c = cand(); if (!c) return;
+    if (rcCanTest(c)) {
+      if (!confirm(R.testConfirm)) return;
+      const { error } = await sb.from("candidates").update({ status: "test_sent", test_sent_at: new Date().toISOString() }).eq("id", c.id);
+      if (error) { alert(error.message); return; }
+    }
+    const ok = await copyText(rcTestUrl(c)); await loadAdmin(); renderRecruit();
+    const m = $("#rcTestMsg"); if (m) { m.style.color = ok ? "var(--ok)" : "var(--err)"; m.textContent = ok ? "✓ " + R.copied : R.copyFail; }
+  });
+  const tl = $("#rcTestLink"); if (tl) tl.addEventListener("focus", () => tl.select());
+  const q9 = $("#rcQ9Save"); if (q9) q9.addEventListener("click", async () => {
+    const c = cand(); if (!c) return; const v = Math.max(0, Math.min(10, parseInt($("#rcQ9").value, 10) || 0));
+    const bd = { ...(c.test_breakdown || {}) }; bd.q9 = { ...(bd.q9 || {}), score: v, max: 10, pending: false };
+    const auto = bd._meta && bd._meta.auto_score != null ? bd._meta.auto_score : Object.entries(bd).filter(([k]) => k !== "q9" && k !== "_meta").reduce((s, [, o]) => s + ((o && o.score) || 0), 0);
+    const { error } = await sb.from("candidates").update({ test_breakdown: bd, test_score: auto + v }).eq("id", c.id);
+    if (error) { alert(error.message); return; } await loadAdmin(); renderRecruit();
+    const m = $("#rcQ9Msg"); if (m) { m.textContent = "✓ " + R.saved; setTimeout(() => { const x = $("#rcQ9Msg"); if (x) x.textContent = ""; }, 2000); }
   });
   const rg = $("#rcRegen"); if (rg) rg.addEventListener("click", async () => {
     const c = cand(); if (!c || !confirm(R.regenConfirm)) return;
