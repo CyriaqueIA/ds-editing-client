@@ -324,6 +324,7 @@
     <section id="v-editors" hidden></section>
     <section id="v-reports" hidden></section>
     <section id="v-ai" hidden></section>
+    <section id="v-time" hidden></section>
     <section id="v-settings" hidden></section>
   </div>
 </main>
@@ -336,7 +337,7 @@ import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 const OPEN_ACCESS = null; // 14/10 : accès libre FERMÉ (liens magiques ?p= distribués aux 5 + télé). Pour le rouvrir un jour : remettre { email, password } du compte partagé et lever son bannissement en base.
 const SUPABASE_URL = "https://xkanmjlpysxpohsuqvwg.supabase.co";
 const SUPABASE_ANON = "sb_publishable_lIZtV_WtN5NcGSb0dnfaiQ_AgKYBIVa";
-const TABS = ["overview", "editors", "reports", "ai", "settings"];   // « ai » : IA vs humains (admins connectés seulement, RPC editor_kpis)
+const TABS = ["overview", "editors", "reports", "ai", "time", "settings"];   // « ai » : IA vs humains (admins connectés seulement, RPC editor_kpis) ; « time » : chrono de montage (admin / dispatch / qualité connectés, RPC chrono_stats)
 const PERIODS = ["today", "week", "month", "lastMonth", "d30"];
 // Colonnes de l'export CSV : format de l'ancien outil (libellés français fixes, séparateur « ; », BOM UTF-8, CRLF)
 const CSV_KEYS = ["reel_en", "reel_fr", "intro_fr", "intro_en", "podcast_fr", "podcast_en"];
@@ -391,6 +392,29 @@ const T3 = {
     tbl: { editor: "Editor", byPilot: "Operator" }, fb: "Jawaban klien", fbNone: "Tidak ada jawaban klien pada periode ini.", fbCols: ["Tanggal", "Klien", "Pesanan", "Editor", "Jawaban", "Komentar"], yes: "Ya", no: "Tidak", aiTag: "AI" } },
 };
 for (const l of Object.keys(T)) { Object.assign(T[l].tabs, T3[l].tabs); T[l].ai = T3[l].ai; }
+// Chrono de montage (22/10, supabase/chrono_v1.sql) : onglet « Temps » — admin / dispatch / qualité connectés ; coût et taux horaires = admin seul
+const T4 = {
+  fr: { tabs: { time: "Temps" }, tm: { kicker: "Chrono de montage", title: "Temps par monteur et par commande", sub: "Sessions Démarrer → Terminer posées sur la vue équipe. Jour de Bali. Une session coupée à 6 h est marquée « à vérifier » et comptée 6 h. Rien n'est modifiable après coup.", need: "Connexion équipe requise pour cet onglet.", loading: "Calcul…",
+    s: { total: "Temps total", sessions: "Sessions", jobs: "Commandes", editors: "Monteurs", flagged: "À vérifier", flaggedSub: "coupées à 6 h", running: "En cours", runningSub: "chronos ouverts", cost: "Coût", costSub: "taux horaire × temps" },
+    eds: "Par monteur", edCols: { name: "Monteur", minutes: "Temps", jobs: "Commandes", sessions: "Sessions", perJob: "Moy. / commande", days: "Jours", flagged: "À vérifier", rate: "Taux horaire", cost: "Coût" },
+    jobs: "Par commande", jobCols: { job: "Commande", client: "Client", minutes: "Temps", editors: "Monteurs", sessions: "Sessions", flagged: "À vérifier", status: "Qualité", cost: "Coût" },
+    sess: "Sessions", sessCols: { day: "Jour", editor: "Monteur", job: "Commande", start: "Début", end: "Fin", minutes: "Durée", comment: "Note" }, more: (n) => `… et ${n} autres (export CSV pour tout voir)`,
+    none: "Aucune session sur la période.", csv: "CSV temps", flag: "à vérifier", running: "en cours", rateSaved: "enregistré", rateBad: "Nombre positif attendu.", rateHint: "Taux saisis ici, jamais visibles des monteurs, de Putu ni de Rania.", qc: { pending: "en attente", ok: "OK", revisions: "à revoir" } } },
+  en: { tabs: { time: "Time" }, tm: { kicker: "Editing timer", title: "Time per editor and per order", sub: "Start → Finish sessions logged on the team board. Bali day. A session auto-stopped at 6 h is flagged « to check » and counted as 6 h. Nothing can be edited afterwards.", need: "Team sign-in required for this tab.", loading: "Computing…",
+    s: { total: "Total time", sessions: "Sessions", jobs: "Orders", editors: "Editors", flagged: "To check", flaggedSub: "auto-stopped at 6 h", running: "Running", runningSub: "open timers", cost: "Cost", costSub: "hourly rate × time" },
+    eds: "Per editor", edCols: { name: "Editor", minutes: "Time", jobs: "Orders", sessions: "Sessions", perJob: "Avg / order", days: "Days", flagged: "To check", rate: "Hourly rate", cost: "Cost" },
+    jobs: "Per order", jobCols: { job: "Order", client: "Client", minutes: "Time", editors: "Editors", sessions: "Sessions", flagged: "To check", status: "QC", cost: "Cost" },
+    sess: "Sessions", sessCols: { day: "Day", editor: "Editor", job: "Order", start: "Start", end: "End", minutes: "Length", comment: "Note" }, more: (n) => `… and ${n} more (CSV export shows everything)`,
+    none: "No session over the period.", csv: "Time CSV", flag: "to check", running: "running", rateSaved: "saved", rateBad: "Positive number expected.", rateHint: "Rates entered here are never shown to editors, Putu or Rania.", qc: { pending: "pending", ok: "OK", revisions: "changes" } } },
+  id: { tabs: { time: "Waktu" }, tm: { kicker: "Timer editing", title: "Waktu per editor dan per pesanan", sub: "Sesi Mulai → Selesai dari papan tim. Hari Bali. Sesi yang berhenti otomatis di 6 jam ditandai « periksa » dan dihitung 6 jam. Tidak bisa diubah setelahnya.", need: "Masuk tim diperlukan untuk tab ini.", loading: "Menghitung…",
+    s: { total: "Total waktu", sessions: "Sesi", jobs: "Pesanan", editors: "Editor", flagged: "Periksa", flaggedSub: "berhenti otomatis 6 jam", running: "Berjalan", runningSub: "timer terbuka", cost: "Biaya", costSub: "tarif per jam × waktu" },
+    eds: "Per editor", edCols: { name: "Editor", minutes: "Waktu", jobs: "Pesanan", sessions: "Sesi", perJob: "Rata-rata / pesanan", days: "Hari", flagged: "Periksa", rate: "Tarif per jam", cost: "Biaya" },
+    jobs: "Per pesanan", jobCols: { job: "Pesanan", client: "Klien", minutes: "Waktu", editors: "Editor", sessions: "Sesi", flagged: "Periksa", status: "QC", cost: "Biaya" },
+    sess: "Sesi", sessCols: { day: "Hari", editor: "Editor", job: "Pesanan", start: "Mulai", end: "Selesai", minutes: "Durasi", comment: "Catatan" }, more: (n) => `… dan ${n} lainnya (ekspor CSV untuk semua)`,
+    none: "Tidak ada sesi pada periode ini.", csv: "CSV waktu", flag: "periksa", running: "berjalan", rateSaved: "tersimpan", rateBad: "Angka positif diperlukan.", rateHint: "Tarif di sini tidak pernah terlihat oleh editor, Putu, atau Rania.", qc: { pending: "menunggu", ok: "OK", revisions: "revisi" } } },
+};
+for (const l of Object.keys(T)) { Object.assign(T[l].tabs, T4[l].tabs); T[l].tm = T4[l].tm; }
+const canTime = () => !!profile && ["admin", "dispatcher", "qc"].includes(profile.role);
 const AI_SAMPLE = 20;   // q41 : 20 vidéos Qualité OK avant de conclure
 const $ = (s) => document.querySelector(s);
 const params = new URLSearchParams(location.search);
@@ -492,7 +516,8 @@ function applyText() {
 }
 function renderTabs() {
   if (tab === "ai" && !isAdmin()) tab = "overview";
-  $("#tabs").innerHTML = TABS.filter((k) => k !== "ai" || isAdmin()).map((k) => `<button type="button" class="tab ${tab === k ? "on" : ""}" data-tab="${k}">${t("tabs." + k)}</button>`).join("");
+  if (tab === "time" && !canTime()) tab = "overview";
+  $("#tabs").innerHTML = TABS.filter((k) => (k !== "ai" || isAdmin()) && (k !== "time" || canTime())).map((k) => `<button type="button" class="tab ${tab === k ? "on" : ""}" data-tab="${k}">${t("tabs." + k)}</button>`).join("");
   $("#tabs").querySelectorAll("[data-tab]").forEach((b) => b.addEventListener("click", () => { tab = b.dataset.tab; const u = new URL(location.href); u.searchParams.set("tab", tab); history.replaceState(null, "", u); renderTabs(); render(); }));
 }
 function renderToolbar() {
@@ -507,7 +532,59 @@ function renderToolbar() {
 }
 function render() {
   TABS.forEach((k) => { $("#v-" + k).hidden = k !== tab; });
-  if (tab === "overview") renderOverview(); else if (tab === "editors") renderEditors(); else if (tab === "reports") renderReports(); else if (tab === "ai") renderAi(); else renderSettings();
+  if (tab === "overview") renderOverview(); else if (tab === "editors") renderEditors(); else if (tab === "reports") renderReports(); else if (tab === "ai") renderAi(); else if (tab === "time") renderTime(); else renderSettings();
+}
+
+/* ===== Temps (chrono de montage, 22/10) : RPC chrono_stats ; admin / dispatch / qualité ; coût + taux pour l'admin seul (la base décide, pas l'écran) ===== */
+let tmReq = 0, tmData = null;
+const fmtH = (m) => { m = Math.round(Number(m) || 0); const h = Math.floor(m / 60), r = m % 60; return h ? `${h} h ${pad(r)}` : `${m} min`; };
+const fmtMoney = (v, cur) => v == null ? "—" : Number(v).toLocaleString(loc(), { style: "currency", currency: cur || "EUR", maximumFractionDigits: 0 });
+async function renderTime() {
+  const M = t("tm"), box = $("#v-time");
+  if (!canTime()) { box.innerHTML = `<div class="panel"><div class="empty">${M.need}</div></div>`; return; }
+  const req = ++tmReq; if (!tmData) box.innerHTML = `<div class="panel"><div class="empty">${M.loading}</div></div>`;
+  const { data, error } = await sb.rpc("chrono_stats", { p_from: period.from, p_to: period.to });
+  if (req !== tmReq || tab !== "time") return;
+  if (error || !data) { box.innerHTML = `<div class="panel"><p class="msg err" style="margin:0;font-size:13px">${t("loadErr")} ${esc(error ? error.message : "?")}</p></div>`; return; }
+  tmData = data;
+  const money = !!data.money, tot = data.total || {}, eds = data.editors || [], jobs = data.jobs || [], sess = data.sessions || [], ratesOf = Object.fromEntries((data.rates || []).map((r) => [r.editor_id, r]));
+  const cur = (data.rates || [])[0] ? data.rates[0].currency : "EUR";
+  const costTot = money ? eds.reduce((a, e) => a + (Number(e.cost) || 0), 0) : null;
+  const stat = (k, v, sub) => `<div class="stat"><div class="mono">${k}</div><div class="v">${v}</div><div class="sub">${sub || ""}</div></div>`;
+  const head = (k, title, extra) => `<div class="ph"><div><div class="mono">${k}</div><h2>${title}</h2></div>${extra || ""}</div>`;
+  const flagTag = (n) => n ? `<span class="tag" style="color:var(--warn);border-color:rgba(245,196,0,.5)">⚠ ${nf(n, 0)}</span>` : "—";
+  const edRow = (e) => `<tr><td class="d">${esc(e.name)}${aiTag(e)}</td><td class="c">${fmtH(e.minutes)}</td><td>${nf(e.jobs, 0)}</td><td>${nf(e.sessions, 0)}</td><td>${e.jobs ? fmtH(e.minutes / e.jobs) : "—"}</td><td>${nf(e.days, 0)}</td><td>${flagTag(e.flagged)}</td>
+    ${money ? `<td><span style="display:inline-flex;gap:6px;align-items:center"><input class="in" type="number" min="0" step="0.5" style="width:84px;padding:6px 8px" data-rate="${esc(e.editor_id)}" value="${e.hourly_rate ?? ""}" placeholder="—"/><select class="in" style="width:auto;padding:6px 8px" data-cur="${esc(e.editor_id)}">${["EUR", "USD", "IDR"].map((c) => `<option ${(e.currency || cur) === c ? "selected" : ""}>${c}</option>`).join("")}</select><span class="mono" data-ratemsg="${esc(e.editor_id)}"></span></span></td><td class="c">${e.cost != null ? fmtMoney(e.cost, e.currency || cur) : "—"}</td>` : ""}</tr>`;
+  const jobRow = (j) => `<tr><td class="d">${esc(j.token || "")} · ${esc(j.project || "")}</td><td>${esc(j.client || "")}</td><td class="c">${fmtH(j.minutes)}</td><td style="text-align:left">${(j.editors || []).map((x) => `${esc(x.name)} ${fmtH(x.minutes)}`).join(" · ")}</td><td>${nf(j.sessions, 0)}</td><td>${flagTag(j.flagged)}</td><td>${esc((M.qc || {})[j.qc_status] || j.qc_status || "")}</td>${money ? `<td class="c">${j.cost != null ? fmtMoney(j.cost, cur) : "—"}</td>` : ""}</tr>`;
+  const SHOW = 60;
+  const sessRow = (s) => `<tr><td class="d">${fmtDay(s.day)}</td><td>${esc(s.editor)}</td><td style="text-align:left">${esc(s.client || "")} · ${esc(s.project || "")}</td><td>${fmtDT(s.started_at)}</td><td>${s.ended_at ? fmtDT(s.ended_at) : `<span class="tag" style="color:var(--ok)">${M.running}</span>`}</td><td class="c">${fmtH(s.minutes)}${s.auto_cut ? ` <span class="tag" style="color:var(--warn)">${M.flag}</span>` : ""}</td><td style="text-align:left">${esc(s.comment || "")}</td></tr>`;
+  box.innerHTML = `<div class="stats" style="grid-template-columns:repeat(${money ? 6 : 5},1fr)">
+      ${stat(M.s.total, fmtH(tot.minutes), `${nf(tot.editors, 0)} ${M.s.editors.toLowerCase()}`)}${stat(M.s.sessions, nf(tot.sessions, 0), "")}${stat(M.s.jobs, nf(tot.jobs, 0), "")}
+      ${stat(M.s.flagged, nf(tot.flagged, 0), M.s.flaggedSub)}${stat(M.s.running, nf(tot.running, 0), M.s.runningSub)}${money ? stat(M.s.cost, fmtMoney(costTot, cur), M.s.costSub) : ""}
+    </div>
+    <div class="panel">${head(M.kicker, M.title, `<button type="button" class="btn" id="tmCsv">${ICONS.dl}${M.csv}</button>`)}<p class="note" style="margin-top:0">${M.sub}${money ? " " + M.rateHint : ""}</p>
+      ${eds.length ? `<div class="scroll"><table class="grid"><thead><tr><th class="d">${M.edCols.name}</th><th>${M.edCols.minutes}</th><th>${M.edCols.jobs}</th><th>${M.edCols.sessions}</th><th>${M.edCols.perJob}</th><th>${M.edCols.days}</th><th>${M.edCols.flagged}</th>${money ? `<th>${M.edCols.rate}</th><th>${M.edCols.cost}</th>` : ""}</tr></thead><tbody>${eds.map(edRow).join("")}</tbody></table></div>` : `<div class="empty">${M.none}</div>`}</div>
+    <div class="panel">${head(M.jobs, M.jobs)}${jobs.length ? `<div class="scroll"><table class="grid"><thead><tr><th class="d">${M.jobCols.job}</th><th>${M.jobCols.client}</th><th>${M.jobCols.minutes}</th><th>${M.jobCols.editors}</th><th>${M.jobCols.sessions}</th><th>${M.jobCols.flagged}</th><th>${M.jobCols.status}</th>${money ? `<th>${M.jobCols.cost}</th>` : ""}</tr></thead><tbody>${jobs.map(jobRow).join("")}</tbody></table></div>` : `<div class="empty">${M.none}</div>`}</div>
+    <div class="panel">${head(M.sess, M.sess)}${sess.length ? `<div class="scroll"><table class="grid"><thead><tr><th class="d">${M.sessCols.day}</th><th>${M.sessCols.editor}</th><th>${M.sessCols.job}</th><th>${M.sessCols.start}</th><th>${M.sessCols.end}</th><th>${M.sessCols.minutes}</th><th>${M.sessCols.comment}</th></tr></thead><tbody>${sess.slice(0, SHOW).map(sessRow).join("")}</tbody></table></div>${sess.length > SHOW ? `<p class="note" style="margin-bottom:0">${M.more(sess.length - SHOW)}</p>` : ""}` : `<div class="empty">${M.none}</div>`}</div>`;
+  $("#tmCsv").addEventListener("click", exportTimeCsv);
+  // taux horaires (admin) : une ligne par monteur dans editor_rates, écrite au changement ; la base refuse tout autre rôle (RLS)
+  box.querySelectorAll("[data-rate],[data-cur]").forEach((inp) => inp.addEventListener("change", async () => {
+    const id = inp.dataset.rate || inp.dataset.cur, rate = box.querySelector(`[data-rate="${id}"]`), curSel = box.querySelector(`[data-cur="${id}"]`), msg = box.querySelector(`[data-ratemsg="${id}"]`);
+    const v = rate.value.trim(); if (v === "") return;
+    const n = Number(v); if (!Number.isFinite(n) || n < 0) { msg.textContent = M.rateBad; return; }
+    const { error } = await sb.from("editor_rates").upsert({ editor_id: id, hourly_rate: n, currency: curSel.value, updated_at: new Date().toISOString() });
+    msg.textContent = error ? "✖ " + error.message : "✓ " + M.rateSaved;
+    if (!error) { tmData = null; setTimeout(() => { if (tab === "time") renderTime(); }, 600); }
+  }));
+}
+function exportTimeCsv() {
+  if (!tmData) return; const M = t("tm"), money = !!tmData.money;
+  const head = ["Jour", "Monteur", "Commande", "Client", "Projet", "Début", "Fin", "Minutes", "Coupée 6h", "Note"];
+  const rows = (tmData.sessions || []).map((s) => [s.day, s.editor, s.token || "", s.client || "", s.project || "", s.started_at, s.ended_at || "", String(s.minutes), s.auto_cut ? "oui" : "", s.comment || ""].map((x) => `"${String(x).replace(/"/g, '""')}"`).join(";"));
+  const eds = (tmData.editors || []).map((e) => ["", e.name, "TOTAL", "", "", "", "", String(e.minutes), String(e.flagged || 0), money && e.cost != null ? `${e.cost} ${e.currency || ""}` : ""].map((x) => `"${String(x).replace(/"/g, '""')}"`).join(";"));
+  const blob = new Blob(["﻿" + [head.join(";"), ...rows, "", ...eds].join("\r\n") + "\r\n"], { type: "text/csv;charset=utf-8" });
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `temps_${period.from}_${period.to}.csv`; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  void M;
 }
 
 /* ===== IA vs humains (Ilana, 20/10) : RPC editor_kpis, admins connectés ===== */
@@ -776,6 +853,7 @@ async function load(force) {
   if (loadError) { $("#v-" + tab).innerHTML = `<div class="panel"><p class="msg err" style="margin:0;font-size:13px">${t("loadErr")} ${esc(loadError)}</p></div>`; return; }
   // rafraîchissement automatique (temps réel / 60 s) : on ne repeint pas les Paramètres pendant une saisie
   if (!force && tab === "settings" && document.activeElement && $("#v-settings").contains(document.activeElement)) return;
+  if (!force && tab === "time" && document.activeElement && $("#v-time").contains(document.activeElement)) return;   // saisie d'un taux horaire en cours
   render();
 }
 async function boot() {

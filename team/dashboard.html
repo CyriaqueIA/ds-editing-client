@@ -166,6 +166,14 @@
     .st.on{color:#0A0B0D;border-color:rgba(255,255,255,.85);background:rgba(255,255,255,.85)}
     .st.auto{cursor:default;border-color:rgba(70,211,105,.5)}
     .st.auto.on{border-color:var(--ok)}
+    /* chrono de montage (22/10) : bandeau « qui monte quoi depuis combien de temps » (télé + dashboard) */
+    .ctv{display:flex;gap:10px;flex-wrap:wrap;padding:12px 16px;margin-bottom:12px;border:1px solid rgba(70,211,105,.4);border-radius:18px;background:rgba(70,211,105,.06);align-items:center}
+    .ctv .ttl{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ok);margin-right:6px}
+    .ctv .it{display:inline-flex;align-items:center;gap:10px;padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.04);font-size:14px}
+    .ctv .it b{font-variant-numeric:tabular-nums;color:var(--ok);font-size:18px}
+    .ctv .it b.flag{color:var(--warn)}
+    .ctv .it small{color:var(--taupe)}
+    body.tv .ctv .it{font-size:17px;padding:10px 18px}body.tv .ctv .it b{font-size:26px}body.tv .ctv .ttl{font-size:14px}
     .st[aria-disabled="true"]{cursor:not-allowed;opacity:.6}
     .st.lk{cursor:default}
     /* retour d'enregistrement (✓ Enregistré / erreur) à côté d'un champ ; .warn = consigne permanente */
@@ -522,6 +530,7 @@
     <div class="stats" id="stats"></div>
     <div class="toolbar" id="toolbar"></div>
     <div class="alerts" id="alerts" aria-live="polite"></div>
+    <div id="chronoTv" hidden></div>
     <div class="asmbar" id="asmbar" aria-live="polite"></div>
     <div class="board" id="board"></div>
     <div class="admin" id="admin" hidden></div>
@@ -598,6 +607,7 @@ const T = {
     needFrame: "Colle d'abord le lien frame.io de livraison : « Livré » reste bloqué sans lui.", locked: "Étape déjà cochée : seule la qualité ou un admin peut la corriger.", redeliver: "Relivrer", redeliverTip: "Corrige le lien frame.io si besoin, puis relivre pour un nouveau contrôle qualité.", redelivered: "✓ Relivré, la qualité est prévenue", round: (n) => `${n}e passage`, savedOk: "✓ Enregistré",
     lk: { editor: "Monteur", dispatcher: "Dispatch", qc: "Qualité", badT: "Lien invalide ou coupé", badP: "Ce lien ne fonctionne plus. Demande-en un nouveau à l'équipe DS Editing.", tooT: "Trop d'essais", tooP: "Réessaie dans quelques minutes.", downT: "Service indisponible", downP: "Impossible de joindre le serveur. Vérifie ta connexion puis réessaie.", byeT: "Lien retiré de cet appareil", byeP: "Rouvre ton lien personnel pour revenir à tes commandes.", retry: "Réessayer", offT: "Accès désactivé", offP: "Ton accès est désactivé pour le moment. Reviens plus tard ou demande à l'équipe DS Editing.", who: (n) => `Connecté avec le lien de ${n}`, queue: (n) => `À attribuer · ${n}`, others: "Autres commandes", brief: "Brief", refs: "Références", logos: "Logos" },
     errs: { FRAMEIO_REQUIS: "Lien frame.io manquant ou invalide (il doit commencer par https://).", ETAPE_VERROUILLEE: "Étape déjà cochée : seule la qualité ou un admin peut la corriger.", QC_OK_VERROUILLE: "Qualité déjà validée : le lien frame.io ne peut plus être modifié (voir avec l'équipe qualité).", REFUSE: "Action refusée pour ton profil.", CHAMP_INTERDIT: "Modification non autorisée pour ton profil.", LIEN_INVALIDE: "Ce lien ne fonctionne plus : demande-en un nouveau.", TROP_D_ESSAIS: "Trop d'essais : réessaie dans quelques minutes.", REOUVERTURE_REFUSEE: "On ne rouvre l'assemblage qu'après un « à revoir » de la qualité.", LIVRAISON_FIGEE: "Commande livrée : après un « à revoir », rouvre d'abord l'assemblage avant de rouvrir une partie.", PARTIE_DEJA_COMMENCEE: "Impossible : une étape est déjà cochée ou un lien déjà posé sur cette commande.", COMMANDE_TERMINEE: "Impossible : la commande est terminée (qualité OK).", PAS_UNE_PARTIE_UNIQUE: "Cette commande est déjà coupée en parties.", PAS_DEUX_PARTIES: "Cette commande n'est pas coupée en Intro / Corps.", ACTION_INCONNUE: "Action inconnue.", JOB_A_PARTIES: "Cette commande est découpée en parties : coche l'étape dans la partie concernée.", PARTIES_NON_LIVREES: "Toutes les parties doivent être livrées avant de livrer la commande.", MONTEUR_INCONNU: "Monteur inconnu.", MONTEUR_DESACTIVE: "Ton accès est désactivé pour le moment.", COMMANDE_COMMENCEE: "Impossible : une étape est déjà cochée, la qualité a tranché ou un lien est posé. On ne supprime qu'une commande pas commencée.", COMMANDE_FACTUREE: "Impossible : cette commande est déjà sur une facture.", INTROUVABLE: "Commande introuvable (déjà supprimée ?)." },
+    chrono: { title: "Temps de montage", pillTip: (n) => `${n} session${n > 1 ? "s" : ""} chronométrée${n > 1 ? "s" : ""} (vue équipe)`, sessions: (n) => `${n} session${n > 1 ? "s" : ""}`, flagged: (n) => `${n} coupée${n > 1 ? "s" : ""} à 6 h, à vérifier`, running: "chrono en cours", cost: "de coût (taux horaire)", tv: "⏱ En montage maintenant" },
     tabs: { prod: "Production", equipe: "Équipe", tarifs: "Tarifs", factures: "Factures", rdv: "Rendez-vous", recrut: "Recrutement", grille: "Grille", rituels: "Rituels", rh: "Espace RH" },
     gh: { notYou: "Ce n'est pas vous ?", sharedFallback: "Vue d'équipe indisponible avec ce compte : connecte-toi avec ton compte nominatif.", morning: "Rituels du matin", prios: "3 priorités du jour", week: "7 derniers jours", tz: "heure de Bali", loading: "Lecture en cours…", retry: "Réessayer",
       rit: { bilan_veille: "Relire le bilan de la veille", agenda_jour: "Vérifier l'agenda et les rendez-vous du jour", relances_jour: "Préparer les relances du jour", nouveaux_contacts: "Repérer les nouveaux contacts à traiter", crm_a_jour: "Vérifier que le CRM est à jour" },
@@ -668,6 +678,7 @@ const T = {
     needFrame: "Paste the frame.io delivery link first: “Delivered” stays blocked without it.", locked: "Step already ticked: only QC or an admin can fix it.", redeliver: "Redeliver", redeliverTip: "Fix the frame.io link if needed, then redeliver for a new quality check.", redelivered: "✓ Redelivered, QC has been notified", round: (n) => `${n}${[11, 12, 13].includes(n % 100) ? "th" : ({ 1: "st", 2: "nd", 3: "rd" })[n % 10] || "th"} pass`, savedOk: "✓ Saved",
     lk: { editor: "Editor", dispatcher: "Dispatch", qc: "Quality", badT: "Invalid or disabled link", badP: "This link no longer works. Ask the DS Editing team for a new one.", tooT: "Too many attempts", tooP: "Try again in a few minutes.", downT: "Service unavailable", downP: "Cannot reach the server. Check your connection and try again.", byeT: "Link removed from this device", byeP: "Open your personal link again to get back to your orders.", retry: "Try again", offT: "Access disabled", offP: "Your access is disabled for now. Come back later or ask the DS Editing team.", who: (n) => `Signed in with ${n}'s link`, queue: (n) => `To assign · ${n}`, others: "Other orders", brief: "Brief", refs: "References", logos: "Logos" },
     errs: { FRAMEIO_REQUIS: "frame.io link missing or invalid (it must start with https://).", ETAPE_VERROUILLEE: "Step already ticked: only QC or an admin can fix it.", QC_OK_VERROUILLE: "QC already approved: the frame.io link can no longer be changed (ask the QC team).", REFUSE: "Action refused for your profile.", CHAMP_INTERDIT: "Change not allowed for your profile.", LIEN_INVALIDE: "This link no longer works: ask for a new one.", TROP_D_ESSAIS: "Too many attempts: try again in a few minutes.", REOUVERTURE_REFUSEE: "The assembly can only be reopened after a QC « needs changes ».", LIVRAISON_FIGEE: "Order delivered: after a « needs changes », reopen the assembly first before reopening a part.", PARTIE_DEJA_COMMENCEE: "Not possible: a step is already ticked or a link already set on this order.", COMMANDE_TERMINEE: "Not possible: the order is finished (QC OK).", PAS_UNE_PARTIE_UNIQUE: "This order is already split into parts.", PAS_DEUX_PARTIES: "This order is not split into Intro / Body.", ACTION_INCONNUE: "Unknown action.", JOB_A_PARTIES: "This order is split into parts: tick the step in the relevant part.", PARTIES_NON_LIVREES: "All parts must be delivered before delivering the order.", MONTEUR_INCONNU: "Unknown editor.", MONTEUR_DESACTIVE: "Your access is disabled for now.", COMMANDE_COMMENCEE: "Not possible: a step is already ticked, QC has decided or a link is set. Only an order that has not started can be deleted.", COMMANDE_FACTUREE: "Not possible: this order is already on an invoice.", INTROUVABLE: "Order not found (already deleted?)." },
+    chrono: { title: "Editing time", pillTip: (n) => `${n} timed session${n > 1 ? "s" : ""} (team board)`, sessions: (n) => `${n} session${n > 1 ? "s" : ""}`, flagged: (n) => `${n} auto-stopped at 6 h, to check`, running: "timer running", cost: "cost (hourly rate)", tv: "⏱ Editing right now" },
     tabs: { prod: "Production", equipe: "Team", tarifs: "Pricing", factures: "Invoices", rdv: "Appointments", recrut: "Recruitment", grille: "Grid", rituels: "Routines", rh: "HR space" },
     gh: { notYou: "Not you?", sharedFallback: "Team view unavailable with this account: sign in with your personal account.", morning: "Morning routines", prios: "Today's 3 priorities", week: "Last 7 days", tz: "Bali time", loading: "Loading…", retry: "Retry",
       rit: { bilan_veille: "Read yesterday's recap", agenda_jour: "Check today's agenda and appointments", relances_jour: "Prepare today's follow-ups", nouveaux_contacts: "Spot the new contacts to handle", crm_a_jour: "Check the CRM is up to date" },
@@ -717,7 +728,7 @@ let lang = params.get("lang") || (() => { try { return localStorage.getItem("ds_
 const t = (k) => T[lang][k];
 let tv = params.get("tv") === "1"; document.body.classList.toggle("tv", tv);
 let me = null, profile = null, myEditor = null, jobs = [], editors = [], filter = params.get("f") || "all", edFilter = params.get("editor") || "", q = "", known = new Set(), sb = null;
-let tab = params.get("tab") || "prod", studios = [], grids = [], offerRows = [], invoicesAll = [], extras = [], tarifStudio = "", bookingSettings = null, bookingsAll = [], candidatesAll = [], interviewsAll = [], interviewSettings = null, scoringGrids = [], recruitOk = false;
+let tab = params.get("tab") || "prod", studios = [], grids = [], offerRows = [], invoicesAll = [], extras = [], tarifStudio = "", bookingSettings = null, bookingsAll = [], candidatesAll = [], interviewsAll = [], interviewSettings = null, scoringGrids = [], recruitOk = false, times = [], rates = [], chronoRun = [];
 const money = (x, cur) => x == null ? "—" : (cur === "USD" ? "$" + Number(x).toLocaleString("en-US", { minimumFractionDigits: 2 }) : Number(x).toLocaleString("fr-FR", { minimumFractionDigits: 2 }) + " €");
 
 /* ===== Accès par lien personnel (lot B) : ?k=<code> =====
@@ -1150,6 +1161,7 @@ function renderBoard() {
         ${multi ? derivedPills(j, st) : `<span class="st ${j.started_at ? "on" : ""}${sLk("started_at")}" data-step="started_at" data-id="${j.id}" ${sAttr("started_at")}>${j.started_at ? "✓" : "○"} ${st.start}</span>`}
         ${multi ? "" : `<span class="st ${j.half_at ? "on" : ""}${sLk("half_at")}" data-step="half_at" data-id="${j.id}" ${sAttr("half_at")}>${j.half_at ? "✓" : "○"} ${st.half}</span>`}
         ${multi ? "" : `<span class="st ${j.delivered_at ? "on" : ""}${sLk("delivered_at")}" data-step="delivered_at" data-id="${j.id}" ${sAttr("delivered_at")}>${j.delivered_at ? "✓" : "○"} ${st.done}</span>`}
+        ${timePill(j)}
         ${dlLine(j)}
         ${fbHtml(j.id, "step")}
       </div>
@@ -1167,6 +1179,7 @@ function renderBoard() {
           ${isAdmin() ? `<b style="margin-top:8px">${t("deliveryDate")}</b><input class="in" type="date" data-field="delivery_date" data-id="${j.id}" value="${j.delivery_date || ""}"/>${fbHtml(j.id, "delivery_date")}<b style="margin-top:8px">${t("noteQc")}</b><input class="in" data-field="qc_note" data-id="${j.id}" value="${esc(j.qc_note || "")}"/>${fbHtml(j.id, "qc_note")}` : (j.qc_note ? `<b style="margin-top:8px">${t("noteQc")}</b>${esc(j.qc_note)}` : "")}
           ${multi && isEditor() ? "" : `<b style="margin-top:8px">${t("notes")}</b><input class="in" data-field="notes" data-id="${j.id}" value="${esc(j.notes || "")}" ${ed && !(multi && isEditor()) ? "" : "disabled"}/>${fbHtml(j.id, "notes")}<span class="help">${esc(t("notesHelp"))}</span>`}
           ${multi ? partNotes(j) : reshapeBlock(j)}
+          ${timeBlock(j)}
           ${canMoney() && !LINKED ? amountBlock(j) : ""}
           ${canDelete(j) ? `<button type="button" class="btn ghost del" data-deljob="${j.id}">${t("delJob").btn}</button>` : ""}
         </div>
@@ -1215,6 +1228,42 @@ function briefBlock(j) {
   const hs = houseStyleOf(j);
   return `<div class="bf"><b>${L.brief}</b>${depBy}${j.work_to_do ? `<span class="wk2">${esc(j.work_to_do)}</span>` : ""}<span class="tx">${esc(j.description || "—")}</span>${hs ? `<div style="margin-top:10px"><b>${t("houseStyle")}</b><span class="tx">${esc(hs)}</span></div>` : ""}${j.brief_url ? `<div class="links"><a href="${safeUrl(j.brief_url)}" target="_blank" rel="noopener noreferrer">${t("brief")}</a></div>` : ""}${ownBriefBlock(j, true)}${refs.length ? `<div class="links"><b>${L.refs}</b>${refs.map(link).join("")}</div>` : ""}${j.logos ? `<div style="margin-top:8px"><b>${L.logos}</b><span class="tx">${esc(j.logos)}</span></div>` : ""}</div>`;
 }
+/* ===== chrono de montage (22/10, supabase/chrono_v1.sql). Sessions Démarrer → Terminer posées par les monteurs sur la vue équipe.
+   Lecture ici par les comptes nominatifs admin / dispatch / qualité (RLS time_sessions_team_read) ; taux horaires et coût = admin seul (editor_rates).
+   Table absente (SQL pas appliqué), lien personnel, télé ou rôle sans droit : listes vides, rien ne s'affiche, rien ne casse. ===== */
+async function fetchTimes() {
+  if (LINKED || tv || !profile) { times = []; rates = []; return; }
+  try { const r = await sb.from("time_sessions").select("job_id,editor_id,started_at,ended_at,auto_cut").order("started_at", { ascending: false }).limit(5000); times = r.error ? [] : (r.data || []); } catch { times = []; }
+  if (canMoney()) { try { const r = await sb.from("editor_rates").select("editor_id,hourly_rate,currency"); rates = r.error ? [] : (r.data || []); } catch { rates = []; } } else rates = [];
+}
+const sessMin = (s, now = Date.now()) => Math.max(0, Math.floor(((s.ended_at ? new Date(s.ended_at) : new Date(now)) - new Date(s.started_at)) / 60000));
+const fmtMinD = (m) => { m = Math.round(m || 0); const h = Math.floor(m / 60), r = m % 60; return h ? `${h} h ${String(r).padStart(2, "0")}` : `${m} min`; };
+function timeOf(j) {
+  const ss = times.filter((s) => s.job_id === j.id); if (!ss.length) return null;
+  const byEd = new Map(); let min = 0, flagged = 0, running = 0;
+  for (const s of ss) { const m = sessMin(s); min += m; if (s.auto_cut) flagged++; if (!s.ended_at) running++; byEd.set(s.editor_id, (byEd.get(s.editor_id) || 0) + m); }
+  let cost = null, cur = "";
+  if (canMoney() && rates.length) { cost = 0; for (const [id, m] of byEd) { const r = rates.find((x) => x.editor_id === id); if (r) { cost += (m / 60) * Number(r.hourly_rate); cur = cur || r.currency; } } }
+  return { min, flagged, running, n: ss.length, cost, cur, byEd: [...byEd.entries()].map(([id, m]) => ({ e: editors.find((x) => x.id === id), m })).sort((a, b) => b.m - a.m) };
+}
+const timePill = (j) => { const x = timeOf(j); if (!x) return ""; return `<span class="st auto ${x.running ? "on" : ""}" title="${esc(t("chrono").pillTip(x.n))}">⏱ ${fmtMinD(x.min)}${x.running ? " ▶" : ""}${x.flagged ? " ⚠" : ""}</span>`; };
+function timeBlock(j) {
+  const x = timeOf(j); if (!x) return ""; const L = t("chrono");
+  return `<div><b>${L.title}</b><div class="lk">${x.byEd.map((b) => `${esc(b.e ? b.e.name : "?")} · ${fmtMinD(b.m)}`).join("<br/>")}</div><span class="help">${esc(L.sessions(x.n))}${x.flagged ? ` · ⚠ ${esc(L.flagged(x.flagged))}` : ""}${x.running ? ` · ▶ ${esc(L.running)}` : ""}${x.cost != null && canMoney() ? ` · <b style="display:inline">${money(x.cost, x.cur || "EUR")}</b> ${esc(L.cost)}` : ""}</span></div>`;
+}
+// chronos en cours (RPC chrono_running : tout compte connecté de l'équipe, télé comprise ; jamais de prix) → bandeau au-dessus des commandes
+async function loadChronoRun() {
+  if (LINKED || !profile) return;
+  try { const { data, error } = await sb.rpc("chrono_running"); chronoRun = error || !data ? [] : (data.running || []); } catch { chronoRun = []; }
+  renderChronoTv();
+}
+function renderChronoTv() {
+  const el = $("#chronoTv"); if (!el) return;
+  if (!chronoRun.length) { el.hidden = true; el.innerHTML = ""; return; }
+  const now = Date.now(); const dur = (iso) => { const s = Math.max(0, Math.floor((now - new Date(iso)) / 1000)); return `${Math.floor(s / 3600)}:${String(Math.floor((s % 3600) / 60)).padStart(2, "0")}`; };
+  el.hidden = false; el.innerHTML = `<div class="ctv"><span class="ttl">${t("chrono").tv}</span>${chronoRun.map((s) => `<span class="it"><b class="${now - new Date(s.started_at) > 6 * 3600e3 ? "flag" : ""}">${dur(s.started_at)}</b>${esc(s.editor)}<small>${esc(s.client)} · ${esc(s.project)}</small></span>`).join("")}</div>`;
+}
+setInterval(() => { if (!document.hidden) loadChronoRun(); }, 30000);
 function amountBlock(j) {
   const s = studios.find((x) => x.id === j.studio_id); const cur = s ? s.currency : "EUR";
   const inv = invoicesAll.find((i) => i.id === j.invoice_id);
@@ -2207,7 +2256,7 @@ async function load(first, keepPop, pre) {
     const [{ data: rr, error }, { data: ee }] = await Promise.all([
       fetchJobs(),
       sb.from("editors").select("id,name,avatar_url,profile_id,active,sort").order("sort"),
-      loadAdmin(), loadAgent(),
+      loadAdmin(), loadAgent(), fetchTimes(),
     ]);
     if (error) { console.error(error); return; }
     rows = rr; eds = ee; attachParts(rows, await fetchParts(rows));
@@ -2229,6 +2278,7 @@ async function load(first, keepPop, pre) {
   if (first && !params.has("editor") && myEditor && profile.role === "editor") edFilter = myEditor.id;
   const openCell = keepPop && document.querySelector(".pop") ? popRef : null;
   renderEditorBar(); renderStats(); renderBoard(); renderPc(); renderAlerts();
+  if (first) loadChronoRun();
   if (!LINKED && tab === "equipe") renderEquipe();
   if (openCell) { const cell = document.querySelector(`[data-${openCell[0]}="${openCell[1]}"]`); if (cell) (openCell[0] === "peds" ? openPartPop : openPop)(cell); }
 }
