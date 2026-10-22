@@ -625,7 +625,7 @@ const T = {
       listTitle: "Rendez-vous", upcoming: "À venir", past: "Passés", cols: ["Date (Paris)", "Nom", "Studio", "E-mail", "Téléphone", "Notes", "Statut", "E-mails"],
       status: { confirmed: "Confirmé", done: "Fait", cancelled: "Annulé", no_show: "Absent" }, none: "Aucun rendez-vous", confirm: "confirmation", reminder: "rappel", local: "chez vous", missing: "Réglages introuvables : appliquer supabase/bookings_v1.sql." },
     rc: { listTitle: "Candidats", hint: "Triés par note de candidature. Rien n'est envoyé d'ici : on copie le lien du test ou de l'invitation et on l'envoie à la main (SEEK ou e-mail). Depuis le 22/10, Safa décide des lots.",
-      allRoles: "Tous les postes", allStatus: "Tous les statuts", roles: { video_editor: "Video Editor", accountant_hr: "Accountant & HR Admin" },
+      allRoles: "Tous les postes", allStatus: "Tous les statuts", searchPh: "Rechercher un candidat (nom, e-mail, ville)", roles: { video_editor: "Video Editor", accountant_hr: "Accountant & HR Admin" },
       status: { new: "Nouveau", scored: "Noté", test_sent: "Test envoyé", test_received: "Test reçu", invited: "Invité", interview_booked: "Entretien réservé", interview_done: "Entretien fait", editing_test: "Test montage", hired: "Embauché", rejected: "Refusé" },
       cols: ["Candidature", "Test", "Candidat", "Poste", "Ville", "Statut", "Entretien (Bali)"], none: "Aucun candidat dans cette vue.", noScore: "—", openHint: "Ouvrir la fiche", close: "Fermer",
       contact: "Contact", phone: "Téléphone / WhatsApp", city: "Ville", source: "Source", profile: "Profil ou CV", portfolio: "Portfolio", created: "Arrivé le", invitedAt: "Invité le", testSentAt: "Test envoyé le", testReceivedAt: "Test reçu le",
@@ -695,7 +695,7 @@ const T = {
       listTitle: "Appointments", upcoming: "Upcoming", past: "Past", cols: ["Date (Paris)", "Name", "Studio", "Email", "Phone", "Notes", "Status", "Emails"],
       status: { confirmed: "Confirmed", done: "Done", cancelled: "Cancelled", no_show: "No-show" }, none: "No appointment", confirm: "confirmation", reminder: "reminder", local: "your time", missing: "Settings not found: apply supabase/bookings_v1.sql." },
     rc: { listTitle: "Candidates", hint: "Sorted by application score. Nothing is sent from here: copy the test link or the invitation link and send it by hand (SEEK message or e-mail). Since 22/10, Safa decides the batches.",
-      allRoles: "All roles", allStatus: "All statuses", roles: { video_editor: "Video Editor", accountant_hr: "Accountant & HR Admin" },
+      allRoles: "All roles", allStatus: "All statuses", searchPh: "Search a candidate (name, e-mail, city)", roles: { video_editor: "Video Editor", accountant_hr: "Accountant & HR Admin" },
       status: { new: "New", scored: "Scored", test_sent: "Test sent", test_received: "Test received", invited: "Invited", interview_booked: "Interview booked", interview_done: "Interview done", editing_test: "Editing test", hired: "Hired", rejected: "Rejected" },
       cols: ["Application", "Test", "Candidate", "Role", "City", "Status", "Interview (Bali)"], none: "No candidate in this view.", noScore: "—", openHint: "Open the file", close: "Close",
       contact: "Contact", phone: "Phone / WhatsApp", city: "City", source: "Source", profile: "Profile or CV", portfolio: "Portfolio", created: "Received", invitedAt: "Invited", testSentAt: "Test sent", testReceivedAt: "Test received",
@@ -1960,7 +1960,8 @@ async function saveRdv() {
 /* Aucun message n'est envoyé d'ici : le bouton copie le lien d'invitation, l'envoi reste manuel après validation de Cyriaque. */
 const RC_STATUS = ["new", "scored", "test_sent", "test_received", "invited", "interview_booked", "interview_done", "editing_test", "hired", "rejected"];
 const RC_BK = ["confirmed", "done", "cancelled", "no_show"], RC_JURORS = ["Sajid", "Rania", "Putu"];
-const rcF = { role: "", status: "" };
+const rcF = { role: "", status: "", q: "" };   // q : barre de recherche (demande de Safa, 22/10) — nom, e-mail, ville
+const rcMatch = (c) => !rcF.q || `${c.name} ${c.email} ${c.city || ""}`.toLowerCase().includes(rcF.q);
 let rcOpenId = null;
 const rcTz = () => (interviewSettings && interviewSettings.timezone) || "Asia/Makassar";
 const rcPretty = (k) => String(k).replace(/_/g, " ");
@@ -2025,7 +2026,7 @@ function renderRecruit() {
   if (!canRecruit()) { $("#admin").innerHTML = `<div class="panel rcp"><p style="color:var(--err);margin:0">${R.reserved}</p></div>`; return; }
   if (!recruitOk || !interviewSettings) { $("#admin").innerHTML = `<div class="panel rcp"><p style="color:var(--err);margin:0">${R.missing}</p></div>`; return; }
   const open = candidatesAll.find((c) => c.id === rcOpenId) || null; if (!open) rcOpenId = null;
-  const list = candidatesAll.filter((c) => (!rcF.role || c.job_role === rcF.role) && (!rcF.status || c.status === rcF.status))
+  const list = candidatesAll.filter((c) => (!rcF.role || c.job_role === rcF.role) && (!rcF.status || c.status === rcF.status) && rcMatch(c))
     .sort((x, y) => (y.application_score ?? -1) - (x.application_score ?? -1) || new Date(y.created_at) - new Date(x.created_at));
   const chips = [["", R.allRoles], ...Object.entries(R.roles)].map(([k, l]) => `<button type="button" class="chip ${rcF.role === k ? "on" : ""}" data-rc-role="${k}">${esc(l)}</button>`).join("");
   const score = (v) => v == null ? `<span class="rc-score none">${R.noScore}</span>` : `<span class="rc-score">${v}<small>/100</small></span>`;
@@ -2047,7 +2048,7 @@ function renderRecruit() {
       `<tr><td>v${g.version}</td><td class="rdv-when">${rcDate(g.created_at)}</td><td>${esc(g.reason)}</td><td><div class="rc-grid">${Object.entries(g.weights || {}).map(([k, v]) => `<span>${esc(rcPretty(k))} ${esc(v)}</span>`).join("")}</div></td></tr>`).join("")}</tbody></table></div>` : `<p class="hint" style="margin:0">${R.noGrid}</p>`); }).join("");
   $("#admin").innerHTML = `${open ? rcFiche(open) : ""}
     <div class="panel rcp"><h3>${R.listTitle} (${list.length})</h3><p class="hint">${R.hint}</p>
-      <div class="rc-bar">${chips}<select class="in" id="rcStatusF" aria-label="${R.statusL}"><option value="">${R.allStatus}</option>${rcOptions(RC_STATUS, rcF.status, (k) => R.status[k])}</select></div>
+      <div class="rc-bar">${chips}<select class="in" id="rcStatusF" aria-label="${R.statusL}"><option value="">${R.allStatus}</option>${rcOptions(RC_STATUS, rcF.status, (k) => R.status[k])}</select><input class="in search" id="rcSearch" type="search" placeholder="${esc(R.searchPh)}" value="${esc(rcF.q)}" autocomplete="off" style="min-width:220px"/></div>
       <div class="rc-scroll"><table class="adm"><thead><tr>${R.cols.map((x) => `<th>${x}</th>`).join("")}</tr></thead><tbody>${list.map(row).join("") || `<tr><td colspan="7" style="color:var(--taupe)">${R.none}</td></tr>`}</tbody></table></div></div>
     <div class="panel rcp"><h3>${R.ivTitle} (${up.length})</h3>${ivTable(up, false)}</div>
     <div class="panel rcp"><h3>${R.avTitle}</h3><p class="hint">${R.avHint}</p>
@@ -2070,6 +2071,10 @@ function wireRecruit() {
   const openFiche = (id) => { rcOpenId = id; renderRecruit(); const f = $("#rcFiche"); if (f) f.scrollIntoView({ behavior: "smooth", block: "start" }); };
   A.querySelectorAll("[data-rc-role]").forEach((b) => b.addEventListener("click", () => { rcF.role = b.dataset.rcRole; renderRecruit(); }));
   const sf = $("#rcStatusF"); if (sf) sf.addEventListener("change", () => { rcF.status = sf.value; renderRecruit(); });
+  const sq = $("#rcSearch"); if (sq) sq.addEventListener("input", () => {   // la liste se filtre à la frappe sans perdre le curseur
+    rcF.q = sq.value.trim().toLowerCase(); const pos = sq.selectionStart; renderRecruit();
+    const n = $("#rcSearch"); if (n) { n.focus(); try { n.setSelectionRange(pos, pos); } catch {} }
+  });
   A.querySelectorAll("tr[data-rc-row]").forEach((tr) => tr.addEventListener("click", (e) => { if (e.target.closest("select,a,button,input")) return; openFiche(tr.dataset.rcRow); }));
   A.querySelectorAll("[data-rc-open]").forEach((a) => a.addEventListener("click", (e) => { e.preventDefault(); if (a.dataset.rcOpen) openFiche(a.dataset.rcOpen); }));
   A.querySelectorAll("[data-rc-status]").forEach((sel) => sel.addEventListener("change", async () => {
