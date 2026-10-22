@@ -598,7 +598,7 @@ const T = {
     needFrame: "Colle d'abord le lien frame.io de livraison : « Livré » reste bloqué sans lui.", locked: "Étape déjà cochée : seule la qualité ou un admin peut la corriger.", redeliver: "Relivrer", redeliverTip: "Corrige le lien frame.io si besoin, puis relivre pour un nouveau contrôle qualité.", redelivered: "✓ Relivré, la qualité est prévenue", round: (n) => `${n}e passage`, savedOk: "✓ Enregistré",
     lk: { editor: "Monteur", dispatcher: "Dispatch", qc: "Qualité", badT: "Lien invalide ou coupé", badP: "Ce lien ne fonctionne plus. Demande-en un nouveau à l'équipe DS Editing.", tooT: "Trop d'essais", tooP: "Réessaie dans quelques minutes.", downT: "Service indisponible", downP: "Impossible de joindre le serveur. Vérifie ta connexion puis réessaie.", byeT: "Lien retiré de cet appareil", byeP: "Rouvre ton lien personnel pour revenir à tes commandes.", retry: "Réessayer", offT: "Accès désactivé", offP: "Ton accès est désactivé pour le moment. Reviens plus tard ou demande à l'équipe DS Editing.", who: (n) => `Connecté avec le lien de ${n}`, queue: (n) => `À attribuer · ${n}`, others: "Autres commandes", brief: "Brief", refs: "Références", logos: "Logos" },
     errs: { FRAMEIO_REQUIS: "Lien frame.io manquant ou invalide (il doit commencer par https://).", ETAPE_VERROUILLEE: "Étape déjà cochée : seule la qualité ou un admin peut la corriger.", QC_OK_VERROUILLE: "Qualité déjà validée : le lien frame.io ne peut plus être modifié (voir avec l'équipe qualité).", REFUSE: "Action refusée pour ton profil.", CHAMP_INTERDIT: "Modification non autorisée pour ton profil.", LIEN_INVALIDE: "Ce lien ne fonctionne plus : demande-en un nouveau.", TROP_D_ESSAIS: "Trop d'essais : réessaie dans quelques minutes.", REOUVERTURE_REFUSEE: "On ne rouvre l'assemblage qu'après un « à revoir » de la qualité.", LIVRAISON_FIGEE: "Commande livrée : après un « à revoir », rouvre d'abord l'assemblage avant de rouvrir une partie.", PARTIE_DEJA_COMMENCEE: "Impossible : une étape est déjà cochée ou un lien déjà posé sur cette commande.", COMMANDE_TERMINEE: "Impossible : la commande est terminée (qualité OK).", PAS_UNE_PARTIE_UNIQUE: "Cette commande est déjà coupée en parties.", PAS_DEUX_PARTIES: "Cette commande n'est pas coupée en Intro / Corps.", ACTION_INCONNUE: "Action inconnue.", JOB_A_PARTIES: "Cette commande est découpée en parties : coche l'étape dans la partie concernée.", PARTIES_NON_LIVREES: "Toutes les parties doivent être livrées avant de livrer la commande.", MONTEUR_INCONNU: "Monteur inconnu.", MONTEUR_DESACTIVE: "Ton accès est désactivé pour le moment.", COMMANDE_COMMENCEE: "Impossible : une étape est déjà cochée, la qualité a tranché ou un lien est posé. On ne supprime qu'une commande pas commencée.", COMMANDE_FACTUREE: "Impossible : cette commande est déjà sur une facture.", INTROUVABLE: "Commande introuvable (déjà supprimée ?)." },
-    tabs: { prod: "Production", equipe: "Équipe", tarifs: "Tarifs", factures: "Factures", rdv: "Rendez-vous", recrut: "Recrutement", grille: "Grille", rituels: "Rituels" },
+    tabs: { prod: "Production", equipe: "Équipe", tarifs: "Tarifs", factures: "Factures", rdv: "Rendez-vous", recrut: "Recrutement", grille: "Grille", rituels: "Rituels", rh: "Espace RH" },
     gh: { notYou: "Ce n'est pas vous ?", sharedFallback: "Vue d'équipe indisponible avec ce compte : connecte-toi avec ton compte nominatif.", morning: "Rituels du matin", prios: "3 priorités du jour", week: "7 derniers jours", tz: "heure de Bali", loading: "Lecture en cours…", retry: "Réessayer",
       rit: { bilan_veille: "Relire le bilan de la veille", agenda_jour: "Vérifier l'agenda et les rendez-vous du jour", relances_jour: "Préparer les relances du jour", nouveaux_contacts: "Repérer les nouveaux contacts à traiter", crm_a_jour: "Vérifier que le CRM est à jour" },
       pri: (n) => `Priorité ${n}`, priDone: (n) => `Priorité ${n} faite`, nRit: (a, b) => `${a}/${b} rituels`, nPri: (a, b) => `${a}/${b} priorités`, at: (h) => `coché à ${h}`, empty: "Pas encore posée", none: "Rien de noté", noMember: "Aucun commercial à afficher.", saved: "✓ Enregistré",
@@ -624,7 +624,7 @@ const T = {
       blocked: "Dates bloquées (une par ligne)", blockedHint: "2026-10-03 · 2026-12-24/2027-01-02 · 2026-10-06T14:00/2026-10-06T16:00 (heure de Paris)", save: "Enregistrer", saved: "enregistré", badRange: "Plage invalide : le début doit précéder la fin",
       listTitle: "Rendez-vous", upcoming: "À venir", past: "Passés", cols: ["Date (Paris)", "Nom", "Studio", "E-mail", "Téléphone", "Notes", "Statut", "E-mails"],
       status: { confirmed: "Confirmé", done: "Fait", cancelled: "Annulé", no_show: "Absent" }, none: "Aucun rendez-vous", confirm: "confirmation", reminder: "rappel", local: "chez vous", missing: "Réglages introuvables : appliquer supabase/bookings_v1.sql." },
-    rc: { listTitle: "Candidats", hint: "Triés par note de candidature. Rien n'est envoyé d'ici : on copie le lien d'invitation et on l'envoie à la main, après validation de Cyriaque.",
+    rc: { listTitle: "Candidats", hint: "Triés par note de candidature. Rien n'est envoyé d'ici : on copie le lien du test ou de l'invitation et on l'envoie à la main (SEEK ou e-mail). Depuis le 22/10, Safa décide des lots.",
       allRoles: "Tous les postes", allStatus: "Tous les statuts", roles: { video_editor: "Video Editor", accountant_hr: "Accountant & HR Admin" },
       status: { new: "Nouveau", scored: "Noté", test_sent: "Test envoyé", test_received: "Test reçu", invited: "Invité", interview_booked: "Entretien réservé", interview_done: "Entretien fait", editing_test: "Test montage", hired: "Embauché", rejected: "Refusé" },
       cols: ["Candidature", "Test", "Candidat", "Poste", "Ville", "Statut", "Entretien (Bali)"], none: "Aucun candidat dans cette vue.", noScore: "—", openHint: "Ouvrir la fiche", close: "Fermer",
@@ -632,6 +632,7 @@ const T = {
       appScore: "Note de candidature", testScore: "Note du test écrit", grid: (n) => n ? `grille v${n}` : "grille non précisée", breakdownApp: "Détail de la candidature", breakdownTest: "Détail du test écrit", noBreakdown: "Pas encore de détail.",
       cCrit: "Critère", cPts: "Points", cProof: "Preuve", screening: "Réponses de présélection", noScreening: "Aucune réponse enregistrée.", juryNotes: "Notes du jury", agentNotes: "Notes de l'agent (lecture seule)", saveNotes: "Enregistrer les notes", saved: "enregistré",
       statusL: "Statut", copyInvite: "Copier le lien d'invitation", copied: "Lien copié", copyFail: "Copie impossible : sélectionner le lien à la main", inviteConfirm: "Le statut passera à « Invité » et le lien deviendra actif. Aucun message n'est envoyé : tu colles le lien dans ton message. Continuer ?", inviteOff: "Lien inactif à ce stade du parcours", linkLabel: "Lien",
+      copyTest: "Copier le lien du test écrit", testConfirm: "Le statut passera à « Test envoyé » et le lien du test (15 min, 10 questions) sera actif 7 jours. Aucun message n'est envoyé : tu colles le lien dans ton message au candidat. Continuer ?", testOff: "Lien du test inactif à ce stade (déjà passé, ou test déjà reçu)", q9Grade: "Q9 (réponse rédigée) · ta note", q9Save: "Enregistrer la note", testMeta: (m) => `Correction automatique ${m.auto_score} / ${m.auto_max} · ${m.minutes} min${m.late_minutes ? ` · en retard de ${m.late_minutes} min` : ""} · Q9 à noter à la main (barème : +3 rythme de l'intro, +3 taille des sous-titres, +3 musique sous la voix à 12:30, +1 anglais clair en 3-5 phrases)`,
       regen: "Nouveau lien", regenConfirm: "L'ancien lien cessera de fonctionner. Continuer ?", rejectConfirm: "Marquer ce candidat « Refusé » ? Son créneau d'entretien sera libéré.", hireConfirm: "Marquer ce candidat « Embauché » ?",
       interview: "Entretien", noInterview: "Pas de créneau réservé.", juror: "Juré", unassigned: "À attribuer", changes: (n) => `${n} modification${n > 1 ? "s" : ""}`,
       ivTitle: "Entretiens à venir", ivPast: "Entretiens passés et annulés", ivCols: ["Date (Bali)", "Candidat", "Poste", "Juré", "Statut", "Contact"], ivNone: "Aucun entretien.", bk: { confirmed: "Confirmé", done: "Fait", cancelled: "Annulé", no_show: "Absent" },
@@ -667,7 +668,7 @@ const T = {
     needFrame: "Paste the frame.io delivery link first: “Delivered” stays blocked without it.", locked: "Step already ticked: only QC or an admin can fix it.", redeliver: "Redeliver", redeliverTip: "Fix the frame.io link if needed, then redeliver for a new quality check.", redelivered: "✓ Redelivered, QC has been notified", round: (n) => `${n}${[11, 12, 13].includes(n % 100) ? "th" : ({ 1: "st", 2: "nd", 3: "rd" })[n % 10] || "th"} pass`, savedOk: "✓ Saved",
     lk: { editor: "Editor", dispatcher: "Dispatch", qc: "Quality", badT: "Invalid or disabled link", badP: "This link no longer works. Ask the DS Editing team for a new one.", tooT: "Too many attempts", tooP: "Try again in a few minutes.", downT: "Service unavailable", downP: "Cannot reach the server. Check your connection and try again.", byeT: "Link removed from this device", byeP: "Open your personal link again to get back to your orders.", retry: "Try again", offT: "Access disabled", offP: "Your access is disabled for now. Come back later or ask the DS Editing team.", who: (n) => `Signed in with ${n}'s link`, queue: (n) => `To assign · ${n}`, others: "Other orders", brief: "Brief", refs: "References", logos: "Logos" },
     errs: { FRAMEIO_REQUIS: "frame.io link missing or invalid (it must start with https://).", ETAPE_VERROUILLEE: "Step already ticked: only QC or an admin can fix it.", QC_OK_VERROUILLE: "QC already approved: the frame.io link can no longer be changed (ask the QC team).", REFUSE: "Action refused for your profile.", CHAMP_INTERDIT: "Change not allowed for your profile.", LIEN_INVALIDE: "This link no longer works: ask for a new one.", TROP_D_ESSAIS: "Too many attempts: try again in a few minutes.", REOUVERTURE_REFUSEE: "The assembly can only be reopened after a QC « needs changes ».", LIVRAISON_FIGEE: "Order delivered: after a « needs changes », reopen the assembly first before reopening a part.", PARTIE_DEJA_COMMENCEE: "Not possible: a step is already ticked or a link already set on this order.", COMMANDE_TERMINEE: "Not possible: the order is finished (QC OK).", PAS_UNE_PARTIE_UNIQUE: "This order is already split into parts.", PAS_DEUX_PARTIES: "This order is not split into Intro / Body.", ACTION_INCONNUE: "Unknown action.", JOB_A_PARTIES: "This order is split into parts: tick the step in the relevant part.", PARTIES_NON_LIVREES: "All parts must be delivered before delivering the order.", MONTEUR_INCONNU: "Unknown editor.", MONTEUR_DESACTIVE: "Your access is disabled for now.", COMMANDE_COMMENCEE: "Not possible: a step is already ticked, QC has decided or a link is set. Only an order that has not started can be deleted.", COMMANDE_FACTUREE: "Not possible: this order is already on an invoice.", INTROUVABLE: "Order not found (already deleted?)." },
-    tabs: { prod: "Production", equipe: "Team", tarifs: "Pricing", factures: "Invoices", rdv: "Appointments", recrut: "Recruitment", grille: "Grid", rituels: "Routines" },
+    tabs: { prod: "Production", equipe: "Team", tarifs: "Pricing", factures: "Invoices", rdv: "Appointments", recrut: "Recruitment", grille: "Grid", rituels: "Routines", rh: "HR space" },
     gh: { notYou: "Not you?", sharedFallback: "Team view unavailable with this account: sign in with your personal account.", morning: "Morning routines", prios: "Today's 3 priorities", week: "Last 7 days", tz: "Bali time", loading: "Loading…", retry: "Retry",
       rit: { bilan_veille: "Read yesterday's recap", agenda_jour: "Check today's agenda and appointments", relances_jour: "Prepare today's follow-ups", nouveaux_contacts: "Spot the new contacts to handle", crm_a_jour: "Check the CRM is up to date" },
       pri: (n) => `Priority ${n}`, priDone: (n) => `Priority ${n} done`, nRit: (a, b) => `${a}/${b} routines`, nPri: (a, b) => `${a}/${b} priorities`, at: (h) => `ticked at ${h}`, empty: "Not set yet", none: "Nothing logged", noMember: "No sales member to show.", saved: "✓ Saved",
@@ -693,7 +694,7 @@ const T = {
       blocked: "Blocked dates (one per line)", blockedHint: "2026-10-03 · 2026-12-24/2027-01-02 · 2026-10-06T14:00/2026-10-06T16:00 (Paris time)", save: "Save", saved: "saved", badRange: "Invalid range: start must be before end",
       listTitle: "Appointments", upcoming: "Upcoming", past: "Past", cols: ["Date (Paris)", "Name", "Studio", "Email", "Phone", "Notes", "Status", "Emails"],
       status: { confirmed: "Confirmed", done: "Done", cancelled: "Cancelled", no_show: "No-show" }, none: "No appointment", confirm: "confirmation", reminder: "reminder", local: "your time", missing: "Settings not found: apply supabase/bookings_v1.sql." },
-    rc: { listTitle: "Candidates", hint: "Sorted by application score. Nothing is sent from here: copy the invitation link and send it by hand, once Cyriaque has approved.",
+    rc: { listTitle: "Candidates", hint: "Sorted by application score. Nothing is sent from here: copy the test link or the invitation link and send it by hand (SEEK message or e-mail). Since 22/10, Safa decides the batches.",
       allRoles: "All roles", allStatus: "All statuses", roles: { video_editor: "Video Editor", accountant_hr: "Accountant & HR Admin" },
       status: { new: "New", scored: "Scored", test_sent: "Test sent", test_received: "Test received", invited: "Invited", interview_booked: "Interview booked", interview_done: "Interview done", editing_test: "Editing test", hired: "Hired", rejected: "Rejected" },
       cols: ["Application", "Test", "Candidate", "Role", "City", "Status", "Interview (Bali)"], none: "No candidate in this view.", noScore: "—", openHint: "Open the file", close: "Close",
@@ -701,6 +702,7 @@ const T = {
       appScore: "Application score", testScore: "Written test score", grid: (n) => n ? `grid v${n}` : "grid not specified", breakdownApp: "Application breakdown", breakdownTest: "Written test breakdown", noBreakdown: "No breakdown yet.",
       cCrit: "Criterion", cPts: "Points", cProof: "Evidence", screening: "Screening answers", noScreening: "No answer recorded.", juryNotes: "Jury notes", agentNotes: "Agent notes (read-only)", saveNotes: "Save notes", saved: "saved",
       statusL: "Status", copyInvite: "Copy invitation link", copied: "Link copied", copyFail: "Copy failed: select the link by hand", inviteConfirm: "The status will change to “Invited” and the link becomes active. No message is sent: you paste the link into your own message. Continue?", inviteOff: "Link inactive at this stage", linkLabel: "Link",
+      copyTest: "Copy written test link", testConfirm: "The status will change to “Test sent” and the test link (15 min, 10 questions) becomes active for 7 days. No message is sent: you paste the link into your own message to the candidate. Continue?", testOff: "Test link inactive at this stage (already past, or test already received)", q9Grade: "Q9 (written answer) · your score", q9Save: "Save score", testMeta: (m) => `Auto-graded ${m.auto_score} / ${m.auto_max} · ${m.minutes} min${m.late_minutes ? ` · late by ${m.late_minutes} min` : ""} · Q9 to grade by hand (rubric: +3 intro pace, +3 subtitle size, +3 music under the voice at 12:30, +1 clear English in 3-5 sentences)`,
       regen: "New link", regenConfirm: "The old link will stop working. Continue?", rejectConfirm: "Mark this candidate “Rejected”? Their interview slot will be released.", hireConfirm: "Mark this candidate “Hired”?",
       interview: "Interview", noInterview: "No slot booked.", juror: "Juror", unassigned: "To assign", changes: (n) => `${n} change${n > 1 ? "s" : ""}`,
       ivTitle: "Upcoming interviews", ivPast: "Past and cancelled interviews", ivCols: ["Date (Bali)", "Candidate", "Role", "Juror", "Status", "Contact"], ivNone: "No interview.", bk: { confirmed: "Confirmed", done: "Done", cancelled: "Cancelled", no_show: "No-show" },
@@ -778,6 +780,9 @@ const isLate = (j) => !isDone(j) && remaining(j) < 0;
 const cls = (j) => isDone(j) ? "done" : remaining(j) < 0 ? "r" : remaining(j) < 2 * 86400000 ? "o" : "g";
 const canRecruit = () => !!profile && profile.can_recruit === true;   // données candidats : drapeau profiles.can_recruit (supabase/recruitment_v2.sql), en plus du rôle
 const isAdmin = () => profile && ["admin", "dispatcher", "qc"].includes(profile.role);
+// 22/10 : RH (Safa) en mode « recrutement seul » : rôle hr + can_recruit (recruitment_v3_hr.sql côté base). Elle n'ouvre que l'onglet Recrutement ;
+// aucune requête de production, de prix ni de factures (isAdmin() reste faux pour elle). Entrée : ?tab=recrut, sinon le dashboard la renvoie vers /rh/.
+const isHrRecruit = () => !!profile && profile.role === "hr" && canRecruit() && !LINKED;
 const canMoney = () => !!profile && profile.role === "admin";
 // 20/10 (QCM prix & accès q2) : Rania = onglet Tarifs + création de clients (drapeau profiles.can_price, supabase/vue_equipe_v1.sql), SANS factures ni montants. Putu : jamais.
 const canTarifs = () => !!profile && (profile.role === "admin" || profile.can_price === true);   // 14/10 (QCM q10) : Tarifs et Factures réservés au rôle admin — Putu (dispatcher) et la qualité ne voient jamais les prix. NB : le vrai verrou en base (RLS price_grids/invoices autorise encore dispatcher et qc) reste à poser.
@@ -1539,6 +1544,11 @@ setInterval(() => { document.querySelectorAll("[data-cd]").forEach((el) => { con
 
 /* ===== onglets admin : Tarifs, Factures ===== */
 function renderTabs() {
+  if (isHrRecruit()) {   // RH : un seul onglet (Recrutement) + retour vers son espace /rh/
+    tab = "recrut"; $("#tabs").hidden = false;
+    $("#tabs").innerHTML = `<a class="tab" href="../rh/${lang === "fr" ? "?lang=fr" : ""}">← ${esc(t("tabs").rh)}</a><button type="button" class="tab on" data-tab="recrut">${t("tabs").recrut}</button>`;
+    renderAdmin(); return;
+  }
   if (!isAdmin() || LINKED) return; $("#tabs").hidden = false;
   if ((tab === "grille" && !canGrille()) || (tab === "rituels" && !canRituals()) || (tab === "tarifs" && !canTarifs()) || (tab === "factures" && !canMoney())) { tab = "prod"; const u = new URL(location.href); u.searchParams.delete("tab"); history.replaceState(null, "", u); }   // onglet Grille / Rituels / Tarifs / Factures demandé par l'adresse sans y avoir droit : retour à la production, rien ne s'affiche
   $("#tabs").innerHTML = ["prod", "equipe", ...(canTarifs() ? ["tarifs"] : []), ...(canMoney() ? ["factures"] : []), "rdv", ...(canRecruit() ? ["recrut"] : []), ...(canGrille() ? ["grille"] : []), ...(canRituals() ? ["rituels"] : [])].map((k) => `<button type="button" class="tab ${tab === k ? "on" : ""}" data-tab="${k}">${t("tabs")[k]}</button>`).join("");
@@ -1854,8 +1864,18 @@ async function loadStudiosLite() {
     if (!r.error && Array.isArray(r.data)) studios = r.data;
   } catch (e) { console.warn(e); }
 }
+// RH (mode recrutement seul) : les 4 lectures du module Recrutement et rien d'autre — la base refuserait studios, factures, prix de toute façon
+async function loadRecruitOnly() {
+  const [g, h, m, n] = await Promise.all([
+    sb.from("candidates").select("*").order("application_score", { ascending: false, nullsFirst: false }).limit(500), sb.from("interview_bookings").select("*").order("starts_at", { ascending: false }).limit(400),
+    sb.from("interview_settings").select("*").eq("id", 1), sb.from("scoring_grids").select("*").order("created_at", { ascending: false }).limit(60)]);
+  recruitOk = !g.error && !h.error && !m.error;
+  candidatesAll = g.data || []; interviewsAll = h.data || []; interviewSettings = Array.isArray(m.data) ? (m.data[0] || null) : (m.data || null); scoringGrids = n.data || [];
+}
 async function loadAdmin() {
-  if (!isAdmin() || LINKED) return;
+  if (LINKED) return;
+  if (isHrRecruit()) return loadRecruitOnly();   // les actions de l'onglet Recrutement rappellent loadAdmin() : la RH recharge ses 4 tables
+  if (!isAdmin()) return;
   const [a, b, c, d, e, f, g, h, m, n, o] = await Promise.all([sb.from("studios").select(STUDIO_COLS).order("name"), sb.from("price_grids").select("*"), sb.from("invoices").select("*").order("period_end", { ascending: false }).limit(300), sb.from("extra_lines").select("*").order("created_at", { ascending: false }).limit(200),
     sb.from("booking_settings").select("*").eq("id", 1), sb.from("bookings").select("*").order("starts_at", { ascending: false }).limit(400),
     sb.from("candidates").select("*").order("application_score", { ascending: false, nullsFirst: false }).limit(500), sb.from("interview_bookings").select("*").order("starts_at", { ascending: false }).limit(400),
@@ -1947,6 +1967,10 @@ const rcPretty = (k) => String(k).replace(/_/g, " ");
 const rcInviteUrl = (c) => new URL("../entretien/?t=" + encodeURIComponent(c.invite_token), location.href).href;
 const rcCanInvite = (c) => RC_STATUS.indexOf(c.status) < RC_STATUS.indexOf("invited");
 const rcLinkLive = (c) => c.status === "invited" || c.status === "interview_booked";
+// test écrit en ligne (22/10, recruitment_v4_test.sql) : même jeton, page ../test/ ; actif au seul statut « test_sent »
+const rcTestUrl = (c) => new URL("../test/?t=" + encodeURIComponent(c.invite_token), location.href).href;
+const rcCanTest = (c) => c.status === "new" || c.status === "scored";
+const rcTestLive = (c) => c.status === "test_sent";
 const rcBooking = (c) => interviewsAll.find((b) => b.candidate_id === c.id && b.status === "confirmed") || null;
 const rcHref = (u, label) => u ? `<a href="${esc(/^https?:\/\//i.test(u) ? u : "https://" + u)}" target="_blank" rel="noopener">${esc(label || u)}</a>` : "—";
 const rcDate = (d) => d ? new Date(d).toLocaleDateString(loc(), { day: "2-digit", month: "short", year: "numeric" }) : "—";
@@ -1964,6 +1988,8 @@ function rcTable(obj, weights) {
 function rcFiche(c) {
   const R = t("rc"), tz = rcTz(), bk = rcBooking(c), grid = scoringGrids.find((g) => g.job_role === c.job_role && g.version === c.application_grid_version);
   const live = rcLinkLive(c), can = rcCanInvite(c);
+  const tLive = rcTestLive(c), tCan = rcCanTest(c), tBdAll = c.test_breakdown || {}, tMeta = tBdAll._meta || null, tQ9 = tBdAll.q9 && typeof tBdAll.q9 === "object" ? tBdAll.q9 : null;
+  const tBd = Object.fromEntries(Object.entries(tBdAll).filter(([k]) => k !== "_meta"));
   const scr = (v) => v == null ? "—" : `${v} / 100`;
   const kv = (k, v) => `<em>${k}</em><span>${v}</span>`;
   const screening = Object.entries(c.screening || {}).map(([k, v]) => kv(esc(rcPretty(k)), esc(v && typeof v === "object" ? JSON.stringify(v) : v))).join("");
@@ -1980,7 +2006,12 @@ function rcFiche(c) {
     </div>
     <div class="rc-cols">
       <div><h4>${R.breakdownApp} · ${scr(c.application_score)} · ${esc(R.grid(c.application_grid_version))}</h4>${rcTable(c.application_breakdown, grid && grid.weights)}</div>
-      <div><h4>${R.breakdownTest} · ${scr(c.test_score)}</h4>${rcTable(c.test_breakdown, null)}</div>
+      <div><h4>${R.breakdownTest} · ${scr(c.test_score)}</h4>
+        <div class="rc-acts" style="margin:0 0 10px"><button type="button" class="btn" id="rcCopyTest" ${tLive || tCan ? "" : `disabled title="${esc(R.testOff)}"`}>${R.copyTest}</button><span id="rcTestMsg" role="status" style="font-size:12px;color:var(--ok)"></span></div>
+        ${tLive ? `<input class="in" id="rcTestLink" readonly aria-label="${R.linkLabel}" style="margin-bottom:10px;font-size:12px" value="${esc(rcTestUrl(c))}"/>` : ""}
+        ${tMeta ? `<p class="hint" style="margin:0 0 8px">${esc(R.testMeta(tMeta))}</p>` : ""}
+        ${tQ9 ? `<div class="rc-kv" style="margin-bottom:8px"><em>${R.q9Grade}</em><span><input class="in" type="number" min="0" max="10" id="rcQ9" style="width:90px;display:inline-block" value="${tQ9.score ?? ""}"/> / 10 <button type="button" class="btn ghost" id="rcQ9Save">${R.q9Save}</button> <span id="rcQ9Msg" style="font-size:12px;color:var(--ok)"></span></span></div>` : ""}
+        ${rcTable(tBd, null)}</div>
     </div>
     <div class="rc-cols">
       <div><h4>${R.screening}</h4>${screening ? `<div class="rc-kv">${screening}</div>` : `<p class="hint" style="margin:0">${R.noScreening}</p>`}</div>
@@ -2071,6 +2102,25 @@ function wireRecruit() {
     }
     const ok = await copyText(rcInviteUrl(c)); await loadAdmin(); renderRecruit();
     const m = $("#rcMsg"); if (m) { m.style.color = ok ? "var(--ok)" : "var(--err)"; m.textContent = ok ? "✓ " + R.copied : R.copyFail; }
+  });
+  const ct = $("#rcCopyTest"); if (ct) ct.addEventListener("click", async () => {
+    const c = cand(); if (!c) return;
+    if (rcCanTest(c)) {
+      if (!confirm(R.testConfirm)) return;
+      const { error } = await sb.from("candidates").update({ status: "test_sent", test_sent_at: new Date().toISOString() }).eq("id", c.id);
+      if (error) { alert(error.message); return; }
+    }
+    const ok = await copyText(rcTestUrl(c)); await loadAdmin(); renderRecruit();
+    const m = $("#rcTestMsg"); if (m) { m.style.color = ok ? "var(--ok)" : "var(--err)"; m.textContent = ok ? "✓ " + R.copied : R.copyFail; }
+  });
+  const tl = $("#rcTestLink"); if (tl) tl.addEventListener("focus", () => tl.select());
+  const q9 = $("#rcQ9Save"); if (q9) q9.addEventListener("click", async () => {
+    const c = cand(); if (!c) return; const v = Math.max(0, Math.min(10, parseInt($("#rcQ9").value, 10) || 0));
+    const bd = { ...(c.test_breakdown || {}) }; bd.q9 = { ...(bd.q9 || {}), score: v, max: 10, pending: false };
+    const auto = bd._meta && bd._meta.auto_score != null ? bd._meta.auto_score : Object.entries(bd).filter(([k]) => k !== "q9" && k !== "_meta").reduce((s, [, o]) => s + ((o && o.score) || 0), 0);
+    const { error } = await sb.from("candidates").update({ test_breakdown: bd, test_score: auto + v }).eq("id", c.id);
+    if (error) { alert(error.message); return; } await loadAdmin(); renderRecruit();
+    const m = $("#rcQ9Msg"); if (m) { m.textContent = "✓ " + R.saved; setTimeout(() => { const x = $("#rcQ9Msg"); if (x) x.textContent = ""; }, 2000); }
   });
   const rg = $("#rcRegen"); if (rg) rg.addEventListener("click", async () => {
     const c = cand(); if (!c || !confirm(R.regenConfirm)) return;
@@ -2272,6 +2322,10 @@ async function boot() {
   // menu « Espaces » (nav.js) : il ne propose que ce que ce profil peut ouvrir (20/10, QCM prix & accès). Effacé à la déconnexion.
   ls.set("ds_nav_role", canMoney() ? "admin" : canTarifs() ? "price" : "team"); ls.set("ds_nav_recruit", canRecruit() ? "1" : "0");
   renderWho();
+  if (isHrRecruit() && params.get("tab") === "recrut") {   // 22/10 : RH → onglet Recrutement seul (candidats Jobstreet, tests, entretiens) ; ni production, ni temps réel, ni PC du bureau
+    $("#logout").hidden = false; $("#gate").hidden = true; $("#app").hidden = false;
+    await loadRecruitOnly(); renderTabs(); return;
+  }
   if (profile.role === "hr") { location.replace("../rh/" + (params.has("lang") ? "?lang=" + encodeURIComponent(params.get("lang")) : "")); return; }   // 20/10 : RH (Safa) → son espace /rh/ (KPI et présence des monteurs) ; isAdmin() l'exclut de tout le reste, aucune requête de production
   if (isSales()) { $("#logout").hidden = false; await bootSales(); return; }   // commercial sans ligne `profiles` : sa vue seulement, aucune requête de production
   $("#logout").hidden = !!OPEN_ACCESS && me.email === OPEN_ACCESS.email; $("#gate").hidden = true; $("#app").hidden = false; $("#live").hidden = false;
@@ -2292,7 +2346,7 @@ $("#loginBtn").addEventListener("click", async () => {
 $("#password").addEventListener("keydown", (e) => { if (e.key === "Enter") $("#loginBtn").click(); });
 $("#logout").addEventListener("click", async () => { ls.del(KEY_STORE); ls.del(ADM.until); ls.del("ds_nav_role"); ls.del("ds_nav_recruit"); if (LINKED) { location.replace(location.pathname + "?bye=1"); return; } await sb.auth.signOut(); location.reload(); });
 $("#lkRetry").addEventListener("click", () => location.reload());
-$("#langBtn").addEventListener("click", () => { lang = lang === "fr" ? "en" : "fr"; try { localStorage.setItem("ds_lang", lang); } catch {} applyText(); if (lkKind) linkScreen(lkKind); if (isSales()) { renderWho(); renderSalesTabs(); if (GH.redraw) GH.redraw(); } else if (profile) { renderWho(); renderEditorBar(); renderToolbar(); renderStats(); renderBoard(); renderTabs(); alertsHtml = null; renderPc(); renderAlerts(); } });
+$("#langBtn").addEventListener("click", () => { lang = lang === "fr" ? "en" : "fr"; try { localStorage.setItem("ds_lang", lang); } catch {} applyText(); if (lkKind) linkScreen(lkKind); if (isSales()) { renderWho(); renderSalesTabs(); if (GH.redraw) GH.redraw(); } else if (isHrRecruit() && params.get("tab") === "recrut") { renderWho(); renderTabs(); } else if (profile) { renderWho(); renderEditorBar(); renderToolbar(); renderStats(); renderBoard(); renderTabs(); alertsHtml = null; renderPc(); renderAlerts(); } });
 $("#tvBtn").addEventListener("click", () => { tv = !tv; document.body.classList.toggle("tv", tv); closePc(); const u = new URL(location.href); tv ? u.searchParams.set("tv", "1") : u.searchParams.delete("tv"); history.replaceState(null, "", u); });
 boot();
 </script>

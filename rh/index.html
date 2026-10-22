@@ -126,6 +126,7 @@
   <div class="right">
     <span class="who" id="who"></span>
     <div class="seg" id="langSeg" role="group" aria-label="Language"><button type="button" data-lang="en">English</button><button type="button" data-lang="fr">Français</button></div>
+    <a class="btn" id="recruitBtn" href="../team/dashboard.html?tab=recrut" hidden><span data-t="recruit"></span></a>
     <a class="btn" id="statsBtn" href="../prod-admin/" target="_blank" rel="noopener" hidden><span data-t="stats"></span></a>
     <button class="btn" id="csvBtn" type="button" hidden><span data-t="csv"></span></button>
     <button class="btn" id="logout" type="button" data-t="logout" hidden></button>
@@ -167,7 +168,7 @@ const SUPABASE_ANON = "sb_publishable_lIZtV_WtN5NcGSb0dnfaiQ_AgKYBIVa";
 const ALLOWED = ["admin", "hr"];   // rôles admis sur cette page (profiles.role) ; la base refuse les autres de toute façon (rh_month → REFUSE)
 
 const T = {
-  en: { kicker: "HR · Editors", title: "Editors — KPI & presence", stats: "Charts (prod-admin)", csv: "Export CSV", logout: "Log out", login: "HR space", loginSub: "Sign in with your DS Editing email.", loginBtn: "Enter",
+  en: { kicker: "HR · Editors", title: "Editors — KPI & presence", recruit: "Recruitment", stats: "Charts (prod-admin)", csv: "Export CSV", logout: "Log out", login: "HR space", loginSub: "Sign in with your DS Editing email.", loginBtn: "Enter",
     deniedT: "Restricted access", deniedP: "This space is for HR and admins only.", thisMonth: "This month", tabs: { kpi: "KPI", presence: "Presence", daily: "Daily reports" },
     loading: "Loading…", err: "Cannot read the month: ", refuse: "Access refused by the database for this account.", migrate: "Waiting for the database update (rh_v1.sql).",
     s: { presence: "Team presence", index: "Team index", points: "Team points", videos: "Videos done", days: "Reports sent", revs: "Revisions", delivered: "Orders delivered", late: "Delivered late" },
@@ -178,7 +179,7 @@ const T = {
       allToday: "Everyone at the office today", fillReports: "Fill the month from reports", fillHint: "Every day with a daily report and no presence yet becomes « Office ».", dayAll: (d) => `Everyone at the office on ${d}?`, done: (n) => `${n} day${n > 1 ? "s" : ""} filled`, nothing: "Nothing to fill" },
     d: { title: "Daily reports", lead: "What each editor declared, day by day. Newest first. « sent HH:MM » = time the editor saved the report (your local time). Revision minutes = time the editor declared on revisions, not a timestamp.", none: "No report this month.", videos: (n) => `${n} video${n > 1 ? "s" : ""}`, pts: (n) => `${n} pts`, revs: (n, m) => `${n} revision${n > 1 ? "s" : ""}${m ? " · " + m + " min of revisions" : ""}`, sent: (h) => `sent ${h}`, noDetail: "(no detail written)" },
     dow: ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"] },
-  fr: { kicker: "RH · Monteurs", title: "Monteurs — KPI & présence", stats: "Graphiques (prod-admin)", csv: "Export CSV", logout: "Déconnexion", login: "Espace RH", loginSub: "Connecte-toi avec ton e-mail DS Editing.", loginBtn: "Entrer",
+  fr: { kicker: "RH · Monteurs", title: "Monteurs — KPI & présence", recruit: "Recrutement", stats: "Graphiques (prod-admin)", csv: "Export CSV", logout: "Déconnexion", login: "Espace RH", loginSub: "Connecte-toi avec ton e-mail DS Editing.", loginBtn: "Entrer",
     deniedT: "Accès réservé", deniedP: "Cet espace est réservé aux RH et aux admins.", thisMonth: "Ce mois-ci", tabs: { kpi: "KPI", presence: "Présence", daily: "Rapports du jour" },
     loading: "Lecture en cours…", err: "Lecture du mois impossible : ", refuse: "Accès refusé par la base pour ce compte.", migrate: "En attente de la mise à jour de la base (rh_v1.sql).",
     s: { presence: "Présence équipe", index: "Index équipe", points: "Points équipe", videos: "Vidéos terminées", days: "Rapports envoyés", revs: "Révisions", delivered: "Commandes livrées", late: "Livrées en retard" },
@@ -421,12 +422,13 @@ async function boot() {
   }
   if (!session) { $("#gate").hidden = false; return; }
   me = session.user;
-  const { data: p } = await sb.from("profiles").select("role,display_name,lang").eq("id", me.id).single();
+  const { data: p } = await sb.from("profiles").select("role,display_name,lang,can_recruit").eq("id", me.id).single();
   profile = p || { role: "", display_name: me.email };
   $("#who").innerHTML = `<b>${esc(profile.display_name)}</b> · ${esc(profile.role || "?")}`;
   $("#logout").hidden = false;
   if (!ALLOWED.includes(profile.role)) { $("#denied").hidden = false; return; }
   $("#app").hidden = false; $("#csvBtn").hidden = false; $("#statsBtn").hidden = profile.role !== "admin";   // /prod-admin/ a son rideau à code : bouton pour les admins seulement
+  $("#recruitBtn").hidden = profile.can_recruit !== true; $("#recruitBtn").href = "../team/dashboard.html?tab=recrut&lang=" + encodeURIComponent(lang);   // 22/10 : Safa reprend le recrutement Jobstreet → onglet Recrutement du dashboard (drapeau profiles.can_recruit, recruitment_v3_hr.sql)
   renderTabs(); await load();
   setInterval(() => { if (document.visibilityState === "visible" && !document.querySelector("td.cell.saving")) load(); }, 120000);
 }
