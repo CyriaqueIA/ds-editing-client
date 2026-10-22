@@ -93,7 +93,50 @@
     .gate p{color:var(--taupe);font-size:14px;line-height:1.55;margin:0 0 18px}
     .gate button{background:rgba(255,255,255,.9);color:#0A0B0D;border:0;border-radius:999px;padding:11px 20px;font-weight:600}
     footer{border-top:1px solid var(--line);padding:16px max(16px,env(safe-area-inset-right,0px)) calc(16px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));text-align:center;color:var(--taupe);font-size:12px}
-    @media (max-width:560px){.row{grid-template-columns:1fr}.tags{flex-direction:row;flex-wrap:wrap;align-items:center;justify-content:flex-start}}
+    /* ---- chrono de montage (22/10) : qui suis-je, chronos en cours, boutons Mulai / Selesai, classement du jour ---- */
+    .who{margin:18px 0 0;border:1px solid var(--line);border-radius:18px;background:var(--surface);padding:14px 16px}
+    .who .mono{display:block;margin-bottom:10px}
+    .who.need{border-color:var(--warn);box-shadow:0 0 0 3px rgba(245,196,0,.15)}
+    .chips{display:flex;gap:8px;flex-wrap:wrap}
+    .chips button{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line-strong);background:rgba(255,255,255,.03);color:var(--cream);border-radius:999px;padding:7px 12px 7px 7px;font-size:13px;font-weight:600}
+    .chips button .av{width:26px;height:26px;font-size:11px}
+    .chips button.on{background:rgba(255,255,255,.92);color:#0A0B0D;border-color:transparent}
+    .chips button:focus-visible{outline:2px solid var(--chrome);outline-offset:2px}
+    .chips .ai{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--taupe);border:1px solid var(--line-strong);border-radius:4px;padding:1px 5px}
+    .chips button.on .ai{color:#0A0B0D;border-color:rgba(0,0,0,.3)}
+    .run{margin:12px 0 0;display:grid;gap:8px}
+    .runc{display:grid;grid-template-columns:auto 1fr auto;gap:6px 14px;align-items:center;padding:12px 16px;border:1px solid rgba(70,211,105,.45);border-radius:16px;background:rgba(70,211,105,.07)}
+    .runc .tm{font-variant-numeric:tabular-nums;font-weight:700;font-size:clamp(28px,6vw,38px);letter-spacing:-.03em;line-height:1;color:var(--ok)}
+    .runc .tm.flag{color:var(--warn)}
+    .runc .cl{min-width:0;font-weight:600;font-size:15px;overflow-wrap:anywhere}
+    .runc .cl small{display:block;font-weight:400;font-size:13px;color:var(--taupe)}
+    .bt{border:0;border-radius:999px;padding:9px 16px;font-weight:700;font-size:13px;letter-spacing:.02em;white-space:nowrap;display:inline-flex;align-items:center;gap:7px}
+    .bt.start{background:rgba(255,255,255,.92);color:#0A0B0D}
+    .bt.stop{background:var(--err);color:#1a0b0a}
+    .bt.ghost{background:transparent;border:1px solid var(--line-strong);color:var(--cream)}
+    .bt:focus-visible{outline:2px solid var(--chrome);outline-offset:2px}
+    .bt:disabled{opacity:.5}
+    .act{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:0 16px 12px}
+    .act .el{font-variant-numeric:tabular-nums;font-weight:700;font-size:18px;color:var(--ok)}
+    .fin{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:0 16px 12px;margin:0}
+    .runc .fin{grid-column:1 / -1;padding:0}
+    .fin input{flex:1 1 180px;min-width:0;font:inherit;font-size:13px;padding:8px 12px;border-radius:999px;border:1px solid var(--line-strong);background:rgba(255,255,255,.04);color:var(--cream)}
+    .fin input:focus-visible{outline:2px solid var(--chrome);outline-offset:2px}
+    .tag.run{color:var(--ok);border-color:rgba(70,211,105,.5);background:rgba(70,211,105,.1)}
+    .tag.time{color:var(--chrome)}
+    .rank{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--surface)}
+    .rank div{display:grid;grid-template-columns:28px 1fr auto;gap:12px;align-items:center;padding:10px 16px;border-top:1px solid var(--line);font-size:14px}
+    .rank div:first-child{border-top:0}
+    .rank div.me{background:rgba(255,255,255,.04)}
+    .rank .pos{font-variant-numeric:tabular-nums;color:var(--taupe);font-weight:600}
+    .rank .nm{display:flex;align-items:center;gap:10px;min-width:0}
+    .rank .nm .av{width:28px;height:28px;font-size:12px}
+    .rank .mn{font-variant-numeric:tabular-nums;font-weight:600;white-space:nowrap}
+    .rank .mn small{color:var(--taupe);font-weight:400;margin-left:6px}
+    .rank .mn .w{color:var(--warn)}
+    .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:rgba(255,255,255,.95);color:#0A0B0D;border-radius:999px;padding:10px 16px;font-size:13px;font-weight:600;z-index:30;box-shadow:0 8px 30px rgba(0,0,0,.4)}
+    .toast.err{background:var(--err)}
+    @media (max-width:560px){.row{grid-template-columns:1fr}.tags{flex-direction:row;flex-wrap:wrap;align-items:center;justify-content:flex-start}.runc{grid-template-columns:1fr auto}.runc .tm{grid-column:1 / -1}}
     @media (max-width:420px){.kv{grid-template-columns:1fr}.kv b{padding-top:6px}}
   </style>
 </head>
@@ -117,7 +160,11 @@
     <h1 id="title"></h1>
     <p class="lead"><span id="leadTxt"></span><span class="live" id="live"><i></i><span id="liveTxt"></span></span></p>
     <div class="stats" id="stats"></div>
+    <div class="who" id="who"></div>
+    <div class="run" id="run"></div>
     <div id="board"></div>
+    <h2 id="todayH"></h2>
+    <div class="rank" id="today"></div>
     <h2 id="queueH"></h2>
     <div class="dl" id="queue"></div>
     <details class="done" id="doneWrap"><summary id="doneH"></summary><div class="dl" id="done"></div></details>
@@ -158,6 +205,10 @@
       tasks: (n) => `<b>${n}</b> tugas`,
       gate: { badT: "Tautan tidak berlaku", badP: "Tautan ini sudah tidak aktif. Minta tautan baru ke Rania.", tooT: "Terlalu banyak percobaan", tooP: "Coba lagi beberapa menit lagi.", downT: "Tidak bisa terhubung", downP: "Server tidak bisa dihubungi. Periksa koneksi lalu coba lagi.", retry: "Coba lagi" },
       foot: "Hanya untuk tim DS Editing. Jangan bagikan tautan ini.",
+      ch: { who: "Siapa kamu?", whoHint: "Pilih namamu dulu, lalu tekan Mulai di tugasmu.", start: "Mulai", stop: "Selesai", finish: "Selesai · simpan", cancel: "Batal", commentPh: "Catatan singkat (opsional)",
+        running: (n) => `${n} sedang berjalan`, since: "sejak", flag: "periksa", ignored: "Kurang dari 1 menit: tidak dicatat.", saved: (m) => `Tersimpan: ${m}`, err: "Gagal. Coba lagi.",
+        todayH: "Waktu hari ini", todayNone: "Belum ada waktu tercatat hari ini.", jobsN: (n) => `${n} tugas`, flagged: (n) => `${n} dipotong otomatis (6 jam)`, total: "total", you: "kamu", ai: "AI",
+        rule: "Tekan Mulai saat mulai mengedit, Selesai saat kirim. Lupa? Otomatis berhenti setelah 6 jam dan ditandai." },
     },
     en: {
       sub: "Editing team", title: "Who is on what", lead: "Read live from the DS Editing system. View only.", upd: (t) => `Updated ${t}`, off: "Offline",
@@ -171,6 +222,10 @@
       tasks: (n) => `<b>${n}</b> job${n === 1 ? "" : "s"}`,
       gate: { badT: "Link not valid", badP: "This link no longer works. Ask Rania for a new one.", tooT: "Too many attempts", tooP: "Try again in a few minutes.", downT: "Cannot connect", downP: "The server cannot be reached. Check your connection and try again.", retry: "Try again" },
       foot: "DS Editing team only. Do not share this link.",
+      ch: { who: "Who are you?", whoHint: "Pick your name first, then press Start on your job.", start: "Start", stop: "Finish", finish: "Finish · save", cancel: "Cancel", commentPh: "Short note (optional)",
+        running: (n) => `${n} running`, since: "since", flag: "check", ignored: "Under 1 minute: not recorded.", saved: (m) => `Saved: ${m}`, err: "Failed. Try again.",
+        todayH: "Time today", todayNone: "No time recorded today yet.", jobsN: (n) => `${n} job${n === 1 ? "" : "s"}`, flagged: (n) => `${n} auto-stopped (6 h)`, total: "total", you: "you", ai: "AI",
+        rule: "Press Start when you begin editing, Finish when you deliver. Forgot? It stops by itself after 6 h and gets flagged." },
     },
   };
   const LOCALE = { id: "id-ID", en: "en-GB" };
@@ -185,6 +240,72 @@
 
   // ---- état
   let data = null, lastOk = null, open = new Set(), gateKind = "";
+
+  // ---- chrono de montage (22/10, supabase/chrono_v1.sql) : état lu par chrono_state, écrit par chrono_start / chrono_stop (code du lien).
+  // Le monteur choisit son nom (gardé sur l'appareil) ; plusieurs chronos en parallèle possibles ; coupure à 6 h côté base ; rien n'est modifiable après.
+  const ME_STORE = "ds_board_me";
+  let meId = store.get(ME_STORE) || "", chrono = { running: [], today: [], jobs: [] }, skew = 0, finishing = null, busy = false, needMe = false, toastT = 0;
+  const C = () => T[lang].ch;
+  const nowServer = () => Date.now() + skew;
+  const pad2 = (n) => String(n).padStart(2, "0");
+  const elapsed = (iso) => { const s = Math.max(0, Math.floor((nowServer() - new Date(iso)) / 1000)); return `${pad2(Math.floor(s / 3600))}:${pad2(Math.floor((s % 3600) / 60))}:${pad2(s % 60)}`; };
+  const fmtMin = (m) => { m = Math.round(Number(m) || 0); const h = Math.floor(m / 60), r = m % 60; return h ? `${h} h ${pad2(r)}` : `${m} min`; };
+  const edById = (id) => ((data && data.editors) || []).find((e) => e.id === id) || { id, name: "?" };
+  const runOf = (jobId, edId) => chrono.running.find((s) => s.job_id === jobId && s.editor_id === edId);
+  const totOf = (jobId, edId) => chrono.jobs.find((x) => x.job_id === jobId && x.editor_id === edId);
+  async function rpc(name, body) {
+    const r = await fetch(`${SB_URL}/rest/v1/rpc/${name}`, { method: "POST", headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, "Content-Type": "application/json" }, body: JSON.stringify(body) });
+    const b = await r.json().catch(() => null);
+    if (!r.ok || !b || typeof b !== "object") throw new Error("HTTP " + r.status);
+    return b;
+  }
+  async function loadChrono() {
+    if (!LINK || !data) return;
+    try { const b = await rpc("chrono_state", { p_key: LINK }); if (b.error) return; chrono = b; skew = new Date(b.server_time) - Date.now(); render(); } catch {}
+  }
+  function toast(msg, err) { let el = $("#toast"); if (!el) { el = document.createElement("div"); el.id = "toast"; document.body.appendChild(el); } el.className = "toast" + (err ? " err" : ""); el.textContent = msg; el.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => { el.hidden = true; }, 2600); }
+  async function startChrono(jobId) {
+    if (!meId) { needMe = true; render(); $("#who").scrollIntoView({ behavior: "smooth", block: "center" }); return; }
+    if (busy) return; busy = true;
+    try { const b = await rpc("chrono_start", { p_key: LINK, p_job: jobId, p_editor: meId }); if (b.error) toast(C().err, true); else await loadChrono(); }
+    catch { toast(C().err, true); }
+    busy = false;
+  }
+  async function stopChrono(sessionId, comment) {
+    if (busy) return; busy = true;
+    try {
+      const b = await rpc("chrono_stop", { p_key: LINK, p_session: sessionId, p_comment: String(comment || "").trim().slice(0, 200) || null });
+      if (b.error) toast(C().err, true); else { finishing = null; toast(b.ignored ? C().ignored : C().saved(fmtMin(b.minutes))); await loadChrono(); }
+    } catch { toast(C().err, true); }
+    busy = false;
+  }
+  const finForm = (sid) => `<form class="fin" data-fin="${esc(sid)}"><input type="text" maxlength="200" placeholder="${esc(C().commentPh)}" aria-label="${esc(C().commentPh)}"/><button type="submit" class="bt stop">■ ${C().finish}</button><button type="button" class="bt ghost" data-cancel="1">${C().cancel}</button></form>`;
+  function renderWho() {
+    const eds = ((data && data.editors) || []).filter((e) => e.active !== false);
+    $("#who").className = "who" + (needMe ? " need" : "");
+    $("#who").innerHTML = `<span class="mono">${C().who}</span><div class="chips">${eds.map((e) => `<button type="button" data-me="${esc(e.id)}" class="${e.id === meId ? "on" : ""}" aria-pressed="${e.id === meId}">${avatar(e)}${esc(e.name)}</button>`).join("")}</div><p class="empty" style="padding:10px 0 0">${meId ? C().rule : C().whoHint}</p>`;
+  }
+  function renderRun() {
+    const mine = meId ? chrono.running.filter((s) => s.editor_id === meId) : [];
+    $("#run").innerHTML = mine.map((s) => { const j = (data.jobs || []).find((x) => x.id === s.job_id); const long = nowServer() - new Date(s.started_at) > 6 * 3600e3;
+      return `<div class="runc"><span class="tm ${long ? "flag" : ""}" data-el="${esc(s.started_at)}">${elapsed(s.started_at)}</span><span class="cl">${j ? esc(j.client_name) : "?"}<small>${j ? esc(j.project) : ""}</small></span>${finishing === s.id ? finForm(s.id) : `<button type="button" class="bt stop" data-stop="${esc(s.id)}">■ ${C().stop}</button>`}</div>`; }).join("");
+  }
+  function renderToday() {
+    $("#todayH").textContent = C().todayH;
+    const rows = chrono.today || [];
+    $("#today").innerHTML = rows.length ? rows.map((r, i) => { const e = edById(r.editor_id); return `<div class="${r.editor_id === meId ? "me" : ""}"><span class="pos">${i + 1}</span><span class="nm">${avatar(e)}${esc(e.name)}${r.editor_id === meId ? ` <span class="tag dim">${C().you}</span>` : ""}</span><span class="mn">${fmtMin(r.minutes)}<small>${C().jobsN(r.jobs)}</small>${r.flagged ? `<small class="w">⚠ ${r.flagged}</small>` : ""}</span></div>`; }).join("") : `<div class="empty">${C().todayNone}</div>`;
+  }
+  // ligne d'action sous une commande : Mulai (mon bloc ou la file « sans monteur »), compteur + Selesai si je suis dessus, total déjà passé
+  function chronoAct(j, ctx) {
+    if (isDone(j)) return "";
+    const canAct = ctx.selfId ? ctx.selfId === meId : !ctx.self && !ctx.showNames;
+    if (!canAct) return "";
+    const tot = meId ? totOf(j.id, meId) : null, mine = meId ? runOf(j.id, meId) : null;
+    const totTag = tot ? `<span class="tag time">⏱ ${fmtMin(tot.minutes)}${tot.flagged ? " ⚠" : ""}</span>` : "";
+    if (mine) return finishing === mine.id ? finForm(mine.id) : `<div class="act"><span class="el" data-el="${esc(mine.started_at)}">${elapsed(mine.started_at)}</span><button type="button" class="bt stop" data-stop="${esc(mine.id)}">■ ${C().stop}</button>${totTag}</div>`;
+    return `<div class="act"><button type="button" class="bt start" data-start="${esc(j.id)}">▶ ${C().start}</button>${totTag}</div>`;
+  }
+  const runTags = (j) => chrono.running.filter((s) => s.job_id === j.id).map((s) => `<span class="tag run">⏱ ${esc(edById(s.editor_id).name)}</span>`).join("");
 
   // ---- dates (règle du dashboard : date souhaitée par le client, sinon date fixée par l'équipe, sinon 5 jours ouvrés après réception)
   const endOfDay = (x) => { const d = new Date(x); d.setHours(23, 59, 59, 999); return d; };
@@ -214,10 +335,11 @@
     const dl = `<span class="tag ${late ? "err" : "dim"}">${late ? t("lateTag") + " · " : ""}${fmtDay(target(j))}</span>`;
     const head = `<button type="button" class="row" data-row="${esc(id)}" aria-expanded="${opened}">
       <span class="cl">${esc(j.client_name)}<small>${esc(j.project)}</small></span>
-      <span class="tags">${partTag(it)}${j.priority && j.priority !== "normal" ? `<span class="tag err">${t("urgent")}</span>` : ""}${isDone(j) ? qcTag(j) : dl}${isDone(j) ? "" : stageTag(it)}${isDone(j) ? "" : qcTag(j)}</span>
+      <span class="tags">${partTag(it)}${j.priority && j.priority !== "normal" ? `<span class="tag err">${t("urgent")}</span>` : ""}${isDone(j) ? qcTag(j) : dl}${isDone(j) ? "" : stageTag(it)}${isDone(j) ? "" : qcTag(j)}${isDone(j) ? "" : runTags(j)}</span>
       ${j.work_to_do ? `<span class="wk">${esc(j.work_to_do)}${ctx.showNames && it.names.length ? ` · ${esc(it.names.join(", "))}` : ""}</span>` : ""}
     </button>`;
-    if (!opened) return `<div class="job">${head}</div>`;
+    const act = chronoAct(j, ctx);
+    if (!opened) return `<div class="job">${head}${act}</div>`;
     const kv = [];
     // le brief d'abord, juste sous le travail à faire : description du client, style maison du studio, palette / CTA (si la base les renvoie), liens
     if (j.description && String(j.description).trim()) kv.push([t("brief"), `<span class="brief">${esc(j.description)}</span>`]);
@@ -236,12 +358,14 @@
     if (j.qc_status === "revisions" || j.qc_note) kv.push([t("qcL"), `${qcTag(j) || ""}${j.qc_note ? `<div class="note">${esc(j.qc_note)}</div>` : ""}`]);
     let parts = "";
     if (isMulti(j)) parts = `<div class="kv"><b>${t("parts")}</b><div class="parts">${j.parts.map((p) => `<div><span class="tag part">${t("part")[p.part_key] || esc(p.label)}</span>${stageTag({ j, p })}<span class="who">${(p.editor_names || []).length ? esc(p.editor_names.join(", ")) : t("noEd")}</span></div>`).join("")}</div></div>`;
-    return `<div class="job">${head}<div class="det">${kv.map(([k, v]) => `<div class="kv"><b>${k}</b><span>${v}</span></div>`).join("")}${parts}</div></div>`;
+    return `<div class="job">${head}${act}<div class="det">${kv.map(([k, v]) => `<div class="kv"><b>${k}</b><span>${v}</span></div>`).join("")}${parts}</div></div>`;
   }
   const sortItems = (a, b) => (isDone(a.j) - isDone(b.j)) || (isLate(b.j) - isLate(a.j)) || (target(a.j) - target(b.j));
 
   function render() {
     if (!data) return;
+    // une note en cours de frappe dans le formulaire « Selesai » survit au rafraîchissement
+    const typing = document.querySelector("[data-fin] input"), typed = typing ? typing.value : "", hadFocus = typing && document.activeElement === typing;
     const L = T[lang];
     $("#sub").textContent = L.sub; $("#title").textContent = L.title; $("#leadTxt").textContent = L.lead; $("#foot").textContent = L.foot;
     $("#langId").classList.toggle("on", lang === "id"); $("#langEn").classList.toggle("on", lang === "en");
@@ -259,18 +383,28 @@
     for (const it of openItems) for (const id of it.eds) { if (!byEd.has(id)) { const i = it.eds.indexOf(id); byEd.set(id, { e: { id, name: it.names[i] || "?" }, items: [] }); } byEd.get(id).items.push(it); }
     $("#board").innerHTML = [...byEd.values()].map(({ e, items }) => `<section class="ed">
       <div class="edh">${avatar(e)}<span class="nm">${esc(e.name)}</span><span class="ct">${L.tasks(items.length)}</span></div>
-      ${items.length ? items.sort(sortItems).map((it) => rowHtml(it, { self: e.name })).join("") : `<div class="empty">${L.none}</div>`}
+      ${items.length ? items.sort(sortItems).map((it) => rowHtml(it, { self: e.name, selfId: e.id })).join("") : `<div class="empty">${L.none}</div>`}
     </section>`).join("");
+    renderWho(); renderRun(); renderToday();
     $("#queueH").textContent = L.queueH;
     $("#queue").innerHTML = naItems.length ? naItems.sort(sortItems).map((it) => rowHtml(it, {})).join("") : `<div class="empty">${L.queueNone}</div>`;
     const done = jobs.filter(isDone).sort((a, b) => new Date(b.qc_at || b.delivered_at || 0) - new Date(a.qc_at || a.delivered_at || 0));
     $("#doneH").textContent = L.doneH(done.length);
     $("#done").innerHTML = done.length ? done.map((j) => rowHtml({ j, p: null, eds: j.editor_ids || [], names: j.editor_names || [] }, { showNames: true })).join("") : `<div class="empty">${L.doneNone}</div>`;
+    const again = document.querySelector("[data-fin] input"); if (again) { if (typed) again.value = typed; if (hadFocus) again.focus(); }
   }
   document.addEventListener("click", (ev) => {
+    const me = ev.target.closest("[data-me]"); if (me) { meId = me.dataset.me; store.set(ME_STORE, meId); needMe = false; finishing = null; render(); return; }
+    const st = ev.target.closest("[data-start]"); if (st) { startChrono(st.dataset.start); return; }
+    const sp = ev.target.closest("[data-stop]"); if (sp) { finishing = sp.dataset.stop; render(); const i = document.querySelector("[data-fin] input"); if (i) i.focus(); return; }
+    const cn = ev.target.closest("[data-cancel]"); if (cn) { finishing = null; render(); return; }
+    if (ev.target.closest("[data-fin]")) return;
     const b = ev.target.closest("[data-row]"); if (!b) return;
     const id = b.dataset.row; open.has(id) ? open.delete(id) : open.add(id); render();
   });
+  document.addEventListener("submit", (ev) => { const f = ev.target.closest("[data-fin]"); if (!f) return; ev.preventDefault(); const i = f.querySelector("input"); stopChrono(f.dataset.fin, i ? i.value : ""); });
+  setInterval(() => { document.querySelectorAll("[data-el]").forEach((el) => { el.textContent = elapsed(el.dataset.el); }); }, 1000);
+  setInterval(loadChrono, 30000);
 
   // ---- écrans d'arrêt
   function gate(kind) {
@@ -297,9 +431,11 @@
       return;
     }
     for (const j of body.jobs || []) { j.work_to_do = scrub(j.work_to_do); j.project = scrub(j.project); j.qc_note = scrub(j.qc_note); j.logos = scrub(j.logos); j.description = scrub(j.description); j.house_style = scrub(j.house_style); }
+    const firstData = !data;
     data = body; lastOk = new Date(); gateKind = "";
     $("#gate").hidden = true; $("#app").hidden = false;
     render();
+    if (firstData) loadChrono();
   }
 
   document.querySelectorAll("[data-lang]").forEach((b) => b.addEventListener("click", () => { lang = b.dataset.lang; store.set("ds_lang", lang); if (gateKind) gate(gateKind); render(); }));
