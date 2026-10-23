@@ -646,7 +646,7 @@ const I18N = {
     "own.links":"Ou un lien vers votre brief","own.linksSmall":"Google Doc, Notion… pensez à autoriser l'accès à toute personne disposant du lien.",
     "own.rushNote":"Les liens de vos rushes (Google Drive, WeTransfer, Dropbox) doivent être écrits dans le brief : notre robot les lit et lance le téléchargement.",
     "own.ack":"Mon brief est complet. DS Editing monte à partir de ce document. Ce qui n'y est pas = choix du monteur. La date de livraison écrite dans le brief fait foi.",
-    "own.inBrief":"dans le brief","own.recap":"Brief fourni : {n}","own.uploading":"Envoi du brief…","own.remove":"Retirer",
+    "own.inBrief":"dans le brief","own.recap":"Brief fourni : {n}","own.uploading":"Envoi du brief…","own.remove":"Retirer","bk.uploading":"Envoi du logo…",
     "s1.title":"Votre projet","s1.hint":"Un nom, un produit. Le reste vient après.",
     "f.projet":"Nom du projet ou de l'épisode","ph.projet":"Ex. Épisode 12 — Dr Weber",
     "f.produit":"Ce que vous nous confiez","f.episodes":"Nombre d'épisodes",
@@ -719,7 +719,7 @@ const I18N = {
     // Seuls les fichiers joints (logo, palette) vivent en mémoire et sont à redéposer : le texte le dit.
     "stale.text":"Une nouvelle version de ce formulaire est disponible. Rafraîchissez la page pour continuer : vos choix sont conservés sur cet appareil, seuls vos fichiers joints (logo, palette) sont à redéposer.","stale.btn":"Rafraîchir la page",
     units:{episode:["épisode","épisodes"],reel_basique:["reel standard","reels standard"],reel_signature:["reel premium","reels premium"],miniature:["miniature","miniatures"],trailer:["trailer","trailers"]},
-    err:{bmode:"Choisissez : j'ai déjà mon brief, ou guidez-moi (étape 04 — Votre brief).",bfiles:"Déposez votre brief : un fichier ou un lien (étape 04 — Votre brief).",no_brief:"Déposez votre brief : un fichier ou un lien (étape 04 — Votre brief).",back:"Cochez la case : votre brief est complet et fait foi (étape 04 — Votre brief).",upload:"L'envoi du brief a échoué. Réessayez, ou écrivez-nous sur WhatsApp.",bigfile:"Un fichier dépasse 25 Mo : déposez-le sur Google Drive et collez le lien.",badtype:"Format non accepté : PDF, Word, image ou texte.",
+    err:{upload_files:"L'envoi du logo ou de la palette a échoué. Réessayez, ou collez un lien Drive dans « Logos et polices ».",badimage:"Format non accepté pour le logo / la palette : PNG, JPG, SVG, WebP ou GIF.",bmode:"Choisissez : j'ai déjà mon brief, ou guidez-moi (étape 04 — Votre brief).",bfiles:"Déposez votre brief : un fichier ou un lien (étape 04 — Votre brief).",no_brief:"Déposez votre brief : un fichier ou un lien (étape 04 — Votre brief).",back:"Cochez la case : votre brief est complet et fait foi (étape 04 — Votre brief).",upload:"L'envoi du brief a échoué. Réessayez, ou écrivez-nous sur WhatsApp.",bigfile:"Un fichier dépasse 25 Mo : déposez-le sur Google Drive et collez le lien.",badtype:"Format non accepté : PDF, Word, image ou texte.",
       projet:"Donnez un nom au projet.",reel0:"Indiquez au moins un reel (étape 03 — Extras).",produit0:"Choisissez ce que vous nous confiez, à l'étape 01 — Produit.",produit:"Votre commande est encore vide : choisissez un produit à l'étape 01 — Produit et sa formule à l'étape 02 — Formule, ou un de vos packs à l'étape 01 sous « Vos vidéos ».",noVideo:"Il manque la vidéo : les extras s'ajoutent à un épisode ou à un pack. Choisissez votre épisode à l'étape 02 — Formule, ou un de vos packs à l'étape 01 — Produit. On garde le reste de votre sélection.",formule:"Choisissez une formule ou un pack à l'étape 02 — Formule.",rushes:"Ajoutez au moins un lien de rushes.",rushesBad:"Un de vos liens de rushes n'est pas un fichier téléchargeable (étape 05 — Fichiers) : corrigez-le, ou déplacez-le vers les vidéos que vous aimez.",contact:"Indiquez un contact et un moyen de le joindre.",
       brTone:"Choisissez un ton et un style (étape 06 — Brief).",brMusic:"Musique : au choix du monteur, fournie, ou non (étape 06 — Brief).",brCaptions:"Captions : mot à mot, par phrases, ou non (étape 06 — Brief).",brCta:"CTA de fin : répondez oui ou non (étape 06 — Brief).",brAvoid:"Dites-nous ce qu'il faut éviter, ou cochez « Rien de particulier » (étape 06 — Brief).",brLikes:"Collez au moins deux liens de vidéos que vous aimez (étape 06 — Brief).",
       brEpDur:"Durée cible de la vidéo 16:9 : complète, ou coupée à combien de minutes (étape 06 — Brief).",brEpHook:"Hook de la vidéo 16:9 : au choix du monteur, ou vos timecodes (étape 06 — Brief).",brReelDur:"Durée cible des reels : 30, 45, 60 s ou autre (étape 06 — Brief).",brReelHook:"Hook des reels : au choix du monteur, ou vos timecodes (étape 06 — Brief).",brThumb:"Donnez le texte de la miniature (étape 06 — Brief).",email:"Indiquez un e-mail valide, c'est là qu'arrivent la confirmation et le suivi.",send:"L'envoi a échoué. Réessayez, ou écrivez-nous sur WhatsApp.",terms:"Cochez les conditions de collaboration pour envoyer la commande.",
@@ -741,7 +741,7 @@ const I18N = {
     "own.links":"Or a link to your brief","own.linksSmall":"Google Doc, Notion… make sure anyone with the link can open it.",
     "own.rushNote":"Your footage links (Google Drive, WeTransfer, Dropbox) must be written in the brief: our robot reads them and starts the download.",
     "own.ack":"My brief is complete. DS Editing edits from this document. Anything not in it = editor's choice. The delivery date written in the brief is binding.",
-    "own.inBrief":"in the brief","own.recap":"Brief provided: {n}","own.uploading":"Uploading the brief…","own.remove":"Remove",
+    "own.inBrief":"in the brief","own.recap":"Brief provided: {n}","own.uploading":"Uploading the brief…","own.remove":"Remove","bk.uploading":"Uploading your logo…",
     "s1.title":"Your project","s1.hint":"A name, a product. The rest comes next.",
     "f.projet":"Project or episode name","ph.projet":"e.g. Episode 12 — Dr Weber",
     "f.produit":"What you're sending us","f.episodes":"Number of episodes",
@@ -808,7 +808,7 @@ const I18N = {
     saved:"Draft saved on this device", empty:"Your order will appear here",
     "stale.text":"A newer version of this form is available. Refresh the page to continue: your choices are kept on this device, only your attached files (logo, palette) need to be dropped again.","stale.btn":"Refresh the page",
     units:{episode:["episode","episodes"],reel_basique:["standard reel","standard reels"],reel_signature:["premium reel","premium reels"],miniature:["thumbnail","thumbnails"],trailer:["trailer","trailers"]},
-    err:{bmode:"Choose: I already have my brief, or guide me (step 04 — Your brief).",bfiles:"Drop your brief: a file or a link (step 04 — Your brief).",no_brief:"Drop your brief: a file or a link (step 04 — Your brief).",back:"Tick the box: your brief is complete and binding (step 04 — Your brief).",upload:"Uploading the brief failed. Try again, or message us on WhatsApp.",bigfile:"A file is over 25 MB: put it on Google Drive and paste the link.",badtype:"Format not accepted: PDF, Word, image or text.",
+    err:{upload_files:"Uploading the logo or palette failed. Try again, or paste a Drive link under “Logos & fonts”.",badimage:"Format not accepted for the logo / palette: PNG, JPG, SVG, WebP or GIF.",bmode:"Choose: I already have my brief, or guide me (step 04 — Your brief).",bfiles:"Drop your brief: a file or a link (step 04 — Your brief).",no_brief:"Drop your brief: a file or a link (step 04 — Your brief).",back:"Tick the box: your brief is complete and binding (step 04 — Your brief).",upload:"Uploading the brief failed. Try again, or message us on WhatsApp.",bigfile:"A file is over 25 MB: put it on Google Drive and paste the link.",badtype:"Format not accepted: PDF, Word, image or text.",
       projet:"Give the project a name.",reel0:"Add at least one reel (step 03 — Extras).",produit0:"Choose what you're sending us, in step 01 — Product.",produit:"Your order is still empty: pick a product in step 01 — Product and its package in step 02 — Package, or one of your packs in step 01 under “Your videos”.",noVideo:"The video itself is missing: extras come on top of an episode or a pack. Pick your episode in step 02 — Package, or one of your packs in step 01 — Product. We keep the rest of your selection.",formule:"Choose a package or a pack in step 02 — Package.",rushes:"Add at least one footage link.",rushesBad:"One of your footage links isn't a downloadable file (step 05 — Files): fix it, or move it to the videos you love.",contact:"Give us a contact and a way to reach them.",
       brTone:"Pick a tone and style (step 06 — Brief).",brMusic:"Music: editor's choice, provided, or none (step 06 — Brief).",brCaptions:"Captions: word by word, by sentence, or none (step 06 — Brief).",brCta:"End CTA: answer yes or no (step 06 — Brief).",brAvoid:"Tell us what to avoid, or tick “Nothing in particular” (step 06 — Brief).",brLikes:"Paste at least two links to videos you love (step 06 — Brief).",
       brEpDur:"Target length of the 16:9 video: full, or cut down to how many minutes (step 06 — Brief).",brEpHook:"Hook of the 16:9 video: editor's choice, or your timecodes (step 06 — Brief).",brReelDur:"Target length of the reels: 30, 45, 60 s or other (step 06 — Brief).",brReelHook:"Hook of the reels: editor's choice, or your timecodes (step 06 — Brief).",brThumb:"Give us the thumbnail text (step 06 — Brief).",email:"Enter a valid email, that's where the confirmation and tracking go.",send:"Sending failed. Try again, or message us on WhatsApp.",terms:"Tick the terms of collaboration to send the order.",
@@ -1562,10 +1562,17 @@ function renderBrandkit() {
   $("#fontpick").querySelectorAll("button").forEach((b) => b.classList.toggle("on", draft.font === b.dataset.font));
   $("#fontName").style.display = draft.font === "team" ? "none" : "";
 }
+// Types acceptés par le bucket « briefs » pour un logo / une palette (SVG : supabase/brand_files_v1.sql). Même limite de poids que le brief.
+const BRAND_TYPES = { png: "image/png", jpg: "image/jpeg", jpeg: "image/jpeg", webp: "image/webp", gif: "image/gif", svg: "image/svg+xml" };
+const brandType = (f) => BRAND_TYPES[(f.name.split(".").pop() || "").toLowerCase()] || "";
 function takeFile(k, file) {
   if (!file) return;
+  const e = t("err");
+  if (file.size > OWN_MAX) { $("#msg").textContent = e.bigfile; return; }
+  if (!brandType(file)) { $("#msg").textContent = e.badimage; return; }
   if (FILES[k] && FILES[k].url) URL.revokeObjectURL(FILES[k].url);
-  FILES[k] = { name: file.name, size: file.size, type: file.type, file, url: /^image\//.test(file.type) ? URL.createObjectURL(file) : "" };
+  FILES[k] = { name: file.name, size: file.size, type: brandType(file), file, url: /^image\//.test(file.type) ? URL.createObjectURL(file) : "" };
+  $("#msg").textContent = "";
   renderBrandkit();
 }
 document.querySelectorAll("[data-file]").forEach((inp) => {
@@ -1638,6 +1645,25 @@ async function uploadBriefFiles() {
     const r = await fetch(`${SB_URL}/storage/v1/object/briefs/${p.split("/").map(encodeURIComponent).join("/")}`, { method: "POST", headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY, "Content-Type": f.type, "x-upsert": "false" }, body: f.file });
     if (!r.ok) throw Object.assign(new Error("upload " + r.status), { code: "upload" });
     out.push({ path: p, name: f.name, size: f.size, type: f.type });
+  }
+  return out;
+}
+/* Logo et capture de palette : AVANT le 23/10/2026 ces fichiers restaient en mémoire du navigateur et seul le texte
+   « Logo: nom (file attached) » partait — rien n'était téléchargeable par les monteurs. Maintenant ils partent dans le même
+   bucket privé « briefs » (clé publique, INSERT seulement, chemin « slug/identifiant/nom ») et la commande les référence dans
+   details.brand_files [{ kind, path, name, size, type }] ; le robot des 10 min les copie dans le dossier Drive de la commande
+   et remplace « (file attached) » par le lien Drive dans le brief, le mail des monteurs et la vue équipe. */
+let BRAND_UPLOADED = [];              // posé par submit() → details.brand_files
+async function uploadBrandFiles() {
+  const list = [["logo", FILES.logo], ["palette", FILES.palette]].filter(([, f]) => f && f.file);
+  if (!list.length) return [];
+  const id = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(36).slice(2)).replace(/-/g, "").toLowerCase().slice(0, 24);
+  const out = [];
+  for (const [kind, f] of list) {
+    const p = `${orderSlug()}/${id}/${safeFile(f.name)}`;
+    const r = await fetch(`${SB_URL}/storage/v1/object/briefs/${p.split("/").map(encodeURIComponent).join("/")}`, { method: "POST", headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY, "Content-Type": f.type, "x-upsert": "false" }, body: f.file });
+    if (!r.ok) throw Object.assign(new Error("upload " + r.status), { code: "upload_files" });
+    out.push({ kind, path: p, name: f.name, size: f.size, type: f.type });
   }
   return out;
 }
@@ -1866,6 +1892,7 @@ function order() {
     brief: ownBrief() ? {} : briefData(),   // brief structuré (20/10) ; `description` ci-dessous en est le texte lisible (briefText via values())
   };
   if (BY) details.deposited_by = BY;   // dépôt interne : affiché sur la commande dans le dashboard équipe
+  if (BRAND_UPLOADED.length) details.brand_files = BRAND_UPLOADED;   // logo / palette téléversés (uploadBrandFiles) : copiés sur Drive par le robot
   if (ownBrief()) {   // brief fourni par le client (QCM 21/10) : le robot des 10 min lit les fichiers et remplit description / brief / rushes / date
     details.brief_mode = "own"; details.brief_files = BRIEF_UPLOADED; details.brief_links = ownLinks();
     details.brief_ack = { accepted_at: new Date().toISOString(), text: String(t("own.ack")).slice(0, 300) };
@@ -1898,6 +1925,8 @@ async function submit() {
     // Brief fourni : les fichiers partent d'abord dans le bucket privé « briefs » (clé publique, INSERT seulement), puis la commande
     // les référence (details.brief_files). Un nouvel identifiant de dossier à chaque essai : jamais d'écrasement.
     if (ownBrief()) { btn.textContent = t("own.uploading"); BRIEF_UPLOADED = await uploadBriefFiles(); btn.textContent = t("btn.sending"); }
+    // Logo / palette en fichier : téléversés AVANT la commande (sinon ils n'existeraient nulle part), référencés dans details.brand_files.
+    if (!ownBrief() && (FILES.logo || FILES.palette)) { btn.textContent = t("bk.uploading"); BRAND_UPLOADED = await uploadBrandFiles(); btn.textContent = t("btn.sending"); }
     const res = await rpc("create_order", { p_slug: orderSlug(), p_key: accessKey, p_order: order() });
     if (!res || !res.token) throw Object.assign(new Error("no_token"), { code: "send" });
     done(String(res.token));
@@ -1905,7 +1934,7 @@ async function submit() {
     // Pas de repli vers les anciens formulaires Google (supprimés du circuit le 29/09) : le brouillon reste enregistré, le client réessaie.
     if (e.offline) return fail(esc(t("err").send));
     if (e.code === "bad_key") return fail(keyMsg("bad_key"));
-    fail(esc(["bad_email", "no_project", "no_rushes", "no_brief", "upload", "terms", "rate_limit"].includes(e.code) ? t("err")[e.code] : t("err").send));
+    fail(esc(["bad_email", "no_project", "no_rushes", "no_brief", "upload", "upload_files", "terms", "rate_limit"].includes(e.code) ? t("err")[e.code] : t("err").send));
   }
 }
 /* repli : même circuit que le formulaire Google, sans serveur (seulement si la base est injoignable et que le studio a un formulaire) */
