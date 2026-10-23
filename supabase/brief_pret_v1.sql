@@ -33,7 +33,8 @@ declare
   s studios%rowtype; t text; v_links text[]; v_refs text[]; v_email text; v_project text; v_deadline date; n int;
   v_own boolean;
 begin
-  select * into s from studios where slug = lower(coalesce(p_slug, '')) and access_token = p_key and length(coalesce(p_key, '')) >= 8;
+  -- 23/10 : clause clé interne (studio_codes_v1) conservée ; la version du 21/10 l'avait perdue → Putu bloqué (voir ds-editing-os/supabase/create_order_v3.sql)
+  select * into s from studios where slug = lower(coalesce(p_slug, '')) and length(coalesce(p_key, '')) >= 8 and (access_token = p_key or id = internal_key_studio(p_key));
   if s.id is null then raise exception 'bad_key'; end if;
   v_email := trim(coalesce(p_order->>'email', ''));
   if v_email !~ '^[^\s@]+@[^\s@]+\.[^\s@]+$' then raise exception 'bad_email'; end if;
