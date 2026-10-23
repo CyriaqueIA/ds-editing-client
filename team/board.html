@@ -326,7 +326,9 @@
   const partTag = (it) => it.p && it.p.part_key !== "single" ? `<span class="tag part">${t("part")[it.p.part_key] || esc(it.p.label)}</span>` : "";
   const AV = ["linear-gradient(135deg,#FF7A2F,#F0476E)", "linear-gradient(135deg,#7B5CFF,#3D8BFF)", "linear-gradient(135deg,#16A085,#3D8BFF)", "linear-gradient(135deg,#E8A317,#FF7A2F)", "linear-gradient(135deg,#F0476E,#7B5CFF)"];
   function avatar(e) { if (safeUrl(e.avatar_url)) return `<span class="av" style="background-image:url('${esc(e.avatar_url)}')"></span>`; let h = 0; for (const ch of e.name) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return `<span class="av" style="background:${AV[h % AV.length]}">${esc(e.name.slice(0, 1).toUpperCase())}</span>`; }
-  const linkList = (arr) => (Array.isArray(arr) ? arr : []).map(safeUrl).filter(Boolean).map((u) => { let h = u; try { h = new URL(u).hostname.replace(/^www\./, ""); } catch {} return `<a href="${esc(u)}" target="_blank" rel="noopener noreferrer">${esc(h)}</a>`; }).join(" · ");
+  // texte libre échappé, adresses http(s) rendues cliquables (logo / palette déposés en fichier → lien Drive posé par le robot)
+  const linkify = (s) => esc(s).replace(/https?:\/\/[^\s<]+/g, (m) => { const u = m.replace(/[.,;:!?)]+$/, ""); return `<a href="${u}" target="_blank" rel="noopener noreferrer">${u.replace(/^https?:\/\//i, "").slice(0, 60)}</a>${m.slice(u.length)}`; });
+  const linkList = (arr) =>(Array.isArray(arr) ? arr : []).map(safeUrl).filter(Boolean).map((u) => { let h = u; try { h = new URL(u).hostname.replace(/^www\./, ""); } catch {} return `<a href="${esc(u)}" target="_blank" rel="noopener noreferrer">${esc(h)}</a>`; }).join(" · ");
 
   // ---- rendu
   function rowHtml(it, ctx) {
@@ -345,7 +347,7 @@
     if (j.description && String(j.description).trim()) kv.push([t("brief"), `<span class="brief">${esc(j.description)}</span>`]);
     if (j.house_style && String(j.house_style).trim()) kv.push([t("house"), `<span class="brief">${esc(j.house_style)}</span>`]);
     const det = j.details && typeof j.details === "object" ? j.details : {};   // 'viewer' ne reçoit pas details aujourd'hui : rien ne s'affiche, rien ne casse
-    if (det.palette && String(det.palette).trim()) kv.push([t("palette"), esc(det.palette)]);
+    if (det.palette && String(det.palette).trim()) kv.push([t("palette"), linkify(det.palette)]);
     if (det.cta_reseaux && String(det.cta_reseaux).trim()) kv.push([t("cta"), esc(det.cta_reseaux)]);
     const briefDoc = safeUrl(j.brief_url); if (briefDoc) kv.push([t("briefDoc"), `<a href="${esc(briefDoc)}" target="_blank" rel="noopener noreferrer">${esc(briefDoc.replace(/^https?:\/\//i, "").slice(0, 60))}</a>`]);
     const folder = safeUrl(j.folder_url); if (folder) kv.push([t("folder"), `<a href="${esc(folder)}" target="_blank" rel="noopener noreferrer">${esc(folder.replace(/^https?:\/\//i, "").slice(0, 60))}</a>`]);
@@ -354,7 +356,7 @@
     if (j.files_path) kv.push([t("rushes"), `<span class="path">${esc(j.files_path)}</span><span style="color:var(--taupe)">${t("pc")}</span>`]);
     const links = linkList(j.rushes_links); if (links) kv.push([t("links"), links]);
     const refs = linkList(j.references_links); if (refs) kv.push([t("refs"), refs]);
-    if (j.logos && String(j.logos).trim()) kv.push([t("logos"), esc(j.logos)]);
+    if (j.logos && String(j.logos).trim()) kv.push([t("logos"), linkify(j.logos)]);   // « Logo: nom — <lien Drive> » : lien cliquable (23/10)
     if (j.qc_status === "revisions" || j.qc_note) kv.push([t("qcL"), `${qcTag(j) || ""}${j.qc_note ? `<div class="note">${esc(j.qc_note)}</div>` : ""}`]);
     let parts = "";
     if (isMulti(j)) parts = `<div class="kv"><b>${t("parts")}</b><div class="parts">${j.parts.map((p) => `<div><span class="tag part">${t("part")[p.part_key] || esc(p.label)}</span>${stageTag({ j, p })}<span class="who">${(p.editor_names || []).length ? esc(p.editor_names.join(", ")) : t("noEd")}</span></div>`).join("")}</div></div>`;
