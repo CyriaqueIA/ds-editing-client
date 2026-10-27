@@ -195,7 +195,7 @@ const STAGES = [["a_contacter", "À contacter"], ["contacte", "Contacté"], ["en
 const STAGE_LABEL = Object.fromEntries(STAGES);
 const OPEN = STAGES.slice(0, 7).map((s) => s[0]);
 const MARKET = { france_metropole: "France", usa: "USA", quebec: "Québec", uk: "UK", antilles_guyane: "Antilles-Guyane", suisse: "Suisse", belgique: "Belgique", luxembourg: "Luxembourg", acadie_n_b: "Acadie", pays_bas: "Pays-Bas", autre: "Autre" };
-const TYPE = { studio_podcast: "Studio podcast", agence_smm_contenu: "Agence contenu", agence_video_production: "Agence vidéo", createur_media: "Créateur / média", formateur_coach: "Formateur / coach", autre: "Autre" };
+const TYPE = { studio_podcast: "Studio podcast", infopreneur: "Infopreneur", youtuber: "YouTuber", agence: "Agence", agence_smm_contenu: "Agence contenu", agence_video_production: "Agence vidéo", createur_media: "Créateur / média", formateur_coach: "Formateur / coach", autre: "Autre" };
 const KIND = { call: "Appel", email: "Mail", message: "Message", note: "Note", task: "Tâche", meeting: "Rendez-vous", stage: "Étape", assistant: "Assistant" };
 const TABS = [["jour", "Ma journée"], ["fiches", "Fiches"], ["tunnel", "Tunnel"], ["clients", "Clients"], ["mail", "Mailing"], ["chiffres", "Chiffres"], ["bot", "Bot et alertes"], ["tele", "Mode télé"]];
 const VIEWER_TABS = ["fiches", "tunnel", "clients", "chiffres", "tele"];
@@ -223,7 +223,7 @@ let toastTimer = null;
 function toast(x) { const t = $("toast"); t.textContent = x; t.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true; }, 3800); }
 
 let sb = null;
-const S = { me: null, members: [], deals: [], contacts: new Map(), tab: "fiches", q: "", stage: "open", market: "", setter: "", quick: "", mine: false, open: null, acts: null, more: {}, busy: false, note: "", sel: null, actsFor: null, week: [], jourMore: {} };
+const S = { me: null, members: [], deals: [], contacts: new Map(), tab: "fiches", q: "", stage: "open", family: "", market: "", setter: "", quick: "", mine: false, open: null, acts: null, more: {}, busy: false, note: "", sel: null, actsFor: null, week: [], jourMore: {} };
 const canEdit = () => S.me && (S.me.role === "admin" || S.me.role === "sales");
 const isOpen = (d) => OPEN.includes(d.stage);
 const ownerName = (d) => (S.members.find((m) => m.user_id === d.owner_id)?.display_name) || cap(d.setter) || "Non attribué";
@@ -291,6 +291,7 @@ function filtered() {
   const q = S.q.trim().toLowerCase();
   return S.deals.filter((d) => {
     if (S.stage === "open" ? !isOpen(d) : S.stage && d.stage !== S.stage) return false;
+    if (S.family && (d.company.type_structure || "studio_podcast") !== S.family) return false;
     if (S.market && d.company.market !== S.market) return false;
     if (S.setter && (d.setter || "") !== S.setter) return false;
     if (S.quick === "late" && !(d.next_action_at && dayDiff(d.next_action_at) < 0)) return false;
@@ -314,6 +315,10 @@ function vFiches() {
   const list = filtered();
   const markets = new Set(S.deals.map((d) => d.company.market)), setters = [...new Set(S.deals.map((d) => d.setter).filter(Boolean))];
   const count = (key, n, label) => h("button", { type: "button", class: "count", "aria-pressed": String(S.quick === key), onclick: () => { S.quick = S.quick === key ? "" : key; if (S.quick) S.stage = "open"; render(); } }, [h("b", { text: String(n) }), h("span", { text: label })]);
+  /* Familles (27/10) : un bouton par famille de prospect, compté sur les fiches ouvertes. type_structure vide = studio podcast (historique). */
+  const famOf = (d) => d.company.type_structure || "studio_podcast";
+  const FAMILIES = [["studio_podcast", "Studios podcast"], ["infopreneur", "Infopreneurs"], ["youtuber", "YouTubers"]];
+  const fam = (key, label) => h("button", { type: "button", class: "count", "aria-pressed": String(S.family === key), onclick: () => { S.family = S.family === key ? "" : key; render(); } }, [h("b", { text: String(key ? open.filter((d) => famOf(d) === key).length : open.length) }), h("span", { text: label })]);
   const search = h("input", { class: "field", type: "search", id: "q", placeholder: "Chercher une société ou un contact", "aria-label": "Chercher", value: S.q, oninput: (ev) => { S.q = ev.target.value; renderTable(); } });
   const holder = h("div", { id: "tableHolder" });
   function renderTable() {
@@ -335,6 +340,7 @@ function vFiches() {
   return h("div", { style: "display:flex;flex-direction:column;gap:14px" }, [
     h("div", { class: "vh" }, [h("h2", { text: "Fiches" }), h("span", { class: "muted small", text: `${S.deals.length} sociétés importées de HubSpot · ${open.length} ouvertes` })]),
     h("div", { class: "counts" }, [count("late", late, "relances en retard"), count("today", today, "à faire aujourd'hui"), count("nodate", nodate, "ouvertes sans date")]),
+    h("div", { class: "counts" }, [fam("", "Toutes les familles"), ...FAMILIES.map(([k, l]) => fam(k, l))]),
     h("div", { class: "filters" }, [
       search,
       select("fStage", "Étape", S.stage, [["open", "Étapes ouvertes"], ["", "Toutes les étapes"], ...STAGES], (v) => { S.stage = v; if (v !== "open") S.quick = ""; render(); }),
