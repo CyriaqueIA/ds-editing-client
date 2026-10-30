@@ -156,6 +156,20 @@ td .sub{display:block;color:var(--muted);font-size:12.5px;max-width:340px;overfl
 .soon{border:1px dashed var(--line-strong);border-radius:14px;padding:22px;display:flex;flex-direction:column;gap:12px;max-width:760px}
 .soon ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
 .hint{font-size:13px;color:var(--muted);border-left:2px solid var(--line-strong);padding-left:10px}
+/* recherche globale (30/10) : en-tête, tous les onglets, toutes les étapes */
+.gs{position:relative;flex:1 1 320px;max-width:520px;min-width:0}
+.gs input{width:100%;border-radius:999px;padding:8px 40px 8px 14px}
+.gs kbd{position:absolute;right:10px;top:50%;transform:translateY(-50%);font:600 11.5px var(--font);color:var(--muted);border:1px solid var(--line-strong);border-radius:6px;padding:0 6px;pointer-events:none}
+.gs input:focus ~ kbd,.gs input:not(:placeholder-shown) ~ kbd{display:none}
+.gs-res{position:absolute;left:0;right:0;top:calc(100% + 6px);background:var(--bg);border:1px solid var(--line-strong);border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,.18);max-height:min(70vh,560px);overflow-y:auto;z-index:15;padding:4px 0}
+.gs-res .qgroup{border-top:1px solid var(--line)}
+.gs-res .qgroup:first-child{border-top:0}
+.gs-item{all:unset;box-sizing:border-box;cursor:pointer;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 8px;align-items:start;width:100%;padding:8px 14px;font-size:13.5px}
+.gs-item[aria-selected="true"],.gs-item:hover{background:var(--accent-soft)}
+.gs-item b{font-weight:600;overflow-wrap:anywhere}
+.gs-item small{grid-column:1/-1;color:var(--muted);font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gs-item mark{background:var(--accent-soft);color:inherit;border-radius:3px;padding:0 1px}
+.gs-foot{font-size:12.5px;color:var(--muted);padding:8px 14px}
 </style>
 </head>
 <body>
@@ -174,6 +188,11 @@ td .sub{display:block;color:var(--muted);font-size:12.5px;max-width:340px;overfl
 <div class="shell" id="app" hidden>
   <div class="top">
     <span class="brand"><i></i>DS<em>Editing CRM</em></span>
+    <div class="gs" id="gs">
+      <input class="field" type="search" id="gsInput" placeholder="Rechercher : société, contact, téléphone, site, note…" aria-label="Rechercher dans tout le CRM" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="gsRes"/>
+      <kbd>/</kbd>
+      <div class="gs-res" id="gsRes" role="listbox" hidden></div>
+    </div>
     <div class="who"><span id="whoami"></span><button class="btn" type="button" id="logout" hidden>Se déconnecter</button><a class="btn" id="notYou" href="?login=1" hidden>Ce n'est pas vous ?</a></div>
   </div>
   <div class="tabs" id="tabs" role="tablist"></div>
@@ -288,7 +307,7 @@ async function addNote(d, body) {
 
 /* ---------- filtres ---------- */
 function filtered() {
-  const q = S.q.trim().toLowerCase();
+  const q = norm(S.q.trim()), qd = digits(S.q);
   return S.deals.filter((d) => {
     if (S.stage === "open" ? !isOpen(d) : S.stage && d.stage !== S.stage) return false;
     if (S.family && (d.company.type_structure || "studio_podcast") !== S.family) return false;
@@ -297,7 +316,7 @@ function filtered() {
     if (S.quick === "late" && !(d.next_action_at && dayDiff(d.next_action_at) < 0)) return false;
     if (S.quick === "today" && !(d.next_action_at && dayDiff(d.next_action_at) === 0)) return false;
     if (S.quick === "nodate" && !(isOpen(d) && !d.next_action_at)) return false;
-    if (q && !(d.company.name.toLowerCase().includes(q) || (S.contacts.get(d.company_id) || []).some((c) => `${c.first_name || ""} ${c.last_name || ""} ${c.email || ""}`.toLowerCase().includes(q)))) return false;
+    if (q && !gsMatch(d, q, qd)) return false;   // même règle que la recherche de l'en-tête (accents ignorés, site, téléphone)
     return true;
   }).sort((a, b) => (a.next_action_at || "9999").localeCompare(b.next_action_at || "9999") || a.company.name.localeCompare(b.company.name));
 }
@@ -548,6 +567,117 @@ function render() {
   } else { ov.hidden = true; dr.textContent = ""; }
 }
 
+/* ---------- recherche globale (30/10) ----------
+   Dans l'en-tête, sur tous les onglets, toutes étapes confondues (Perdu, Écarté et Gagné compris).
+   En local : société, site, téléphone, contacts (nom, e-mail, téléphone). En base : texte des notes, appels et mails (crm_activities). */
+const G = { q: "", hits: [], notes: [], noteQ: "", items: [], idx: -1, timer: null, seq: 0 };
+const norm = (s) => String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+const digits = (s) => { const x = String(s || "").replace(/\D/g, ""); return x[0] === "0" ? x.slice(1) : x; };   // 06 12… et +33 6 12… se retrouvent
+const fullName = (p) => [p.first_name, p.last_name].filter(Boolean).join(" ");
+const noteQuery = (s) => s.trim().replace(/["\\*%]/g, " ").replace(/\s+/g, " ").trim();
+function gsMatch(d, q, qd) {
+  const c = d.company, people = S.contacts.get(d.company_id) || [];
+  if (norm(c.name).includes(q)) return { rank: norm(c.name).startsWith(q) ? 0 : 1, why: "" };
+  for (const p of people) {
+    if (norm(fullName(p)).includes(q)) return { rank: 2, why: fullName(p) + (p.job_title ? " · " + p.job_title : "") };
+    if (norm(p.email).includes(q)) return { rank: 2, why: p.email };
+  }
+  if (norm(c.website).includes(q)) return { rank: 3, why: c.website };
+  if (qd.length >= 4) {
+    if (digits(c.phone).includes(qd)) return { rank: 3, why: c.phone };
+    const p = people.find((x) => digits(x.phone).includes(qd));
+    if (p) return { rank: 3, why: `${p.phone} · ${fullName(p) || "contact"}` };
+  }
+  return null;
+}
+function mark(text, q) {
+  const i = norm(text).indexOf(norm(q.trim()));
+  if (!q.trim() || i < 0) return [text];
+  const n = q.trim().length;
+  return [text.slice(0, i), h("mark", { text: text.slice(i, i + n) }), text.slice(i + n)];
+}
+function snippet(text, q) {
+  const t = String(text || "").replace(/\s+/g, " "), i = norm(t).indexOf(norm(q));
+  if (i < 0) return t.slice(0, 120);
+  const a = Math.max(0, i - 40);
+  return (a ? "…" : "") + t.slice(a, a + 140);
+}
+function gsRun() {
+  const q = norm(G.q.trim()), qd = digits(G.q);
+  G.hits = q.length < 2 ? [] : S.deals.map((d) => [d, gsMatch(d, q, qd)]).filter((x) => x[1])
+    .sort((a, b) => a[1].rank - b[1].rank || a[0].company.name.localeCompare(b[0].company.name));
+  G.idx = -1; clearTimeout(G.timer);
+  if (noteQuery(G.q).length >= 3) G.timer = setTimeout(gsNotes, 300); else { G.seq++; G.notes = []; G.noteQ = ""; }
+  gsRender();
+}
+async function gsNotes() {
+  const raw = noteQuery(G.q), seq = ++G.seq;
+  const { data, error } = await sb.from("crm_activities").select("id,deal_id,company_id,kind,subject,body,occurred_at")
+    .neq("kind", "stage").or(`body.ilike."*${raw}*",subject.ilike."*${raw}*"`).order("occurred_at", { ascending: false }).limit(30);
+  if (seq !== G.seq) return;
+  G.notes = error ? [] : data; G.noteQ = raw; G.noteErr = error ? (error.message || "erreur") : "";
+  gsRender();
+}
+function gsItem(dealId, kids) {
+  const i = G.items.length; G.items.push(dealId);
+  return h("button", { type: "button", class: "gs-item", role: "option", id: "gsItem" + i, "aria-selected": String(i === G.idx), onclick: () => gsOpen(dealId) }, kids);
+}
+function gsRender() {
+  const box = $("gsRes"), inp = $("gsInput"), q = G.q.trim(), raw = noteQuery(G.q), kids = [];
+  G.items = []; box.textContent = "";
+  if (norm(q).length < 2) { box.hidden = true; inp.setAttribute("aria-expanded", "false"); return; }
+  if (G.hits.length) {
+    kids.push(h("div", { class: "qgroup", text: `Fiches · ${G.hits.length}` }));
+    G.hits.slice(0, 8).forEach(([d, m]) => kids.push(gsItem(d.id, [
+      h("b", null, mark(d.company.name, q)), h("span", { class: "pill" + (d.stage === "gagne" ? " ok" : ""), text: STAGE_LABEL[d.stage] }),
+      h("small", null, m.why ? mark(m.why, q) : [[TYPE[d.company.type_structure], MARKET[d.company.market], ownerName(d)].filter(Boolean).join(" · ")]),
+    ])));
+    if (G.hits.length > 8) kids.push(h("button", { type: "button", class: "more", style: "display:block;width:100%;padding:8px", onclick: gsAll }, [`Voir les ${G.hits.length} fiches dans l'onglet Fiches`]));
+  }
+  const notes = G.noteQ === raw ? G.notes.map((a) => [a, (a.deal_id && byId(a.deal_id)) || S.deals.find((d) => d.company_id === a.company_id)]).filter((x) => x[1]).slice(0, 8) : [];
+  if (notes.length) {
+    kids.push(h("div", { class: "qgroup", text: "Dans les notes et la chronologie" }));
+    notes.forEach(([a, d]) => { const t = norm(a.body).includes(norm(raw)) ? a.body : a.subject; kids.push(gsItem(d.id, [
+      h("b", { text: d.company.name }), h("span", { class: "muted small", text: `${KIND[a.kind] || a.kind} · ${frDate(a.occurred_at)}` }),
+      h("small", null, mark(snippet(t, raw), raw)),
+    ])); });
+  }
+  const pending = raw.length >= 3 && G.noteQ !== raw;
+  if (pending) kids.push(h("div", { class: "gs-foot", text: "Recherche dans les notes…" }));
+  else if (G.noteErr && raw.length >= 3) kids.push(h("div", { class: "gs-foot", text: "Notes indisponibles : " + G.noteErr }));
+  if (!kids.length) kids.push(h("div", { class: "gs-foot", text: raw.length < 3 && !G.hits.length ? "Aucune fiche. Tape au moins 3 lettres pour chercher aussi dans les notes." : "Aucun résultat." }));
+  kids.forEach((k) => box.appendChild(k));
+  box.hidden = false; inp.setAttribute("aria-expanded", "true");
+  if (G.idx >= 0) inp.setAttribute("aria-activedescendant", "gsItem" + G.idx); else inp.removeAttribute("aria-activedescendant");
+}
+function gsClose() { $("gsRes").hidden = true; $("gsInput").setAttribute("aria-expanded", "false"); G.idx = -1; }
+function gsOpen(dealId) { gsClose(); $("gsInput").blur(); openFiche(dealId); }
+function gsAll() { S.tab = "fiches"; S.q = G.q.trim(); S.stage = ""; S.quick = ""; S.family = ""; S.market = ""; S.setter = ""; gsClose(); render(); }
+function gsInit() {
+  const inp = $("gsInput");
+  inp.addEventListener("input", () => { G.q = inp.value; gsRun(); });
+  inp.addEventListener("focus", () => { if (G.q.trim()) gsRender(); });
+  inp.addEventListener("keydown", (ev) => {
+    if (ev.key === "ArrowDown" || ev.key === "ArrowUp") {
+      if (!G.items.length) return; ev.preventDefault();
+      G.idx = ev.key === "ArrowDown" ? (G.idx + 1) % G.items.length : (G.idx <= 0 ? G.items.length - 1 : G.idx - 1);
+      gsRender(); $("gsItem" + G.idx)?.scrollIntoView({ block: "nearest" });
+    } else if (ev.key === "Enter") {
+      ev.preventDefault(); const id = G.items[Math.max(0, G.idx)]; if (id) gsOpen(id);
+    } else if (ev.key === "Escape") {
+      ev.stopPropagation();   // ne ferme pas la fiche ouverte derrière
+      if (!$("gsRes").hidden) gsClose(); else { inp.value = ""; G.q = ""; gsRun(); inp.blur(); }
+    }
+  });
+  document.addEventListener("click", (ev) => { if (!$("gs").contains(ev.target)) gsClose(); });
+  document.addEventListener("keydown", (ev) => {   // « / » ou Ctrl+K (Cmd+K sur Mac) : aller à la recherche depuis n'importe où
+    const typing = ev.target.closest?.("input,textarea,select,[contenteditable]");
+    if ((ev.key === "/" && !typing && !ev.ctrlKey && !ev.metaKey) || ((ev.ctrlKey || ev.metaKey) && ev.key.toLowerCase() === "k")) {
+      if ($("app").hidden) return; ev.preventDefault(); inp.focus(); inp.select();
+    }
+  });
+}
+
 /* ---------- session ---------- */
 async function boot(user) {
   const { data, error } = await sb.from("crm_members").select("*");
@@ -567,6 +697,7 @@ async function boot(user) {
 }
 async function init() {
   sb = createClient(SUPABASE_URL, SUPABASE_ANON);
+  gsInit();
   $("loginForm").addEventListener("submit", async (ev) => {
     ev.preventDefault(); $("loginMsg").textContent = ""; $("loginBtn").disabled = true;
     const { data, error } = await sb.auth.signInWithPassword({ email: $("email").value.trim(), password: $("password").value });
@@ -574,7 +705,7 @@ async function init() {
     if (error) { $("loginMsg").textContent = "E-mail ou mot de passe incorrect."; return; }
     $("password").value = ""; boot(data.user);
   });
-  $("logout").addEventListener("click", async () => { await sb.auth.signOut({ scope: "local" }); S.me = null; S.open = null; $("app").hidden = true; $("overlay").hidden = true; $("login").hidden = false; });
+  $("logout").addEventListener("click", async () => { await sb.auth.signOut({ scope: "local" }); S.me = null; S.open = null; $("gsInput").value = ""; G.q = ""; gsRun(); $("app").hidden = true; $("overlay").hidden = true; $("login").hidden = false; });
   $("overlay").addEventListener("click", (ev) => { if (ev.target === $("overlay")) closeFiche(); });
   document.addEventListener("keydown", (ev) => { if (ev.key === "Escape" && S.open) closeFiche(); });
   const qs = new URLSearchParams(location.search);
