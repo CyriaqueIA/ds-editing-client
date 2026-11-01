@@ -115,6 +115,15 @@ td .sub{display:block;color:var(--muted);font-size:12.5px;max-width:340px;overfl
 .person{background:var(--surface);border-radius:10px;padding:9px 12px;font-size:13.5px;overflow-wrap:anywhere}
 .person b{font-weight:600}
 .box{border:1px solid var(--line-strong);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:10px}
+/* nouvelle fiche (setters) */
+.nf{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px}
+.nf label{display:flex;flex-direction:column;gap:4px;font-size:12.5px;font-weight:600;color:var(--muted);min-width:0}
+.nf label.w{grid-column:1 / -1}
+.nf .field{width:100%}
+.nf .seg{display:flex;gap:4px}
+.nf .seg button{border:1px solid var(--line-strong);background:transparent;border-radius:999px;padding:6px 12px;font-size:13px;font-weight:600;cursor:pointer;color:var(--muted)}
+.nf .seg button[aria-pressed="true"]{background:var(--fg);color:var(--btn-fg);border-color:var(--fg)}
+.dup{font-size:13px;color:var(--warn);border:1px solid var(--warn);border-radius:10px;padding:8px 12px;display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
 .rowf{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .rowf .grow{flex:1 1 220px}
 .ctx{font-size:13.5px;display:flex;flex-direction:column;gap:8px}
@@ -242,7 +251,7 @@ let toastTimer = null;
 function toast(x) { const t = $("toast"); t.textContent = x; t.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true; }, 3800); }
 
 let sb = null;
-const S = { me: null, members: [], deals: [], contacts: new Map(), tab: "fiches", q: "", stage: "open", family: "", market: "", setter: "", quick: "", mine: false, open: null, acts: null, more: {}, busy: false, note: "", sel: null, actsFor: null, week: [], jourMore: {} };
+const S = { me: null, members: [], deals: [], contacts: new Map(), tab: "fiches", q: "", stage: "open", family: "", market: "", setter: "", quick: "", mine: false, open: null, acts: null, more: {}, busy: false, note: "", sel: null, actsFor: null, week: [], jourMore: {}, newOpen: false, nf: null };
 const canEdit = () => S.me && (S.me.role === "admin" || S.me.role === "sales");
 const isOpen = (d) => OPEN.includes(d.stage);
 const ownerName = (d) => (S.members.find((m) => m.user_id === d.owner_id)?.display_name) || cap(d.setter) || "Non attribué";
@@ -357,7 +366,7 @@ function vFiches() {
   }
   renderTable();
   return h("div", { style: "display:flex;flex-direction:column;gap:14px" }, [
-    h("div", { class: "vh" }, [h("h2", { text: "Fiches" }), h("span", { class: "muted small", text: `${S.deals.length} sociétés importées de HubSpot · ${open.length} ouvertes` })]),
+    h("div", { class: "vh" }, [h("h2", { text: "Fiches" }), h("div", { class: "rowf" }, [h("span", { class: "muted small", text: `${S.deals.length} sociétés · ${open.length} ouvertes` }), canEdit() ? h("button", { type: "button", class: "btn pri", id: "newLead", onclick: openNew }, ["+ Nouvelle fiche"]) : null])]),
     h("div", { class: "counts" }, [count("late", late, "relances en retard"), count("today", today, "à faire aujourd'hui"), count("nodate", nodate, "ouvertes sans date")]),
     h("div", { class: "counts" }, [fam("", "Toutes les familles"), ...FAMILIES.map(([k, l]) => fam(k, l))]),
     h("div", { class: "filters" }, [
@@ -457,8 +466,88 @@ function fiche(d, inline) {
   kids.push(acts == null ? h("p", { class: "muted small", text: "Chargement…" }) : acts.length ? h("ul", { class: "tl" }, acts.map(actLine)) : h("p", { class: "muted small", text: "Aucun échange enregistré." }));
   return h("div", { class: "fiche" }, kids);
 }
-function openFiche(id) { S.open = id; S.note = ""; ensureActs(id); render(); }
-function closeFiche() { S.open = null; S.note = ""; render(); }
+function openFiche(id) { S.open = id; S.newOpen = false; S.note = ""; ensureActs(id); render(); }
+function closeFiche() { S.open = null; S.newOpen = false; S.note = ""; render(); }
+
+/* ---------- nouvelle fiche (setters : société + deal + contact en une fois ; policies crm_v1 : insert admin/sales) ---------- */
+const VERDICTS = [["icp", "ICP"], ["attente", "En attente"], ["sortir", "Sortir"]];
+const NF_MARKETS = ["france_metropole", "belgique", "suisse", "luxembourg", "quebec", "usa", "uk", "autre"];
+function plusDays(n) { const d = new Date(); d.setDate(d.getDate() + n); return `${d.getFullYear()}-${p2(d.getMonth() + 1)}-${p2(d.getDate())}`; }
+function blankLead() { return { name: "", website: "", city: "", market: "france_metropole", type_structure: "studio_podcast", phone: "", first_name: "", last_name: "", job_title: "", verdict: "icp", note: "", next_action_at: plusDays(1) }; }
+function normName(s) { return (s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/\s*\(.*?\)\s*/g, " ").replace(/[^a-z0-9]+/g, " ").trim(); }
+function domainOf(u) { return (u || "").trim().toLowerCase().replace(/^https?:\/\//, "").replace(/^www\./, "").split(/[/?#]/)[0]; }
+function findDuplicate(f) {
+  const n = normName(f.name), dom = domainOf(f.website);
+  if (!n && !dom) return null;
+  return S.deals.find((d) => (n && normName(d.company.name) === n) || (dom && domainOf(d.company.website) === dom)) || null;
+}
+function openNew() { S.open = null; S.newOpen = true; S.nf = blankLead(); render(); }
+async function must(p) { const r = await p; if (r.error) throw r.error; return r; }
+async function createLead(f) {
+  if (S.busy) return; S.busy = true;
+  try {
+    const me = S.me, setter = (me.display_name || "").split(" ")[0].toLowerCase(), today = todayIso(), note = f.note.trim();
+    const company = {
+      name: f.name.trim(), website: f.website.trim() ? (f.website.trim().startsWith("http") ? f.website.trim() : "https://" + domainOf(f.website)) : null,
+      city: f.city.trim() || null, market: f.market, type_structure: f.type_structure, phone: f.phone.trim() || null,
+      lang: ["usa", "uk"].includes(f.market) ? "en" : "fr", source: `setter_${setter}_${today}`, statut_client: "prospect",
+    };
+    const c = (await must(sb.from("crm_companies").insert(company).select("*").single())).data;
+    const deal = { company_id: c.id, title: `${c.name} — montage marque blanche`, owner_id: me.user_id, setter, first_channel: "phone", stage_changed_at: new Date().toISOString() };
+    if (f.verdict === "sortir") { deal.stage = "ecarte"; deal.lost_reason = note || "Hors cible (grille setter)"; }
+    else { deal.stage = "a_contacter"; deal.next_action = (f.verdict === "icp" ? "ICP : " : "Nurture : il manque ") + (note || (f.verdict === "icp" ? "appeler le gérant" : "une preuve")); deal.next_action_at = f.next_action_at || plusDays(1); }
+    const d = (await must(sb.from("crm_deals").insert(deal).select("*, company:crm_companies(*)").single())).data;
+    if (f.first_name.trim() || f.last_name.trim()) {
+      const p = (await must(sb.from("crm_contacts").insert({ company_id: c.id, first_name: f.first_name.trim() || null, last_name: f.last_name.trim() || null, job_title: f.job_title.trim() || null, phone: f.phone.trim() || null }).select("*").single())).data;
+      S.contacts.set(c.id, [p]);
+    }
+    await sb.from("crm_activities").insert({ deal_id: d.id, company_id: c.id, kind: "note", body: `Fiche créée par ${me.display_name} · verdict ${VERDICTS.find((v) => v[0] === f.verdict)[1]}${note ? " · " + note : ""}`, author_id: me.user_id, author_label: me.display_name });
+    S.deals.push(d); S.newOpen = false; S.nf = null; S.busy = false;
+    toast(`Fiche ${c.name} créée.`); openFiche(d.id); return;
+  } catch (e) { toast("Création impossible : " + (e.message || e)); }
+  S.busy = false; render();
+}
+function newForm() {
+  const f = S.nf, upd = (k) => (ev) => { f[k] = ev.target.value; if (k === "name" || k === "website") refreshDup(); };
+  const inp = (k, label, attrs, wide) => h("label", { class: wide ? "w" : null }, [label, h("input", Object.assign({ class: "field", type: "text", value: f[k], oninput: upd(k) }, attrs || {}))]);
+  const dupBox = h("div", { class: "dup", hidden: true });
+  function refreshDup() {
+    const d = findDuplicate(f); dupBox.textContent = "";
+    if (!d) { dupBox.hidden = true; return; }
+    dupBox.hidden = false;
+    dupBox.appendChild(h("span", { text: `Déjà au CRM : ${d.company.name} (${STAGE_LABEL[d.stage]}, ${ownerName(d)}).` }));
+    dupBox.appendChild(h("button", { type: "button", class: "btn", onclick: () => openFiche(d.id) }, ["Ouvrir la fiche existante"]));
+  }
+  const verdict = h("div", { class: "seg", role: "group", "aria-label": "Verdict" }, VERDICTS.map(([k, l]) => h("button", { type: "button", "aria-pressed": String(f.verdict === k), onclick: () => { f.verdict = k; if (k === "attente") f.next_action_at = plusDays(30); if (k === "icp") f.next_action_at = plusDays(1); render(); } }, [l])));
+  const noteLabel = f.verdict === "icp" ? "Pourquoi ICP (preuves : plateaux, avis, montage vendu)" : f.verdict === "attente" ? "Ce qui manque" : "Motif de sortie";
+  const form = h("div", { class: "nf" }, [
+    inp("name", "Studio *", { placeholder: "Nom du studio", required: true }, true),
+    inp("website", "Site web", { placeholder: "mumbo.fr", inputmode: "url" }),
+    inp("city", "Ville", { placeholder: "Paris 2e" }),
+    h("label", null, ["Marché", select("nfMarket", "Marché", f.market, NF_MARKETS.map((k) => [k, MARKET[k] || k]), (v) => { f.market = v; })]),
+    h("label", null, ["Type", select("nfType", "Type", f.type_structure, Object.entries(TYPE), (v) => { f.type_structure = v; })]),
+    inp("phone", "Téléphone (source : mentions légales, pied de page…)", { placeholder: "06 00 00 00 00", type: "tel" }, true),
+    inp("first_name", "Gérant · prénom", { placeholder: "Amir" }),
+    inp("last_name", "Gérant · nom", { placeholder: "Laieb" }),
+    inp("job_title", "Fonction (ex. président, d'après les mentions légales)", { placeholder: "Président" }, true),
+    h("label", { class: "w" }, ["Verdict", verdict]),
+    h("label", { class: "w" }, [noteLabel, h("textarea", { class: "field", value: f.note, oninput: upd("note"), placeholder: f.verdict === "icp" ? "6 décors, +50 avis, montage 125-325 €/h, gérant trouvé" : f.verdict === "attente" ? "pas de preuve de montage vendu" : "audio seul" })]),
+    f.verdict === "sortir" ? null : h("label", null, ["Prochaine action le", h("input", { class: "field", type: "date", value: f.next_action_at, oninput: upd("next_action_at") })]),
+  ]);
+  const submit = h("button", { type: "button", class: "btn pri", onclick: () => {
+    if (!f.name.trim()) { toast("Le nom du studio est obligatoire."); return; }
+    const d = findDuplicate(f); if (d) { toast(`${d.company.name} est déjà au CRM : ouvre la fiche existante.`); refreshDup(); return; }
+    if (f.verdict !== "sortir" && !f.next_action_at) { toast("Il faut une date de prochaine action."); return; }
+    createLead(f);
+  } }, [S.busy ? "Création…" : "Créer la fiche"]);
+  return h("div", { class: "fiche" }, [
+    h("div", { style: "display:flex;justify-content:space-between;gap:10px;align-items:center" }, [h("span", { class: "lbl", text: "Nouvelle fiche" }), h("button", { type: "button", class: "btn", onclick: closeFiche }, ["Fermer"])]),
+    h("h2", { text: "Un studio qualifié avec la grille" }),
+    h("p", { class: "hint", text: "Avant de créer : les critères 1 à 3 prouvés sur le site, le gérant et le numéro cherchés dans les mentions légales. La fiche part en « À contacter » avec ton verdict comme prochaine action." }),
+    dupBox, form,
+    h("div", { class: "rowf" }, [submit, h("span", { class: "muted small", text: `Prospecté par ${S.me.display_name}` })]),
+  ]);
+}
 
 /* ---------- onglets de la maquette ---------- */
 function weekLabel() { const m = monday(), e = new Date(m); e.setDate(m.getDate() + 6); return `Semaine du ${p2(m.getDate())}/${p2(m.getMonth() + 1)} au ${p2(e.getDate())}/${p2(e.getMonth() + 1)}`; }
@@ -564,6 +653,9 @@ function render() {
   if (S.open && byId(S.open)) {
     const top = dr.scrollTop;
     dr.textContent = ""; dr.appendChild(fiche(byId(S.open))); ov.hidden = false; dr.scrollTop = top;
+  } else if (S.newOpen && S.nf && canEdit()) {
+    const top = dr.scrollTop;
+    dr.textContent = ""; dr.appendChild(newForm()); ov.hidden = false; dr.scrollTop = top;
   } else { ov.hidden = true; dr.textContent = ""; }
 }
 
@@ -707,7 +799,7 @@ async function init() {
   });
   $("logout").addEventListener("click", async () => { await sb.auth.signOut({ scope: "local" }); S.me = null; S.open = null; $("gsInput").value = ""; G.q = ""; gsRun(); $("app").hidden = true; $("overlay").hidden = true; $("login").hidden = false; });
   $("overlay").addEventListener("click", (ev) => { if (ev.target === $("overlay")) closeFiche(); });
-  document.addEventListener("keydown", (ev) => { if (ev.key === "Escape" && S.open) closeFiche(); });
+  document.addEventListener("keydown", (ev) => { if (ev.key === "Escape" && (S.open || S.newOpen)) closeFiche(); });
   const qs = new URLSearchParams(location.search);
   const nominative = qs.has("login");   // ?login=1 : connexion nominative (même motif que team/dashboard.html), pas d'auto-login
   const { data: sessData } = await sb.auth.getSession();
