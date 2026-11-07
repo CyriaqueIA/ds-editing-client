@@ -373,6 +373,7 @@
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(data.email)) { fld(form, 'email').classList.add('bad'); toast(x.errEmail, 'error'); return; }
     var btn = form.querySelector('.ds-submit'), lab = btn.querySelector('span');
     btn.disabled = true; lab.textContent = x.sending; state.data.sending = true;
+    if (window.dsTrack) dsTrack.lead('portfolio', data); /* copie dans le CRM (onglet Visits) + alerte Telegram */
     fetch(ENDPOINT, {
       method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
       body: JSON.stringify({ name: data.name, email: data.email, studio: data.studio, _subject: 'Demande de portfolio privé — ' + (data.studio || data.name) })

@@ -32,7 +32,7 @@ window.DS_PORTFOLIO = {
   // Formules : mêmes noms partout (dépôt, portfolio privé, showreel)
   tiers: [
     { slug: "standard", fr: ["Standard", "Montage propre et rythmé, habillage simple, son mixé."], en: ["Standard", "Clean, paced edit, simple graphics, mixed sound."] },
-    { slug: "premium", fr: ["Premium", "Standard + ouverture percutante de 45 s, titres animés, sound design."], en: ["Premium", "Standard + a punchy 45 s cold open, motion titles, sound design."] },
+    { slug: "premium", fr: ["Premium", "Standard + ouverture percutante de 20 à 30 s, titres animés, sound design."], en: ["Premium", "Standard + a punchy 20–30 s cold open, motion titles, sound design."] },
     { slug: "signature", fr: ["Signature", "Premium + intro façon « Diary of a CEO », b-roll premium, livraison prioritaire."], en: ["Signature", "Premium + a “Diary of a CEO”-style intro, premium b-roll, priority delivery."] },
   ],
 
@@ -40,11 +40,21 @@ window.DS_PORTFOLIO = {
   // (décision du 30/09 : Standard, Premium et Signature restent affichées sur Podcast et VSL).
   hiddenTiers: {},
 
-  // Ouverture du portfolio privé sans ?type= dans le lien : ce type et cette formule (demande de Cyriaque du 03/10 : Podcast Signature).
-  landing: { type: "podcast-interview", tier: "signature" },
+  // Ouverture du portfolio privé sans ?type= dans le lien : ce type et cette formule.
+  // 07/11/2026 : Podcast Premium (avant : Signature, demande du 03/10), car Signature n'a pas de prix barré (« Sur devis »).
+  landing: { type: "podcast-interview", tier: "premium" },
 
   // true = aucun prix affiché dans le portfolio privé (demande de Cyriaque du 03/10). Repasser à false pour les réafficher.
   hidePrices: true,
+
+  // Parcours d'ouverture du portfolio privé (cadrage Waalaxy du 07/11/2026) :
+  // 1) pop-up témoignage vidéo, 2) « Voir les tarifs », 3) « On a un cadeau pour vous » (numéro + nom du podcast),
+  // 4) révélation « premier montage offert » + prix barrés (la grille `prices` ci-dessous, même si hidePrices = true).
+  // Le cadeau n'est jamais nommé avant la saisie du numéro. `gift: null` = parcours coupé, page comme avant.
+  gift: {
+    studio: "Mediacast",
+    video: "https://drive.google.com/file/d/1GNgz84s2gym0Z1EFUfLEHcrZMXZmk4Bw/preview", // témoignage vertical, 61 s (Drive, lecture seule)
+  },
 
   // Types sans exemple qui affichent la scène animée « bientôt » (orbe + « Premier montage offert ») au lieu des cases vides.
   // La scène disparaît d'elle-même dès qu'une vidéo du type arrive du Drive.
@@ -54,13 +64,17 @@ window.DS_PORTFOLIO = {
   // Hors taxes, par vidéo livrée. Écrire le texte tel qu'il doit apparaître ; vide = « Sur devis ».
   // `unique` = une seule formule pour ce type (un seul onglet « Formule unique », toutes ses vidéos ensemble).
   // Jamais de prix dans la colonne de gauche (demande de Cyriaque).
+  // 07/11/2026 : Cyriaque choisit la grille My Studio (= grille v2 de la plateforme du 07/10, Vault « Offre et tarifs »)
+  // pour les prix barrés du parcours cadeau. Pas de palier Signature dans cette grille → « Sur devis ».
+  // VSL : la grille a Standard 59 € / Premium 179 € ; le portfolio n'a qu'une formule VSL → prix Standard affiché.
+  // YouTube & Docu : absent de la grille → « Sur devis ». Anciens prix (maquette 01/10) : 119/199/279, reels 19/29/45, VSL 49, trailers 49, miniatures 25, YouTube 99/169/239.
   prices: {
-    "podcast-interview": { standard: "119 €", premium: "199 €", signature: "279 €" },
-    "vsl": { unique: "49 €" },
-    "reels-shorts": { standard: "19 €", premium: "29 €", signature: "45 €" },
-    "trailers": { unique: "49 €" },
-    "miniatures": { unique: "25 €" },
-    "youtube-docu": { standard: "99 €", premium: "169 €", signature: "239 €" },
+    "podcast-interview": { standard: "129 €", premium: "209 €", signature: "" },
+    "vsl": { unique: "59 €" },
+    "reels-shorts": { standard: "14,90 €", premium: "24,90 €", signature: "" },
+    "trailers": { unique: "34 €" },
+    "miniatures": { unique: "12 €" },
+    "youtube-docu": { standard: "", premium: "", signature: "" },
     "ia": { standard: "", premium: "", signature: "" },
   },
 
@@ -107,6 +121,6 @@ window.dsEmbed = function (url) {
 
 // Traductions NL / DA (accueil). Le français et l'anglais restent au-dessus.
 (function () {
-  var X = {"nl": {"types": {"podcast-interview": ["Podcast & Interview", "Multicam · Talk"], "vsl": ["Ads / VSL", "Salesvideo’s · Meta · TikTok · YouTube"], "reels-shorts": ["Reels & Shorts", "TikTok · Instagram · Shorts"], "youtube-docu": ["YouTube & Docu", "Long-form · Brand film"], "ia": ["AI-video’s", "Gegenereerd · Gemonteerd"], "miniatures": ["Thumbnails", "Covervisuals"], "trailers": ["Trailers", "60–90 s voor socials"]}, "tiers": {"standard": ["Standard", "Strakke, goed getimede montage, eenvoudige graphics, gemixt geluid."], "premium": ["Premium", "Standard + een pakkende cold open van 45 s, motion titles, sound design."], "signature": ["Signature", "Premium + een intro in “Diary of a CEO”-stijl, premium B-roll, prioritaire levering."]}}, "da": {"types": {"podcast-interview": ["Podcast & Interview", "Multicam · Talk"], "vsl": ["Ads / VSL", "Salgsvideoer · Meta · TikTok · YouTube"], "reels-shorts": ["Reels & Shorts", "TikTok · Instagram · Shorts"], "youtube-docu": ["YouTube & Docu", "Long-form · Brandfilm"], "ia": ["AI-videoer", "Genereret · Klippet"], "miniatures": ["Thumbnails", "Covervisuals"], "trailers": ["Trailere", "60–90 s til sociale medier"]}, "tiers": {"standard": ["Standard", "Rent klip med tempo, enkel grafik, mixet lyd."], "premium": ["Premium", "Standard + en slagkraftig cold open på 45 s, animerede titler, sounddesign."], "signature": ["Signature", "Premium + en intro i “Diary of a CEO”-stil, premium b-roll, prioriteret levering."]}}}, P = window.DS_PORTFOLIO;
+  var X = {"nl": {"types": {"podcast-interview": ["Podcast & Interview", "Multicam · Talk"], "vsl": ["Ads / VSL", "Salesvideo’s · Meta · TikTok · YouTube"], "reels-shorts": ["Reels & Shorts", "TikTok · Instagram · Shorts"], "youtube-docu": ["YouTube & Docu", "Long-form · Brand film"], "ia": ["AI-video’s", "Gegenereerd · Gemonteerd"], "miniatures": ["Thumbnails", "Covervisuals"], "trailers": ["Trailers", "60–90 s voor socials"]}, "tiers": {"standard": ["Standard", "Strakke, goed getimede montage, eenvoudige graphics, gemixt geluid."], "premium": ["Premium", "Standard + een pakkende cold open van 20–30 s, motion titles, sound design."], "signature": ["Signature", "Premium + een intro in “Diary of a CEO”-stijl, premium B-roll, prioritaire levering."]}}, "da": {"types": {"podcast-interview": ["Podcast & Interview", "Multicam · Talk"], "vsl": ["Ads / VSL", "Salgsvideoer · Meta · TikTok · YouTube"], "reels-shorts": ["Reels & Shorts", "TikTok · Instagram · Shorts"], "youtube-docu": ["YouTube & Docu", "Long-form · Brandfilm"], "ia": ["AI-videoer", "Genereret · Klippet"], "miniatures": ["Thumbnails", "Covervisuals"], "trailers": ["Trailere", "60–90 s til sociale medier"]}, "tiers": {"standard": ["Standard", "Rent klip med tempo, enkel grafik, mixet lyd."], "premium": ["Premium", "Standard + en slagkraftig cold open på 20–30 s, animerede titler, sounddesign."], "signature": ["Signature", "Premium + en intro i “Diary of a CEO”-stil, premium b-roll, prioriteret levering."]}}}, P = window.DS_PORTFOLIO;
   Object.keys(X).forEach(function (l) { ["types", "tiers"].forEach(function (k) { (P[k] || []).forEach(function (o) { if (X[l][k][o.slug]) o[l] = X[l][k][o.slug]; }); }); });
 })();
