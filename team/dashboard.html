@@ -794,7 +794,7 @@ const isAdmin = () => profile && ["admin", "dispatcher", "qc"].includes(profile.
 // 22/10 : RH (Safa) en mode « recrutement seul » : rôle hr + can_recruit (recruitment_v3_hr.sql côté base). Elle n'ouvre que l'onglet Recrutement ;
 // aucune requête de production, de prix ni de factures (isAdmin() reste faux pour elle). Entrée : ?tab=recrut, sinon le dashboard la renvoie vers /rh/.
 const isHrRecruit = () => !!profile && profile.role === "hr" && canRecruit() && !LINKED;
-const canMoney = () => !!profile && profile.role === "admin";
+const canMoney = () => !!profile && (profile.role === "admin" || profile.can_price === true);   // 08/11 (décision Cyriaque) : Rania (can_price) voit aussi l'onglet Factures, avec Payée / Annuler.
 // 20/10 (QCM prix & accès q2) : Rania = onglet Tarifs + création de clients (drapeau profiles.can_price, supabase/vue_equipe_v1.sql), SANS factures ni montants. Putu : jamais.
 const canTarifs = () => !!profile && (profile.role === "admin" || profile.can_price === true);   // 14/10 (QCM q10) : Tarifs et Factures réservés au rôle admin — Putu (dispatcher) et la qualité ne voient jamais les prix. NB : le vrai verrou en base (RLS price_grids/invoices autorise encore dispatcher et qc) reste à poser.
 const isEditor = () => !!profile && profile.role === "editor";
