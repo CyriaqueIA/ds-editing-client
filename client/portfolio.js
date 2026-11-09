@@ -55,8 +55,9 @@ window.DS_PORTFOLIO = {
   // `video` : lecteur Drive, utilisé seulement si `src` est vide.
   gift: {
     studio: "Mediacast",
-    src: { fr: "../videos/apercus/temoignage-mediacast-fr.mp4" }, // en : version anglaise à ajouter (doublage IA, accord Mediacast requis)
-    poster: { fr: "../videos/apercus/temoignage-mediacast-fr.jpg" },
+    // en : doublage ElevenLabs (voix d'Aurianne clonée) + lip-sync Sync 3, 09/11/2026, accord d'Aurianne transmis par Cyriaque. Sans mention IA (choix de Cyriaque).
+    src: { fr: "../videos/apercus/temoignage-mediacast-fr.mp4", en: "../videos/apercus/temoignage-mediacast-en.mp4" },
+    poster: { fr: "../videos/apercus/temoignage-mediacast-fr.jpg", en: "../videos/apercus/temoignage-mediacast-en.jpg" },
     video: "https://drive.google.com/file/d/1GNgz84s2gym0Z1EFUfLEHcrZMXZmk4Bw/preview", // témoignage vertical, 61 s (Drive, lecture seule)
   },
 
