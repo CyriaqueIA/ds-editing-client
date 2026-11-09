@@ -34,8 +34,10 @@
   "motion": true,
   "logo": "rec"
 }/*EDITMODE-END*/;
-/* Secours des boutons « Réserver un appel » si le calendrier (js/ds-booking.js) ne charge pas : ancre vers le formulaire. */
-window.DS_CALENDLY="#contact";
+/* UNE seule valeur pilote tous les boutons « Réserver un appel » (js/ds-app.js, js/ds-booking.js, js/ds-panels.js).
+   Vide = calendrier maison sur place (js/ds-booking.js), avec repli vers le formulaire #contact.
+   Le jour où le vrai calendrier existe : colle son lien https://… ici, rien d'autre à changer. */
+window.DS_CALENDLY="";
 /* Vidéo des visites (PostHog Europe), seulement si le visiteur accepte les cookies. Clé publique phc_… : vide = désactivé. Voir js/ds-track.js */
 window.DS_POSTHOG={key:"phc_w45PRxEUceX65owmCK38DkQ3y8aRCHigUBKvDfyTAisi",host:"https://eu.i.posthog.com"};</script>
 </head>

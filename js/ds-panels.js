@@ -19,7 +19,7 @@
   var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
   var find = function (arr, fn) { for (var i = 0; i < (arr || []).length; i++) if (fn(arr[i])) return arr[i]; return null; };
   var ENDPOINT = 'https://formsubmit.co/ajax/contact@ds-editing.com';
-  var BOOK = function () { return window.DS_CALENDLY || '#contact'; };
+  var BOOK = function () { return /^https?:\/\//i.test(window.DS_CALENDLY || '') ? window.DS_CALENDLY : '#contact'; };
 
   /* 0. textes */
   var T = {

@@ -71,8 +71,11 @@
       bar.querySelector('.ck-no').onclick = function () { decide('no'); };
       document.body.appendChild(bar);
     }
-    paintBar(); bar.hidden = false; requestAnimationFrame(function () { bar.classList.add('in'); });
+    paintBar(); bar.hidden = false; requestAnimationFrame(function () { bar.classList.add('in'); ckh(); });
   }
+  /* hauteur de la bannière → --ckh : le sticky « Réserver un appel » se pose au-dessus au lieu d'être caché (css/ds-consent.css) */
+  function ckh() { if (bar && !bar.hidden) document.documentElement.style.setProperty('--ckh', bar.offsetHeight + 'px'); }
+  window.addEventListener('resize', ckh);
   function decide(v) {
     put('localStorage', 'ds_consent', v); put('localStorage', 'ds_consent_at', new Date().toISOString());
     if (bar) { bar.classList.remove('in'); setTimeout(function () { bar.hidden = true; }, 300); }

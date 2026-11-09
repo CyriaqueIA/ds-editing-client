@@ -1,8 +1,9 @@
 (function(){
 'use strict';
 document.querySelectorAll('[data-loop]').forEach(function(t){t.innerHTML+=t.innerHTML.replace(/id="([^"]+)"/g,'id="$1-b"');});
-var CAL = window.DS_CALENDLY || 'https://calendly.com/';
-document.querySelectorAll('.js-book').forEach(function(a){a.href=CAL;if(CAL.charAt(0)!=='#'){a.target='_blank';a.rel='noopener';}});
+/* DS_CALENDLY (index.html) : lien https:// = calendrier externe ; vide = calendrier maison (js/ds-booking.js), href de secours #contact. */
+var CAL = /^https?:\/\//i.test(window.DS_CALENDLY||'') ? window.DS_CALENDLY : '';
+document.querySelectorAll('.js-book').forEach(function(a){if(CAL){a.href=CAL;a.target='_blank';a.rel='noopener';}else{a.setAttribute('href','#contact');}});
 document.documentElement.classList.add('js');
 var nav=document.getElementById('nav'),sticky=document.getElementById('sticky');
 function onS(){var y=scrollY;nav.classList.toggle('solid',y>30);sticky.classList.toggle('show',y>innerHeight*.9);}

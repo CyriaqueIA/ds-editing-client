@@ -275,6 +275,7 @@
         var ends = res && res.ends_at ? new Date(res.ends_at).getTime() : starts + ((state.av && state.av.slot_minutes) || 30) * 60000;
         state.booked = { token: (res && res.token) || '', starts: starts, ends: ends, email: d.email, name: d.name };
         savedForm = {}; state.step = 3; render();
+        if (window.dsTrack) dsTrack.booked(d.email); /* relie l'appel à la visite (onglet Visits du CRM) */
       })
       .catch(function (e) {
         state.sending = false;
@@ -336,6 +337,7 @@
   var isOpen = function () { return root && !root.hidden; };
   document.addEventListener('click', function (e) {
     var b = e.target && e.target.closest ? e.target.closest('.js-book') : null; if (!b) return;
+    if (/^https?:\/\//i.test(window.DS_CALENDLY || '')) return; /* vrai calendrier branché : le lien s'ouvre tout seul (ds-app.js) */
     e.preventDefault(); open();
   }, true);
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && isOpen()) close(); });
