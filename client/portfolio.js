@@ -51,8 +51,12 @@ window.DS_PORTFOLIO = {
   // 1) pop-up témoignage vidéo, 2) « Voir les tarifs », 3) « On a un cadeau pour vous » (numéro + nom du podcast),
   // 4) révélation « premier montage offert » + prix barrés (la grille `prices` ci-dessous, même si hidePrices = true).
   // Le cadeau n'est jamais nommé avant la saisie du numéro. `gift: null` = parcours coupé, page comme avant.
+  // `src` / `poster` : mp4 hébergé sur le site (cadrage 9:16 propre), par langue ; une langue absente reprend la version FR.
+  // `video` : lecteur Drive, utilisé seulement si `src` est vide.
   gift: {
     studio: "Mediacast",
+    src: { fr: "../videos/apercus/temoignage-mediacast-fr.mp4" }, // en : version anglaise à ajouter (doublage IA, accord Mediacast requis)
+    poster: { fr: "../videos/apercus/temoignage-mediacast-fr.jpg" },
     video: "https://drive.google.com/file/d/1GNgz84s2gym0Z1EFUfLEHcrZMXZmk4Bw/preview", // témoignage vertical, 61 s (Drive, lecture seule)
   },
 

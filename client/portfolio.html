@@ -144,7 +144,8 @@
     .gift h2{margin:0 0 8px;font-size:clamp(24px,5vw,30px)}
     .gift p{margin:0 0 16px;color:var(--taupe);font-size:14.5px;line-height:1.5}
     .gift .vid{position:relative;width:min(100%,calc(48vh * 9 / 16));aspect-ratio:9/16;margin:0 auto 16px;border-radius:16px;overflow:hidden;border:1px solid var(--line);background:#000}
-    .gift .vid iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+    .gift .vid iframe,.gift .vid video{position:absolute;inset:0;width:100%;height:100%;border:0}
+    .gift .vid video{object-fit:cover;background:#000}
     .gift .btn{height:44px;padding:0 24px;font-size:15px;width:100%}
     .gift .skip{display:inline-block;margin-top:12px;background:none;border:none;color:var(--taupe);font:inherit;font-size:13px;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
     .gift .skip:hover{color:var(--cream)}
@@ -186,7 +187,7 @@
 <div class="modal" id="modal"><div class="box"><div class="bar"><span id="modalTitle"></span><button type="button" id="modalClose">×</button></div><div id="modalMedia"></div></div></div>
 <div class="gift" id="gift" role="dialog" aria-modal="true" aria-labelledby="giftTitle"><div class="box" id="giftBox"></div></div>
 
-<script src="portfolio.js?v=12"></script>
+<script src="portfolio.js?v=13"></script>
 <script src="previews.js?v=10"></script>
 <script>
 (function () {
@@ -252,12 +253,15 @@
     return Promise.all([a, b]);
   }
   const phoneOk = (s) => { const d = s.replace(/\D/g, ""); return /^\+?[\d\s().-]+$/.test(s.trim()) && d.length >= 8 && d.length <= 15; };
+  // Vidéo du témoignage dans la langue de la page, sinon la version FR (gift.src / gift.poster = chaîne ou { fr, en })
+  const giftSrc = (k) => { const v = G && G[k]; return !v ? "" : typeof v === "string" ? v : v[lang] || v.fr || ""; };
   function giftOpen(step, data) {
     const t = T[lang], box = $("#giftBox"); data = data || {};
     const fill = (s) => s.replace("{studio}", esc(G.studio)).replace("{phone}", esc(data.phone || "")).replace("{podcast}", esc(data.podcast || ""));
     if (step === 1) box.innerHTML = `<button class="x" type="button" data-close aria-label="×">×</button>
       <div class="mono">${t.g1Kicker}</div><h2 class="display" id="giftTitle">${fill(t.g1Title)}</h2><p>${t.g1Text}</p>
-      <div class="vid"><iframe src="${esc(G.video)}" allow="autoplay; fullscreen" allowfullscreen title="${esc(G.studio)}"></iframe></div>
+      <div class="vid">${giftSrc("src") ? `<video src="${esc(giftSrc("src"))}" poster="${esc(giftSrc("poster"))}" controls playsinline preload="metadata" title="${esc(G.studio)}"></video>`
+        : `<iframe src="${esc(G.video)}" allow="autoplay; fullscreen" allowfullscreen title="${esc(G.studio)}"></iframe>`}</div>
       <button class="btn" type="button" data-next>${t.g1Btn}</button><button class="skip" type="button" data-close>${t.skip}</button>`;
     if (step === 2) box.innerHTML = `<button class="x" type="button" data-close aria-label="×">×</button>
       <div class="gift-ic" aria-hidden="true">🎁</div><div class="mono">${t.g2Kicker}</div><h2 class="display" id="giftTitle">${t.g2Title}</h2><p>${t.g2Text}</p>
