@@ -163,6 +163,7 @@
     @media (max-width:480px){.lv-rec em{display:none}.app-header .lang{padding:0 10px;font-size:12px}.app-header .btn{padding:0 12px;font-size:12.5px}}
     @media (max-width:400px){.lv-rec{font-size:19px}.app-header{padding:10px 12px;gap:8px}}
   </style>
+  <link href="/css/ds-consent.css" rel="stylesheet"/>
 </head>
 <body>
 <div class="app" id="app">
@@ -245,7 +246,8 @@
   const LOCAL = !location.hostname || /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
   const RPC = "https://xkanmjlpysxpohsuqvwg.supabase.co/rest/v1/rpc/site_lead_add", SB_KEY = "sb_publishable_lIZtV_WtN5NcGSb0dnfaiQ_AgKYBIVa"; // clé publique (anon), règles dans la RPC
   function sendLead(phone, podcast) {
-    const p = { kind: "gift", phone, studio: podcast, project_type: "podcast", lang, message: `Portfolio privé : cadeau débloqué (1er montage offert). Podcast : ${podcast}` };
+    const vt = (() => { try { return sessionStorage.getItem("ds_visit_started") === "1" && localStorage.getItem("ds_team") !== "1" ? sessionStorage.getItem("ds_visit") : null; } catch { return null; } })(); // relie le lead à la visite (js/ds-track.js)
+    const p = { kind: "gift", phone, studio: podcast, project_type: "podcast", lang, visit_token: vt, message: `Portfolio privé : cadeau débloqué (1er montage offert). Podcast : ${podcast}` };
     if (LOCAL) { console.info("[gift] envoi simulé (serveur local) :", p); return Promise.resolve(); }
     const a = fetch(RPC, { method: "POST", keepalive: true, headers: { apikey: SB_KEY, "Content-Type": "application/json" }, body: JSON.stringify({ p }) }).catch(() => {});
     const b = fetch("https://formsubmit.co/ajax/contact@ds-editing.com", { method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json" },
@@ -374,5 +376,6 @@
   if (G && !unlocked && params.get("gift") !== "0") giftOpen(1);
 })();
 </script>
+<script src="/js/ds-track.js"></script>
 </body>
 </html>

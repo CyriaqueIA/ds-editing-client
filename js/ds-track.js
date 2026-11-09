@@ -5,6 +5,7 @@
      Sans consentement : pays, sections vues, durée, provenance. Avec : + IP, clics, vidéo PostHog.
    - Mise à jour toutes les 15 s et quand l'onglet est quitté (site_visit_update).
    - window.dsTrack.lead(kind, data) : formulaire de contact / portfolio (site_lead_add) ; dsTrack.booked(email) : appel réservé.
+   - Pages suivies (09/11/2026) : accueil, services/*.html, client/portfolio.html (bannière après le pop-up cadeau).
    - Équipe exclue : ?team=1 (ou une connexion au CRM) pose localStorage ds_team ; ?team=0 l'enlève.
    - PostHog : window.DS_POSTHOG.key dans index.html (vide = pas de vidéo).
    Lecture : ds-editing.com/crm/ → onglet « Visits » (Cyriaque, Sajid).
@@ -61,12 +62,12 @@
   function paintBar() {
     if (!bar) return; var x = TXT[lang()];
     bar.querySelector('.ck-t').textContent = x.t; bar.querySelector('.ck-ok').textContent = x.ok; bar.querySelector('.ck-no').textContent = x.no;
-    var a = bar.querySelector('.ck-pol'); a.textContent = x.pol; a.href = 'privacy.html?lang=' + lang();
+    var a = bar.querySelector('.ck-pol'); a.textContent = x.pol; a.href = '/privacy.html?lang=' + lang();
   }
   function showBar() {
     if (!bar) {
       bar = document.createElement('div'); bar.className = 'ckbar'; bar.setAttribute('role', 'dialog'); bar.setAttribute('aria-label', 'Cookies');
-      bar.innerHTML = '<p><span class="ck-t"></span> <a class="ck-pol" href="privacy.html"></a></p><div class="ck-b"><button type="button" class="ck-no"></button><button type="button" class="ck-ok"></button></div>';
+      bar.innerHTML = '<p><span class="ck-t"></span> <a class="ck-pol" href="/privacy.html"></a></p><div class="ck-b"><button type="button" class="ck-no"></button><button type="button" class="ck-ok"></button></div>';
       bar.querySelector('.ck-ok').onclick = function () { decide('yes'); };
       bar.querySelector('.ck-no').onclick = function () { decide('no'); };
       document.body.appendChild(bar);
@@ -86,8 +87,10 @@
   function maybeBar() {
     if (get('localStorage', 'ds_consent')) return;
     if (document.getElementById('lgate') && !document.documentElement.classList.contains('lang-ok')) return;
+    var g = document.getElementById('gift'); if (g && g.classList.contains('open')) return; /* portfolio : après le pop-up cadeau */
     showBar();
   }
+  var giftEl = document.getElementById('gift'); if (giftEl) new MutationObserver(maybeBar).observe(giftEl, { attributes: true, attributeFilter: ['class'] });
   new MutationObserver(function () { maybeBar(); paintBar(); }).observe(document.documentElement, { attributes: true, attributeFilter: ['class', 'lang'] });
   document.addEventListener('click', function (e) { var a = e.target.closest('.js-cookies'); if (!a) return; e.preventDefault(); showBar(); });
 
@@ -138,9 +141,11 @@
     /* sections vues */
     if ('IntersectionObserver' in window) {
       var io = new IntersectionObserver(function (es) {
-        es.forEach(function (e) { if (e.isIntersecting && sections.indexOf(e.target.id) < 0) { sections.push(e.target.id); put('sessionStorage', 'ds_sections', JSON.stringify(sections)); dirty = true; } });
+        es.forEach(function (e) { var k = e.target.getAttribute('data-trk'); if (e.isIntersecting && sections.indexOf(k) < 0) { sections.push(k); put('sessionStorage', 'ds_sections', JSON.stringify(sections)); dirty = true; } });
       }, { threshold: 0.35 });
-      document.querySelectorAll('section[id], footer').forEach(function (s) { if (!s.id) s.id = 'footer'; io.observe(s); });
+      /* nom d'une section : son id, sinon sa 1re classe (pages services) ; préfixé par la page hors accueil */
+      var pg = location.pathname.replace(/\/index\.html$|\/$/, '').split('/').pop().replace(/\.html$/, '');
+      document.querySelectorAll('section, footer').forEach(function (s) { var k = s.id || s.classList[0] || s.tagName.toLowerCase(); s.setAttribute('data-trk', pg ? pg + ':' + k : k); io.observe(s); });
     }
     /* clics (le libellé seulement ; jamais le contenu des champs) */
     document.addEventListener('click', function (e) {
