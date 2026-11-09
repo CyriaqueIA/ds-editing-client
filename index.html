@@ -25,6 +25,7 @@
 <link rel="stylesheet" href="css/ds-panels.css">
 <link rel="stylesheet" href="css/ds-booking.css">
 <link rel="stylesheet" href="css/ds-lang.css">
+<link rel="stylesheet" href="css/ds-consent.css">
 <!-- Écran « Choose your language » : sauté si une langue est déjà enregistrée ou si le lien porte ?lang=en|fr|nl|da -->
 <script>(function(){var L=['en','fr','nl','da'],q=(location.search.match(/[?&]lang=([a-z]{2})/i)||[])[1],s;q=q&&q.toLowerCase();try{if(L.indexOf(q)>=0)localStorage.setItem('ds_lang',q);s=localStorage.getItem('ds_lang')}catch(e){s=q}if(L.indexOf(s)>=0){document.documentElement.lang=s;document.documentElement.className+=' lang-ok'}})();</script>
 <script>window.__DS_TWEAKS__=/*EDITMODE-BEGIN*/{
@@ -34,7 +35,9 @@
   "logo": "rec"
 }/*EDITMODE-END*/;
 /* Secours des boutons « Réserver un appel » si le calendrier (js/ds-booking.js) ne charge pas : ancre vers le formulaire. */
-window.DS_CALENDLY="#contact";</script>
+window.DS_CALENDLY="#contact";
+/* Vidéo des visites (PostHog Europe), seulement si le visiteur accepte les cookies. Clé publique phc_… : vide = désactivé. Voir js/ds-track.js */
+window.DS_POSTHOG={key:"phc_w45PRxEUceX65owmCK38DkQ3y8aRCHigUBKvDfyTAisi",host:"https://eu.i.posthog.com"};</script>
 </head>
 <!-- Classes du thème posées ici (et plus seulement par js/ds-app.js) : sinon le premier rendu montre le thème rouge de base avant le thème Apple. -->
 <body class="atv motion" data-logo="rec">
@@ -409,7 +412,7 @@ window.DS_CALENDLY="#contact";</script>
 <div class="foot-grid">
 <div><a class="logo big" href="#top" aria-label="DS Editing"><span class="lv lv-img"><img class="logo-img" src="ds-media/logo.png" alt="DS Editing" style="height:64px"></span><span class="lv lv-cut">DS<i></i><em>Editing</em></span><span class="lv lv-slate"><b>DS</b><em>Editing</em></span><span class="lv lv-rec"><i></i>DS<em>Editing</em></span><span class="lv lv-frame"><b>DS</b><em>Editing</em></span><span class="lv lv-play"><svg viewBox="0 0 24 24"><path d="M7 4l13 8-13 8z"></path></svg>DS<em>Editing</em></span></a><p style="margin-top:16px;max-width:320px" data-fr="Un studio boutique de montage en marque blanche qui aide studios, agences et créateurs à livrer de la vidéo premium, plus vite." data-nl="Een boutique white-label montagestudio die studio’s, agencies en creators helpt sneller premium video te leveren." data-da="Et boutique white label-klippestudie, der hjælper studier, bureauer og skabere med at levere premium video, hurtigere.">A boutique white-label editing studio helping studios, agencies and creators ship premium video, faster.</p></div>
 <div class="foot-col"><h6>Services</h6><a href="#services">YouTube &amp; Docu</a><a href="#services">Podcast &amp; Interview</a><a href="#services">Reels &amp; Shorts</a><a href="#services">VSL</a><a href="#services">Ads</a><a href="#services" data-fr="Motion & étalonnage" data-nl="Motion &amp;amp; color" data-da="Motion &amp;amp; color">Motion &amp; color</a></div>
-<div class="foot-col"><h6>Studio</h6><a href="#process" data-fr="Process" data-nl="Werkwijze" data-da="Proces">Process</a><a href="#packages" data-fr="Packs" data-nl="Pakketten" data-da="Pakker">Packages</a><a href="#team" data-fr="L’équipe" data-nl="Team" data-da="Team">Team</a><a href="#studio" data-fr="Nos locaux" data-nl="Onze omgeving" data-da="Vores område">Our space</a><a href="client/" data-fr="Espace client" data-nl="Klantomgeving" data-da="Kundeområde">Client space</a><a href="suivi.html" data-fr="Suivre ma commande" data-nl="Volg mijn bestelling" data-da="Følg min ordre">Track my order</a><a href="conditions.html" data-fr="Conditions de collaboration" data-nl="Samenwerkingsvoorwaarden" data-da="Samarbejdsvilkår">Terms of collaboration</a></div>
+<div class="foot-col"><h6>Studio</h6><a href="#process" data-fr="Process" data-nl="Werkwijze" data-da="Proces">Process</a><a href="#packages" data-fr="Packs" data-nl="Pakketten" data-da="Pakker">Packages</a><a href="#team" data-fr="L’équipe" data-nl="Team" data-da="Team">Team</a><a href="#studio" data-fr="Nos locaux" data-nl="Onze omgeving" data-da="Vores område">Our space</a><a href="client/" data-fr="Espace client" data-nl="Klantomgeving" data-da="Kundeområde">Client space</a><a href="suivi.html" data-fr="Suivre ma commande" data-nl="Volg mijn bestelling" data-da="Følg min ordre">Track my order</a><a href="conditions.html" data-fr="Conditions de collaboration" data-nl="Samenwerkingsvoorwaarden" data-da="Samarbejdsvilkår">Terms of collaboration</a><a href="privacy.html" data-fr="Confidentialité" data-nl="Privacy" data-da="Privatliv">Privacy</a><a href="#" class="js-cookies">Cookies</a></div>
 <div class="foot-col"><h6>Contact</h6><a href="mailto:contact@ds-editing.com">contact@ds-editing.com</a><a href="https://www.instagram.com/ds.videoediting/" target="_blank" rel="noopener">Instagram</a><a href="https://www.youtube.com/watch?v=fMyb3M30DGI" target="_blank" rel="noopener">YouTube</a><a href="https://www.trustpilot.com/review/ds-editing.com" target="_blank" rel="noopener">Trustpilot</a></div>
 </div>
 <div class="foot-bot"><span data-fr="© 2026 DS Editing · Canggu, Bali · Tous droits réservés" data-nl="© 2026 DS Editing · Canggu, Bali · Alle rechten voorbehouden" data-da="© 2026 DS Editing · Canggu, Bali · Alle rettigheder forbeholdes">© 2026 DS Editing · Canggu, Bali · All rights reserved</span><span data-fr="Réservations ouvertes" data-nl="Boekingen open" data-da="Booking åben">Bookings open</span></div>
@@ -433,5 +436,6 @@ window.DS_CALENDLY="#contact";</script>
 <script src="js/ds-panels.js"></script>
 <script src="js/ds-booking.js"></script>
 <script src="js/ds-lang.js"></script>
+<script src="js/ds-track.js"></script>
 </body>
 </html>
