@@ -489,6 +489,27 @@
     .gh-wait p{margin:0 0 12px;color:var(--taupe);font-size:14px;line-height:1.5}
     .gh-wait.bad p{color:var(--err)}
     @media (max-width:700px){.gh-day{grid-template-columns:1fr}}
+
+    /* Révisions facturables (10/11) : badge de version, fenêtre de relivraison, lignes extra par vidéo */
+    .rvb{white-space:nowrap;margin-left:6px}
+    .rvb.bill{color:var(--warn);border-color:rgba(245,196,0,.35);background:rgba(245,196,0,.12)}
+    .rvbox{margin-top:8px}.rvbox:empty{display:none}
+    .rvbox .rvt{display:block;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--taupe);margin-bottom:6px}
+    .rvbox .rvl{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:12px;padding:6px 0;border-top:1px solid var(--line)}
+    .rvbox .rvl.off{opacity:.55;text-decoration:line-through}.rvbox .rvl .nm{flex:1 1 160px;min-width:0}
+    .rvbox .btn{height:32px;padding:0 12px;font-size:12px}
+    .rvm .rvq{display:flex;flex-direction:column;gap:6px;margin:0 0 12px;border:0;padding:0}
+    .rvm .rvq label{display:flex;align-items:center;gap:8px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;cursor:pointer;font-size:14px}
+    .rvm .rvq label:hover{border-color:var(--line-strong)}
+    .rvm .rvq legend{font-size:12px;color:var(--taupe);margin-bottom:6px;padding:0}
+    .rvm .rvmsg{font-size:14px;line-height:1.45;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.04);margin:0 0 12px}
+    .rvm .rvmsg.bill{border-color:rgba(245,196,0,.45);background:rgba(245,196,0,.1);color:var(--cream)}
+    .rvm .rvmsg.free{border-color:rgba(70,211,105,.4);background:rgba(70,211,105,.08)}
+    .rvm .rvmsg.err{border-color:rgba(240,138,130,.5);background:rgba(240,138,130,.1)}
+    .rvm textarea.in{min-height:84px;resize:vertical;margin-bottom:8px}
+    .rvm .rvact{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px;margin-top:6px}
+    .rvm .rvcp{margin-bottom:12px}.rvm .rvcp b{display:block;font-size:12px;color:var(--taupe);margin-bottom:4px}
+    @media(max-width:560px){.rvm .rvact .btn{flex:1 1 100%}}
   </style>
 </head>
 <body>
@@ -544,6 +565,8 @@
       <div id="ordL"></div>
     </div>
   </div>
+  <!-- Relivraison / annulation d'une ligne de révision (10/11) : contenu écrit par le script -->
+  <div class="ordm rvm" id="rvm" hidden role="dialog" aria-modal="true" aria-labelledby="rvT"><div class="box" id="rvBox"></div></div>
   <!-- Suppression d'une commande (21/10) : confirmation ; la base refuse tout ce qui est commencé ou facturé (supabase/suppression_commande_v1.sql) -->
   <div class="ordm delm" id="delm" hidden role="dialog" aria-modal="true" aria-labelledby="delT">
     <div class="box">
@@ -603,10 +626,17 @@ const T = {
       asmTag: "À assembler", asmT: "À assembler", asmP: "Les deux parties sont livrées : colle-les ensemble, pose le lien frame.io FINAL, puis livre la commande.", finalPh: "Lien frame.io FINAL de la commande", finalBtn: "Livré (finale)", finalOk: "✓ Livré, la qualité est prévenue",
       revisions: "À revoir : le dispatch relivre la finale ; corrige ta partie si on te le demande.",
       split: "Couper en Intro / Corps", splitAsk: "Couper cette commande en Intro et Corps (un monteur par partie) ?", splitOk: "✓ Commande coupée en Intro / Corps", merge: "Fusionner en une seule partie", mergeAsk: "Fusionner Intro et Corps en une seule partie (les monteurs sont gardés) ?", mergeOk: "✓ Commande fusionnée en une seule partie",
-      finalDone: "Livré (finale)", reopen: "Rouvrir l'assemblage", wait: (a, b) => `Assemblage : ${a} / ${b} partie${b > 1 ? "s" : ""} livrée${b > 1 ? "s" : ""}`, bar: (n) => `${n} commande${n > 1 ? "s" : ""} à assembler`, derived: "Calculé d'après les parties : coche dans la partie.", noEd: "À attribuer", final: "Lien final" },
+      finalDone: "Livré (finale)", reopen: "Relivrer la finale", wait: (a, b) => `Assemblage : ${a} / ${b} partie${b > 1 ? "s" : ""} livrée${b > 1 ? "s" : ""}`, bar: (n) => `${n} commande${n > 1 ? "s" : ""} à assembler`, derived: "Calculé d'après les parties : coche dans la partie.", noEd: "À attribuer", final: "Lien final" },
     needFrame: "Colle d'abord le lien frame.io de livraison : « Livré » reste bloqué sans lui.", locked: "Étape déjà cochée : seule la qualité ou un admin peut la corriger.", redeliver: "Relivrer", redeliverTip: "Corrige le lien frame.io si besoin, puis relivre pour un nouveau contrôle qualité.", redelivered: "✓ Relivré, la qualité est prévenue", round: (n) => `${n}e passage`, savedOk: "✓ Enregistré",
     lk: { editor: "Monteur", dispatcher: "Dispatch", qc: "Qualité", badT: "Lien invalide ou coupé", badP: "Ce lien ne fonctionne plus. Demande-en un nouveau à l'équipe DS Editing.", tooT: "Trop d'essais", tooP: "Réessaie dans quelques minutes.", downT: "Service indisponible", downP: "Impossible de joindre le serveur. Vérifie ta connexion puis réessaie.", byeT: "Lien retiré de cet appareil", byeP: "Rouvre ton lien personnel pour revenir à tes commandes.", retry: "Réessayer", offT: "Accès désactivé", offP: "Ton accès est désactivé pour le moment. Reviens plus tard ou demande à l'équipe DS Editing.", who: (n) => `Connecté avec le lien de ${n}`, queue: (n) => `À attribuer · ${n}`, others: "Autres commandes", brief: "Brief", refs: "Références", logos: "Logos" },
-    errs: { FRAMEIO_REQUIS: "Lien frame.io manquant ou invalide (il doit commencer par https://).", ETAPE_VERROUILLEE: "Étape déjà cochée : seule la qualité ou un admin peut la corriger.", QC_OK_VERROUILLE: "Qualité déjà validée : le lien frame.io ne peut plus être modifié (voir avec l'équipe qualité).", REFUSE: "Action refusée pour ton profil.", CHAMP_INTERDIT: "Modification non autorisée pour ton profil.", LIEN_INVALIDE: "Ce lien ne fonctionne plus : demande-en un nouveau.", TROP_D_ESSAIS: "Trop d'essais : réessaie dans quelques minutes.", REOUVERTURE_REFUSEE: "On ne rouvre l'assemblage qu'après un « à revoir » de la qualité.", LIVRAISON_FIGEE: "Commande livrée : après un « à revoir », rouvre d'abord l'assemblage avant de rouvrir une partie.", PARTIE_DEJA_COMMENCEE: "Impossible : une étape est déjà cochée ou un lien déjà posé sur cette commande.", COMMANDE_TERMINEE: "Impossible : la commande est terminée (qualité OK).", PAS_UNE_PARTIE_UNIQUE: "Cette commande est déjà coupée en parties.", PAS_DEUX_PARTIES: "Cette commande n'est pas coupée en Intro / Corps.", ACTION_INCONNUE: "Action inconnue.", JOB_A_PARTIES: "Cette commande est découpée en parties : coche l'étape dans la partie concernée.", PARTIES_NON_LIVREES: "Toutes les parties doivent être livrées avant de livrer la commande.", MONTEUR_INCONNU: "Monteur inconnu.", MONTEUR_DESACTIVE: "Ton accès est désactivé pour le moment.", COMMANDE_COMMENCEE: "Impossible : une étape est déjà cochée, la qualité a tranché ou un lien est posé. On ne supprime qu'une commande pas commencée.", COMMANDE_FACTUREE: "Impossible : cette commande est déjà sur une facture.", INTROUVABLE: "Commande introuvable (déjà supprimée ?)." },
+    errs: { REVISION_PAR_RPC: "Le passage « à revoir » / « en attente » se fait avec la fenêtre de demande ou de relivraison, pas à la main.", LIEN_VERROUILLE_PAR_RPC: "Vidéo déjà livrée : le lien Frame.io ne change que par une relivraison.", LIGNE_EN_FACTURATION: "Cette ligne est en cours de facturation : réessaie dans un instant.", LIGNE_ANNULEE: "Cette ligne est annulée.", ILLIMITEES_NON_ANNULABLE: "Une ligne « illimité » ne s'annule pas (l'admin peut l'offrir).", AUCUNE_DEMANDE: "Aucune demande de révision en cours : passe d'abord la vidéo en « à revoir ».", DEJA_A_REVOIR: "Cette vidéo est déjà « à revoir ».", DEJA_OFFERTE: "Ligne déjà offerte.", LIVRAISON_FIGEE: "Commande livrée : rouvre d'abord l'assemblage (relivraison).", ILLIMITEES_PAR_RPC: "Les révisions illimitées se passent avec le bouton « Passer en illimité », pas à la main.", PRIX_MANQUANT: "Prix manquant pour ce client dans la grille : rien n'est enregistré. Préviens Cyriaque.", RAISON_REQUISE: "Raison obligatoire.", LIGNE_FACTUREE: "Cette ligne est déjà sur une facture émise.", DEJA_ANNULEE: "Ligne déjà annulée.", DEJA_ILLIMITEES: "Cette vidéo est déjà en illimité.", PAS_A_RELIVRER: "Cette vidéo n'est pas à relivrer (statut qualité).", FRAMEIO_REQUIS: "Lien frame.io manquant ou invalide (il doit commencer par https://).", ETAPE_VERROUILLEE: "Étape déjà cochée : seule la qualité ou un admin peut la corriger.", QC_OK_VERROUILLE: "Qualité déjà validée : le lien frame.io ne peut plus être modifié (voir avec l'équipe qualité).", REFUSE: "Action refusée pour ton profil.", CHAMP_INTERDIT: "Modification non autorisée pour ton profil.", LIEN_INVALIDE: "Ce lien ne fonctionne plus : demande-en un nouveau.", TROP_D_ESSAIS: "Trop d'essais : réessaie dans quelques minutes.", REOUVERTURE_REFUSEE: "On ne rouvre l'assemblage qu'après un « à revoir » de la qualité.", LIVRAISON_FIGEE: "Commande livrée : après un « à revoir », rouvre d'abord l'assemblage avant de rouvrir une partie.", PARTIE_DEJA_COMMENCEE: "Impossible : une étape est déjà cochée ou un lien déjà posé sur cette commande.", COMMANDE_TERMINEE: "Impossible : la commande est terminée (qualité OK).", PAS_UNE_PARTIE_UNIQUE: "Cette commande est déjà coupée en parties.", PAS_DEUX_PARTIES: "Cette commande n'est pas coupée en Intro / Corps.", ACTION_INCONNUE: "Action inconnue.", JOB_A_PARTIES: "Cette commande est découpée en parties : coche l'étape dans la partie concernée.", PARTIES_NON_LIVREES: "Toutes les parties doivent être livrées avant de livrer la commande.", MONTEUR_INCONNU: "Monteur inconnu.", MONTEUR_DESACTIVE: "Ton accès est désactivé pour le moment.", COMMANDE_COMMENCEE: "Impossible : une étape est déjà cochée, la qualité a tranché ou un lien est posé. On ne supprime qu'une commande pas commencée.", COMMANDE_FACTUREE: "Impossible : cette commande est déjà sur une facture.", INTROUVABLE: "Commande introuvable (déjà supprimée ?)." },
+    rv: { reqTitle: "Passer en « à revoir »", cancelReq: "Annuler la demande", cancelReqAsk: "Annuler la demande de révision ? La vidéo reprend son état d'avant.", cancelReqDone: "✓ Demande annulée", offer: "Offrir", offerT: "Offrir cette ligne", offerHint: "La ligne reste sur la facture à 0 €. La raison est gardée.", offerDo: "Offrir la ligne", offered: "offerte", reopenTitle: "Relivrer la finale (rouvrir l'assemblage)", reopenSubmit: "Rouvrir l'assemblage", reqSubmit: "Passer en à revoir", reqSent: "✓ À revoir", noteL: "Note pour le monteur (optionnelle)", notePh: "Ce qui doit changer…", recall: "Raison posée par la qualité : ", noDirectOk: "« À revoir » → « OK » direct n'existe plus : relivre d'abord la vidéo, puis valide.", frameLocked: "Vidéo déjà livrée : le lien ne change que par une relivraison.", title: "Relivrer la vidéo", reasonL: "Raison (obligatoire)", client: "Révision client", ds: "Erreur DS", frameL: "Lien Frame.io de la nouvelle version", reasonReq: "Choisis une raison.", frameReq: "Colle un lien Frame.io valide (https://…).", submit: "Relivrer", close: "Fermer", loading: "Calcul de la facturation…", stateErr: "État de facturation illisible : ferme et rouvre dans un instant.",
+      ifClient: "Si « Révision client » : ", billed: (v, a, st) => `Ce sera la V${v} : ${a} ajoutés à la facture de ${st}.`, billedNoAmt: (v) => `Ce sera la V${v} : révision payante ajoutée à la facture.`, bPaid: (v) => `V${v} · payante`, needNominative: "Annulation impossible avec le compte partagé « Équipe » : connecte-toi avec ton compte nominatif.", included: (v) => `Ce sera la V${v} : incluse.`, unlimited: "Vidéo en illimité : rien n'est ajouté à la facture.", inactive: "Facturation pas encore active pour ce client : rien n'est ajouté à la facture.", dsFree: "Erreur DS : rien n'est facturé au client.",
+      bUnl: "Illimité", bInc: (v) => `V${v} · incluse`, bBill: (v, a) => `V${v} · ${a}`, bOff: (v) => `V${v} · facturation inactive`, bTip: "Prochaine relivraison de cette vidéo", boxT: "Révisions facturables",
+      unlBtn: "Passer en illimité", unlAsk: (st) => `Passer cette vidéo en illimité pour ${st} ?\nLes lignes à l'unité déjà ajoutées sont annulées et le comptage s'arrête.`, unlDone: (n, a) => `✓ Illimité${a ? " · " + a : ""} · ${n} ligne${n > 1 ? "s" : ""} annulée${n > 1 ? "s" : ""}`,
+      linesT: "Lignes sur la facture", cancel: "Annuler", cancelT: "Annuler cette ligne", cancelHint: "La ligne ne sera plus facturée. La raison est gardée.", cancelDo: "Annuler la ligne", back: "Retour", cancelled: "annulée", invoiced: "déjà facturée", auto: "auto", noLines: "Aucune ligne.", readFail: "Lignes illisibles.",
+      doneT: (v) => `V${v} livrée`, copyT: "Texte prêt à copier pour le client", copy: "Copier", copied: "Copié", copyFail: "Copie impossible : sélectionne le texte à la main.", sent: "✓ Relivrée",
+      clientFr: (v, a) => `V${v} livrée. ${a ? a + " ajoutés" : "Une révision payante est ajoutée"} à ta facture de la semaine. Pour ne plus compter sur cette vidéo, passe en illimité.`, clientEn: (v, a) => `V${v} delivered. ${a ? a + " added" : "A paid revision is added"} to your invoice this week. To stop counting revisions on this video, switch to unlimited.` },
     chrono: { title: "Temps de montage", pillTip: (n) => `${n} session${n > 1 ? "s" : ""} chronométrée${n > 1 ? "s" : ""} (vue équipe)`, sessions: (n) => `${n} session${n > 1 ? "s" : ""}`, flagged: (n) => `${n} coupée${n > 1 ? "s" : ""} à 6 h, à vérifier`, running: "chrono en cours", cost: "de coût (taux horaire)", tv: "⏱ En montage maintenant" },
     tabs: { prod: "Production", equipe: "Équipe", tarifs: "Tarifs", factures: "Factures", rdv: "Rendez-vous", recrut: "Recrutement", grille: "Grille", rituels: "Rituels", rh: "Espace RH" },
     gh: { notYou: "Ce n'est pas vous ?", sharedFallback: "Vue d'équipe indisponible avec ce compte : connecte-toi avec ton compte nominatif.", morning: "Rituels du matin", prios: "3 priorités du jour", week: "7 derniers jours", tz: "heure de Bali", loading: "Lecture en cours…", retry: "Réessayer",
@@ -674,10 +704,17 @@ const T = {
       asmTag: "To assemble", asmT: "To assemble", asmP: "Both parts are delivered: put them together, paste the FINAL frame.io link, then deliver the order.", finalPh: "FINAL frame.io link of the order", finalBtn: "Delivered (final)", finalOk: "✓ Delivered, QC has been notified",
       revisions: "Needs changes: dispatch redelivers the final; fix your part if you are asked to.",
       split: "Split into Intro / Body", splitAsk: "Split this order into Intro and Body (one editor per part)?", splitOk: "✓ Order split into Intro / Body", merge: "Merge into a single part", mergeAsk: "Merge Intro and Body into a single part (editors are kept)?", mergeOk: "✓ Order merged into a single part",
-      finalDone: "Delivered (final)", reopen: "Reopen assembly", wait: (a, b) => `Assembly: ${a} / ${b} part${b > 1 ? "s" : ""} delivered`, bar: (n) => `${n} order${n > 1 ? "s" : ""} to assemble`, derived: "Computed from the parts: tick it in the part.", noEd: "Unassigned", final: "Final link" },
+      finalDone: "Delivered (final)", reopen: "Redeliver the final", wait: (a, b) => `Assembly: ${a} / ${b} part${b > 1 ? "s" : ""} delivered`, bar: (n) => `${n} order${n > 1 ? "s" : ""} to assemble`, derived: "Computed from the parts: tick it in the part.", noEd: "Unassigned", final: "Final link" },
     needFrame: "Paste the frame.io delivery link first: “Delivered” stays blocked without it.", locked: "Step already ticked: only QC or an admin can fix it.", redeliver: "Redeliver", redeliverTip: "Fix the frame.io link if needed, then redeliver for a new quality check.", redelivered: "✓ Redelivered, QC has been notified", round: (n) => `${n}${[11, 12, 13].includes(n % 100) ? "th" : ({ 1: "st", 2: "nd", 3: "rd" })[n % 10] || "th"} pass`, savedOk: "✓ Saved",
     lk: { editor: "Editor", dispatcher: "Dispatch", qc: "Quality", badT: "Invalid or disabled link", badP: "This link no longer works. Ask the DS Editing team for a new one.", tooT: "Too many attempts", tooP: "Try again in a few minutes.", downT: "Service unavailable", downP: "Cannot reach the server. Check your connection and try again.", byeT: "Link removed from this device", byeP: "Open your personal link again to get back to your orders.", retry: "Try again", offT: "Access disabled", offP: "Your access is disabled for now. Come back later or ask the DS Editing team.", who: (n) => `Signed in with ${n}'s link`, queue: (n) => `To assign · ${n}`, others: "Other orders", brief: "Brief", refs: "References", logos: "Logos" },
-    errs: { FRAMEIO_REQUIS: "frame.io link missing or invalid (it must start with https://).", ETAPE_VERROUILLEE: "Step already ticked: only QC or an admin can fix it.", QC_OK_VERROUILLE: "QC already approved: the frame.io link can no longer be changed (ask the QC team).", REFUSE: "Action refused for your profile.", CHAMP_INTERDIT: "Change not allowed for your profile.", LIEN_INVALIDE: "This link no longer works: ask for a new one.", TROP_D_ESSAIS: "Too many attempts: try again in a few minutes.", REOUVERTURE_REFUSEE: "The assembly can only be reopened after a QC « needs changes ».", LIVRAISON_FIGEE: "Order delivered: after a « needs changes », reopen the assembly first before reopening a part.", PARTIE_DEJA_COMMENCEE: "Not possible: a step is already ticked or a link already set on this order.", COMMANDE_TERMINEE: "Not possible: the order is finished (QC OK).", PAS_UNE_PARTIE_UNIQUE: "This order is already split into parts.", PAS_DEUX_PARTIES: "This order is not split into Intro / Body.", ACTION_INCONNUE: "Unknown action.", JOB_A_PARTIES: "This order is split into parts: tick the step in the relevant part.", PARTIES_NON_LIVREES: "All parts must be delivered before delivering the order.", MONTEUR_INCONNU: "Unknown editor.", MONTEUR_DESACTIVE: "Your access is disabled for now.", COMMANDE_COMMENCEE: "Not possible: a step is already ticked, QC has decided or a link is set. Only an order that has not started can be deleted.", COMMANDE_FACTUREE: "Not possible: this order is already on an invoice.", INTROUVABLE: "Order not found (already deleted?)." },
+    errs: { REVISION_PAR_RPC: "Setting “needs changes” / “pending” is done with the request or redelivery window, not by hand.", LIEN_VERROUILLE_PAR_RPC: "Already delivered: the Frame.io link only changes through a redelivery.", LIGNE_EN_FACTURATION: "This line is being invoiced: try again in a moment.", LIGNE_ANNULEE: "This line is cancelled.", ILLIMITEES_NON_ANNULABLE: "An “unlimited” line cannot be cancelled (an admin can offer it).", AUCUNE_DEMANDE: "No revision request in progress: set the video to “needs changes” first.", DEJA_A_REVOIR: "This video is already “needs changes”.", DEJA_OFFERTE: "Line already offered.", LIVRAISON_FIGEE: "Order delivered: reopen the assembly first (redelivery).", ILLIMITEES_PAR_RPC: "Unlimited revisions are set with the “Switch to unlimited” button, not by hand.", PRIX_MANQUANT: "Price missing for this client in the price grid: nothing was saved. Tell Cyriaque.", RAISON_REQUISE: "Reason required.", LIGNE_FACTUREE: "This line is already on an issued invoice.", DEJA_ANNULEE: "Line already cancelled.", DEJA_ILLIMITEES: "This video is already unlimited.", PAS_A_RELIVRER: "This video is not up for redelivery (QC status).", FRAMEIO_REQUIS: "frame.io link missing or invalid (it must start with https://).", ETAPE_VERROUILLEE: "Step already ticked: only QC or an admin can fix it.", QC_OK_VERROUILLE: "QC already approved: the frame.io link can no longer be changed (ask the QC team).", REFUSE: "Action refused for your profile.", CHAMP_INTERDIT: "Change not allowed for your profile.", LIEN_INVALIDE: "This link no longer works: ask for a new one.", TROP_D_ESSAIS: "Too many attempts: try again in a few minutes.", REOUVERTURE_REFUSEE: "The assembly can only be reopened after a QC « needs changes ».", LIVRAISON_FIGEE: "Order delivered: after a « needs changes », reopen the assembly first before reopening a part.", PARTIE_DEJA_COMMENCEE: "Not possible: a step is already ticked or a link already set on this order.", COMMANDE_TERMINEE: "Not possible: the order is finished (QC OK).", PAS_UNE_PARTIE_UNIQUE: "This order is already split into parts.", PAS_DEUX_PARTIES: "This order is not split into Intro / Body.", ACTION_INCONNUE: "Unknown action.", JOB_A_PARTIES: "This order is split into parts: tick the step in the relevant part.", PARTIES_NON_LIVREES: "All parts must be delivered before delivering the order.", MONTEUR_INCONNU: "Unknown editor.", MONTEUR_DESACTIVE: "Your access is disabled for now.", COMMANDE_COMMENCEE: "Not possible: a step is already ticked, QC has decided or a link is set. Only an order that has not started can be deleted.", COMMANDE_FACTUREE: "Not possible: this order is already on an invoice.", INTROUVABLE: "Order not found (already deleted?)." },
+    rv: { reqTitle: "Set to “needs changes”", cancelReq: "Cancel the request", cancelReqAsk: "Cancel the revision request? The video goes back to its previous state.", cancelReqDone: "✓ Request cancelled", offer: "Offer", offerT: "Offer this line", offerHint: "The line stays on the invoice at 0. The reason is kept.", offerDo: "Offer the line", offered: "offered", reopenTitle: "Redeliver the final (reopen assembly)", reopenSubmit: "Reopen assembly", reqSubmit: "Set to needs changes", reqSent: "✓ Needs changes", noteL: "Note for the editor (optional)", notePh: "What must change…", recall: "Reason set by QC: ", noDirectOk: "“Needs changes” → “OK” directly no longer exists: redeliver the video first, then approve.", frameLocked: "Already delivered: the link only changes through a redelivery.", title: "Redeliver the video", reasonL: "Reason (required)", client: "Client revision", ds: "DS error", frameL: "Frame.io link of the new version", reasonReq: "Pick a reason.", frameReq: "Paste a valid Frame.io link (https://…).", submit: "Redeliver", close: "Close", loading: "Computing billing…", stateErr: "Billing state unreadable: close and reopen in a moment.",
+      ifClient: "If “Client revision”: ", billed: (v, a, st) => `This will be V${v}: ${a} added to ${st}'s invoice.`, billedNoAmt: (v) => `This will be V${v}: paid revision added to the invoice.`, bPaid: (v) => `V${v} · paid`, needNominative: "Cancelling is not possible with the shared “Team” account: sign in with your personal account.", included: (v) => `This will be V${v}: included.`, unlimited: "Unlimited video: nothing is added to the invoice.", inactive: "Billing is not active for this client yet: nothing is added to the invoice.", dsFree: "DS error: nothing is billed to the client.",
+      bUnl: "Unlimited", bInc: (v) => `V${v} · included`, bBill: (v, a) => `V${v} · ${a}`, bOff: (v) => `V${v} · billing off`, bTip: "Next redelivery of this video", boxT: "Billable revisions",
+      unlBtn: "Switch to unlimited", unlAsk: (st) => `Switch this video to unlimited for ${st}?\nPer-revision lines already added are cancelled and counting stops.`, unlDone: (n, a) => `✓ Unlimited${a ? " · " + a : ""} · ${n} line${n > 1 ? "s" : ""} cancelled`,
+      linesT: "Invoice lines", cancel: "Cancel", cancelT: "Cancel this line", cancelHint: "The line will no longer be billed. The reason is kept.", cancelDo: "Cancel the line", back: "Back", cancelled: "cancelled", invoiced: "already invoiced", auto: "auto", noLines: "No line.", readFail: "Lines unreadable.",
+      doneT: (v) => `V${v} delivered`, copyT: "Ready-to-copy text for the client", copy: "Copy", copied: "Copied", copyFail: "Copy failed: select the text by hand.", sent: "✓ Redelivered",
+      clientFr: (v, a) => `V${v} livrée. ${a ? a + " ajoutés" : "Une révision payante est ajoutée"} à ta facture de la semaine. Pour ne plus compter sur cette vidéo, passe en illimité.`, clientEn: (v, a) => `V${v} delivered. ${a ? a + " added" : "A paid revision is added"} to your invoice this week. To stop counting revisions on this video, switch to unlimited.` },
     chrono: { title: "Editing time", pillTip: (n) => `${n} timed session${n > 1 ? "s" : ""} (team board)`, sessions: (n) => `${n} session${n > 1 ? "s" : ""}`, flagged: (n) => `${n} auto-stopped at 6 h, to check`, running: "timer running", cost: "cost (hourly rate)", tv: "⏱ Editing right now" },
     tabs: { prod: "Production", equipe: "Team", tarifs: "Pricing", factures: "Invoices", rdv: "Appointments", recrut: "Recruitment", grille: "Grid", rituels: "Routines", rh: "HR space" },
     gh: { notYou: "Not you?", sharedFallback: "Team view unavailable with this account: sign in with your personal account.", morning: "Morning routines", prios: "Today's 3 priorities", week: "Last 7 days", tz: "Bali time", loading: "Loading…", retry: "Retry",
@@ -1165,7 +1202,7 @@ function renderBoard() {
         ${dlLine(j)}
         ${fbHtml(j.id, "step")}
       </div>
-      <div class="qc ${j.qc_status}">${isAdmin() ? `<select class="in" data-act="qc" data-id="${j.id}">${["pending", "ok", "revisions"].map((k) => `<option value="${k}" ${k === j.qc_status ? "selected" : ""}>${qc[k]}</option>`).join("")}</select>` : `<span class="badge ${j.qc_status === "ok" ? "ok" : j.qc_status === "revisions" ? "err" : ""}">${qc[j.qc_status]}</span>`}${isAdmin() && j.qc_status === "pending" && j.qc_round > 0 ? `<span class="badge warn rnd" data-round="${j.qc_round}">${t("round")(j.qc_round + 1)}</span>` : ""}${isEditor() && ed && !multi && j.qc_status === "revisions" ? `<button type="button" class="btn" data-redeliver="${j.id}" title="${esc(t("redeliverTip"))}">${t("redeliver")}</button>` : ""}${fbHtml(j.id, "qc")}</div>
+      <div class="qc ${j.qc_status}">${isAdmin() ? `<select class="in" data-act="qc" data-id="${j.id}">${["pending", "ok", "revisions"].map((k) => `<option value="${k}" ${k === j.qc_status ? "selected" : ""} ${k === "ok" && j.qc_status === "revisions" ? "disabled" : ""}>${qc[k]}</option>`).join("")}</select>` : `<span class="badge ${j.qc_status === "ok" ? "ok" : j.qc_status === "revisions" ? "err" : ""}">${qc[j.qc_status]}</span>`}${isAdmin() && j.qc_status === "pending" && j.qc_round > 0 ? `<span class="badge warn rnd" data-round="${j.qc_round}">${t("round")(j.qc_round + 1)}</span>` : ""}${canRev() ? `<span data-revbadge="${j.id}"></span>` : ""}${canRev() && j.qc_status === "revisions" ? `<button type="button" class="btn ghost rvcr" data-rvcancelreq="${j.id}">${t("rv").cancelReq}</button>` : ""}${isEditor() && ed && !multi && j.qc_status === "revisions" ? `<button type="button" class="btn" data-redeliver="${j.id}" title="${esc(t("redeliverTip"))}">${t("redeliver")}</button>` : ""}${fbHtml(j.id, "qc")}</div>
       <div class="links">${j.brief_url ? `<a href="${safeUrl(j.brief_url)}" target="_blank" rel="noopener">${t("brief")}</a>` : ""}${j.folder_url ? `<a href="${safeUrl(j.folder_url)}" target="_blank" rel="noopener">${t("files")}</a>` : ""}${j.frameio_url ? `<a href="${safeUrl(j.frameio_url)}" target="_blank" rel="noopener">${t("frame")}</a>` : ""}</div>
       <button type="button" class="more" data-more="${j.id}">⋯</button>
       ${multi ? partsBlock(j) : ""}
@@ -1175,18 +1212,20 @@ function renderBoard() {
         <div><b>${t("rushes")}</b><div class="lk">${(j.rushes_links || []).map((u) => `<a href="${safeUrl(u)}" target="_blank" rel="noopener">${esc(u)}</a>`).join("\n") || "—"}</div></div>
         <div${isEditor() && LINKED ? " hidden" : ""}>${isAdmin() ? `<b>${t("contact")}</b>${esc(j.contact || "—")}<br/><b style="margin-top:8px">${t("email")}</b>${esc(j.email || "—")}<br/>` : ""}${briefField(j)}${houseStyleField(j)}</div>
         <div>
-          ${multi ? "" : `<b>${t("frame")}</b><input class="in" data-field="frameio_url" data-id="${j.id}" value="${esc(j.frameio_url || "")}" placeholder="${t("frameioPh")}" ${ed && !(isEditor() && j.qc_status === "ok") ? "" : "disabled"} ${isEditor() && j.qc_status === "ok" ? `title="${esc(t("errs").QC_OK_VERROUILLE)}"` : ""}/>${fbHtml(j.id, "frameio_url")}${ed && !j.delivered_at && !FRAME_OK(j.frameio_url) ? `<span class="fb warn">${t("needFrame")}</span>` : ""}`}
+          ${multi ? "" : `<b>${t("frame")}</b><input class="in" data-field="frameio_url" data-id="${j.id}" value="${esc(j.frameio_url || "")}" placeholder="${t("frameioPh")}" ${ed && !j.delivered_at && !(isEditor() && j.qc_status === "ok") ? "" : "disabled"} ${j.delivered_at ? `title="${esc(t("rv").frameLocked)}"` : isEditor() && j.qc_status === "ok" ? `title="${esc(t("errs").QC_OK_VERROUILLE)}"` : ""}/>${fbHtml(j.id, "frameio_url")}${ed && !j.delivered_at && !FRAME_OK(j.frameio_url) ? `<span class="fb warn">${t("needFrame")}</span>` : ""}`}
           ${isAdmin() ? `<b style="margin-top:8px">${t("deliveryDate")}</b><input class="in" type="date" data-field="delivery_date" data-id="${j.id}" value="${j.delivery_date || ""}"/>${fbHtml(j.id, "delivery_date")}<b style="margin-top:8px">${t("noteQc")}</b><input class="in" data-field="qc_note" data-id="${j.id}" value="${esc(j.qc_note || "")}"/>${fbHtml(j.id, "qc_note")}` : (j.qc_note ? `<b style="margin-top:8px">${t("noteQc")}</b>${esc(j.qc_note)}` : "")}
           ${multi && isEditor() ? "" : `<b style="margin-top:8px">${t("notes")}</b><input class="in" data-field="notes" data-id="${j.id}" value="${esc(j.notes || "")}" ${ed && !(multi && isEditor()) ? "" : "disabled"}/>${fbHtml(j.id, "notes")}<span class="help">${esc(t("notesHelp"))}</span>`}
           ${multi ? partNotes(j) : reshapeBlock(j)}
           ${timeBlock(j)}
           ${canMoney() && !LINKED ? amountBlock(j) : ""}
+          ${canRev() ? `<div class="rvbox" data-revbox="${j.id}"></div>` : ""}
           ${canDelete(j) ? `<button type="button" class="btn ghost del" data-deljob="${j.id}">${t("delJob").btn}</button>` : ""}
         </div>
       </div>
     </div>`;
   }).join("");
   wireBoard();
+  if (canRev()) { list.forEach((j) => rvPaint(j.id)); rvRefresh(list.filter((j) => j.qc_status !== "ok" || (j.qc_round || 0) > 0)); }   // badge : cache d'abord, puis lecture des versions manquantes
   flashUntil.forEach((until, id) => { setTimeout(() => { if ((flashUntil.get(id) || 0) <= Date.now()) { flashUntil.delete(id); const el = document.querySelector(`.job[data-id="${id}"]`); if (el) el.classList.remove("flash"); } }, Math.max(0, until - Date.now()) + 20); });
 }
 /* ---- Brief monteurs (20/10, brief_monteurs_v1.sql). Style maison du client : clé house_style posée par team_jobs sur chaque commande (tous rôles,
@@ -1291,13 +1330,8 @@ function wireBoard() {
     if (!ok) { notes.delete(id); if (b.isConnected) b.disabled = false; return; }
     setTimeout(() => { const m = document.querySelector(`[data-fxmsg="${id}"]`); if (m && (notes.get(id) || 0) <= Date.now()) m.textContent = ""; }, 8100);
   }));
-  B.querySelectorAll("[data-redeliver]").forEach((b) => b.addEventListener("click", async () => {
-    const j = jobs.find((x) => x.id === b.dataset.redeliver); if (!j) return;
-    const inp = B.querySelector(`[data-field="frameio_url"][data-id="${j.id}"]`), frame = normFrame((inp && inp.value) || j.frameio_url);
-    if (!FRAME_OK(frame)) { needFrame(j.id, inp); return; }
-    b.disabled = true;
-    const patch = { qc_status: "pending" }; if (frame !== String(j.frameio_url || "")) patch.frameio_url = frame;   // lien corrigé + relivraison en un seul envoi
-    if (!(await update(j.id, patch, false, "step", t("redelivered"))) && b.isConnected) b.disabled = false;
+  B.querySelectorAll("[data-redeliver]").forEach((b) => b.addEventListener("click", () => {   // 10/11 : la relivraison passe obligatoirement par la fenêtre (raison + lien Frame.io) puis par la RPC redeliver_job
+    const j = jobs.find((x) => x.id === b.dataset.redeliver); if (j) rvOpenRedeliver(j);
   }));
   B.querySelectorAll("[data-step]").forEach((el) => el.addEventListener("click", async () => {
     const j = jobs.find((x) => x.id === el.dataset.id); const k = el.dataset.step;
@@ -1311,10 +1345,16 @@ function wireBoard() {
       if (frame !== String(j.frameio_url || "")) patch.frameio_url = frame;
     }
     if (k === "delivered_at" && val && !j.started_at) patch.started_at = val;
-    if (k === "delivered_at" && !val) patch.qc_status = "pending";
+    if (k === "delivered_at" && !val && j.qc_status !== "pending") { (j.qc_status === "ok" ? rvOpenRequest : rvOpenRedeliver)(j); return; }   // décocher « Livré » d'une vidéo « à revoir » / « OK » = la relivrer : même fenêtre, pas de contournement
     await update(j.id, patch, false, "step");
   }));
-  B.querySelectorAll("[data-act='qc']").forEach((s) => s.addEventListener("change", async () => { await update(s.dataset.id, LINKED ? { qc_status: s.value } : { qc_status: s.value, qc_at: s.value === "pending" ? null : new Date().toISOString(), qc_owner: s.value === "pending" ? null : profile.display_name }, false, "qc"); }));
+  B.querySelectorAll("[data-act='qc']").forEach((s) => s.addEventListener("change", async () => {
+    const jq = jobs.find((x) => x.id === s.dataset.id);
+    if (jq && s.value === "revisions" && jq.qc_status !== "revisions") { s.value = jq.qc_status; rvOpenRequest(jq); return; }   // → « à revoir » (aussi depuis « OK ») : fenêtre raison + note, la base facture si dû
+    if (jq && jq.qc_status === "revisions" && s.value === "ok") { s.value = "revisions"; setFb(jq.id, "qc", false, t("rv").noDirectOk, 7000); return; }   // « à revoir » → « OK » direct supprimé : il faut une relivraison d'abord
+    if (jq && jq.qc_status === "revisions" && s.value === "pending") { s.value = "revisions"; rvOpenRedeliver(jq); return; }   // « à revoir » → « en attente » = relivraison (lien Frame.io)
+    if (jq && jq.qc_status === "ok" && s.value === "pending") { s.value = "ok"; rvOpenRequest(jq); return; }   // « OK » → « en attente » : d'abord poser la raison de la révision
+    await update(s.dataset.id, LINKED ? { qc_status: s.value } : { qc_status: s.value, qc_at: s.value === "pending" ? null : new Date().toISOString(), qc_owner: s.value === "pending" ? null : profile.display_name }, false, "qc"); }));
   B.querySelectorAll("[data-field]").forEach((i) => i.addEventListener("change", async () => {
     let v = i.value.trim() || null;
     if (v && i.dataset.field === "frameio_url") v = normFrame(v);
@@ -1555,8 +1595,8 @@ function wirePartActions(B) {
     if (r.error) { setFb(id, "reshape", false, errText(r.error), 7000); if (b.isConnected) b.disabled = false; return; }
     setFb(id, "reshape", true, act === "split" ? L.splitOk : L.mergeOk, 2500); await load(false);
   }));
-  B.querySelectorAll("[data-asm-reopen]").forEach((b) => b.addEventListener("click", async () => {   // rouvrir l'assemblage (« à revoir ») : la commande n'est plus livrée, qualité remise en attente
-    b.disabled = true; if (!(await update(b.dataset.asmReopen, { delivered_at: null, qc_status: "pending" }, false, "asm")) && b.isConnected) b.disabled = false;
+  B.querySelectorAll("[data-asm-reopen]").forEach((b) => b.addEventListener("click", () => {   // 10/11 : « rouvrir » une commande à parties « à revoir » = la relivrer avec la finale corrigée : fenêtre + redeliver_job (la base garde delivered_at, repasse la qualité en attente)
+    const j = jobs.find((x) => x.id === b.dataset.asmReopen); if (j) rvOpenRedeliver(j, true);   // p_reopen_assembly
   }));
 }
 // clic n'importe où sur la ligne = ouvre / ferme le détail (sauf boutons, menus, liens, champs, étapes, choix des monteurs, détail lui-même)
@@ -1565,6 +1605,7 @@ $("#board").addEventListener("click", (ev) => {
   const row = ev.target.closest(".job"); if (!row || ev.target.closest("a,button,input,select,textarea,label,.st,.eds.can,.pop,.detail")) return;
   if (String(window.getSelection ? window.getSelection() : "").length) return;   // sélection de texte en cours
   const on = row.classList.toggle("open"); on ? openIds.add(row.dataset.id) : openIds.delete(row.dataset.id);
+  if (on && canRev()) rvOnOpen(row.dataset.id);
 });
 // monteur : écriture par la fonction job_editor_update (la politique d'écriture directe est retirée par supabase/lot_a_verrous.sql) ;
 // PGRST202 = fonction absente (SQL du lot A pas encore appliqué) -> ancien chemin, pour qu'aucun ordre de mise en ligne ne casse
@@ -1590,6 +1631,212 @@ async function update(id, patch, keepPop, fb, okMsg) {
 }
 // chrono : mise à jour chaque seconde, sans re-rendu
 setInterval(() => { document.querySelectorAll("[data-cd]").forEach((el) => { const j = jobs.find((x) => x.id === el.dataset.cd); if (j) el.textContent = countdown(remaining(j), isDone(j)); }); }, 1000);
+
+/* ===== Révisions facturables (10/11/2026) =====
+   V1 et V2 incluses ; chaque RELIVRAISON « Révision client » à partir de la V3 = une ligne extra auto sur la facture hebdo ; « illimité » remplace les lignes à l'unité et arrête le comptage.
+   Tout part de la base (RPC redeliver_job, set_unlimited_revisions, cancel_extra_line, job_revision_state) : ce fichier n'affiche et n'appelle que.
+   Aucun prix écrit ici : les montants viennent de la base, et seulement pour l'admin (next_price / amount sont null pour les autres : on écrit « payante », jamais un chiffre).
+   Le monteur (editor) n'a ni badge, ni prix, ni bouton illimité / annuler : canRev() = admin / dispatcher / qc.
+   Modes : session nominative = RPC redeliver_job… ; lien perso (?k=) = team_redeliver_job… avec p_key (supabase/revisions_facturables_v1.sql, ds-editing-os). */
+const canRev = () => isAdmin();
+const rvMoney = () => !!profile && profile.role === "admin";   // la base ne renvoie les montants qu'à l'admin
+// une seule porte pour les 4 RPC : lien perso → team_*(p_key, …) ; une erreur renvoyée dans le corps ({error}) devient une vraie erreur
+async function rvCall(fn, args) {
+  let r; try { r = LINKED ? await sb.rpc("team_" + fn, { p_key: LINK, ...args }) : await sb.rpc(fn, args); } catch (e) { return { error: e }; }
+  if (!r.error && r.data && typeof r.data === "object" && !Array.isArray(r.data) && r.data.error) { linkProblem(r.data.error); return { error: { message: String(r.data.error) } }; }
+  return r;
+}
+const revCache = new Map();   // id -> { sig, s } ; sig change quand la vidéo bouge (tour, statut, relivraison)
+let revOff = false;           // vrai dès que la base répond « fonction absente » : on arrête d'appeler (SQL pas encore appliqué)
+const revSig = (j) => [j.qc_round, j.qc_status, j.redelivered_at, j.delivered_at].join("|");
+const rvStudio = (j) => studios.find((x) => x.id === j.studio_id) || null;
+const rvCur = (j) => (rvStudio(j) || {}).currency;
+const rvStName = (j) => (rvStudio(j) || {}).name || j.client_name || "";
+const rvData = (r) => { const d = r && r.data; return Array.isArray(d) ? d[0] : d; };
+const rvMissing = (e) => !!e && (e.code === "PGRST202" || e.status === 404 || /could not find the function|does not exist/i.test(String(e.message || "")));
+// SQL (_rev_state) : version = qc_round + 1 = version AFFICHÉE actuelle (V1 = 1re livraison). La prochaine relivraison sera donc version + 1.
+const rvNextV = (s) => Number(s.version) + 1;
+// payante ? admin : next_price > 0 ; autres : next_price est null → on déduit (aucune incluse restante, pas illimité, facturation active)
+const rvPaid = (s) => !s.unlimited && s.billing_active !== false && (s.next_price != null ? Number(s.next_price) > 0 : Number(s.included_left) === 0);
+async function rvFetch(j, force) {
+  if (revOff) return null;
+  const c = revCache.get(j.id); if (!force && c && c.sig === revSig(j)) return c.s;
+  try {
+    const r = await rvCall("job_revision_state", { p_job: j.id });
+    if (r.error) { if (rvMissing(r.error)) revOff = true; return null; }
+    const s = rvData(r); if (!s || typeof s !== "object") return null;
+    revCache.set(j.id, { sig: revSig(j), s }); return s;
+  } catch (e) { console.warn(e); return null; }
+}
+async function rvRefresh(list) {
+  if (!canRev() || revOff) return;
+  const todo = list.filter((j) => { const c = revCache.get(j.id); return !c || c.sig !== revSig(j); }); let i = 0;
+  const worker = async () => { while (i < todo.length && !revOff) { const j = todo[i++]; await rvFetch(j); rvPaint(j.id); } };
+  await Promise.all([worker(), worker(), worker(), worker()]);   // 4 appels en parallèle : une RPC par vidéo (voir PR.md : à fusionner dans la liste des jobs)
+}
+function rvBadge(s, j) {
+  const R = t("rv"), v = rvNextV(s), cur = rvCur(j), tip = `title="${esc(R.bTip)}"`;
+  if (s.unlimited) return `<span class="badge ok rvb" ${tip}>${R.bUnl}</span>`;
+  if (s.billing_active === false) return `<span class="badge rvb" ${tip}>${R.bOff(v)}</span>`;
+  if (rvPaid(s)) return `<span class="badge bill rvb" ${tip}>${s.next_price != null ? R.bBill(v, money(s.next_price, cur)) : R.bPaid(v)}</span>`;
+  return `<span class="badge rvb" ${tip}>${R.bInc(v)}</span>`;
+}
+function rvBox(s, j) {
+  const R = t("rv"); if (!s) return "";
+  const unl = !s.unlimited && s.billing_active !== false ? `<button type="button" class="btn ghost" data-rvunl="${j.id}">${R.unlBtn}</button>` : "";
+  return `<span class="rvt">${R.boxT}</span>${rvBadge(s, j)} ${unl}${rvLinesHtml(s, j)}`;
+}
+function rvPaint(id) {
+  if (!canRev()) return; const j = jobs.find((x) => x.id === id); if (!j) return;
+  const c = revCache.get(id), s = c && c.s;
+  document.querySelectorAll(`[data-revbadge="${id}"]`).forEach((el) => { el.innerHTML = s ? rvBadge(s, j) : ""; });
+  document.querySelectorAll(`[data-revbox="${id}"]`).forEach((el) => { el.innerHTML = rvBox(s, j); });
+}
+function rvOnOpen(id) { const j = jobs.find((x) => x.id === id); if (j) rvRefresh([j]); }
+// lignes extra de CETTE vidéo : fournies par job_revision_state (champ lines, avec leurs id)
+function rvLinesHtml(s, j) {
+  const R = t("rv"), cur = rvCur(j), rows = Array.isArray(s.lines) ? s.lines : [];
+  if (!rows.length) return "";
+  return `<span class="rvt" style="margin-top:8px">${R.linesT}</span>` + rows.map((e) => `<div class="rvl ${e.cancelled_at ? "off" : ""}"><span class="nm">${esc(e.label || e.kind)}</span>${e.amount != null ? `<span>${money(e.amount, cur)}</span>` : ""}${e.cancelled_at ? `<span class="badge err">${R.cancelled}</span>` : e.offered ? `<span class="badge ok">${R.offered}</span>` : e.invoiced ? `<span class="badge">${R.invoiced}</span>` : e.kind === "revisions_illimitees" ? (rvMoney() && !LINKED ? `<button type="button" class="btn ghost" data-rvoffer="${e.id}" data-rvjob="${j.id}">${R.offer}</button>` : "") : `<button type="button" class="btn ghost" data-rvcancel="${e.id}" data-rvjob="${j.id}">${R.cancel}</button>`}</div>`).join("");
+}
+async function rvAfter(id, force) {
+  const j = jobs.find((x) => x.id === id);
+  if (j) revCache.delete(id);
+  await load(false); if (!LINKED) await loadAdmin();
+  const j2 = jobs.find((x) => x.id === id); if (j2) { await rvFetch(j2, true); rvPaint(id); }
+  if (canMoney() && tab === "factures") renderFactures();
+}
+/* --- fenêtre commune --- */
+let rvPrevFocus = null;
+const rvOpen = (html) => { rvPrevFocus = document.activeElement; $("#rvBox").innerHTML = html; $("#rvm").hidden = false; };
+const rvClose = () => { $("#rvm").hidden = true; $("#rvBox").innerHTML = ""; if (rvPrevFocus && rvPrevFocus.isConnected) try { rvPrevFocus.focus(); } catch (e) {} rvPrevFocus = null; };
+document.addEventListener("keydown", (ev) => { if (ev.key === "Escape" && !$("#rvm").hidden) rvClose(); });
+$("#rvm").addEventListener("mousedown", (ev) => { if (ev.target === $("#rvm")) rvClose(); });
+function rvCopyBtn(el) {
+  const txt = document.getElementById(el.dataset.rvcopy).value, R = t("rv");
+  const ok = () => { el.textContent = R.copied; setTimeout(() => { el.textContent = R.copy; }, 1800); };
+  const fallback = () => { const ta = document.getElementById(el.dataset.rvcopy); ta.focus(); ta.select(); try { document.execCommand("copy") ? ok() : alert(R.copyFail); } catch (e) { alert(R.copyFail); } };
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(ok, fallback); else fallback();
+}
+/* --- relivrer --- */
+function rvMsg(s, j, reason) {
+  const R = t("rv"); if (reason === "erreur_ds") return { cls: "free", txt: R.dsFree };
+  const pre = reason ? "" : R.ifClient, v = rvNextV(s);
+  if (s.unlimited) return { cls: "free", txt: pre + R.unlimited };
+  if (s.billing_active === false) return { cls: "", txt: pre + R.inactive };
+  if (rvPaid(s)) return { cls: "bill", txt: pre + (s.next_price != null ? R.billed(v, money(s.next_price, rvCur(j)), rvStName(j)) : R.billedNoAmt(v)) };
+  return { cls: "free", txt: pre + R.included(v) };
+}
+// NOUVEAU PRINCIPE (10/11) : la qualité / le dispatch posent la raison en passant la vidéo « à revoir » (request_revision) ; le monteur relivre avec le seul lien (redeliver_job).
+// Le prix est annoncé ici, au moment où la raison est posée. Réservé admin / dispatcher / qc ; marche aussi depuis une vidéo « OK ».
+async function rvOpenRequest(j) {
+  if (!canRev()) return;
+  const R = t("rv");
+  rvOpen(`<div class="bh"><b id="rvT">${R.reqTitle}</b><button type="button" class="btn ghost" data-rvx aria-label="${esc(R.close)}">✕</button></div>
+    <p class="hint">${esc(j.client_name || "")} · ${esc(j.project || "")}</p>
+    <fieldset class="rvq"><legend>${R.reasonL}</legend>
+      <label><input type="radio" name="rvReason" value="client"/> ${R.client}</label>
+      <label><input type="radio" name="rvReason" value="erreur_ds"/> ${R.ds}</label></fieldset>
+    <label class="hint" for="rvNote" style="display:block;margin-bottom:6px">${R.noteL}</label>
+    <textarea class="in" id="rvNote" placeholder="${esc(R.notePh)}"></textarea>
+    <p class="rvmsg" id="rvMsg" role="status">${R.loading}</p>
+    <p class="rvmsg err" id="rvErr" role="alert" hidden></p>
+    <div class="rvact"><button type="button" class="btn ghost" data-rvx>${R.close}</button><button type="button" class="btn" id="rvGo" disabled>${R.reqSubmit}</button></div>`);
+  const box = $("#rvBox"), go = $("#rvGo"), err = $("#rvErr"); let s = null;
+  const reason = () => { const r = box.querySelector('input[name="rvReason"]:checked'); return r ? r.value : ""; };
+  const paintMsg = () => { const m = $("#rvMsg"); if (!m) return; if (!s) { m.className = "rvmsg err"; m.textContent = R.stateErr; return; } const x = rvMsg(s, j, reason()); m.className = "rvmsg " + x.cls; m.textContent = x.txt; };
+  const showErr = (m) => { err.textContent = m; err.hidden = !m; };
+  box.querySelectorAll("[data-rvx]").forEach((b) => b.addEventListener("click", rvClose));
+  box.querySelectorAll('input[name="rvReason"]').forEach((r) => r.addEventListener("change", () => { showErr(""); paintMsg(); }));
+  const first = box.querySelector('input[name="rvReason"]'); if (first) first.focus();
+  s = await rvFetch(j, true); if ($("#rvm").hidden || !$("#rvGo")) return; paintMsg(); go.disabled = !s;
+  go.addEventListener("click", async () => {
+    const why = reason(); if (!why) { showErr(R.reasonReq); return; }
+    showErr(""); go.disabled = true;
+    const r = await rvCall("request_revision", { p_job: j.id, p_reason: why, p_note: $("#rvNote").value.trim() || null });   // la base passe la vidéo « à revoir », pose la raison et facture si dû
+    if (r.error) { showErr(errText(r.error)); go.disabled = false; return; }
+    revCache.delete(j.id); rvClose(); await load(false); if (!LINKED) await loadAdmin();
+    const jn = jobs.find((x) => x.id === j.id); if (jn) { await rvFetch(jn, true); rvPaint(j.id); }
+    if (canMoney() && tab === "factures") renderFactures();
+    setFb(j.id, "qc", true, R.reqSent, 4000);
+  });
+}
+// relivrer : plus de choix de raison, seulement le lien Frame.io. La raison posée par la qualité est rappelée (sans prix hors admin).
+async function rvOpenRedeliver(j, reopen) {
+  const R = t("rv"), frame0 = String(j.frameio_url || "");
+  // raison posée par la qualité : lue dans job_revision_state().pending (jamais montrée au monteur : la base la lui refuse)
+  const st = canRev() ? await rvFetch(j, true) : null, pd = st && st.pending;
+  const recall = pd ? `<p class="rvmsg">${R.recall}<b>${esc(pd.reason === "erreur_ds" ? R.ds : R.client)}</b>${pd.requested_by ? ` · ${esc(pd.requested_by)}` : ""}${pd.note ? ` · ${esc(pd.note)}` : ""}</p>` : "";
+  rvOpen(`<div class="bh"><b id="rvT">${reopen ? R.reopenTitle : R.title}</b><button type="button" class="btn ghost" data-rvx aria-label="${esc(R.close)}">✕</button></div>
+    <p class="hint">${esc(j.client_name || "")} · ${esc(j.project || "")}</p>${recall}
+    <label class="hint" for="rvFrame" style="display:block;margin-bottom:6px">${R.frameL}</label>
+    <input class="in" id="rvFrame" type="url" inputmode="url" autocomplete="off" placeholder="${esc(t("frameioPh"))}" value="${esc(frame0)}"/>
+    <p class="rvmsg err" id="rvErr" role="alert" hidden></p>
+    <div class="rvact"><button type="button" class="btn ghost" data-rvx>${R.close}</button><button type="button" class="btn" id="rvGo">${reopen ? R.reopenSubmit : R.submit}</button></div>`);
+  const box = $("#rvBox"), go = $("#rvGo"), err = $("#rvErr");
+  const showErr = (m) => { err.textContent = m; err.hidden = !m; };
+  box.querySelectorAll("[data-rvx]").forEach((b) => b.addEventListener("click", rvClose));
+  $("#rvFrame").focus();
+  go.addEventListener("click", async () => {
+    const frame = normFrame($("#rvFrame").value);
+    if (!(reopen && !frame) && !FRAME_OK(frame)) { showErr(R.frameReq); $("#rvFrame").focus(); return; }   // rouverture d'assemblage : le lien FINAL viendra à la livraison, il peut rester vide
+    showErr(""); go.disabled = true;
+    const r = await rvCall("redeliver_job", { p_job: j.id, p_frameio_url: frame || null, p_reopen_assembly: !!reopen });   // la base pose redelivered_at / qc_round / lien / statut : aucun UPDATE direct ici
+    if (r.error) { showErr(errText(r.error)); go.disabled = false; return; }
+    const res = rvData(r) || {}; revCache.delete(j.id);
+    await load(false); if (!LINKED && canRev()) await loadAdmin();
+    const jn = jobs.find((x) => x.id === j.id); if (jn && canRev()) { await rvFetch(jn, true); rvPaint(j.id); }
+    if (canMoney() && tab === "factures") renderFactures();
+    if (canRev() && res.billed) {   // relivraison facturée : texte prêt à copier (le vrai message automatique viendra dans une 2e PR)
+      const cur = rvCur(j), v = res.version, hasAmt = rvMoney() && res.amount != null && Number(res.amount) > 0, amt = Number(res.amount);
+      const fmtEn = (x) => (cur === "USD" ? "$" : "€") + Number(x).toFixed(2);
+      rvOpen(`<div class="bh"><b id="rvT">${R.doneT(v)}</b><button type="button" class="btn ghost" data-rvx aria-label="${esc(R.close)}">✕</button></div>
+        <p class="rvmsg bill">${esc(hasAmt ? R.billed(v, money(amt, cur), rvStName(j)) : R.billedNoAmt(v))}</p><p class="hint">${R.copyT}</p>
+        <div class="rvcp"><b>FR</b><textarea class="in" id="rvTxtFr" readonly>${esc(R.clientFr(v, hasAmt ? money(amt, cur) : ""))}</textarea><button type="button" class="btn" data-rvcopy="rvTxtFr">${R.copy}</button></div>
+        <div class="rvcp"><b>EN</b><textarea class="in" id="rvTxtEn" readonly>${esc(R.clientEn(v, hasAmt ? fmtEn(amt) : ""))}</textarea><button type="button" class="btn" data-rvcopy="rvTxtEn">${R.copy}</button></div>
+        <div class="rvact"><button type="button" class="btn ghost" data-rvx>${R.close}</button></div>`);
+      $("#rvBox").querySelectorAll("[data-rvx]").forEach((b) => b.addEventListener("click", rvClose));
+      $("#rvBox").querySelectorAll("[data-rvcopy]").forEach((b) => b.addEventListener("click", () => rvCopyBtn(b)));
+    } else { rvClose(); setFb(j.id, "step", true, R.sent, 4000); }
+  });
+}
+/* --- annuler une ligne auto (raison obligatoire) --- */
+function rvOpenCancel(lineId, jobId, offer) {
+  const R = t("rv");
+  rvOpen(`<div class="bh"><b id="rvT">${offer ? R.offerT : R.cancelT}</b><button type="button" class="btn ghost" data-rvx aria-label="${esc(R.close)}">✕</button></div>
+    <p class="hint">${offer ? R.offerHint : R.cancelHint}</p><textarea class="in" id="rvWhy" placeholder="${esc(R.reasonL)}"></textarea>
+    <p class="rvmsg err" id="rvErr" role="alert" hidden></p>
+    <div class="rvact"><button type="button" class="btn ghost" data-rvx>${R.back}</button><button type="button" class="btn danger" id="rvGo">${offer ? R.offerDo : R.cancelDo}</button></div>`);
+  const box = $("#rvBox"), err = $("#rvErr"), go = $("#rvGo");
+  box.querySelectorAll("[data-rvx]").forEach((b) => b.addEventListener("click", rvClose)); $("#rvWhy").focus();
+  go.addEventListener("click", async () => {
+    const why = $("#rvWhy").value.trim(); if (!why) { err.textContent = R.reasonReq; err.hidden = false; return; }
+    go.disabled = true; const r = await rvCall(offer ? "offer_extra_line" : "cancel_extra_line", { p_line: lineId, p_reason: why });
+    if (r.error) { err.textContent = !LINKED && /^REFUSE/.test(String(r.error.message || "")) ? R.needNominative : errText(r.error); err.hidden = false; go.disabled = false; return; }
+    rvClose(); if (jobId) await rvAfter(jobId); else { if (!LINKED) await loadAdmin(); if (tab === "factures") renderFactures(); }
+  });
+}
+async function rvCancelRequest(id, btn) {   // annule la demande « à revoir » : la base remet l'état d'avant
+  const R = t("rv"); if (!confirm(R.cancelReqAsk)) return;
+  btn.disabled = true; const r = await rvCall("cancel_revision_request", { p_job: id });
+  if (r.error) { alert(errText(r.error)); if (btn.isConnected) btn.disabled = false; return; }
+  revCache.delete(id); await load(false); if (!LINKED) await loadAdmin(); setFb(id, "qc", true, R.cancelReqDone, 4000);
+}
+async function rvUnlimited(id, btn) {
+  const R = t("rv"), j = jobs.find((x) => x.id === id); if (!j) return;
+  if (!confirm(R.unlAsk(rvStName(j)))) return;
+  btn.disabled = true; const r = await rvCall("set_unlimited_revisions", { p_job: id });
+  if (r.error) { alert(errText(r.error)); if (btn.isConnected) btn.disabled = false; return; }
+  const d = rvData(r) || {}, n = Number(d.cancelled_lines || 0);
+  await rvAfter(id); setFb(id, "step", true, R.unlDone(n, d.amount != null ? money(d.amount, rvCur(j)) : ""), 5000);
+}
+// clics délégués : le tableau et l'onglet Factures sont redessinés souvent
+document.addEventListener("click", (ev) => {
+  const u = ev.target.closest("[data-rvunl]"); if (u && canRev()) { rvUnlimited(u.dataset.rvunl, u); return; }
+  const c = ev.target.closest("[data-rvcancel]"); if (c && canRev()) { rvOpenCancel(c.dataset.rvcancel, c.dataset.rvjob); return; }
+  const o = ev.target.closest("[data-rvoffer]"); if (o && rvMoney() && !LINKED) { rvOpenCancel(o.dataset.rvoffer, o.dataset.rvjob, true); return; }
+  const q = ev.target.closest("[data-rvcancelreq]"); if (q && canRev()) rvCancelRequest(q.dataset.rvcancelreq, q);
+});
 
 /* ===== onglets admin : Tarifs, Factures ===== */
 function renderTabs() {
@@ -1894,12 +2141,13 @@ function renderFactures() {
   const rows = invoicesAll.map((i) => `<tr><td class="mono" style="color:var(--amber);font-size:12px;letter-spacing:0">${esc(i.number)}</td><td>${esc(stName(i.studio_id))}</td><td>${fmtD(i.period_start + "T12:00:00")} → ${fmtD(i.period_end + "T12:00:00")}</td><td><b>${money(i.total, i.currency)}</b></td>
     <td><span class="badge ${i.status === "payee" ? "ok" : i.status === "annulee" ? "err" : ""}">${i.status === "payee" ? t("paid") : i.status === "annulee" ? t("cancel") : t("issued")}${i.paid_at ? " · " + fmtD(i.paid_at) : ""}</span></td><td>${i.sent_at ? "✓ " + fmtDT(i.sent_at) : "—"}${i.reminder_count ? ` · 🔔 ${i.reminder_count}` : ""}</td>
     <td style="white-space:nowrap">${i.pdf_url ? `<a class="btn ghost" href="${esc(i.pdf_url)}" target="_blank" rel="noopener">PDF</a> ` : ""}${i.status === "emise" ? `<button type="button" class="btn" data-paid="${i.id}">${t("markPaid")}</button> <button type="button" class="btn ghost" data-cancel="${i.id}">${t("cancel")}</button>` : ""}</td></tr>`).join("");
-  const pend = extras.filter((e) => !e.invoice_id);
+  const pend = extras.filter((e) => !e.invoice_id && !e.cancelled_at);   // 10/11 : une ligne annulée ne se facture plus
+  const RV = t("rv");
   $("#admin").innerHTML = `<div class="panel"><p style="font-size:12px;color:var(--taupe);margin:0 0 12px">${t("factHint")}</p>
       <table class="adm"><thead><tr>${t("cols").map((c) => `<th>${c}</th>`).join("")}</tr></thead><tbody>${rows || `<tr><td colspan="7" style="color:var(--taupe)">${t("none")}</td></tr>`}</tbody></table></div>
     <div class="panel"><h3>${t("extrasTitle")}</h3>
       <div class="row-form"><label>${t("clientSel")}<select class="in" id="xStudio">${studios.map((x) => `<option value="${x.id}">${esc(x.name)}</option>`).join("")}</select></label><label>${t("label")}<input class="in" id="xLabel"/></label><label>${t("qty")}<input class="in" id="xQty" type="number" value="1" min="0.5" step="0.5"/></label><label>${t("unit")}<input class="in" id="xPrice" type="number" step="0.01"/></label><label style="flex-direction:row;align-items:center;gap:6px"><input type="checkbox" id="xOff"/> ${t("offered")}</label><button type="button" class="btn" id="xAdd">${t("add")}</button></div>
-      <table class="adm" style="margin-top:12px"><thead><tr><th>${t("clientSel")}</th><th>${t("label")}</th><th>${t("qty")}</th><th>${t("unit")}</th><th>${t("pending")}</th><th></th></tr></thead><tbody>${pend.map((e) => `<tr><td>${esc(stName(e.studio_id))}</td><td>${esc(e.label)}${e.offered ? ` <span class="badge ok">${t("offered")}</span>` : ""}</td><td>${e.qty}</td><td>${money(e.unit_price, studios.find((x) => x.id === e.studio_id)?.currency)}</td><td>${fmtDT(e.created_at)}</td><td><button type="button" class="btn ghost" data-del="${e.id}">${t("del")}</button></td></tr>`).join("") || `<tr><td colspan="6" style="color:var(--taupe)">${t("none")}</td></tr>`}</tbody></table></div>`;
+      <table class="adm" style="margin-top:12px"><thead><tr><th>${t("clientSel")}</th><th>${t("label")}</th><th>${t("qty")}</th><th>${t("unit")}</th><th>${t("pending")}</th><th></th></tr></thead><tbody>${pend.map((e) => `<tr><td>${esc(stName(e.studio_id))}</td><td>${esc(e.label)}${e.offered ? ` <span class="badge ok">${t("offered")}</span>` : ""}</td><td>${e.qty}</td><td>${money(e.unit_price, studios.find((x) => x.id === e.studio_id)?.currency)}</td><td>${fmtDT(e.created_at)}</td><td>${e.kind ? `<span class="badge">${RV.auto}</span> ${canRev() && e.kind !== "revisions_illimitees" ? `<button type="button" class="btn ghost" data-rvcancel="${e.id}" data-rvjob="${e.job_id || ""}">${RV.cancel}</button>` : ""}` : `<button type="button" class="btn ghost" data-del="${e.id}">${t("del")}</button>`}</td></tr>`).join("") || `<tr><td colspan="6" style="color:var(--taupe)">${t("none")}</td></tr>`}</tbody></table></div>`;
   $("#admin").querySelectorAll("[data-paid]").forEach((b) => b.addEventListener("click", async () => { const { error } = await sb.from("invoices").update({ status: "payee", paid_at: new Date().toISOString() }).eq("id", b.dataset.paid); if (error) alert(error.message); await loadAdmin(); renderFactures(); }));
   $("#admin").querySelectorAll("[data-cancel]").forEach((b) => b.addEventListener("click", async () => { if (!confirm(t("cancel") + " ?")) return; const { error } = await sb.from("invoices").update({ status: "annulee" }).eq("id", b.dataset.cancel); if (error) alert(error.message); await loadAdmin(); renderFactures(); }));
   $("#admin").querySelectorAll("[data-del]").forEach((b) => b.addEventListener("click", async () => { await sb.from("extra_lines").delete().eq("id", b.dataset.del); await loadAdmin(); renderFactures(); }));
