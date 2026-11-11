@@ -31,8 +31,8 @@ window.DS_PORTFOLIO = {
 
   // Formules : mêmes noms partout (dépôt, portfolio privé, showreel)
   tiers: [
-    { slug: "standard", fr: ["Standard", "Montage propre et rythmé, habillage simple, son mixé."], en: ["Standard", "Clean, paced edit, simple graphics, mixed sound."] },
-    { slug: "premium", fr: ["Premium", "Standard + ouverture percutante de 20 à 30 s, titres animés, sound design."], en: ["Premium", "Standard + a punchy 20–30 s cold open, motion titles, sound design."] },
+    { slug: "standard", fr: ["Standard", "Montage propre et rythmé, habillage simple, son mixé, intro simple."], en: ["Standard", "Clean, paced edit, simple graphics, mixed sound, simple intro."] },
+    { slug: "premium", fr: ["Premium", "Standard + ouverture percutante de 45 s, titres animés, sound design."], en: ["Premium", "Standard + a punchy 45 s cold open, motion titles, sound design."] },
     { slug: "signature", fr: ["Signature", "Premium + intro façon « Diary of a CEO », b-roll premium, livraison prioritaire."], en: ["Signature", "Premium + a “Diary of a CEO”-style intro, premium b-roll, priority delivery."] },
   ],
 
