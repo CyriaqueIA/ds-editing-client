@@ -251,7 +251,7 @@ let toastTimer = null;
 function toast(x) { const t = $("toast"); t.textContent = x; t.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true; }, 3800); }
 
 let sb = null;
-const S = { me: null, members: [], deals: [], contacts: new Map(), tab: "fiches", q: "", stage: "open", family: "", market: "", setter: "", quick: "", mine: false, open: null, acts: null, more: {}, busy: false, note: "", sel: null, actsFor: null, week: [], jourMore: {}, newOpen: false, nf: null };
+const S = { me: null, members: [], deals: [], contacts: new Map(), tab: "fiches", q: "", stage: "open", family: "", market: "", setter: "", quick: "", mine: false, open: null, acts: null, more: {}, busy: false, note: "", sel: null, actsFor: null, week: [], jourMore: {}, newOpen: false, nf: null, onoff: [] };
 const canEdit = () => S.me && (S.me.role === "admin" || S.me.role === "sales");
 const isOpen = (d) => OPEN.includes(d.stage);
 const ownerName = (d) => (S.members.find((m) => m.user_id === d.owner_id)?.display_name) || cap(d.setter) || "Non attribué";
@@ -270,6 +270,49 @@ async function load() {
   S.deals = deals.data; S.members = members.data; S.week = week;
   S.contacts = new Map();
   for (const c of contacts.data) { if (!S.contacts.has(c.company_id)) S.contacts.set(c.company_id, []); S.contacts.get(c.company_id).push(c); }
+  S.onoff = await loadOnoff();
+}
+/* Appels Onoff dont le numéro n'est pas dans le CRM (onoff_v1.sql). Lecture réservée aux comptes nominatifs : sinon liste vide. */
+async function loadOnoff() {
+  if (!canEdit()) return [];
+  const { data, error } = await sb.from("onoff_calls").select("id,started_at,received_at,external_number,external_name,external_company,direction,outcome,duration_s,author_label,summary,notes").is("activity_id", null).order("received_at", { ascending: false }).limit(50);
+  return error ? [] : data;
+}
+async function linkOnoff(call, companyId) {
+  if (!companyId) { toast("Choisis d'abord la société."); return; }
+  if (S.busy) return; S.busy = true;
+  try {
+    const { error } = await sb.rpc("crm_onoff_link", { p_call: call.id, p_company: companyId });
+    if (error) throw error;
+    S.onoff = S.onoff.filter((c) => c.id !== call.id);
+    S.week = await loadWeek();
+    toast("Appel rattaché à la fiche.");
+  } catch (e) { toast("Rattachement impossible : " + (e.message || e)); }
+  S.busy = false; render();
+}
+function onoffPanel() {
+  if (!canEdit() || !S.onoff || !S.onoff.length) return null;
+  const companies = [...new Map(S.deals.map((d) => [d.company_id, d.company.name])).entries()].sort((a, b) => a[1].localeCompare(b[1]));
+  const rows = S.onoff.map((c) => {
+    let pick = "";
+    const who = [c.external_name, c.external_company].filter(Boolean).join(" · ");
+    const bits = [frDate(c.started_at || c.received_at), c.direction === "in" ? "reçu" : "passé", c.outcome, c.duration_s ? `${Math.max(1, Math.round(c.duration_s / 60))} min` : null, c.author_label].filter(Boolean).join(" · ");
+    const text = c.summary || c.notes;
+    return h("div", { class: "qrow", style: "flex-direction:column;align-items:stretch;gap:6px;padding:10px" }, [
+      h("div", null, [h("b", { text: c.external_number || "Numéro masqué" }), who ? h("span", { class: "muted", text: " · " + who }) : null]),
+      h("small", { class: "muted", text: bits }),
+      text ? h("div", { class: "body clip small", text }) : null,
+      h("div", { style: "display:flex;gap:8px;flex-wrap:wrap" }, [
+        h("select", { class: "field", "aria-label": "Société de cet appel", style: "flex:1;min-width:180px", onchange: (ev) => { pick = ev.target.value; } },
+          [h("option", { value: "" }, ["Choisir la société…"]), ...companies.map(([id, name]) => h("option", { value: id }, [name]))]),
+        h("button", { type: "button", class: "btn", onclick: () => linkOnoff(c, pick) }, ["Rattacher"]),
+      ]),
+    ]);
+  });
+  return h("div", { class: "panel" }, [
+    h("div", { class: "ph" }, [h("b", { text: "Appels Onoff à rattacher" }), h("span", { class: "muted small", text: `${S.onoff.length} appel${S.onoff.length > 1 ? "s" : ""} avec un numéro absent du CRM` })]),
+    h("div", null, rows),
+  ]);
 }
 function monday() { const d = new Date(); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); return d; }
 async function loadWeek() {
@@ -589,7 +632,8 @@ function vJour() {
   return h("div", { style: "display:flex;flex-direction:column;gap:14px" }, [
     h("div", { class: "vh" }, [h("h2", { text: "Ma journée · " + S.me.display_name }), h("span", { class: "muted small", text: weekLabel() })]),
     tiles(stats(S.me.user_id)),
-    h("p", { class: "hint", text: "Les six chiffres comptent ce qui est fait dans ce CRM depuis lundi. L'appel en un clic, le résultat en deux clics et la règle des 4 tentatives arrivent à la tranche 2." }),
+    h("p", { class: "hint", text: "Les six chiffres comptent ce qui est fait dans ce CRM depuis lundi. Les appels Onoff s'ajoutent tout seuls à la fiche dont le numéro correspond." }),
+    onoffPanel(),
     h("div", { class: "day" }, [
       h("div", { class: "panel" }, [h("div", { class: "ph" }, [h("b", { text: "File du jour" }), h("span", { class: "muted small", text: `${all.length} fiche${all.length > 1 ? "s" : ""}${late ? " · " + late + " en retard" : ""}` })]), list.length ? h("div", null, list) : h("div", { class: "empty", text: "La file est vide. Aucune action due aujourd'hui." })]),
       h("div", { class: "panel" }, [sel ? fiche(sel, true) : h("div", { class: "empty", text: "Choisis une fiche dans la file." })]),
