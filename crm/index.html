@@ -114,6 +114,11 @@ td .sub{display:block;color:var(--muted);font-size:12.5px;max-width:340px;overfl
 .people{display:flex;flex-direction:column;gap:8px}
 .person{background:var(--surface);border-radius:10px;padding:9px 12px;font-size:13.5px;overflow-wrap:anywhere}
 .person b{font-weight:600}
+.person{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.person .pedit{all:unset;cursor:pointer;font-size:12.5px;font-weight:600;color:var(--accent);flex:none;padding:2px 0}
+.person .pedit:focus-visible,.addc:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.addc{all:unset;cursor:pointer;font-size:13px;font-weight:600;color:var(--accent);padding:4px 0;align-self:flex-start}
+@media (max-width:460px){.nf.ce{grid-template-columns:1fr}}
 .box{border:1px solid var(--line-strong);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:10px}
 /* nouvelle fiche (setters) */
 .nf{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px}
@@ -251,7 +256,7 @@ let toastTimer = null;
 function toast(x) { const t = $("toast"); t.textContent = x; t.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true; }, 3800); }
 
 let sb = null;
-const S = { me: null, members: [], deals: [], contacts: new Map(), tab: "fiches", q: "", stage: "open", family: "", market: "", setter: "", quick: "", mine: false, open: null, acts: null, more: {}, busy: false, note: "", sel: null, actsFor: null, week: [], jourMore: {}, newOpen: false, nf: null, onoff: [] };
+const S = { me: null, members: [], deals: [], contacts: new Map(), tab: "fiches", q: "", stage: "open", family: "", market: "", setter: "", quick: "", mine: false, open: null, acts: null, more: {}, busy: false, note: "", sel: null, actsFor: null, week: [], jourMore: {}, newOpen: false, nf: null, onoff: [], ce: null };
 const canEdit = () => S.me && (S.me.role === "admin" || S.me.role === "sales");
 const isOpen = (d) => OPEN.includes(d.stage);
 const ownerName = (d) => (S.members.find((m) => m.user_id === d.owner_id)?.display_name) || cap(d.setter) || "Non attribué";
@@ -483,11 +488,17 @@ function fiche(d, inline) {
     cell("Dernier contact", d.last_contact_at ? frDate(d.last_contact_at) : null),
     cell("Raison de la perte", d.lost_reason),
   ]));
-  if (people.length) kids.push(h("div", null, [h("span", { class: "lbl", text: people.length > 1 ? "Contacts" : "Contact" }), h("div", { class: "people", style: "margin-top:6px" }, people.map((p) => h("div", { class: "person" }, [
-    h("b", { text: [p.first_name, p.last_name].filter(Boolean).join(" ") || "Sans nom" }), p.job_title ? ` · ${p.job_title}` : "", h("br"),
-    h("span", { class: "muted", text: [p.email, p.phone].filter(Boolean).join(" · ") || "Pas de coordonnées" }),
-    p.linkedin_url ? h("span", null, [" · ", h("a", { href: p.linkedin_url, target: "_blank", rel: "noopener" }, ["LinkedIn"])]) : null,
-  ])))]));
+  const ce = edit && S.ce && S.ce.company_id === d.company_id ? S.ce : null;
+  if (people.length || edit) kids.push(h("div", null, [h("span", { class: "lbl", text: people.length > 1 ? "Contacts" : "Contact" }), h("div", { class: "people", style: "margin-top:6px" }, [
+    ...people.map((p) => (ce && ce.id === p.id ? contactForm(d, ce) : h("div", { class: "person" }, [h("div", { style: "min-width:0" }, [
+      h("b", { text: [p.first_name, p.last_name].filter(Boolean).join(" ") || "Sans nom" }), p.job_title ? ` · ${p.job_title}` : "", h("br"),
+      h("span", { class: "muted", text: [p.email, p.phone].filter(Boolean).join(" · ") || "Pas de coordonnées" }),
+      p.linkedin_url ? h("span", null, [" · ", h("a", { href: p.linkedin_url, target: "_blank", rel: "noopener" }, ["LinkedIn"])]) : null,
+    ]), edit && !ce ? h("button", { type: "button", class: "pedit", "aria-label": `Modifier ${fullName(p) || "ce contact"}`, onclick: () => editContact(p) }, ["Modifier"]) : null]))),
+    ce && !ce.id ? contactForm(d, ce) : null,
+    edit && !ce ? h("button", { type: "button", class: "addc", onclick: () => editContact(null, d.company_id) }, ["+ Ajouter un contact"]) : null,
+    !people.length && !ce ? h("p", { class: "muted small", text: "Aucun contact sur cette fiche." }) : null,
+  ])]));
   if (isOpen(d)) {
     if (edit) {
       const txt = h("input", { class: "field grow", type: "text", id: "nextText", "aria-label": "Prochaine action", placeholder: "Prochaine action", value: d.next_action || "" });
@@ -509,8 +520,94 @@ function fiche(d, inline) {
   kids.push(acts == null ? h("p", { class: "muted small", text: "Chargement…" }) : acts.length ? h("ul", { class: "tl" }, acts.map(actLine)) : h("p", { class: "muted small", text: "Aucun échange enregistré." }));
   return h("div", { class: "fiche" }, kids);
 }
-function openFiche(id) { S.open = id; S.newOpen = false; S.note = ""; ensureActs(id); render(); }
-function closeFiche() { S.open = null; S.newOpen = false; S.note = ""; render(); }
+function openFiche(id) { S.open = id; S.newOpen = false; S.note = ""; S.ce = null; ensureActs(id); render(); }
+function closeFiche() { S.open = null; S.newOpen = false; S.note = ""; S.ce = null; render(); }
+
+/* ---------- contacts d'une fiche : ajouter / modifier (12/11) ----------
+   Policies crm_v1 : insert et update de crm_contacts ouverts à admin/sales. Le téléphone est enregistré au format
+   international (+33…) quand on sait le lire : le webhook Onoff compare les 9 derniers chiffres (crm_phone_key),
+   donc un numéro bien rangé ici = les prochains appels se rattachent tout seuls à la fiche. */
+const CC = { france_metropole: "33", belgique: "32", suisse: "41", uk: "44", usa: "1", quebec: "1" };
+const CE_FIELDS = [["first_name", "Prénom"], ["last_name", "Nom"], ["job_title", "Fonction"], ["phone", "Téléphone"], ["email", "E-mail"]];
+function e164(raw, market) {
+  const s = (raw || "").trim();
+  if (!s) return null;
+  let d = s.replace(/[^\d+]/g, "");
+  if (d.startsWith("00")) d = "+" + d.slice(2);
+  if (d.startsWith("+")) { d = "+" + d.slice(1).replace(/\D/g, ""); return d.length >= 9 && d.length <= 16 ? d : s; }
+  const cc = CC[market || "france_metropole"];
+  if (cc === "1") { if (d.length === 10) return "+1" + d; if (d.length === 11 && d[0] === "1") return "+" + d; return s; }
+  if (cc === "33" && d.length === 11 && d.startsWith("33")) return "+" + d;
+  if (cc === "33" && !(d.length === 10 && d[0] === "0")) return s;
+  if (cc && d[0] === "0" && d.length >= 9 && d.length <= 11) return "+" + cc + d.slice(1);
+  return s;   // format inconnu (marché « autre », numéro court…) : gardé tel quel
+}
+const phoneKey = (p) => { const x = String(p || "").replace(/\D/g, ""); return x.length >= 8 ? x.slice(-9) : null; };   // = crm_phone_key() en base
+function editContact(p, companyId) {
+  S.ce = p ? { id: p.id, company_id: p.company_id, f: Object.fromEntries(CE_FIELDS.map(([k]) => [k, p[k] || ""])) }
+           : { id: null, company_id: companyId, f: Object.fromEntries(CE_FIELDS.map(([k]) => [k, ""])) };
+  render();
+  setTimeout(() => { const x = document.getElementById("ce_first_name"); if (x) x.focus(); }, 0);
+}
+function contactForm(d, ce) {
+  const f = ce.f, inp = (k, label, attrs, wide) => h("label", { class: wide ? "w" : null }, [label,
+    h("input", Object.assign({ class: "field", type: "text", id: "ce_" + k, value: f[k], oninput: (ev) => { f[k] = ev.target.value; } }, attrs || {}))]);
+  const save = () => saveContact(d, ce);
+  const box = h("div", { class: "box", role: "group", "aria-label": ce.id ? "Modifier le contact" : "Nouveau contact",
+    onkeydown: (ev) => { if (ev.key === "Escape") { ev.stopPropagation(); S.ce = null; render(); } else if (ev.key === "Enter" && ev.target.tagName === "INPUT") save(); } }, [
+    h("span", { class: "lbl", text: ce.id ? "Modifier le contact" : "Nouveau contact" }),
+    h("div", { class: "nf ce" }, [
+      inp("first_name", "Prénom", { placeholder: "Morgan", autocomplete: "off" }),
+      inp("last_name", "Nom", { placeholder: "Prudhomme", autocomplete: "off" }),
+      inp("job_title", "Fonction", { placeholder: "Fondateur" }, true),
+      inp("phone", "Téléphone", { type: "tel", placeholder: "06 12 34 56 78 ou +33 6…", inputmode: "tel" }),
+      inp("email", "E-mail", { type: "email", placeholder: "morgan@studio.fr", inputmode: "email" }),
+    ]),
+    h("p", { class: "muted small", text: "Le numéro est rangé au format +33… : les prochains appels Onoff de ce numéro arrivent seuls sur la fiche." }),
+    h("div", { class: "rowf" }, [
+      h("button", { type: "button", class: "btn pri", disabled: S.busy, onclick: save }, [S.busy ? "Enregistrement…" : "Enregistrer"]),
+      h("button", { type: "button", class: "btn", onclick: () => { S.ce = null; render(); } }, ["Annuler"]),
+    ]),
+  ]);
+  return box;
+}
+async function saveContact(d, ce) {
+  if (S.busy) return;
+  const t = (k) => (ce.f[k] || "").trim() || null;
+  const row = { first_name: t("first_name"), last_name: t("last_name"), job_title: t("job_title"), email: t("email"), phone: e164(ce.f.phone, d.company.market) };
+  if (row.email) row.email = row.email.toLowerCase();
+  if (!row.first_name && !row.last_name && !row.phone && !row.email) { toast("Il faut au moins un nom, un téléphone ou un e-mail."); return; }
+  if (row.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(row.email)) { toast("L'e-mail ne semble pas valide."); return; }
+  const list = S.contacts.get(d.company_id) || [], old = ce.id ? list.find((p) => p.id === ce.id) : null;
+  const changed = old ? CE_FIELDS.filter(([k]) => (old[k] || null) !== row[k]) : [];
+  if (old && !changed.length) { S.ce = null; render(); toast("Rien n'a changé."); return; }
+  S.busy = true; render();
+  let p = null, linked = 0;
+  try {
+    p = ce.id ? (await must(sb.from("crm_contacts").update(row).eq("id", ce.id).select("*").single())).data
+              : (await must(sb.from("crm_contacts").insert({ company_id: d.company_id, ...row }).select("*").single())).data;
+    S.contacts.set(d.company_id, ce.id ? list.map((x) => (x.id === p.id ? p : x)) : [...list, p]);
+    S.ce = null;
+    const who = fullName(p) || p.phone || p.email || "sans nom";
+    const body = old
+      ? `Contact modifié : ${who}\n` + changed.map(([k, l]) => `${l} : ${old[k] || "vide"} → ${p[k] || "vide"}`).join("\n")
+      : `Contact ajouté : ${[who, p.job_title, p.phone, p.email].filter(Boolean).join(" · ")}`;
+    const act = await sb.from("crm_activities").insert({ deal_id: d.id, company_id: d.company_id, contact_id: p.id, kind: "note", body, author_id: S.me.user_id, author_label: S.me.display_name });
+    if (act.error) toast("Contact enregistré, mais pas la ligne de chronologie : " + act.error.message);
+    // Appels Onoff déjà en attente (« à rattacher ») dont le numéro correspond : rattachés tout de suite à cette fiche.
+    const key = phoneKey(p.phone);
+    if (key && (!old || phoneKey(old.phone) !== key)) {
+      for (const c of S.onoff.filter((x) => phoneKey(x.external_number) === key)) {
+        const { error } = await sb.rpc("crm_onoff_link", { p_call: c.id, p_company: d.company_id, p_contact: p.id, p_deal: d.id });
+        if (!error) { linked++; S.onoff = S.onoff.filter((x) => x.id !== c.id); }
+      }
+      if (linked) S.week = await loadWeek();
+    }
+    S.acts = await loadActs(d);
+    if (!act.error) toast((old ? "Contact modifié." : "Contact ajouté.") + (linked ? ` ${linked} appel${linked > 1 ? "s" : ""} Onoff rattaché${linked > 1 ? "s" : ""} à la fiche.` : ""));
+  } catch (e) { toast((p ? "Contact enregistré, suite incomplète : " : "Contact non enregistré : ") + (e.message || e)); }
+  S.busy = false; render();
+}
 
 /* ---------- nouvelle fiche (setters : société + deal + contact en une fois ; policies crm_v1 : insert admin/sales) ---------- */
 const VERDICTS = [["icp", "ICP"], ["attente", "En attente"], ["sortir", "Sortir"]];
