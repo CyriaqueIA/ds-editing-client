@@ -118,6 +118,16 @@ td .sub{display:block;color:var(--muted);font-size:12.5px;max-width:340px;overfl
 .person .pedit{all:unset;cursor:pointer;font-size:12.5px;font-weight:600;color:var(--accent);flex:none;padding:2px 0}
 .person .pedit:focus-visible,.addc:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .addc{all:unset;cursor:pointer;font-size:13px;font-weight:600;color:var(--accent);padding:4px 0;align-self:flex-start}
+/* Lusha (12/11) : bouton par contact + propositions sous le contact */
+.pacts{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex:none}
+.person .pedit[disabled]{opacity:.45;cursor:not-allowed}
+.lu{font-size:13.5px}
+.lu fieldset{border:0;margin:0;padding:0;display:flex;flex-direction:column;gap:4px;min-width:0}
+.lu legend{padding:0;margin-bottom:2px}
+.lu label{display:flex;gap:8px;align-items:flex-start;overflow-wrap:anywhere;cursor:pointer}
+.lu input{margin:3px 0 0;flex:none;accent-color:var(--accent)}
+.lu .dnc{color:var(--err);font-weight:600}
+.lu .err{color:var(--err)}
 @media (max-width:460px){.nf.ce{grid-template-columns:1fr}}
 .box{border:1px solid var(--line-strong);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:10px}
 /* nouvelle fiche (setters) */
@@ -256,7 +266,7 @@ let toastTimer = null;
 function toast(x) { const t = $("toast"); t.textContent = x; t.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true; }, 3800); }
 
 let sb = null;
-const S = { me: null, members: [], deals: [], contacts: new Map(), tab: "fiches", q: "", stage: "open", family: "", market: "", setter: "", quick: "", mine: false, open: null, acts: null, more: {}, busy: false, note: "", sel: null, actsFor: null, week: [], jourMore: {}, newOpen: false, nf: null, onoff: [], ce: null };
+const S = { me: null, members: [], deals: [], contacts: new Map(), tab: "fiches", q: "", stage: "open", family: "", market: "", setter: "", quick: "", mine: false, open: null, acts: null, more: {}, busy: false, note: "", sel: null, actsFor: null, week: [], jourMore: {}, newOpen: false, nf: null, onoff: [], ce: null, lu: {}, luBusy: null };
 const canEdit = () => S.me && (S.me.role === "admin" || S.me.role === "sales");
 const isOpen = (d) => OPEN.includes(d.stage);
 const ownerName = (d) => (S.members.find((m) => m.user_id === d.owner_id)?.display_name) || cap(d.setter) || "Non attribué";
@@ -490,11 +500,14 @@ function fiche(d, inline) {
   ]));
   const ce = edit && S.ce && S.ce.company_id === d.company_id ? S.ce : null;
   if (people.length || edit) kids.push(h("div", null, [h("span", { class: "lbl", text: people.length > 1 ? "Contacts" : "Contact" }), h("div", { class: "people", style: "margin-top:6px" }, [
-    ...people.map((p) => (ce && ce.id === p.id ? contactForm(d, ce) : h("div", { class: "person" }, [h("div", { style: "min-width:0" }, [
+    ...people.map((p) => (ce && ce.id === p.id ? contactForm(d, ce) : h("div", { class: "people" }, [h("div", { class: "person" }, [h("div", { style: "min-width:0" }, [
       h("b", { text: [p.first_name, p.last_name].filter(Boolean).join(" ") || "Sans nom" }), p.job_title ? ` · ${p.job_title}` : "", h("br"),
       h("span", { class: "muted", text: [p.email, p.phone].filter(Boolean).join(" · ") || "Pas de coordonnées" }),
       p.linkedin_url ? h("span", null, [" · ", h("a", { href: p.linkedin_url, target: "_blank", rel: "noopener" }, ["LinkedIn"])]) : null,
-    ]), edit && !ce ? h("button", { type: "button", class: "pedit", "aria-label": `Modifier ${fullName(p) || "ce contact"}`, onclick: () => editContact(p) }, ["Modifier"]) : null]))),
+    ]), edit && !ce ? h("div", { class: "pacts" }, [
+      h("button", { type: "button", class: "pedit", "aria-label": `Modifier ${fullName(p) || "ce contact"}`, onclick: () => editContact(p) }, ["Modifier"]),
+      h("button", { type: "button", class: "pedit", "aria-label": `Chercher ${fullName(p) || "ce contact"} sur Lusha`, disabled: !!S.luBusy, onclick: () => lushaSearch(d, p) }, [S.luBusy === p.id ? "Recherche…" : "Chercher sur Lusha"]),
+    ]) : null]), edit && !ce && S.lu[p.id] ? lushaBox(d, p, S.lu[p.id]) : null]))),
     ce && !ce.id ? contactForm(d, ce) : null,
     edit && !ce ? h("button", { type: "button", class: "addc", onclick: () => editContact(null, d.company_id) }, ["+ Ajouter un contact"]) : null,
     !people.length && !ce ? h("p", { class: "muted small", text: "Aucun contact sur cette fiche." }) : null,
@@ -520,8 +533,8 @@ function fiche(d, inline) {
   kids.push(acts == null ? h("p", { class: "muted small", text: "Chargement…" }) : acts.length ? h("ul", { class: "tl" }, acts.map(actLine)) : h("p", { class: "muted small", text: "Aucun échange enregistré." }));
   return h("div", { class: "fiche" }, kids);
 }
-function openFiche(id) { S.open = id; S.newOpen = false; S.note = ""; S.ce = null; ensureActs(id); render(); }
-function closeFiche() { S.open = null; S.newOpen = false; S.note = ""; S.ce = null; render(); }
+function openFiche(id) { S.open = id; S.newOpen = false; S.note = ""; S.ce = null; S.lu = {}; ensureActs(id); render(); }
+function closeFiche() { S.open = null; S.newOpen = false; S.note = ""; S.ce = null; S.lu = {}; render(); }
 
 /* ---------- contacts d'une fiche : ajouter / modifier (12/11) ----------
    Policies crm_v1 : insert et update de crm_contacts ouverts à admin/sales. Le téléphone est enregistré au format
@@ -602,7 +615,7 @@ async function saveContact(d, ce) {
     S.ce = null;
     const who = fullName(p) || p.phone || p.email || "sans nom";
     const body = old
-      ? `Contact modifié : ${who}\n` + changed.map(([k, l]) => `${l} : ${old[k] || "vide"} → ${p[k] || "vide"}`).join("\n")
+      ? `Contact modifié${ce.src ? ` (source ${ce.src})` : ""} : ${who}\n` + changed.map(([k, l]) => `${l} : ${old[k] || "vide"} → ${p[k] || "vide"}`).join("\n")
       : `Contact ajouté : ${[who, p.job_title, p.phone, p.email].filter(Boolean).join(" · ")}`;
     const act = await sb.from("crm_activities").insert({ deal_id: d.id, company_id: d.company_id, contact_id: p.id, kind: "note", body, author_id: S.me.user_id, author_label: S.me.display_name });
     // Appels Onoff déjà en attente (« à rattacher ») dont le numéro correspond : rattachés tout de suite à cette fiche.
@@ -618,6 +631,84 @@ async function saveContact(d, ce) {
     toast((old ? "Contact modifié." : "Contact ajouté.") + (act.error ? ` Ligne de chronologie non enregistrée : ${act.error.message}.` : "") + (linked ? ` ${linked} appel${linked > 1 ? "s" : ""} Onoff rattaché${linked > 1 ? "s" : ""} à la fiche.` : "") + (failed ? ` ${failed} appel${failed > 1 ? "s" : ""} Onoff non rattaché${failed > 1 ? "s" : ""} : à faire dans « Ma journée ».` : ""));
   } catch (e) { toast((p ? "Contact enregistré, suite incomplète : " : "Contact non enregistré : ") + (e.message || e)); }
   S.busy = false; render();
+}
+
+/* ---------- Lusha : une recherche pour UN contact (12/11) ----------
+   Fonction Edge « lusha-enrich » (ds-editing-os/supabase/functions/lusha-enrich) : vérifie le rôle admin/sales,
+   appelle Lusha avec la clé gardée côté Supabase, renvoie des propositions SANS rien écrire sur le contact,
+   et note la recherche (crédits) dans la chronologie. Rien n'est enregistré sur le contact avant « Appliquer »,
+   qui passe par saveContact (même normalisation du téléphone, même note, même rattachement Onoff). */
+const LU_TYPE = { mobile: "mobile", direct: "ligne directe", work: "pro", personal: "perso", phone: "fixe", landline: "fixe", other: "autre" };
+/* Réponse non-2xx : nos erreurs ont { error, message } en français ; sinon (fonction pas déployée, passerelle Supabase)
+   le corps est en anglais ou vide, donc on traduit d'après le code HTTP. */
+const LU_HTTP = { 401: "Session expirée : reconnecte-toi au CRM.", 404: "Fonction Lusha introuvable : elle n'est pas encore déployée dans Supabase.", 429: "Trop de recherches Lusha d'un coup : réessaie dans quelques minutes." };
+async function lushaError(error) {
+  const res = error && error.context, status = res && typeof res.status === "number" ? res.status : null;
+  let body = null;
+  try { body = res && typeof res.json === "function" ? await res.json() : null; } catch { body = null; }
+  if (body && typeof body.error === "string" && body.message) return body;
+  if (!status) return { error: "network", message: "Fonction Lusha injoignable (réseau ou fonction pas encore déployée)." };
+  return { error: "http", message: LU_HTTP[status] || `Fonction Lusha en erreur (HTTP ${status}).` };
+}
+async function lushaSearch(d, p, force) {
+  if (S.luBusy) return;
+  const ask = force
+    ? `Relancer Lusha pour ${fullName(p) || "ce contact"} ?\nIl a déjà été cherché il y a moins de 30 jours : ça redépense des crédits.`
+    : `Chercher ${fullName(p) || "ce contact"} sur Lusha ?\nÇa dépense des crédits Lusha (un mobile révélé = 5 crédits).`;
+  if (!window.confirm(ask)) return;
+  S.luBusy = p.id; S.lu[p.id] = { busy: true }; render();
+  let out = null;
+  try {
+    const { data, error } = await sb.functions.invoke("lusha-enrich", { body: force ? { contact_id: p.id, deal_id: d.id, force: true } : { contact_id: p.id, deal_id: d.id } });
+    out = error ? await lushaError(error) : data;
+  } catch (e) { out = { error: "network", message: "Fonction Lusha injoignable : " + (e.message || e) }; }
+  out = out || { error: "empty", message: "Réponse vide." };
+  const prop = out.ok ? out.proposal : null;
+  S.lu[p.id] = prop
+    ? { prop, credits: out.credits_charged, noteErr: out.note_error,
+        pick: { phone: p.phone || !prop.phones.length ? -1 : Math.max(0, prop.phones.findIndex((x) => x.type === "mobile" && !x.do_not_call)),
+                email: p.email || !prop.emails.length ? -1 : 0, job: !!prop.job_title && !p.job_title } }
+    : { err: out.message || "Erreur inconnue.", credits: out.credits_charged, recent: out.error === "recent" };
+  S.luBusy = null;
+  if ("credits_charged" in out) { try { if (S.actsFor === d.id) S.acts = await loadActs(d); } catch { /* chronologie rechargée au prochain affichage */ } }
+  render();
+}
+function lushaBox(d, p, st) {
+  const close = h("button", { type: "button", class: "btn", onclick: () => { delete S.lu[p.id]; render(); } }, ["Fermer"]);
+  const credits = st.credits != null ? `${st.credits} crédit${st.credits > 1 ? "s" : ""} Lusha consommé${st.credits > 1 ? "s" : ""}.` : "";
+  if (st.busy) return h("div", { class: "box lu", role: "status" }, [h("span", { class: "muted", text: "Recherche Lusha en cours…" })]);
+  if (st.err) return h("div", { class: "box lu", role: "alert" }, [h("span", { class: "lbl", text: "Lusha" }), h("p", { class: "err", text: st.err }), credits ? h("p", { class: "muted small", text: credits }) : null, h("div", { class: "rowf" }, [
+    st.recent ? h("button", { type: "button", class: "btn", disabled: !!S.luBusy, onclick: () => lushaSearch(d, p, true) }, ["Relancer quand même (coûte des crédits)"]) : null, close])]);
+  const pr = st.prop, name = "lu_" + p.id;
+  const radio = (field, i, label, extra) => h("label", null, [
+    h("input", { type: "radio", name: `${name}_${field}`, value: String(i), checked: st.pick[field] === i, onchange: () => { st.pick[field] = i; } }),
+    h("span", null, [label, extra || null])]);
+  const kids = [h("span", { class: "lbl", text: "Propositions Lusha" })];
+  if (pr.name || pr.company) kids.push(h("p", { class: "muted small", text: "Personne trouvée : " + [pr.name, pr.company].filter(Boolean).join(" · ") }));
+  if (pr.phones.length) kids.push(h("fieldset", null, [h("legend", { class: "lbl", text: "Téléphone" }),
+    ...pr.phones.map((x, i) => radio("phone", i, [x.number, LU_TYPE[x.type] || x.type].filter(Boolean).join(" · "), x.do_not_call ? h("span", { class: "dnc", text: " · ne pas appeler (liste d'opposition)" }) : null)),
+    radio("phone", -1, p.phone ? `Garder l'actuel (${p.phone})` : "Ne rien mettre")]));
+  if (pr.emails.length) kids.push(h("fieldset", null, [h("legend", { class: "lbl", text: "E-mail" }),
+    ...pr.emails.map((x, i) => radio("email", i, [x.email, LU_TYPE[x.type] || x.type, x.confidence ? `fiabilité ${x.confidence}` : null].filter(Boolean).join(" · "))),
+    radio("email", -1, p.email ? `Garder l'actuel (${p.email})` : "Ne rien mettre")]));
+  if (pr.job_title) kids.push(h("label", null, [
+    h("input", { type: "checkbox", checked: st.pick.job, onchange: (ev) => { st.pick.job = ev.target.checked; } }),
+    h("span", { text: `Fonction : ${pr.job_title}` + (p.job_title ? ` (actuelle : ${p.job_title})` : "") })]));
+  if (credits || st.noteErr) kids.push(h("p", { class: "muted small", text: [credits, st.noteErr ? `Note de suivi non enregistrée : ${st.noteErr}.` : ""].filter(Boolean).join(" ") }));
+  kids.push(h("p", { class: "muted small", text: "Rien n'est enregistré tant que tu n'as pas cliqué « Appliquer »." }));
+  kids.push(h("div", { class: "rowf" }, [h("button", { type: "button", class: "btn pri", disabled: S.busy, onclick: () => lushaApply(d, p, st) }, ["Appliquer"]), close]));
+  return h("div", { class: "box lu", role: "group", "aria-label": `Propositions Lusha pour ${fullName(p) || "ce contact"}` }, kids);
+}
+async function lushaApply(d, p, st) {
+  const pr = st.prop, f = Object.fromEntries(CE_FIELDS.map(([k]) => [k, p[k] || ""]));
+  if (st.pick.phone >= 0 && pr.phones[st.pick.phone]) f.phone = pr.phones[st.pick.phone].number;
+  if (st.pick.email >= 0 && pr.emails[st.pick.email]) f.email = pr.emails[st.pick.email].email;
+  if (st.pick.job && pr.job_title) f.job_title = pr.job_title;
+  if (CE_FIELDS.every(([k]) => f[k] === (p[k] || ""))) { toast("Choisis au moins une proposition, ou ferme."); return; }
+  const ce = S.ce = { id: p.id, company_id: p.company_id, f, src: "Lusha" };   // = formulaire « Modifier » prérempli
+  await saveContact(d, ce);
+  if (S.ce !== ce) delete S.lu[p.id];   // enregistré : on range les propositions
+  render();                              // refus (ex. e-mail invalide) : S.ce reste posé, render() affiche le formulaire prérempli pour corriger
 }
 
 /* ---------- nouvelle fiche (setters : société + deal + contact en une fois ; policies crm_v1 : insert admin/sales) ---------- */
