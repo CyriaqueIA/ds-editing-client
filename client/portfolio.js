@@ -72,6 +72,8 @@ window.DS_PORTFOLIO = {
   // Upsell sous la grille de tous les portfolios (14/11/2026) : « Un épisode, cinq contenus » (épisode + 2 reels + miniature + trailer).
   // Jamais de prix. false = bloc masqué.
   upsell: true,
+  // Vignettes de l'upsell (début de l'id Drive, voir client/previews.js). Vide = la première vidéo du type.
+  upsellPicks: { episode: "1oDMpQ", trailer: "1Bx_vj", thumbnail: "" },
 
   // Types sans exemple qui affichent la scène animée « bientôt » (orbe + « Premier montage offert ») au lieu des cases vides.
   // La scène disparaît d'elle-même dès qu'une vidéo du type arrive du Drive.
