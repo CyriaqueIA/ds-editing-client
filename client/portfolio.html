@@ -162,8 +162,62 @@
     #giftBtn{white-space:nowrap}
     @media (max-width:480px){.lv-rec em{display:none}.app-header .lang{padding:0 10px;font-size:12px}.app-header .btn{padding:0 12px;font-size:12.5px}}
     @media (max-width:400px){.lv-rec{font-size:19px}.app-header{padding:10px 12px;gap:8px}}
+
+    /* ---- Portfolio personnalisé (client/prospects.js, lien ?p=<slug>) : démo du prospect + 3 accroches + appel ---- */
+    .pp{display:grid;grid-template-columns:1fr auto;gap:36px;align-items:center;margin:0 0 34px;padding:34px 38px;border:1px solid var(--line);border-radius:22px;background:var(--glass),var(--surface);box-shadow:inset 0 1px 0 rgba(255,255,255,.06);position:relative;overflow:hidden}
+    .pp::before{content:"";position:absolute;inset:-30% -10% auto auto;width:460px;height:460px;border-radius:50%;background:radial-gradient(circle,rgba(127,163,207,.16),transparent 62%);pointer-events:none}
+    .pp-copy{position:relative;min-width:0}
+    .pp-copy .mono{margin-bottom:10px}
+    .pp-copy h2{margin:0 0 12px;font-size:clamp(28px,3.4vw,42px)}
+    .pp-copy p{margin:0 0 18px;color:var(--taupe);font-size:15px;max-width:56ch}
+    .pp-copy p b{color:var(--cream);font-weight:600}
+    .pp-hooks{list-style:none;margin:0 0 22px;padding:0;display:flex;flex-direction:column;gap:8px;counter-reset:h}
+    .pp-hooks li{counter-increment:h;display:flex;gap:12px;align-items:baseline;padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.03);font-size:14.5px;line-height:1.45}
+    .pp-hooks li::before{content:"Accroche " counter(h);flex:none;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--accent2)}
+    .pp-cta{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .pp-cta .btn{height:44px;padding:0 24px;font-size:15px}
+    .pp-cta .lang{height:44px;padding:0 18px;font-size:14px}
+    .pp-demo{position:relative;width:min(300px,62vw);aspect-ratio:9/16;border-radius:18px;overflow:hidden;border:1px solid var(--line-strong);background:#000;box-shadow:0 26px 60px rgba(0,0,0,.5)}
+    .pp-demo video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000}
+    .pp-demo.wait{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;padding:20px;background:linear-gradient(135deg,var(--surface),var(--surface-2));color:var(--taupe);font-size:13px}
+    .pp-demo.wait b{color:var(--cream);font-size:16px;font-weight:600}
+    .pp-more{margin:0 0 6px}
+    @media (max-width:900px){.pp{grid-template-columns:1fr;padding:24px 18px;gap:22px}.pp-demo{justify-self:center;order:-1}}
+
+    /* ---- Bande défilante des studios (portfolio.js → studios ok: true) : logo, sinon initiales ---- */
+    .trust{display:flex;align-items:center;gap:18px;padding:10px 0 10px 20px;border-bottom:1px solid var(--line);background:rgba(255,255,255,.015);overflow:hidden}
+    .trust>.mono{flex:none;max-width:150px;line-height:1.35}
+    .trust-rail{flex:1;min-width:0;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent);mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent)}
+    .trust-track{display:flex;width:max-content;animation:trust 55s linear infinite}
+    .trust-rail:hover .trust-track{animation-play-state:paused}
+    .trust-group{display:flex;gap:10px;padding-right:10px}
+    .trust-item{display:flex;align-items:center;gap:10px;flex:none;padding:5px 14px 5px 5px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+    .trust-item img,.trust-item i{width:32px;height:32px;border-radius:8px;object-fit:cover;flex:none}
+    .trust-item i{display:flex;align-items:center;justify-content:center;font-style:normal;font-weight:700;font-size:12px;letter-spacing:.02em;background:var(--chrome);color:#0A0B0D}
+    .trust-item b{display:block;font-size:13px;font-weight:600;white-space:nowrap}
+    .trust-item span{display:block;font-size:11px;color:var(--taupe);white-space:nowrap}
+    @keyframes trust{to{transform:translateX(-50%)}}
+    @media (max-width:640px){.trust{padding:8px 0}.trust>.mono{display:none}}
+
+    /* ---- Upsell sous la grille (portfolio.js → upsell) : « Un épisode, cinq contenus », jamais de prix ---- */
+    .upsell{margin:34px 0 0;padding:30px 32px;border:1px solid var(--line);border-radius:22px;background:var(--glass),var(--surface);box-shadow:inset 0 1px 0 rgba(255,255,255,.06);position:relative;overflow:hidden}
+    .upsell::before{content:"";position:absolute;inset:auto -8% -50% auto;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle,rgba(127,163,207,.14),transparent 62%);pointer-events:none}
+    .upsell>*{position:relative}
+    .upsell .mono{margin-bottom:10px}
+    .upsell h2{margin:0 0 10px;font-size:clamp(26px,3.2vw,38px)}
+    .upsell p{margin:0 0 20px;color:var(--taupe);font-size:15px;max-width:60ch}
+    .up-pack{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:0 0 22px}
+    .up-tile{position:relative;aspect-ratio:4/5;border-radius:14px;overflow:hidden;border:1px solid var(--line);background:linear-gradient(135deg,var(--surface-2),#0b0d10)}
+    .up-tile img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.8}
+    .up-tile::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(5,6,7,.85),transparent 55%)}
+    .up-tile .n{position:absolute;top:8px;left:8px;z-index:1;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;background:linear-gradient(180deg,#FFFFFF,#C9D0D7);color:#0A0B0D}
+    .up-tile .lb{position:absolute;left:10px;right:10px;bottom:9px;z-index:1;font-size:13px;font-weight:600;line-height:1.2}
+    .up-tile .lb span{display:block;font-size:11px;font-weight:500;color:var(--taupe)}
+    .upsell .btn{height:44px;padding:0 24px;font-size:15px}
+    @media (max-width:700px){.upsell{padding:24px 18px}.up-pack{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:40%;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:4px}.up-tile{scroll-snap-align:start}}
   </style>
   <link href="/css/ds-consent.css" rel="stylesheet"/>
+  <link href="/css/ds-booking.css" rel="stylesheet"/>
 </head>
 <body>
 <div class="app" id="app">
@@ -172,15 +226,19 @@
     <div class="brand"><b>DS Editing</b><small class="mono" data-t="sub"></small></div>
     <div class="right"><span class="private"><i></i><span data-t="private"></span></span><button class="lang" id="giftBtn" type="button" data-t="g1Btn" hidden></button><button class="lang" id="langBtn" type="button">EN</button><a class="btn" id="contact" href="#" data-t="contact"></a></div>
   </header>
+  <div class="trust" id="trust" hidden></div>
   <div class="app-main" id="main">
     <nav class="sidebar"><div class="mono" data-t="types"></div><div id="types"></div></nav>
     <div class="content">
+      <section class="pp" id="pp" hidden></section>
+      <div class="mono pp-more" id="ppMore" hidden></div>
       <h1 class="display" id="typeTitle"></h1>
       <p class="sub" id="typeSub"></p>
       <div class="tier-tabs" id="tiers"></div>
       <p class="tier-desc" id="tierDesc"></p>
       <div class="video-grid" id="grid"></div>
       <p class="foot" id="foot"></p>
+      <section class="upsell" id="upsell" hidden></section>
     </div>
   </div>
   <div class="gate" id="gate" hidden></div>
@@ -188,8 +246,9 @@
 <div class="modal" id="modal"><div class="box"><div class="bar"><span id="modalTitle"></span><button type="button" id="modalClose">×</button></div><div id="modalMedia"></div></div></div>
 <div class="gift" id="gift" role="dialog" aria-modal="true" aria-labelledby="giftTitle"><div class="box" id="giftBox"></div></div>
 
-<script src="portfolio.js?v=14"></script>
-<script src="previews.js?v=10"></script>
+<script src="portfolio.js?v=15"></script>
+<script src="previews.js?v=11"></script>
+<script src="prospects.js?v=1"></script>
 <script>
 (function () {
   // Clé du lien privé. Le lien à envoyer : portfolio.html?k=CLÉ
@@ -210,7 +269,9 @@
   const $ = (s) => document.querySelector(s);
   const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const params = new URLSearchParams(location.search);
-  let lang = params.get("lang") || (() => { try { return localStorage.getItem("ds_lang"); } catch { return null; } })() || ((navigator.language || "en").slice(0, 2) === "fr" ? "fr" : "en");
+  // Portfolio « recommandé » (portfolio.js → referrals, lien ?r=<slug>) : jamais de prix, cadeau = téléphone + e-mail
+  const RF = (P.referrals || {})[params.get("r")] || null;
+  let lang = params.get("lang") || (RF && RF.lang) || (() => { try { return localStorage.getItem("ds_lang"); } catch { return null; } })() || ((navigator.language || "en").slice(0, 2) === "fr" ? "fr" : "en");
   if (!["fr", "en"].includes(lang)) lang = "en";
   const T = {
     fr: { sub: "Exemples de production", private: "Lien privé", contact: "Prendre contact", types: "Type de contenu", soon: "Bientôt", quote: "Sur devis", unique: "Formule unique", uniqueDesc: "Une seule formule pour ce format.", perVideo: "par vidéo livrée, hors taxes", noneTier: "Aucun exemple dans cette formule", noneTierSub: "Le tarif reste affiché : {p} par vidéo livrée.", count1: "{n} exemple en {f}", countN: "{n} exemples en {f}", footPrice: "prix hors taxes, par vidéo livrée", soonPrice: "Tarif prévu pour ce format : {p}.", gate: "Cet espace est réservé aux studios avec qui nous échangeons. Demandez votre lien à contact@ds-editing.com.",
@@ -218,17 +279,42 @@
       soonSubject: "Premier montage offert — {type}", soonBody: "Bonjour Cyriaque,\n\nJe souhaite tester DS Editing sur un projet {type}.\n\n",
       g1Kicker: "Témoignage client", g1Title: "{studio} nous confie ses montages.", g1Text: "Une minute, en vidéo, sur notre façon de travailler.", g1Btn: "Voir les tarifs", skip: "Passer",
       g2Kicker: "Avant les tarifs", g2Title: "On a un cadeau pour vous.", g2Text: "Laissez votre numéro et le nom de votre podcast pour le découvrir.", phone: "Votre numéro", phonePh: "06 12 34 56 78", podcast: "Nom de votre podcast", podcastPh: "Mon podcast", g2Btn: "Découvrir mon cadeau", sending: "Envoi…", g2Note: "On ne vous appelle que pour votre cadeau.", errPhone: "Ce numéro ne semble pas valide.", errPodcast: "Indiquez le nom de votre podcast.",
-      g3Kicker: "Votre cadeau", g3Title: "Votre premier montage est offert.", g3Text: "On vous appelle au {phone} pour lancer le premier épisode de {podcast}. Voici nos tarifs : le premier, c'est nous qui l'offrons.", g3Btn: "Voir les tarifs", free: "1er montage offert" },
+      g3Kicker: "Votre cadeau", g3Title: "Votre premier montage est offert.", g3Text: "On vous appelle au {phone} pour lancer le premier épisode de {podcast}. Voici nos tarifs : le premier, c'est nous qui l'offrons.", g3Btn: "Voir les tarifs", free: "1er montage offert",
+      trust: "Ils nous confient leurs montages",
+      upKicker: "Pour aller plus loin", upTitle: "Un épisode, <em>cinq</em> contenus.", upText: "On monte l'épisode, puis on en tire 2 reels, la miniature et le trailer. De quoi publier partout à partir d'un seul tournage.", upBtn: "Réserver un appel",
+      upEp: "Épisode", upReel: "Reel", upThumb: "Miniature", upTrailer: "Trailer" },
     en: { sub: "Production examples", private: "Private link", contact: "Get in touch", types: "Content type", soon: "Coming soon", quote: "On quote", unique: "Single package", uniqueDesc: "One package for this format.", perVideo: "per delivered video, excl. VAT", noneTier: "No example in this package yet", noneTierSub: "The price still applies: {p} per delivered video.", count1: "{n} example in {f}", countN: "{n} examples in {f}", footPrice: "prices excl. VAT, per delivered video", soonPrice: "Planned price for this format: {p}.", gate: "This space is reserved for studios we're talking with. Ask for your link at contact@ds-editing.com.",
       soonKicker: "Coming soon to the portfolio", soonTitle: "We already do it.", soonText: "Our {type} examples are on their way. No need to wait: send us a project, the first edit is on us.", soonBtn: "First edit on us",
       soonSubject: "First edit on us — {type}", soonBody: "Hi Cyriaque,\n\nI'd like to try DS Editing on a {type} project.\n\n",
       g1Kicker: "Client testimonial", g1Title: "{studio} trusts us with their edits.", g1Text: "One minute, on video, about how we work.", g1Btn: "See pricing", skip: "Skip",
       g2Kicker: "Before pricing", g2Title: "We have a gift for you.", g2Text: "Leave your number and your podcast's name to unlock it.", phone: "Your phone number", phonePh: "+1 305 555 0123", podcast: "Your podcast's name", podcastPh: "My podcast", g2Btn: "Unlock my gift", sending: "Sending…", g2Note: "We'll only call you about your gift.", errPhone: "That number doesn't look valid.", errPodcast: "Please enter your podcast's name.",
-      g3Kicker: "Your gift", g3Title: "Your first edit is on us.", g3Text: "We'll call you at {phone} to kick off the first episode of {podcast}. Here's our pricing: the first one is on us.", g3Btn: "See pricing", free: "1st edit on us" },
+      g3Kicker: "Your gift", g3Title: "Your first edit is on us.", g3Text: "We'll call you at {phone} to kick off the first episode of {podcast}. Here's our pricing: the first one is on us.", g3Btn: "See pricing", free: "1st edit on us",
+      trust: "They trust us with their edits",
+      upKicker: "Go further", upTitle: "One episode, <em>five</em> pieces of content.", upText: "We edit the episode, then cut 2 reels, the thumbnail and the trailer from it. Everything you need to publish everywhere from a single recording.", upBtn: "Book a call",
+      upEp: "Episode", upReel: "Reel", upThumb: "Thumbnail", upTrailer: "Trailer" },
   };
+  if (RF) {
+    // Recommandés : aucun mot sur les tarifs, le formulaire demande téléphone + e-mail
+    Object.assign(T.fr, { private: `Recommandé par ${RF.by}`, g1Btn: "🎁 Un cadeau pour vous", g2Kicker: `Recommandé par ${RF.by}`, g2Text: "Laissez votre numéro et votre e-mail pour le découvrir.",
+      email: "Votre e-mail", emailPh: "vous@studio.com", errEmail: "Cet e-mail ne semble pas valide.", g2Note: "On ne vous contacte que pour votre cadeau.",
+      g3Text: "On vous appelle au {phone} pour lancer votre premier montage.", g3Btn: "Voir nos réalisations" });
+    Object.assign(T.en, { private: `Recommended by ${RF.by}`, g1Btn: "🎁 A gift for you", g2Kicker: `Recommended by ${RF.by}`, g2Text: "Leave your number and email to unlock it.",
+      email: "Your email", emailPh: "you@studio.com", errEmail: "That email doesn't look valid.", g2Note: "We'll only contact you about your gift.",
+      g3Text: "We'll call you at {phone} to get your first edit started.", g3Btn: "See our work" });
+  }
+  // Portfolio personnalisé (client/prospects.js, ?p=<slug>) : français + tutoiement, ouverture sur les reels, prix toujours masqués
+  const PR = (window.DS_PROSPECTS || {})[params.get("p")] || null;
+  if (PR) {
+    lang = "fr";
+    Object.assign(T.fr, { private: `Préparé pour ${PR.first}`, contact: "Me contacter", g1Btn: "🎁 Un cadeau pour toi",
+      g2Kicker: "Pour toi", g2Title: "On a un cadeau pour toi.", g2Text: "Laisse ton numéro et le nom de ta chaîne pour le découvrir.", phone: "Ton numéro", podcast: "Nom de ta chaîne", podcastPh: PR.brand || "Ma chaîne",
+      g2Note: "On ne t'appelle que pour ton cadeau.", errPhone: "Ce numéro ne semble pas valide.", errPodcast: "Indique le nom de ta chaîne.",
+      g3Kicker: "Ton cadeau", g3Title: "Ton premier montage est offert.", g3Text: "On t'appelle au {phone} pour lancer le premier montage de {podcast}.", g3Btn: "Revoir ma démo",
+      upTitle: "Une vidéo, <em>cinq</em> contenus.", upText: "On monte ta vidéo, puis on en tire 2 reels, la miniature et le trailer. De quoi publier partout à partir d'un seul tournage.", upEp: "Ta vidéo" });
+  }
   // Type demandé dans le lien (?type=…) : un type fusionné (ex. ads → vsl) ou inconnu retombe sur un type existant
   const typeOf = (slug) => P.types.find((x) => x.slug === slug || (x.also || []).includes(slug));
-  const land = (!params.get("type") && P.landing) || {};
+  const land = (!params.get("type") && (PR ? { type: "reels-shorts" } : P.landing)) || {};
   let type = (typeOf(params.get("type") || land.type) || P.types[0]).slug, tier = land.tier || P.tiers[0].slug;
   if (params.get("k") !== KEY) { $("#main").hidden = true; $("#gate").hidden = false; $("#gate").textContent = T[lang].gate; return; }
 
@@ -245,16 +331,24 @@
   // Jamais depuis un serveur local (localhost / 127.0.0.1 / fichier) : on journalise seulement, pour tester sans écrire en base.
   const LOCAL = !location.hostname || /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
   const RPC = "https://xkanmjlpysxpohsuqvwg.supabase.co/rest/v1/rpc/site_lead_add", SB_KEY = "sb_publishable_lIZtV_WtN5NcGSb0dnfaiQ_AgKYBIVa"; // clé publique (anon), règles dans la RPC
-  function sendLead(phone, podcast) {
+  function sendLead(phone, podcast, email) {
     const vt = (() => { try { return sessionStorage.getItem("ds_visit_started") === "1" && localStorage.getItem("ds_team") !== "1" ? sessionStorage.getItem("ds_visit") : null; } catch { return null; } })(); // relie le lead à la visite (js/ds-track.js)
-    const p = { kind: "gift", phone, studio: podcast, project_type: "podcast", lang, visit_token: vt, message: `Portfolio privé : cadeau débloqué (1er montage offert). Podcast : ${podcast}` };
+    const p = RF
+      ? { kind: "gift", phone, email, project_type: "podcast", lang, visit_token: vt, message: `Portfolio recommandé par ${RF.by} (r=${params.get("r")}) : cadeau débloqué (1er montage offert).` }
+      : PR
+      ? { kind: "gift", phone, studio: podcast, project_type: "reels", lang, visit_token: vt, message: `Portfolio perso ${PR.name} (${params.get("p")}) : cadeau débloqué (1er montage offert). Chaîne : ${podcast}` }
+      : { kind: "gift", phone, studio: podcast, project_type: "podcast", lang, visit_token: vt, message: `Portfolio privé : cadeau débloqué (1er montage offert). Podcast : ${podcast}` };
     if (LOCAL) { console.info("[gift] envoi simulé (serveur local) :", p); return Promise.resolve(); }
     const a = fetch(RPC, { method: "POST", keepalive: true, headers: { apikey: SB_KEY, "Content-Type": "application/json" }, body: JSON.stringify({ p }) }).catch(() => {});
+    const mail = RF
+      ? { _subject: `Portfolio recommandé par ${RF.by} : cadeau débloqué — ${email}`, Téléphone: phone, "E-mail": email, "Recommandé par": RF.by, _replyto: email }
+      : { _subject: `Portfolio${PR ? " perso " + PR.name : ""} : cadeau débloqué — ${podcast}`, Téléphone: phone, Podcast: podcast };
     const b = fetch("https://formsubmit.co/ajax/contact@ds-editing.com", { method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json" },
-      body: JSON.stringify({ _subject: `Portfolio : cadeau débloqué — ${podcast}`, Téléphone: phone, Podcast: podcast, Langue: lang, _template: "table", _captcha: "false" }) }).catch(() => {});
+      body: JSON.stringify({ ...mail, Langue: lang, _template: "table", _captcha: "false" }) }).catch(() => {});
     return Promise.all([a, b]);
   }
   const phoneOk = (s) => { const d = s.replace(/\D/g, ""); return /^\+?[\d\s().-]+$/.test(s.trim()) && d.length >= 8 && d.length <= 15; };
+  const emailOk = (s) => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(s) && s.length <= 200; // même règle que la RPC site_lead_add
   // Vidéo du témoignage dans la langue de la page, sinon la version FR (gift.src / gift.poster = chaîne ou { fr, en })
   const giftSrc = (k) => { const v = G && G[k]; return !v ? "" : typeof v === "string" ? v : v[lang] || v.fr || ""; };
   function giftOpen(step, data) {
@@ -268,7 +362,8 @@
     if (step === 2) box.innerHTML = `<button class="x" type="button" data-close aria-label="×">×</button>
       <div class="gift-ic" aria-hidden="true">🎁</div><div class="mono">${t.g2Kicker}</div><h2 class="display" id="giftTitle">${t.g2Title}</h2><p>${t.g2Text}</p>
       <form novalidate><label>${t.phone}<input name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="${t.phonePh}" required/></label>
-      <label>${t.podcast}<input name="podcast" type="text" autocomplete="organization" maxlength="120" placeholder="${t.podcastPh}" required/></label>
+      ${RF ? `<label>${t.email}<input name="email" type="email" inputmode="email" autocomplete="email" maxlength="200" placeholder="${t.emailPh}" required/></label>`
+        : `<label>${t.podcast}<input name="podcast" type="text" autocomplete="organization" maxlength="120" placeholder="${t.podcastPh}" required/></label>`}
       <p class="err" aria-live="polite"></p><button class="btn" type="submit">${t.g2Btn}</button><p class="note">${t.g2Note}</p></form>`;
     if (step === 3) box.innerHTML = `<button class="x" type="button" data-close aria-label="×">×</button>
       <div class="gift-ic" aria-hidden="true">🎁</div><div class="mono">${t.g3Kicker}</div><h2 class="display" id="giftTitle">${t.g3Title}</h2><p>${fill(t.g3Text)}</p>
@@ -279,12 +374,15 @@
     if (form) {
       form.addEventListener("submit", (e) => {
         e.preventDefault();
-        const phone = form.phone.value.trim(), podcast = form.podcast.value.trim(), err = form.querySelector(".err"), btn = form.querySelector("button[type=submit]");
+        const fPodcast = form.elements.namedItem("podcast"), fEmail = form.elements.namedItem("email");
+        const phone = form.phone.value.trim(), podcast = fPodcast ? fPodcast.value.trim() : "", email = fEmail ? fEmail.value.trim() : "", err = form.querySelector(".err"), btn = form.querySelector("button[type=submit]");
         if (!phoneOk(phone)) { err.textContent = t.errPhone; form.phone.focus(); return; }
-        if (!podcast) { err.textContent = t.errPodcast; form.podcast.focus(); return; }
+        if (fPodcast && !podcast) { err.textContent = t.errPodcast; fPodcast.focus(); return; }
+        if (fEmail && !emailOk(email)) { err.textContent = t.errEmail; fEmail.focus(); return; }
         err.textContent = ""; btn.disabled = true; btn.textContent = t.sending;
-        sendLead(phone, podcast).finally(() => { unlocked = true; store.set("1"); render(); giftOpen(3, { phone, podcast }); });
+        sendLead(phone, podcast, email).finally(() => { unlocked = true; store.set("1"); render(); giftOpen(3, { phone, podcast }); });
       });
+      if (PR && PR.brand && form.elements.namedItem("podcast")) form.elements.namedItem("podcast").value = PR.brand;
       setTimeout(() => form.phone.focus(), 50);
     }
     $("#gift").classList.add("open"); document.body.style.overflow = "hidden";
@@ -307,7 +405,8 @@
     const prices = P.prices[type] || {};
     // portfolio.js → hidePrices : aucun prix nulle part (onglets, description, pied, scène « bientôt »)
     // … sauf une fois le cadeau débloqué (parcours gift) : les prix s'affichent, barrés, avec « 1er montage offert »
-    const hide = P.hidePrices && !unlocked;
+    const hide = !!PR || !!RF || (P.hidePrices && !unlocked); // portfolio perso et recommandés : jamais de prix (prix en visio)
+    renderProspect(); renderTrust(); renderUpsell();
     const show = (p) => (hide ? "" : p);
     const fmt = (p) => (unlocked ? `<s>${esc(p)}</s>` : esc(p));
     // Formules visibles pour ce type (portfolio.js → hiddenTiers) ; si la formule courante est masquée, on repart sur la première
@@ -327,7 +426,7 @@
       ? `<div class="tier active unique"><b>${t.unique}</b>${hide ? "" : `<span>${fmt(unique)}${unlocked ? `<i class="free">${t.free}</i>` : ""}</span>`}</div>`
       : tiers.map((ti) => `<div class="tier ${ti.slug === tier ? "active" : ""}" data-tier="${ti.slug}"><b>${ti[lang][0]}</b>${hide ? "" : `<span>${prices[ti.slug] ? fmt(prices[ti.slug]) : t.quote}${unlocked && prices[ti.slug] ? `<i class="free">${t.free}</i>` : ""}</span>`}</div>`).join("");
     $("#tiers").querySelectorAll("[data-tier]").forEach((el) => el.addEventListener("click", () => { tier = el.dataset.tier; render(); }));
-    $("#tierDesc").innerHTML = `${unique ? t.uniqueDesc : esc(tiers.find((x) => x.slug === tier)[lang][1])}${price ? ` <em>${fmt(price)}</em> ${t.perVideo}.${unlocked ? ` <span class="free">${t.free}.</span>` : ""}` : ""}`;
+    $("#tierDesc").innerHTML = `${unique ? t.uniqueDesc : esc(tiers.find((x) => x.slug === tier)[lang][1])}${price ? ` <em>${fmt(price)}</em> ${t.perVideo}.${unlocked ? ` <span class="free">${t.free}.</span>` : ""}` : RF && unlocked ? ` <span class="free">${t.free}.</span>` : ""}`;
     const items = ofType.filter((it) => !tiered || it.tier === tier)
       .sort((a, b) => (a.lang && a.lang !== lang ? 1 : 0) - (b.lang && b.lang !== lang ? 1 : 0) || (a.vertical ? 1 : 0) - (b.vertical ? 1 : 0)); // langue de l'interface d'abord, puis 16:9 avant 9:16
     const grid = $("#grid");
@@ -337,8 +436,57 @@
     grid.innerHTML = items.length
       ? items.map((it, i) => `<div class="video-cell${it.vertical ? " v" : ""}" data-i="${i}"><img src="${window.dsThumb(it)}" alt=""/><div class="video-overlay"><div class="play-btn">▶</div></div><div class="cap">${it.title || ""}<span>${studio(it)}</span></div></div>`).join("")
       : `<div class="none-tier"><b>${t.noneTier}</b>${price ? `<span>${t.noneTierSub.replace("{p}", esc(price))}</span>` : ""}</div>`;
-    if (items.length) { const f = unique ? t.unique.toLowerCase() : tiers.find((x) => x.slug === tier)[lang][0].toLowerCase(); $("#foot").textContent = `${(items.length === 1 ? t.count1 : t.countN).replace("{n}", items.length).replace("{f}", f)}${price ? ` · ${t.footPrice}` : ""}`; }
+    if (items.length) {
+      // type sans formule (ex. YouTube & Docu) : « 2 exemples », sans « en standard »
+      const f = unique ? t.unique.toLowerCase() : tiered ? tiers.find((x) => x.slug === tier)[lang][0].toLowerCase() : "";
+      const c = (items.length === 1 ? t.count1 : t.countN).replace("{n}", items.length);
+      $("#foot").textContent = `${f ? c.replace("{f}", f) : c.replace(/ (en|in) \{f\}/, "")}${price ? ` · ${t.footPrice}` : ""}`;
+    }
     grid.querySelectorAll(".video-cell[data-i]").forEach((cell) => cell.addEventListener("click", () => play(cell, items[+cell.dataset.i])));
+  }
+  // Bloc du portfolio perso : « Préparé pour {prénom} », SA démo, 3 accroches, appel de 20 min, cadeau
+  function renderProspect() {
+    if (!PR) return;
+    const pp = $("#pp"); if (pp.dataset.done) return; pp.dataset.done = "1";
+    const v = PR.video || {}, d = PR.demo, hooks = (PR.hooks || []).filter(Boolean);
+    pp.innerHTML = `<div class="pp-copy">
+        <div class="mono">Préparé pour ${esc(PR.first)}${PR.brand ? ` · ${esc(PR.brand)}` : ""}</div>
+        <h2 class="display">${esc(PR.first)}, voici ce qu'on ferait avec <em>ta</em> vidéo.</h2>
+        <p>${d ? `On a pris <b>« ${esc(v.title)} »</b> et on en a tiré 45 secondes en vertical, prêtes à poster.` : `On prépare 45 secondes tirées de <b>« ${esc(v.title)} »</b>.`}${hooks.length ? " Et 3 accroches pour ouvrir tes prochaines vidéos :" : ""}</p>
+        ${hooks.length ? `<ol class="pp-hooks">${hooks.slice(0, 3).map((h) => `<li>${esc(h)}</li>`).join("")}</ol>` : ""}
+        <div class="pp-cta"><a class="btn js-book" href="#">Réserver un appel</a>${G ? `<button class="lang" type="button" data-gift>🎁 Un cadeau pour toi</button>` : ""}</div>
+      </div>
+      <div class="pp-demo${d ? "" : " wait"}">${d
+        ? `<video src="${esc(d.src)}" poster="${esc(d.poster || "")}" controls playsinline preload="metadata" controlsList="nodownload noplaybackrate" disablepictureinpicture></video>`
+        : `<b>Ta démo arrive</b><span>45 s · format vertical</span>`}</div>`;
+    pp.hidden = false;
+    $("#ppMore").textContent = "Nos autres réalisations"; $("#ppMore").hidden = false;
+    const g = pp.querySelector("[data-gift]"); if (g) g.addEventListener("click", () => giftOpen(2));
+    document.title = `DS Editing — Préparé pour ${PR.first}`;
+  }
+  // Bande défilante des studios (portfolio.js → studios ok: true). Construite une fois par langue, pour ne pas relancer l'animation à chaque clic.
+  function renderTrust() {
+    const el = $("#trust"), ok = (P.studios || []).filter((s) => s.ok);
+    if (!ok.length) { el.hidden = true; return; }
+    if (el.dataset.lang === lang) return; el.dataset.lang = lang;
+    const ini = (n) => { const w = n.split(/\s+/).filter((x) => x && !/^(the|le|la|les)$/i.test(x)); return (w.length > 1 ? w[0][0] + w[1][0] : (w[0] || "").slice(0, 1)).toUpperCase(); };
+    const one = ok.map((s) => `<div class="trust-item">${s.logo ? `<img src="../${esc(s.logo)}" alt="" loading="lazy"/>` : `<i aria-hidden="true">${esc(ini(s.name))}</i>`}<div><b>${esc(s.name)}</b>${s.sub ? `<span>${esc(s.sub)}</span>` : ""}</div></div>`).join("");
+    el.innerHTML = `<div class="mono">${T[lang].trust}</div><div class="trust-rail" role="img" aria-label="${esc(ok.map((s) => s.name).join(", "))}"><div class="trust-track"><div class="trust-group">${one}</div><div class="trust-group" aria-hidden="true">${one}</div></div></div>`;
+    el.hidden = false;
+  }
+  // Upsell « Un épisode, cinq contenus » (portfolio.js → upsell) : vignettes tirées de nos vraies vidéos, jamais de prix, bouton d'appel (js/ds-booking.js)
+  function renderUpsell() {
+    const el = $("#upsell");
+    if (!P.upsell) { el.hidden = true; return; }
+    if (el.dataset.lang === lang) return; el.dataset.lang = lang;
+    const t = T[lang], items = P.items || [];
+    const pick = (cat, n, test) => items.filter((it) => it.cat === cat && (it.poster || it.image) && (!test || test(it))).sort((a, b) => (a.lang === lang ? 0 : 1) - (b.lang === lang ? 0 : 1)).slice(0, n);
+    const ep = pick("podcast-interview", 1, (it) => !it.vertical)[0], reels = pick("reels-shorts", 2), th = pick("miniatures", 1)[0], tr = pick("trailers", 1)[0];
+    const tile = (n, it, label, fmt) => `<div class="up-tile">${it ? `<img src="${esc(window.dsThumb(it))}" alt="" loading="lazy"/>` : ""}<span class="n">${n}</span><div class="lb">${label}<span>${fmt}</span></div></div>`;
+    el.innerHTML = `<div class="mono">${t.upKicker}</div><h2 class="display">${t.upTitle}</h2><p>${t.upText}</p>
+      <div class="up-pack">${tile(1, ep, t.upEp, "16:9")}${tile(2, reels[0], t.upReel, "9:16")}${tile(3, reels[1], t.upReel, "9:16")}${tile(4, th, t.upThumb, "16:9")}${tile(5, tr, t.upTrailer, "16:9")}</div>
+      <a class="btn js-book" href="#">${t.upBtn}</a>`;
+    el.hidden = false;
   }
   // Scène « bientôt » : orbe ● du logo (yeux, rebond, clin d'œil) + accessoire selon le type, texte et bouton mail
   function soonScene(ty, price) {
@@ -370,12 +518,17 @@
   $("#modalClose").addEventListener("click", closeModal);
   $("#modal").addEventListener("click", (e) => { if (e.target.id === "modal") closeModal(); });
   document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModal(); });
-  $("#langBtn").addEventListener("click", () => { lang = lang === "fr" ? "en" : "fr"; try { localStorage.setItem("ds_lang", lang); } catch {} render(); });
+  $("#langBtn").addEventListener("click", () => {
+    lang = lang === "fr" ? "en" : "fr"; try { localStorage.setItem("ds_lang", lang); } catch {}
+    if (RF) { const u = new URL(location.href); u.searchParams.set("lang", lang); history.replaceState(null, "", u); } // le lien recommandé force une langue : on garde le choix au rechargement
+    render();
+  });
   $("#giftBtn").addEventListener("click", () => giftOpen(2));
   render();
-  if (G && !unlocked && params.get("gift") !== "0") giftOpen(1);
+  if (G && !unlocked && params.get("gift") !== "0" && !PR) giftOpen(1); // portfolio perso : pas de pop-up par-dessus sa démo
 })();
 </script>
 <script src="/js/ds-track.js"></script>
+<script src="/js/ds-booking.js"></script>
 </body>
 </html>

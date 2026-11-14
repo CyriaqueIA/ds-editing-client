@@ -107,6 +107,12 @@ window.DS_PREVIEWS = {
   "reel_signature": {
     "fr": [
       {
+        "src": "../videos/apercus/reels-premium-fr-blanc-corrine-reels-1-v2-1yFTfd.mp4",
+        "poster": "../videos/apercus/reels-premium-fr-blanc-corrine-reels-1-v2-1yFTfd.jpg",
+        "title": "Blanc Corrine",
+        "vertical": true
+      },
+      {
         "src": "../videos/apercus/reels-premium-fr-shorts-11-1n-nad.mp4",
         "poster": "../videos/apercus/reels-premium-fr-shorts-11-1n-nad.jpg",
         "title": "Short · 11",
@@ -138,12 +144,6 @@ window.DS_PREVIEWS = {
       }
     ],
     "en": [
-      {
-        "src": "../videos/apercus/reels-premium-en-blanc-corrine-reels-1-v2-1yFTfd.mp4",
-        "poster": "../videos/apercus/reels-premium-en-blanc-corrine-reels-1-v2-1yFTfd.jpg",
-        "title": "Blanc Corrine",
-        "vertical": true
-      },
       {
         "src": "../videos/apercus/reels-premium-en-cv-studio-miami-reels-2-1ia8Yt.mp4",
         "poster": "../videos/apercus/reels-premium-en-cv-studio-miami-reels-2-1ia8Yt.jpg",
@@ -292,6 +292,86 @@ window.DS_PREVIEWS = {
       "image": true
     },
     {
+      "id": "1yMlP5CZiMRX0DehPgIdiPckXW4QBc078",
+      "cat": "youtube-docu",
+      "tier": null,
+      "lang": "fr",
+      "title": "Face cam · 5 questions avant de gronder",
+      "path": "videos/apercus/youtube-docu-fr-face-cam-5-questions-avant-de-gronder-1yMlP5.mp4",
+      "posterPath": "videos/apercus/youtube-docu-fr-face-cam-5-questions-avant-de-gronder-1yMlP5.jpg",
+      "vertical": true
+    },
+    {
+      "id": "1sPc2MSZ-TFuidpTFyqDRREZNxyBgpGyE",
+      "cat": "youtube-docu",
+      "tier": null,
+      "lang": "fr",
+      "title": "Face cam · Quatre ans de thérapie en une minute",
+      "path": "videos/apercus/youtube-docu-fr-face-cam-quatre-ans-de-therapie-en-une-m-1sPc2M.mp4",
+      "posterPath": "videos/apercus/youtube-docu-fr-face-cam-quatre-ans-de-therapie-en-une-m-1sPc2M.jpg",
+      "vertical": true
+    },
+    {
+      "id": "1m48K23ucswdDvCV_NFQm8o6NVfAWzcUh",
+      "cat": "youtube-docu",
+      "tier": null,
+      "lang": "fr",
+      "title": "Face cam · Ta colère cache autre chose",
+      "path": "videos/apercus/youtube-docu-fr-face-cam-ta-colere-cache-autre-chose-1m48K2.mp4",
+      "posterPath": "videos/apercus/youtube-docu-fr-face-cam-ta-colere-cache-autre-chose-1m48K2.jpg",
+      "vertical": true
+    },
+    {
+      "id": "1wQdNbard2nbSwnVHaiisf8xG33Iyvpwe",
+      "cat": "youtube-docu",
+      "tier": null,
+      "lang": "fr",
+      "title": "Réaction reportage · Plaquée pour une orange",
+      "path": "videos/apercus/youtube-docu-fr-reaction-reportage-plaquee-pour-une-oran-1wQdNb.mp4",
+      "posterPath": "videos/apercus/youtube-docu-fr-reaction-reportage-plaquee-pour-une-oran-1wQdNb.jpg",
+      "vertical": true
+    },
+    {
+      "id": "1zXw93BnEDrJYwZFyAMpsqZm9ytlj0ACH",
+      "cat": "youtube-docu",
+      "tier": null,
+      "lang": "fr",
+      "title": "Réaction reportage · Ses vêtements par la fenêtre",
+      "path": "videos/apercus/youtube-docu-fr-reaction-reportage-ses-vetements-par-la--1zXw93.mp4",
+      "posterPath": "videos/apercus/youtube-docu-fr-reaction-reportage-ses-vetements-par-la--1zXw93.jpg",
+      "vertical": true
+    },
+    {
+      "id": "1J9dRVR-7GZoTAyd7vVn5dNpYfdCNl0fx",
+      "cat": "youtube-docu",
+      "tier": null,
+      "lang": "fr",
+      "title": "Réaction Super Nanny · C'était mieux sans vous",
+      "path": "videos/apercus/youtube-docu-fr-reaction-super-nanny-c-etait-mieux-sans--1J9dRV.mp4",
+      "posterPath": "videos/apercus/youtube-docu-fr-reaction-super-nanny-c-etait-mieux-sans--1J9dRV.jpg",
+      "vertical": true
+    },
+    {
+      "id": "1VCtvLyQceRz8bIklaOGO0V99n1g5mSip",
+      "cat": "youtube-docu",
+      "tier": null,
+      "lang": "fr",
+      "title": "Réaction Super Nanny · Tu veux que je te fasse pareil",
+      "path": "videos/apercus/youtube-docu-fr-reaction-super-nanny-tu-veux-que-je-te-f-1VCtvL.mp4",
+      "posterPath": "videos/apercus/youtube-docu-fr-reaction-super-nanny-tu-veux-que-je-te-f-1VCtvL.jpg",
+      "vertical": true
+    },
+    {
+      "id": "1VKIFBNjLidFQL_a8RUmzSVictXBFxufm",
+      "cat": "youtube-docu",
+      "tier": null,
+      "lang": "fr",
+      "title": "Trend · La trend Jessica",
+      "path": "videos/apercus/youtube-docu-fr-trend-la-trend-jessica-1VKIFB.mp4",
+      "posterPath": "videos/apercus/youtube-docu-fr-trend-la-trend-jessica-1VKIFB.jpg",
+      "vertical": true
+    },
+    {
       "id": "1pIDNma--o5i_Vhw49T_AzOm8p38LbV0l",
       "cat": "ads",
       "tier": null,
@@ -372,16 +452,6 @@ window.DS_PREVIEWS = {
       "vertical": true
     },
     {
-      "id": "1yFTfdK97HQfZ5AqAkZqROMkozCtIOCZD",
-      "cat": "reels-shorts",
-      "tier": "premium",
-      "lang": "en",
-      "title": "Blanc Corrine",
-      "path": "videos/apercus/reels-premium-en-blanc-corrine-reels-1-v2-1yFTfd.mp4",
-      "posterPath": "videos/apercus/reels-premium-en-blanc-corrine-reels-1-v2-1yFTfd.jpg",
-      "vertical": true
-    },
-    {
       "id": "1ia8YtxhGMepr49X4Mi-y3vLvcmnMtajV",
       "cat": "reels-shorts",
       "tier": "premium",
@@ -419,6 +489,16 @@ window.DS_PREVIEWS = {
       "title": "Shub · Reel 4",
       "path": "videos/apercus/reels-premium-en-shub-reel-4-1QNDsM.mp4",
       "posterPath": "videos/apercus/reels-premium-en-shub-reel-4-1QNDsM.jpg",
+      "vertical": true
+    },
+    {
+      "id": "1yFTfdK97HQfZ5AqAkZqROMkozCtIOCZD",
+      "cat": "reels-shorts",
+      "tier": "premium",
+      "lang": "fr",
+      "title": "Blanc Corrine",
+      "path": "videos/apercus/reels-premium-fr-blanc-corrine-reels-1-v2-1yFTfd.mp4",
+      "posterPath": "videos/apercus/reels-premium-fr-blanc-corrine-reels-1-v2-1yFTfd.jpg",
       "vertical": true
     },
     {

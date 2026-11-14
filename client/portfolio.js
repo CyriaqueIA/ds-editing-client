@@ -23,7 +23,8 @@ window.DS_PORTFOLIO = {
     // Ads et VSL = un seul type (décision du 30/09) : `also` rattache les vidéos rangées en cat "ads" au type "vsl".
     { slug: "vsl", also: ["ads"], ratio: "16/9", fr: ["Ads / VSL", "Vidéos de vente · Meta · TikTok · YouTube"], en: ["Ads / VSL", "Sales videos · Meta · TikTok · YouTube"] },
     { slug: "reels-shorts", ratio: "9/16", fr: ["Reels & Shorts", "TikTok · Instagram · Shorts"], en: ["Reels & Shorts", "TikTok · Instagram · Shorts"] },
-    { slug: "youtube-docu", ratio: "16/9", fr: ["YouTube & Docu", "Long format · Brand film"], en: ["YouTube & Docu", "Long-form · Brand film"] },
+    // 14/11/2026 : les vidéos pour YouTubeurs (réactions, face cam, extrait d'épisode) vont ici (Drive « Youtube & docu »).
+    { slug: "youtube-docu", ratio: "16/9", fr: ["YouTube & Docu", "Réactions · Face cam · Long format"], en: ["YouTube & Docu", "Reactions · Face cam · Long-form"] },
     { slug: "ia", ratio: "16/9", fr: ["Vidéos IA", "Générées · Montées"], en: ["AI videos", "Generated · Edited"] },
     { slug: "miniatures", ratio: "16/9", fr: ["Miniatures", "Visuels de couverture"], en: ["Thumbnails", "Cover visuals"] },
     { slug: "trailers", ratio: "16/9", fr: ["Trailers", "60–90 s pour les réseaux"], en: ["Trailers", "60–90 s for socials"] },
@@ -61,6 +62,17 @@ window.DS_PORTFOLIO = {
     video: "https://drive.google.com/file/d/1GNgz84s2gym0Z1EFUfLEHcrZMXZmk4Bw/preview", // témoignage vertical, 61 s (Drive, lecture seule)
   },
 
+  // Portfolios « recommandés » (14/11/2026) : lien ?k=CLÉ&r=<slug>. Pour les contacts qu'un client nous amène.
+  // Aucun prix, jamais (même après le cadeau). Cadeau = téléphone + e-mail, puis « 1er montage offert ».
+  // `by` : nom affiché (« Recommandé par … ») · `lang` : langue d'ouverture (le bouton FR/EN reste là).
+  referrals: {
+    "april-jackson": { by: "April Jackson", lang: "en" },
+  },
+
+  // Upsell sous la grille de tous les portfolios (14/11/2026) : « Un épisode, cinq contenus » (épisode + 2 reels + miniature + trailer).
+  // Jamais de prix. false = bloc masqué.
+  upsell: true,
+
   // Types sans exemple qui affichent la scène animée « bientôt » (orbe + « Premier montage offert ») au lieu des cases vides.
   // La scène disparaît d'elle-même dès qu'une vidéo du type arrive du Drive.
   soon: ["ia", "youtube-docu"],
@@ -85,6 +97,7 @@ window.DS_PORTFOLIO = {
 
   // Studios et créateurs qui nous confient leurs montages (section « Ils nous font confiance »).
   // `ok: true` = affiché. Logo dans assets/clients/. Cliquer sur un studio ouvre ses vidéos (items dont studio = name).
+  // Aussi la bande défilante en haut du portfolio privé (logo, sinon initiales).
   studios: [
     { name: "The Move Miami", sub: "", url: "https://www.themovemiami.com", logo: "assets/clients/the-move-miami.png", ok: true },
     { name: "Mediacast", sub: "", url: "", logo: "assets/clients/mediacast.png", ok: true },
@@ -95,6 +108,13 @@ window.DS_PORTFOLIO = {
     { name: "DotCom", sub: "", url: "", logo: "assets/clients/dotcom.png", ok: true },
     { name: "Sept-Up", sub: "", url: "https://septup.io", logo: "assets/clients/sept-up.png", ok: true },
     { name: "Prime Studio", sub: "", url: "", logo: "assets/clients/prime-studio.png", ok: true },
+    // 14/11/2026 : ajoutés à la bande défilante sur demande de Cyriaque. Logos pris sur leurs sites (blueroomstudio.fr, podblend.fr,
+    // thepodhouse.fr, topovideo.com). April Jackson : aucun logo trouvé → initiales.
+    { name: "Blue Room", sub: "Podcast studio", url: "https://blueroomstudio.fr", logo: "assets/clients/blue-room.png", ok: true },
+    { name: "Podblend", sub: "Podcast studio", url: "https://podblend.fr", logo: "assets/clients/podblend.png", ok: true },
+    { name: "The Pod House", sub: "Podcast studio", url: "https://thepodhouse.fr", logo: "assets/clients/the-pod-house.png", ok: true },
+    { name: "Topo Video", sub: "", url: "https://www.topovideo.com", logo: "assets/clients/topo-video.png", ok: true },
+    { name: "April Jackson", sub: "", url: "", logo: "", ok: true },
   ],
 
   // Studio de chaque vidéo du Drive : { "<id Drive de la vidéo>": "Nom exact d'un studio ci-dessus" }.
@@ -126,6 +146,6 @@ window.dsEmbed = function (url) {
 
 // Traductions NL / DA (accueil). Le français et l'anglais restent au-dessus.
 (function () {
-  var X = {"nl": {"types": {"podcast-interview": ["Podcast & Interview", "Multicam · Talk"], "vsl": ["Ads / VSL", "Salesvideo’s · Meta · TikTok · YouTube"], "reels-shorts": ["Reels & Shorts", "TikTok · Instagram · Shorts"], "youtube-docu": ["YouTube & Docu", "Long-form · Brand film"], "ia": ["AI-video’s", "Gegenereerd · Gemonteerd"], "miniatures": ["Thumbnails", "Covervisuals"], "trailers": ["Trailers", "60–90 s voor socials"]}, "tiers": {"standard": ["Standard", "Strakke, goed getimede montage, eenvoudige graphics, gemixt geluid, eenvoudige intro."], "premium": ["Premium", "Standard + een pakkende cold open van 45 s, motion titles, sound design."], "signature": ["Signature", "Premium + een intro in “Diary of a CEO”-stijl, premium B-roll, prioritaire levering."]}}, "da": {"types": {"podcast-interview": ["Podcast & Interview", "Multicam · Talk"], "vsl": ["Ads / VSL", "Salgsvideoer · Meta · TikTok · YouTube"], "reels-shorts": ["Reels & Shorts", "TikTok · Instagram · Shorts"], "youtube-docu": ["YouTube & Docu", "Long-form · Brandfilm"], "ia": ["AI-videoer", "Genereret · Klippet"], "miniatures": ["Thumbnails", "Covervisuals"], "trailers": ["Trailere", "60–90 s til sociale medier"]}, "tiers": {"standard": ["Standard", "Rent klip med tempo, enkel grafik, mixet lyd, enkel intro."], "premium": ["Premium", "Standard + en slagkraftig cold open på 45 s, animerede titler, sounddesign."], "signature": ["Signature", "Premium + en intro i “Diary of a CEO”-stil, premium b-roll, prioriteret levering."]}}}, P = window.DS_PORTFOLIO;
+  var X = {"nl": {"types": {"podcast-interview": ["Podcast & Interview", "Multicam · Talk"], "vsl": ["Ads / VSL", "Salesvideo’s · Meta · TikTok · YouTube"], "reels-shorts": ["Reels & Shorts", "TikTok · Instagram · Shorts"], "youtube-docu": ["YouTube & Docu", "Reacties · Face cam · Long-form"], "ia": ["AI-video’s", "Gegenereerd · Gemonteerd"], "miniatures": ["Thumbnails", "Covervisuals"], "trailers": ["Trailers", "60–90 s voor socials"]}, "tiers": {"standard": ["Standard", "Strakke, goed getimede montage, eenvoudige graphics, gemixt geluid, eenvoudige intro."], "premium": ["Premium", "Standard + een pakkende cold open van 45 s, motion titles, sound design."], "signature": ["Signature", "Premium + een intro in “Diary of a CEO”-stijl, premium B-roll, prioritaire levering."]}}, "da": {"types": {"podcast-interview": ["Podcast & Interview", "Multicam · Talk"], "vsl": ["Ads / VSL", "Salgsvideoer · Meta · TikTok · YouTube"], "reels-shorts": ["Reels & Shorts", "TikTok · Instagram · Shorts"], "youtube-docu": ["YouTube & Docu", "Reaktioner · Face cam · Long-form"], "ia": ["AI-videoer", "Genereret · Klippet"], "miniatures": ["Thumbnails", "Covervisuals"], "trailers": ["Trailere", "60–90 s til sociale medier"]}, "tiers": {"standard": ["Standard", "Rent klip med tempo, enkel grafik, mixet lyd, enkel intro."], "premium": ["Premium", "Standard + en slagkraftig cold open på 45 s, animerede titler, sounddesign."], "signature": ["Signature", "Premium + en intro i “Diary of a CEO”-stil, premium b-roll, prioriteret levering."]}}}, P = window.DS_PORTFOLIO;
   Object.keys(X).forEach(function (l) { ["types", "tiers"].forEach(function (k) { (P[k] || []).forEach(function (o) { if (X[l][k][o.slug]) o[l] = X[l][k][o.slug]; }); }); });
 })();
