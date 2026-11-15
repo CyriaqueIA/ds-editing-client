@@ -292,6 +292,36 @@ window.DS_PREVIEWS = {
       "image": true
     },
     {
+      "id": "1ImYdE9qz0uc9zpnUOoW4piZMWg6PC7-R",
+      "cat": "youtube-docu",
+      "tier": null,
+      "lang": "en",
+      "title": "A Life Elsewhere · A Japanese woman in Cambodia",
+      "path": "videos/apercus/youtube-docu-en-a-life-elsewhere-a-japanese-woman-in-cam-1ImYdE.mp4",
+      "posterPath": "videos/apercus/youtube-docu-en-a-life-elsewhere-a-japanese-woman-in-cam-1ImYdE.jpg",
+      "vertical": false
+    },
+    {
+      "id": "17zWejEslQvx6jTLM9TN2TGr6NoHlZ0gg",
+      "cat": "youtube-docu",
+      "tier": null,
+      "lang": "en",
+      "title": "A Life Elsewhere · Ex-military cop, found God in Bali",
+      "path": "videos/apercus/youtube-docu-en-a-life-elsewhere-ex-military-cop-found-g-17zWej.mp4",
+      "posterPath": "videos/apercus/youtube-docu-en-a-life-elsewhere-ex-military-cop-found-g-17zWej.jpg",
+      "vertical": false
+    },
+    {
+      "id": "17sSZiXWxC9hxIol1Fu597F2AXSxHTzjK",
+      "cat": "youtube-docu",
+      "tier": null,
+      "lang": "en",
+      "title": "Elevéte with Andrea · Dance conventions",
+      "path": "videos/apercus/youtube-docu-en-elevete-with-andrea-dance-conventions-17sSZi.mp4",
+      "posterPath": "videos/apercus/youtube-docu-en-elevete-with-andrea-dance-conventions-17sSZi.jpg",
+      "vertical": false
+    },
+    {
       "id": "1yMlP5CZiMRX0DehPgIdiPckXW4QBc078",
       "cat": "youtube-docu",
       "tier": null,
@@ -320,6 +350,16 @@ window.DS_PREVIEWS = {
       "path": "videos/apercus/youtube-docu-fr-face-cam-ta-colere-cache-autre-chose-1m48K2.mp4",
       "posterPath": "videos/apercus/youtube-docu-fr-face-cam-ta-colere-cache-autre-chose-1m48K2.jpg",
       "vertical": true
+    },
+    {
+      "id": "1GIIaeJ9UmqHbrXKLedqonTeCLWiaNpTK",
+      "cat": "youtube-docu",
+      "tier": null,
+      "lang": "fr",
+      "title": "Michel Khoury · Avocate, emprise et couple toxique",
+      "path": "videos/apercus/youtube-docu-fr-michel-khoury-avocate-emprise-et-couple--1GIIae.mp4",
+      "posterPath": "videos/apercus/youtube-docu-fr-michel-khoury-avocate-emprise-et-couple--1GIIae.jpg",
+      "vertical": false
     },
     {
       "id": "1wQdNbard2nbSwnVHaiisf8xG33Iyvpwe",
@@ -390,6 +430,26 @@ window.DS_PREVIEWS = {
       "path": "videos/apercus/ads-brandrukus-vsl-1-132RfM.mp4",
       "posterPath": "videos/apercus/ads-brandrukus-vsl-1-132RfM.jpg",
       "vertical": true
+    },
+    {
+      "id": "1_SGIX3EOlhkTFdzw1zlJsredHSGqbtBU",
+      "cat": "ads",
+      "tier": null,
+      "lang": null,
+      "title": "IN IT · VSL Barefaced Holiday Sale",
+      "path": "videos/apercus/ads-in-it-vsl-barefaced-holiday-sale-1_SGIX.mp4",
+      "posterPath": "videos/apercus/ads-in-it-vsl-barefaced-holiday-sale-1_SGIX.jpg",
+      "vertical": false
+    },
+    {
+      "id": "1Sr9R7fMh9vvocbLHd0QKgXztDXQo2ffK",
+      "cat": "ads",
+      "tier": null,
+      "lang": null,
+      "title": "IN IT · VSL Barefaced pour les auditeurs",
+      "path": "videos/apercus/ads-in-it-vsl-barefaced-pour-les-auditeurs-1Sr9R7.mp4",
+      "posterPath": "videos/apercus/ads-in-it-vsl-barefaced-pour-les-auditeurs-1Sr9R7.jpg",
+      "vertical": false
     },
     {
       "id": "1bxLr1_4Ip_mKTrvaQpu9MbwggWk7tJk-",

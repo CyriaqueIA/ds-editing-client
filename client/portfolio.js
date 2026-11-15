@@ -117,12 +117,46 @@ window.DS_PORTFOLIO = {
     { name: "The Pod House", sub: "Podcast studio", url: "https://thepodhouse.fr", logo: "assets/clients/the-pod-house.png", ok: true },
     { name: "Topo Video", sub: "", url: "https://www.topovideo.com", logo: "assets/clients/topo-video.png", ok: true },
     { name: "April Jackson", sub: "", url: "", logo: "", ok: true },
+    // 15/11/2026 : ajoutés sur demande de Cyriaque (message « Ajouter Brooklyn House of Content, Republichild, Michel Khoury »).
+    // Logos : site brooklyncontenthouse.com, avatars YouTube @republichild et @iam_michelkhoury.
+    { name: "The Brooklyn Content House", sub: "Podcast studio", url: "https://www.brooklyncontenthouse.com", logo: "assets/clients/brooklyn-content-house.png", ok: true },
+    { name: "Republichild", sub: "Content creator", url: "https://www.youtube.com/@republichild", logo: "assets/clients/republichild.png", ok: true },
+    { name: "Michel Khoury", sub: "Podcast", url: "https://www.youtube.com/@iam_michelkhoury", logo: "assets/clients/michel-khoury.png", ok: true },
   ],
 
   // Studio de chaque vidéo du Drive : { "<id Drive de la vidéo>": "Nom exact d'un studio ci-dessus" }.
   // Les ids sont dans client/previews.js (items[].id). Rempli par Cyriaque ; vide = la vidéo n'est rattachée à aucun studio.
+  // 15/11/2026 : rattachements vérifiés (chaînes YouTube, Vault) ; Elevéte → The Move Miami et Confessions Nocturnes → Prime Studio (réponse de Cyriaque).
+  // Un clic sur un studio de la bande défilante ouvre toutes ses vidéos.
   videoStudios: {
-    "1f_J_-BPF7y_SVGedwqcicnV0o9NsbVYZ": "The Move Miami", // The Move Miami_Hannah Podcast_Extrait portfolio 4 min
+    "1f_J_-BPF7y_SVGedwqcicnV0o9NsbVYZ": "The Move Miami", // The Move Miami_Hannah Podcast_Extrait portfolio 4 min (IN IT)
+    "1ia8YtxhGMepr49X4Mi-y3vLvcmnMtajV": "The Move Miami", // CV Studio Miami · 2
+    "1lbWrUp4jGpwnH38HCs9LqOG0EM6cKim9": "The Move Miami", // CV Studio Miami · 5
+    "1eKPTAC37BuDmq3wq-TAmLzksJy1F1Axa": "The Move Miami", // Elevate · Intro ép. 1
+    "1wyl7MzSfbkSST_friOOq5kTZjYQn7jWs": "The Move Miami", // Elevate · Intro ép. 2
+    "1Bx_vj9K-icym2lo9Nqt6JfQ5lzb9j86a": "The Move Miami", // Elevate · Trailer
+    "1GpUlBRqN4MYmbA4-PjMnKH4YnG3AxA0C": "The Move Miami", // Elevate Pod · Ép. 1
+    "1Hhp3QD_4Qk3KyGtFAwLKlIcAKvvG6b0Q": "The Move Miami", // Elevate · Trailer vertical
+    "1hIvkk9431OmmQM6usDhbXG3eydu11pOn": "A Life Elsewhere", // A Black Woman in Asia · Best of
+    "146h9bG0lgmIXeHNP3yt-KZ6NsDBWUJxl": "A Life Elsewhere", // miniature 7 Kids in Jamaica
+    "1HU0wT3VhG9k7x0FTNN7NTQo16zC-cy0e": "A Life Elsewhere", // miniature I Couldn't Have Kids
+    "1GcXWVCtbrnLeLEVqgtI4QKgkVYG14dcM": "A Life Elsewhere", // miniature Police in Africa
+    "1Eoj9L5vk7p1rvXk8Qr3uurR4MSGJS_B4": "A Life Elsewhere", // miniature She Planned South America
+    "1yMlP5CZiMRX0DehPgIdiPckXW4QBc078": "Republichild", // Face cam · 5 questions avant de gronder
+    "1sPc2MSZ-TFuidpTFyqDRREZNxyBgpGyE": "Republichild", // Face cam · Quatre ans de thérapie en une minute
+    "1m48K23ucswdDvCV_NFQm8o6NVfAWzcUh": "Republichild", // Face cam · Ta colère cache autre chose
+    "1wQdNbard2nbSwnVHaiisf8xG33Iyvpwe": "Republichild", // Réaction reportage · Plaquée pour une orange
+    "1zXw93BnEDrJYwZFyAMpsqZm9ytlj0ACH": "Republichild", // Réaction reportage · Ses vêtements par la fenêtre
+    "1J9dRVR-7GZoTAyd7vVn5dNpYfdCNl0fx": "Republichild", // Réaction Super Nanny · C'était mieux sans vous
+    "1VCtvLyQceRz8bIklaOGO0V99n1g5mSip": "Republichild", // Réaction Super Nanny · Tu veux que je te fasse pareil
+    "1VKIFBNjLidFQL_a8RUmzSVictXBFxufm": "Republichild", // Trend · La trend Jessica
+    // Lot du 15/11 (liens YouTube et Frame.io envoyés par Cyriaque)
+    "17zWejEslQvx6jTLM9TN2TGr6NoHlZ0gg": "A Life Elsewhere", // Ex-military cop, found God in Bali (YouTube, extrait 4 min)
+    "1ImYdE9qz0uc9zpnUOoW4piZMWg6PC7-R": "A Life Elsewhere", // A Japanese woman in Cambodia (YouTube, extrait 4 min)
+    "17sSZiXWxC9hxIol1Fu597F2AXSxHTzjK": "The Move Miami", // Elevéte with Andrea · Dance conventions (YouTube, extrait 4 min)
+    "1GIIaeJ9UmqHbrXKLedqonTeCLWiaNpTK": "Michel Khoury", // Avocate, emprise et couple toxique (YouTube, extrait 4 min)
+    "1Sr9R7fMh9vvocbLHd0QKgXztDXQo2ffK": "The Move Miami", // IN IT · VSL Barefaced pour les auditeurs (Frame.io)
+    "1_SGIX3EOlhkTFdzw1zlJsredHSGqbtBU": "The Move Miami", // IN IT · VSL Barefaced Holiday Sale (Frame.io)
   },
 
   contactEmail: "cyriaque.gely@ds-editing.com",

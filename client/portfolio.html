@@ -198,6 +198,26 @@
     .trust-item span{display:block;font-size:11px;color:var(--taupe);white-space:nowrap}
     @keyframes trust{to{transform:translateX(-50%)}}
     @media (max-width:640px){.trust{padding:8px 0}.trust>.mono{display:none}}
+    /* Studio avec des projets : cliquable (ouvre le panneau #sp) */
+    .trust-item.has{cursor:pointer;transition:border-color .2s,background .2s}
+    .trust-item.has:hover,.trust-item.has:focus-visible{border-color:var(--line-strong);background:var(--surface-2);outline:none}
+    .trust-item.has span{color:var(--accent2)}
+
+    /* ---- Panneau « nos projets pour <studio> » (clic dans la bande défilante) ---- */
+    .sp{position:fixed;inset:0;z-index:45;background:rgba(5,6,7,.86);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);display:none;align-items:flex-start;justify-content:center;padding:40px 16px;overflow:auto}
+    .sp.open{display:flex}
+    .sp .box{width:min(1100px,100%);background:var(--glass),var(--surface);border:1px solid var(--line-strong);border-radius:22px;padding:22px;box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 30px 80px rgba(0,0,0,.6);animation:rise .4s cubic-bezier(.2,.8,.2,1) both}
+    .sp-head{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+    .sp-head img,.sp-head i{width:52px;height:52px;border-radius:12px;object-fit:cover;flex:none}
+    .sp-head i{display:flex;align-items:center;justify-content:center;font-style:normal;font-weight:700;font-size:16px;background:var(--chrome);color:#0A0B0D}
+    .sp-head .mono{margin-bottom:4px}
+    .sp-head h2{margin:0;font-size:clamp(22px,3vw,30px)}
+    .sp-head small{color:var(--taupe);font-size:13px}
+    .sp-head .x{margin-left:auto;align-self:flex-start;background:none;border:none;color:var(--taupe);font-size:26px;line-height:1;cursor:pointer;padding:4px}
+    .sp-head .x:hover{color:var(--cream)}
+    @media (max-width:640px){.sp{padding:16px 10px}.sp .box{padding:16px}}
+    /* Type qui mélange 16:9 et 9:16 (ex. YouTube & Docu) : deux grilles l'une sous l'autre */
+    .grid-stack{display:flex;flex-direction:column;gap:12px}
 
     /* ---- Upsell sous la grille (portfolio.js → upsell) : « Un épisode, cinq contenus », jamais de prix ---- */
     .upsell{margin:34px 0 0;padding:30px 32px;border:1px solid var(--line);border-radius:22px;background:var(--glass),var(--surface);box-shadow:inset 0 1px 0 rgba(255,255,255,.06);position:relative;overflow:hidden}
@@ -247,9 +267,10 @@
 </div>
 <div class="modal" id="modal"><div class="box"><div class="bar"><span id="modalTitle"></span><button type="button" id="modalClose">×</button></div><div id="modalMedia"></div></div></div>
 <div class="gift" id="gift" role="dialog" aria-modal="true" aria-labelledby="giftTitle"><div class="box" id="giftBox"></div></div>
+<div class="sp" id="sp" role="dialog" aria-modal="true" aria-labelledby="spTitle"><div class="box"><div class="sp-head" id="spHead"></div><div id="spGrid"></div></div></div>
 
-<script src="portfolio.js?v=16"></script>
-<script src="previews.js?v=11"></script>
+<script src="portfolio.js?v=17"></script>
+<script src="previews.js?v=12"></script>
 <script src="prospects.js?v=1"></script>
 <script>
 (function () {
@@ -282,7 +303,7 @@
       g1Kicker: "Témoignage client", g1Title: "{studio} nous confie ses montages.", g1Text: "Une minute, en vidéo, sur notre façon de travailler.", g1Btn: "Voir les tarifs", skip: "Passer",
       g2Kicker: "Avant les tarifs", g2Title: "On a un cadeau pour vous.", g2Text: "Laissez votre numéro et le nom de votre podcast pour le découvrir.", phone: "Votre numéro", phonePh: "06 12 34 56 78", podcast: "Nom de votre podcast", podcastPh: "Mon podcast", g2Btn: "Découvrir mon cadeau", sending: "Envoi…", g2Note: "On ne vous appelle que pour votre cadeau.", errPhone: "Ce numéro ne semble pas valide.", errPodcast: "Indiquez le nom de votre podcast.",
       g3Kicker: "Votre cadeau", g3Title: "Votre premier montage est offert.", g3Text: "On vous appelle au {phone} pour lancer le premier épisode de {podcast}. Voici nos tarifs : le premier, c'est nous qui l'offrons.", g3Btn: "Voir les tarifs", free: "1er montage offert",
-      trust: "Ils nous confient leurs montages",
+      trust: "Ils nous confient leurs montages · cliquez pour voir", spKicker: "Nos projets pour", projects1: "1 projet", projectsN: "{n} projets",
       upKicker: "Pour aller plus loin", upTitle: "Un épisode, <em>cinq</em> contenus.", upText: "On monte l'épisode, puis on en tire 2 reels, la miniature et le trailer. De quoi publier partout à partir d'un seul tournage.", upBtn: "Réserver un appel",
       upEp: "Épisode", upReel: "Reel", upThumb: "Miniature", upTrailer: "Trailer" },
     en: { sub: "Production examples", private: "Private link", contact: "Get in touch", types: "Content type", soon: "Coming soon", quote: "On quote", unique: "Single package", uniqueDesc: "One package for this format.", perVideo: "per delivered video, excl. VAT", noneTier: "No example in this package yet", noneTierSub: "The price still applies: {p} per delivered video.", count1: "{n} example in {f}", countN: "{n} examples in {f}", footPrice: "prices excl. VAT, per delivered video", soonPrice: "Planned price for this format: {p}.", gate: "This space is reserved for studios we're talking with. Ask for your link at contact@ds-editing.com.",
@@ -291,7 +312,7 @@
       g1Kicker: "Client testimonial", g1Title: "{studio} trusts us with their edits.", g1Text: "One minute, on video, about how we work.", g1Btn: "See pricing", skip: "Skip",
       g2Kicker: "Before pricing", g2Title: "We have a gift for you.", g2Text: "Leave your number and your podcast's name to unlock it.", phone: "Your phone number", phonePh: "+1 305 555 0123", podcast: "Your podcast's name", podcastPh: "My podcast", g2Btn: "Unlock my gift", sending: "Sending…", g2Note: "We'll only call you about your gift.", errPhone: "That number doesn't look valid.", errPodcast: "Please enter your podcast's name.",
       g3Kicker: "Your gift", g3Title: "Your first edit is on us.", g3Text: "We'll call you at {phone} to kick off the first episode of {podcast}. Here's our pricing: the first one is on us.", g3Btn: "See pricing", free: "1st edit on us",
-      trust: "They trust us with their edits",
+      trust: "They trust us with their edits · click to see", spKicker: "Our work for", projects1: "1 project", projectsN: "{n} projects",
       upKicker: "Go further", upTitle: "One episode, <em>five</em> pieces of content.", upText: "We edit the episode, then cut 2 reels, the thumbnail and the trailer from it. Everything you need to publish everywhere from a single recording.", upBtn: "Book a call",
       upEp: "Episode", upReel: "Reel", upThumb: "Thumbnail", upTrailer: "Trailer" },
   };
@@ -434,18 +455,41 @@
     const grid = $("#grid");
     $("#foot").textContent = "";
     if (soon) { grid.className = "soon-host"; grid.innerHTML = soonScene(ty, price); return; }
-    const allVert = items.length ? items.every((it) => it.vertical ?? ty.ratio === "9/16") : ty.ratio === "9/16"; grid.className = "video-grid" + (allVert ? " vert" : "");
-    grid.innerHTML = items.length
-      ? items.map((it, i) => `<div class="video-cell${it.vertical ? " v" : ""}" data-i="${i}"><img src="${window.dsThumb(it)}" alt=""/><div class="video-overlay"><div class="play-btn">▶</div></div><div class="cap">${it.title || ""}<span>${studio(it)}</span></div></div>`).join("")
-      : `<div class="none-tier"><b>${t.noneTier}</b>${price ? `<span>${t.noneTierSub.replace("{p}", esc(price))}</span>` : ""}</div>`;
+    if (items.length) videoGrid(grid, items, ty.ratio === "9/16");
+    else { grid.className = "video-grid" + (ty.ratio === "9/16" ? " vert" : ""); grid.innerHTML = `<div class="none-tier"><b>${t.noneTier}</b>${price ? `<span>${t.noneTierSub.replace("{p}", esc(price))}</span>` : ""}</div>`; }
     if (items.length) {
       // type sans formule (ex. YouTube & Docu) : « 2 exemples », sans « en standard »
       const f = unique ? t.unique.toLowerCase() : tiered ? tiers.find((x) => x.slug === tier)[lang][0].toLowerCase() : "";
       const c = (items.length === 1 ? t.count1 : t.countN).replace("{n}", items.length);
       $("#foot").textContent = `${f ? c.replace("{f}", f) : c.replace(/ (en|in) \{f\}/, "")}${price ? ` · ${t.footPrice}` : ""}`;
     }
-    grid.querySelectorAll(".video-cell[data-i]").forEach((cell) => cell.addEventListener("click", () => play(cell, items[+cell.dataset.i])));
   }
+  // Grille de vidéos (portfolio et panneau studio) : images chargées au défilement ; 16:9 et 9:16 dans deux grilles quand le lot mélange les deux
+  function videoGrid(el, items, vertDefault) {
+    const isV = (it) => it.vertical ?? vertDefault;
+    const cell = (it, i) => `<div class="video-cell${isV(it) ? " v" : ""}" data-i="${i}"><img src="${esc(window.dsThumb(it))}" alt="" loading="lazy" decoding="async"/><div class="video-overlay"><div class="play-btn">▶</div></div><div class="cap">${esc(it.title || "")}<span>${esc(studio(it))}</span></div></div>`;
+    const all = items.map((it, i) => [it, i]), hz = all.filter(([it]) => !isV(it)), vt = all.filter(([it]) => isV(it));
+    const g = (list, vert) => `<div class="video-grid${vert ? " vert" : ""}">${list.map(([it, i]) => cell(it, i)).join("")}</div>`;
+    if (hz.length && vt.length) { el.className = "grid-stack"; el.innerHTML = g(hz, false) + g(vt, true); }
+    else { el.className = "video-grid" + (vt.length ? " vert" : ""); el.innerHTML = all.map(([it, i]) => cell(it, i)).join(""); }
+    el.querySelectorAll(".video-cell[data-i]").forEach((c) => c.addEventListener("click", () => play(c, items[+c.dataset.i])));
+  }
+  const ini = (n) => { const w = String(n).split(/\s+/).filter((x) => x && !/^(the|le|la|les)$/i.test(x)); return (w.length > 1 ? w[0][0] + w[1][0] : (w[0] || "").slice(0, 1)).toUpperCase(); };
+  const pcount = (n) => (n === 1 ? T[lang].projects1 : T[lang].projectsN.replace("{n}", n));
+  const studioItems = (name) => (P.items || []).filter((it) => it.studio === name && it.cat !== "cta");
+  // Panneau « nos projets pour <studio> » : toutes ses vidéos et miniatures, lecture sur place
+  function openStudio(name) {
+    const st = (P.studios || []).find((s) => s.name === name) || { name }, items = studioItems(name);
+    if (!items.length) return;
+    $("#spHead").innerHTML = `${st.logo ? `<img src="../${esc(st.logo)}" alt=""/>` : `<i aria-hidden="true">${esc(ini(name))}</i>`}<div><div class="mono">${T[lang].spKicker}</div><h2 class="display" id="spTitle">${esc(name)}</h2><small>${pcount(items.length)}</small></div><button class="x" type="button" aria-label="×">×</button>`;
+    $("#spHead .x").addEventListener("click", closeStudio);
+    videoGrid($("#spGrid"), items, false);
+    $("#sp").classList.add("open"); document.body.style.overflow = "hidden";
+  }
+  function closeStudio() { $("#sp").classList.remove("open"); $("#spGrid").innerHTML = ""; document.body.style.overflow = ""; }
+  $("#sp").addEventListener("click", (e) => { if (e.target.id === "sp") closeStudio(); });
+  // Échap : la fenêtre vidéo d'abord (elle est au-dessus), sinon le panneau studio
+  window.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("#modal").classList.contains("open") && $("#sp").classList.contains("open")) closeStudio(); }, true);
   // Bloc du portfolio perso : « Préparé pour {prénom} », SA démo, 3 accroches, appel de 20 min, cadeau
   function renderProspect() {
     if (!PR) return;
@@ -471,9 +515,11 @@
     const el = $("#trust"), ok = (P.studios || []).filter((s) => s.ok);
     if (!ok.length) { el.hidden = true; return; }
     if (el.dataset.lang === lang) return; el.dataset.lang = lang;
-    const ini = (n) => { const w = n.split(/\s+/).filter((x) => x && !/^(the|le|la|les)$/i.test(x)); return (w.length > 1 ? w[0][0] + w[1][0] : (w[0] || "").slice(0, 1)).toUpperCase(); };
-    const one = ok.map((s) => `<div class="trust-item">${s.logo ? `<img src="../${esc(s.logo)}" alt="" loading="lazy"/>` : `<i aria-hidden="true">${esc(ini(s.name))}</i>`}<div><b>${esc(s.name)}</b>${s.sub ? `<span>${esc(s.sub)}</span>` : ""}</div></div>`).join("");
-    el.innerHTML = `<div class="mono">${T[lang].trust}</div><div class="trust-rail" role="img" aria-label="${esc(ok.map((s) => s.name).join(", "))}"><div class="trust-track"><div class="trust-group">${one}</div><div class="trust-group" aria-hidden="true">${one}</div></div></div>`;
+    // Studio avec au moins une vidéo rattachée (portfolio.js → videoStudios) : cliquable, « N projets » à la place du sous-titre
+    const one = (dup) => ok.map((s) => { const n = studioItems(s.name).length;
+      return `<div class="trust-item${n ? " has" : ""}"${n ? ` data-studio="${esc(s.name)}" role="button" tabindex="${dup ? -1 : 0}"` : ""}>${s.logo ? `<img src="../${esc(s.logo)}" alt="" loading="lazy"/>` : `<i aria-hidden="true">${esc(ini(s.name))}</i>`}<div><b>${esc(s.name)}</b>${n ? `<span>${pcount(n)}</span>` : s.sub ? `<span>${esc(s.sub)}</span>` : ""}</div></div>`; }).join("");
+    el.innerHTML = `<div class="mono">${T[lang].trust}</div><div class="trust-rail"><div class="trust-track"><div class="trust-group">${one(false)}</div><div class="trust-group" aria-hidden="true">${one(true)}</div></div></div>`;
+    el.querySelectorAll("[data-studio]").forEach((b) => { const go = () => openStudio(b.dataset.studio); b.addEventListener("click", go); b.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } }); });
     el.hidden = false;
   }
   // Upsell « Un épisode, cinq contenus » (portfolio.js → upsell) : vignettes tirées de nos vraies vidéos, jamais de prix, bouton d'appel (js/ds-booking.js)
