@@ -157,6 +157,10 @@ window.DS_PORTFOLIO = {
     "1GIIaeJ9UmqHbrXKLedqonTeCLWiaNpTK": "Michel Khoury", // Avocate, emprise et couple toxique (YouTube, extrait 4 min)
     "1Sr9R7fMh9vvocbLHd0QKgXztDXQo2ffK": "The Move Miami", // IN IT · VSL Barefaced pour les auditeurs (Frame.io)
     "1_SGIX3EOlhkTFdzw1zlJsredHSGqbtBU": "The Move Miami", // IN IT · VSL Barefaced Holiday Sale (Frame.io)
+    "1GKB2yKG3EEl2w3PBF411yJelPpAcRH7M": "The Move Miami", // CV Studio Miami · Los 5 principios de la nutrición (YouTube, extrait 4 min)
+    "1J0n19Z3xd3nKCJZMlvSUZAojTiv5ruXG": "The Move Miami", // CV Studio Miami · Kyle's coaching story (YouTube, extrait 4 min)
+    "1UaasCSgfpaGecfNBLLAf4Qeq6lNn5Pfe": "The Move Miami", // IN IT Podcast · The Motherload of the Mental Load (YouTube, extrait 4 min)
+    "1QhuZers9XpAWekoe1Ph8q65NdeCOHsw4": "Prime Studio", // Confessions Nocturnes · Aïna (YouTube, extrait 4 min) — rattachement donné par Cyriaque
   },
 
   contactEmail: "cyriaque.gely@ds-editing.com",

@@ -292,6 +292,16 @@ window.DS_PREVIEWS = {
       "image": true
     },
     {
+      "id": "1GKB2yKG3EEl2w3PBF411yJelPpAcRH7M",
+      "cat": "youtube-docu",
+      "tier": null,
+      "lang": null,
+      "title": "CV Studio Miami · Los 5 principios de la nutrición",
+      "path": "videos/apercus/youtube-docu-cv-studio-miami-los-5-principios-de-la-n-1GKB2y.mp4",
+      "posterPath": "videos/apercus/youtube-docu-cv-studio-miami-los-5-principios-de-la-n-1GKB2y.jpg",
+      "vertical": false
+    },
+    {
       "id": "1ImYdE9qz0uc9zpnUOoW4piZMWg6PC7-R",
       "cat": "youtube-docu",
       "tier": null,
@@ -312,6 +322,16 @@ window.DS_PREVIEWS = {
       "vertical": false
     },
     {
+      "id": "1J0n19Z3xd3nKCJZMlvSUZAojTiv5ruXG",
+      "cat": "youtube-docu",
+      "tier": null,
+      "lang": "en",
+      "title": "CV Studio Miami · Kyle's coaching story",
+      "path": "videos/apercus/youtube-docu-en-cv-studio-miami-kyle-s-coaching-story-1J0n19.mp4",
+      "posterPath": "videos/apercus/youtube-docu-en-cv-studio-miami-kyle-s-coaching-story-1J0n19.jpg",
+      "vertical": false
+    },
+    {
       "id": "17sSZiXWxC9hxIol1Fu597F2AXSxHTzjK",
       "cat": "youtube-docu",
       "tier": null,
@@ -319,6 +339,26 @@ window.DS_PREVIEWS = {
       "title": "Elevéte with Andrea · Dance conventions",
       "path": "videos/apercus/youtube-docu-en-elevete-with-andrea-dance-conventions-17sSZi.mp4",
       "posterPath": "videos/apercus/youtube-docu-en-elevete-with-andrea-dance-conventions-17sSZi.jpg",
+      "vertical": false
+    },
+    {
+      "id": "1UaasCSgfpaGecfNBLLAf4Qeq6lNn5Pfe",
+      "cat": "youtube-docu",
+      "tier": null,
+      "lang": "en",
+      "title": "IN IT Podcast · The Motherload of the Mental Load",
+      "path": "videos/apercus/youtube-docu-en-in-it-podcast-the-motherload-of-the-ment-1UaasC.mp4",
+      "posterPath": "videos/apercus/youtube-docu-en-in-it-podcast-the-motherload-of-the-ment-1UaasC.jpg",
+      "vertical": false
+    },
+    {
+      "id": "1QhuZers9XpAWekoe1Ph8q65NdeCOHsw4",
+      "cat": "youtube-docu",
+      "tier": null,
+      "lang": "fr",
+      "title": "Confessions Nocturnes · Aïna, sans tabou",
+      "path": "videos/apercus/youtube-docu-fr-confessions-nocturnes-aina-sans-tabou-1QhuZe.mp4",
+      "posterPath": "videos/apercus/youtube-docu-fr-confessions-nocturnes-aina-sans-tabou-1QhuZe.jpg",
       "vertical": false
     },
     {
