@@ -327,12 +327,14 @@
   };
   if (RF) {
     // Recommandés : aucun mot sur les tarifs, le formulaire demande téléphone + e-mail
-    Object.assign(T.fr, { private: `Recommandé par ${RF.by}`, g1Btn: "🎁 Un cadeau pour vous", g2Kicker: `Recommandé par ${RF.by}`, g2Text: "Laissez votre numéro et votre e-mail pour le découvrir.",
+    // Studio appelé (16/11/2026) : `label` remplace « Recommandé par … » (ex. « Préparé pour Pauline · Panache Stories »), `g3Title` / `g3Text` = son cadeau.
+    const rfFr = RF.label?.fr || `Recommandé par ${RF.by}`, rfEn = RF.label?.en || `Recommended by ${RF.by}`;
+    Object.assign(T.fr, { private: rfFr, g1Btn: "🎁 Un cadeau pour vous", g2Kicker: rfFr, g2Text: "Laissez votre numéro et votre e-mail pour le découvrir.",
       email: "Votre e-mail", emailPh: "vous@studio.com", errEmail: "Cet e-mail ne semble pas valide.", g2Note: "On ne vous contacte que pour votre cadeau.",
-      g3Text: "On vous appelle au {phone} pour lancer votre premier montage.", g3Btn: "Voir nos réalisations" });
-    Object.assign(T.en, { private: `Recommended by ${RF.by}`, g1Btn: "🎁 A gift for you", g2Kicker: `Recommended by ${RF.by}`, g2Text: "Leave your number and email to unlock it.",
+      g3Text: "On vous appelle au {phone} pour lancer votre premier montage.", g3Btn: "Voir nos réalisations" }, RF.gift?.fr || {});
+    Object.assign(T.en, { private: rfEn, g1Btn: "🎁 A gift for you", g2Kicker: rfEn, g2Text: "Leave your number and email to unlock it.",
       email: "Your email", emailPh: "you@studio.com", errEmail: "That email doesn't look valid.", g2Note: "We'll only contact you about your gift.",
-      g3Text: "We'll call you at {phone} to get your first edit started.", g3Btn: "See our work" });
+      g3Text: "We'll call you at {phone} to get your first edit started.", g3Btn: "See our work" }, RF.gift?.en || {});
   }
   // Portfolio personnalisé (client/prospects.js, ?p=<slug>) : français + tutoiement, ouverture sur les reels, prix toujours masqués
   const PR = (window.DS_PROSPECTS || {})[params.get("p")] || null;
@@ -366,14 +368,14 @@
   function sendLead(phone, podcast, email) {
     const vt = (() => { try { return sessionStorage.getItem("ds_visit_started") === "1" && localStorage.getItem("ds_team") !== "1" ? sessionStorage.getItem("ds_visit") : null; } catch { return null; } })(); // relie le lead à la visite (js/ds-track.js)
     const p = RF
-      ? { kind: "gift", phone, email, project_type: "podcast", lang, visit_token: vt, message: `Portfolio recommandé par ${RF.by} (r=${params.get("r")}) : cadeau débloqué (1er montage offert).` }
+      ? { kind: "gift", phone, email, project_type: "podcast", lang, visit_token: vt, message: `${RF.label ? "Portfolio " + RF.label.fr : "Portfolio recommandé par " + RF.by} (r=${params.get("r")}) : cadeau débloqué (${RF.gift ? "semaine de montage offerte" : "1er montage offert"}).` }
       : PR
       ? { kind: "gift", phone, studio: podcast, project_type: "reels", lang, visit_token: vt, message: `Portfolio perso ${PR.name} (${params.get("p")}) : cadeau débloqué (1er montage offert). Chaîne : ${podcast}` }
       : { kind: "gift", phone, studio: podcast, project_type: "podcast", lang, visit_token: vt, message: `Portfolio privé : cadeau débloqué (1er montage offert). Podcast : ${podcast}` };
     if (LOCAL) { console.info("[gift] envoi simulé (serveur local) :", p); return Promise.resolve(); }
     const a = fetch(RPC, { method: "POST", keepalive: true, headers: { apikey: SB_KEY, "Content-Type": "application/json" }, body: JSON.stringify({ p }) }).catch(() => {});
     const mail = RF
-      ? { _subject: `Portfolio recommandé par ${RF.by} : cadeau débloqué — ${email}`, Téléphone: phone, "E-mail": email, "Recommandé par": RF.by, _replyto: email }
+      ? { _subject: `${RF.label ? "Portfolio " + RF.label.fr : "Portfolio recommandé par " + RF.by} : cadeau débloqué — ${email}`, Téléphone: phone, "E-mail": email, "Recommandé par": RF.by, _replyto: email }
       : { _subject: `Portfolio${PR ? " perso " + PR.name : ""} : cadeau débloqué — ${podcast}`, Téléphone: phone, Podcast: podcast };
     const b = fetch("https://formsubmit.co/ajax/contact@ds-editing.com", { method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json" },
       body: JSON.stringify({ ...mail, Langue: lang, _template: "table", _captcha: "false" }) }).catch(() => {});

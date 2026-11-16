@@ -65,8 +65,23 @@ window.DS_PORTFOLIO = {
   // Portfolios « recommandés » (14/11/2026) : lien ?k=CLÉ&r=<slug>. Pour les contacts qu'un client nous amène.
   // Aucun prix, jamais (même après le cadeau). Cadeau = téléphone + e-mail, puis « 1er montage offert ».
   // `by` : nom affiché (« Recommandé par … ») · `lang` : langue d'ouverture (le bouton FR/EN reste là).
+  // Studio appelé (16/11/2026), même mode : `label` { fr, en } remplace « Recommandé par … », `gift` { fr, en } = son cadeau (g3Title, g3Text).
+  //   Lien : ?k=CLÉ&r=<slug>&ref=<slug> (`ref` = source de la visite dans l'alerte Telegram).
   referrals: {
     "april-jackson": { by: "April Jackson", lang: "en" },
+    "panache-stories": { by: "Panache Stories", lang: "fr",
+      label: { fr: "Préparé pour Pauline · Panache Stories", en: "Prepared for Pauline · Panache Stories" },
+      gift: {
+        fr: { g3Title: "Votre semaine de montage est offerte.", g3Text: "On vous appelle au {phone} pour lancer votre semaine de montage.", free: "Semaine de montage offerte" },
+        en: { g3Title: "Your week of editing is on us.", g3Text: "We'll call you at {phone} to start your week of editing.", free: "Week of editing on us" },
+      } },
+    // 16/11/2026 : Cem (Le Podcast Studio, Bruxelles), relance par e-mail. Il ne veut plus d'appels : g3Text sans « on vous appelle ».
+    "le-podcast-studio": { by: "Le Podcast Studio", lang: "fr",
+      label: { fr: "Préparé pour Cem · Le Podcast Studio", en: "Prepared for Cem · Le Podcast Studio" },
+      gift: {
+        fr: { g3Title: "Votre semaine de montage est offerte.", g3Text: "Sans engagement. On vous écrit pour lancer votre semaine de montage.", free: "Semaine de montage offerte" },
+        en: { g3Title: "Your week of editing is on us.", g3Text: "No commitment. We'll email you to start your week of editing.", free: "Week of editing on us" },
+      } },
   },
 
   // Upsell sous la grille de tous les portfolios (14/11/2026) : « Un épisode, cinq contenus » (épisode + 2 reels + miniature + trailer).
