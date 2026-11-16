@@ -95,7 +95,7 @@ window.DS_POSTHOG={key:"phc_w45PRxEUceX65owmCK38DkQ3y8aRCHigUBKvDfyTAisi",host:"
 </div>
 
 <section class="hero" id="top" data-screen-label="Hero">
-<div class="hero-media crop"><video src="ds-media/pod-daniel.mp4" poster="ds-media/pod-daniel.jpg" data-start="8" data-end="24" autoplay muted loop playsinline></video></div>
+<div class="hero-media crop"><video src="ds-media/pod-daniel-hero.mp4" poster="ds-media/pod-daniel.jpg" autoplay muted loop playsinline preload="auto"></video></div>
 <div class="wrap" style="width:100%">
 <div class="hero-in">
 <div class="series rv-in"><b>DS</b><span data-fr="Studio de montage en marque blanche" data-nl="White-label montagestudio" data-da="White label-klippestudie">White-label editing studio</span></div>
@@ -211,11 +211,11 @@ window.DS_POSTHOG={key:"phc_w45PRxEUceX65owmCK38DkQ3y8aRCHigUBKvDfyTAisi",host:"
 <div class="screen">
 <div class="notch"></div>
 <div class="feed">
-<div class="rv"><video src="ds-media/reel1.mp4" autoplay muted loop playsinline></video></div>
-<div class="rv"><video src="ds-media/youtube.mp4" autoplay muted loop playsinline></video></div>
-<div class="rv"><video src="ds-media/reel3.mp4" autoplay muted loop playsinline></video></div>
-<div class="rv"><video src="ds-media/reel2.mp4" autoplay muted loop playsinline></video></div>
-<div class="rv"><video src="ds-media/reel1.mp4" autoplay muted loop playsinline></video></div>
+<div class="rv"><video data-lazy-src="ds-media/reel1.mp4" muted loop playsinline preload="none"></video></div>
+<div class="rv"><video data-lazy-src="ds-media/youtube.mp4" muted loop playsinline preload="none"></video></div>
+<div class="rv"><video data-lazy-src="ds-media/reel3.mp4" muted loop playsinline preload="none"></video></div>
+<div class="rv"><video data-lazy-src="ds-media/reel2.mp4" muted loop playsinline preload="none"></video></div>
+<div class="rv"><video data-lazy-src="ds-media/reel1.mp4" muted loop playsinline preload="none"></video></div>
 </div>
 <div class="ui"><div class="side"><div><svg viewBox="0 0 24 24"><path d="M12 21s-8-5.3-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.7-8 11-8 11z"></path></svg></div><div><svg viewBox="0 0 24 24"><path d="M4 4h16v12H8l-4 4z"></path></svg></div><div><svg viewBox="0 0 24 24"><path d="M3 11l18-8-8 18-2-8z"></path></svg></div></div><div class="who"><b>@ds.videoediting</b>Edited by DS</div><div class="bar"></div></div>
 </div>
@@ -435,6 +435,7 @@ window.DS_POSTHOG={key:"phc_w45PRxEUceX65owmCK38DkQ3y8aRCHigUBKvDfyTAisi",host:"
 <script src="services/services.js"></script>
 <script src="js/ds-app.js"></script>
 <script src="js/ds-extras.js"></script>
+<script src="js/ds-lazy.js"></script>
 <script src="js/ds-panels.js"></script>
 <script src="js/ds-booking.js"></script>
 <script src="js/ds-lang.js"></script>
