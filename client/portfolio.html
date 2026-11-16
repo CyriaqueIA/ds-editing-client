@@ -14,6 +14,7 @@
     :root{--bg:#050607;--surface:#0F1114;--surface-2:#161A1F;--line:rgba(255,255,255,.09);--line-strong:rgba(255,255,255,.22);--cream:#F5F5F1;--taupe:#9AA3AD;--amber:#DCE3EA;--amber-soft:rgba(220,227,234,.12);--ok:#46D369;--err:#F08A82;--warn:#F5C400;--blue:#7FB0E0;--accent2:#B9C9DA;--chrome:linear-gradient(180deg,#FFFFFF 0%,#E3E7EC 38%,#9BA4AE 72%,#D6DBE0 100%);--chrome2:linear-gradient(95deg,#B9C9DA 0%,#7FA3CF 45%,#E6ECF2 100%);--glass:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));color-scheme:dark}
     *{box-sizing:border-box}
     [hidden]{display:none!important}
+    html{scrollbar-gutter:stable} /* 16/11/2026 : la page ne saute plus quand une fenêtre bloque le défilement (barre gardée) */
     html,body{margin:0;background:var(--bg);color:var(--cream);font-family:'Geist',system-ui,sans-serif;-webkit-font-smoothing:antialiased;height:100%}
     body{background:radial-gradient(1200px 700px at 85% -5%,rgba(125,155,195,.16),transparent 60%),radial-gradient(900px 600px at -10% 40%,rgba(160,170,185,.08),transparent 60%),#050607;background-attachment:fixed;font-size:15px;line-height:1.55}
     a{color:inherit;text-decoration:none}
@@ -187,16 +188,24 @@
     /* ---- Bande défilante des studios (portfolio.js → studios ok: true) : logo, sinon initiales ---- */
     .trust{display:flex;align-items:center;gap:18px;padding:10px 0 10px 20px;border-bottom:1px solid var(--line);background:rgba(255,255,255,.015);overflow:hidden}
     .trust>.mono{flex:none;max-width:150px;line-height:1.35}
-    .trust-rail{flex:1;min-width:0;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent);mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent)}
-    .trust-track{display:flex;width:max-content;animation:trust 55s linear infinite}
-    .trust-rail:hover .trust-track{animation-play-state:paused}
+    /* 16/11/2026 : plus de mask-image sur la bande qui bouge (coûteux sur iPhone, la page ramait) ; fondus en pseudo-éléments fixes,
+       piste sur sa propre couche (translate3d + will-change), animation en pause quand une vidéo joue ou qu'une fenêtre est ouverte */
+    .trust-rail{flex:1;min-width:0;overflow:hidden;position:relative}
+    .trust-rail::before,.trust-rail::after{content:"";position:absolute;top:0;bottom:0;width:28px;z-index:1;pointer-events:none}
+    .trust-rail::before{left:0;background:linear-gradient(90deg,var(--bg),transparent)}
+    .trust-rail::after{right:0;background:linear-gradient(270deg,var(--bg),transparent)}
+    .trust-track{display:flex;width:max-content;animation:trust 55s linear infinite;will-change:transform;transform:translate3d(0,0,0);backface-visibility:hidden}
+    .trust-rail:hover .trust-track,.trust.paused .trust-track{animation-play-state:paused}
     .trust-group{display:flex;gap:10px;padding-right:10px}
     .trust-item{display:flex;align-items:center;gap:10px;flex:none;padding:5px 14px 5px 5px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
     .trust-item img,.trust-item i{width:32px;height:32px;border-radius:8px;object-fit:cover;flex:none}
     .trust-item i{display:flex;align-items:center;justify-content:center;font-style:normal;font-weight:700;font-size:12px;letter-spacing:.02em;background:var(--chrome);color:#0A0B0D}
     .trust-item b{display:block;font-size:13px;font-weight:600;white-space:nowrap}
     .trust-item span{display:block;font-size:11px;color:var(--taupe);white-space:nowrap}
-    @keyframes trust{to{transform:translateX(-50%)}}
+    @keyframes trust{to{transform:translate3d(-50%,0,0)}}
+    /* Vidéo qui charge : rond qui tourne par-dessus l'affiche (la case ne reste pas noire sans signe de vie) */
+    .video-cell.loading::after{content:"";position:absolute;left:50%;top:50%;width:38px;height:38px;margin:-19px 0 0 -19px;border-radius:50%;border:3px solid rgba(255,255,255,.25);border-top-color:#fff;animation:spin .8s linear infinite;pointer-events:none;z-index:2}
+    @keyframes spin{to{transform:rotate(360deg)}}
     @media (max-width:640px){.trust{padding:8px 0}.trust>.mono{display:none}}
     /* Studio avec des projets : cliquable (ouvre le panneau #sp) */
     .trust-item.has{cursor:pointer;transition:border-color .2s,background .2s}
@@ -488,6 +497,10 @@
   }
   function closeStudio() { $("#sp").classList.remove("open"); $("#spGrid").innerHTML = ""; document.body.style.overflow = ""; }
   $("#sp").addEventListener("click", (e) => { if (e.target.id === "sp") closeStudio(); });
+  // Bande défilante en pause pendant qu'une vidéo joue ou qu'une fenêtre est ouverte (moins de travail pour le téléphone)
+  const trustPause = () => { const busy = [...document.querySelectorAll("video")].some((x) => !x.paused) || $("#sp").classList.contains("open") || $("#gift").classList.contains("open") || $("#modal").classList.contains("open"); $("#trust").classList.toggle("paused", busy); };
+  ["play", "pause", "ended"].forEach((ev) => document.addEventListener(ev, trustPause, true));
+  const mo = new MutationObserver(trustPause); ["#sp", "#gift", "#modal"].forEach((s) => mo.observe($(s), { attributes: true, attributeFilter: ["class"] }));
   // Échap : la fenêtre vidéo d'abord (elle est au-dessus), sinon le panneau studio
   window.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("#modal").classList.contains("open") && $("#sp").classList.contains("open")) closeStudio(); }, true);
   // Bloc du portfolio perso : « Préparé pour {prénom} », SA démo, 3 accroches, appel de 20 min, cadeau
@@ -557,8 +570,15 @@
     if (it.image) { $("#modalTitle").textContent = it.title || ""; $("#modalMedia").innerHTML = `<img src="${it.src}" alt="" style="display:block;max-width:100%;max-height:80vh;margin:0 auto"/>`; $("#modal").classList.add("open"); return; }
     if (it.src) { // mp4 hébergé : lecture dans la case, comme HTR
       document.querySelectorAll(".video-cell.playing video").forEach((v) => { v.pause(); v.closest(".video-cell").classList.remove("playing"); v.remove(); });
-      const v = document.createElement("video"); v.src = it.src; v.controls = true; v.playsInline = true; v.autoplay = true; v.poster = it.poster || ""; v.setAttribute("controlsList", "nodownload noplaybackrate noremoteplayback"); v.disablePictureInPicture = true; v.disableRemotePlayback = true; v.addEventListener("contextmenu", (e) => e.preventDefault()); v.muted = false; v.volume = 1;
-      cell.classList.add("playing"); cell.appendChild(v);
+      const v = document.createElement("video"); v.controls = true; v.playsInline = true; v.setAttribute("playsinline", ""); v.setAttribute("webkit-playsinline", ""); v.preload = "auto"; v.poster = it.poster || ""; v.setAttribute("controlsList", "nodownload noplaybackrate noremoteplayback"); v.disablePictureInPicture = true; v.disableRemotePlayback = true; v.addEventListener("contextmenu", (e) => e.preventDefault()); v.muted = false; v.volume = 1;
+      v.src = it.src;
+      cell.classList.add("playing", "loading"); cell.appendChild(v);
+      const ready = () => cell.classList.remove("loading");
+      v.addEventListener("playing", ready); v.addEventListener("canplay", ready); v.addEventListener("error", ready);
+      // 16/11/2026 : lecture lancée explicitement dans le clic (iPhone refuse l'« autoplay » d'une vidéo avec le son) ;
+      // si le navigateur refuse quand même, on relance en muet, les contrôles restent pour remettre le son
+      const p = v.play();
+      if (p && p.catch) p.catch(() => { v.muted = true; v.play().catch(() => ready()); });
       return;
     }
     const em = window.dsEmbed(it.url);
