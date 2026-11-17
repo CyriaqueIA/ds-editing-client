@@ -55,6 +55,17 @@
     .live i{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 10px var(--ok)}
 
     main{padding:18px 20px 60px}
+    /* ---- Commandes clients / Démos prospection (17/11) ---- */
+    .viewsw[hidden]{display:none}
+    .viewsw{display:inline-flex;gap:2px;padding:3px;margin-bottom:14px;max-width:100%;border:1px solid var(--line);border-radius:999px;background:var(--surface)}
+    .viewsw button{font:inherit;font-size:13px;font-weight:600;letter-spacing:-.01em;color:var(--taupe);background:transparent;border:1px solid transparent;border-radius:999px;padding:9px 16px;min-height:40px;cursor:pointer;transition:border-color .2s,background .2s,color .2s}
+    .viewsw button:hover{color:var(--cream)}
+    .viewsw button.on{color:#fff;background:var(--amber-soft);border-color:rgba(220,230,240,.5)}
+    .viewsw button:focus-visible{outline:2px solid rgba(220,227,234,.6);outline-offset:2px}
+    .viewsw .n{display:inline-block;margin-left:2px;font-variant-numeric:tabular-nums}
+    @media (max-width:520px){.viewsw{display:flex;width:100%}.viewsw button{flex:1 1 0;padding:9px 8px;font-size:12.5px}}
+    .demotag{display:inline-block;margin-left:6px;vertical-align:middle;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border-radius:999px;padding:2px 8px;color:var(--accent2);border:1px solid rgba(185,201,218,.45);background:rgba(185,201,218,.1)}
+    body.tv .viewsw{display:none}
     /* ---- barre des monteurs ---- */
     .edbar{display:flex;gap:10px;flex-wrap:wrap;align-items:stretch;margin-bottom:16px}
     .ed{display:flex;align-items:center;gap:10px;padding:8px 16px 8px 8px;border:1px solid var(--line);border-radius:999px;background:var(--surface);cursor:pointer;user-select:none;transition:border-color .2s,background .2s}
@@ -547,6 +558,7 @@
   </div>
 
   <div id="app" hidden>
+    <div class="viewsw" id="viewsw" role="group" hidden></div>
     <div class="edbar" id="edbar"></div>
     <div class="stats" id="stats"></div>
     <div class="toolbar" id="toolbar"></div>
@@ -639,6 +651,7 @@ const T = {
       doneT: (v) => `V${v} livrée`, copyT: "Texte prêt à copier pour le client", copy: "Copier", copied: "Copié", copyFail: "Copie impossible : sélectionne le texte à la main.", sent: "✓ Relivrée",
       clientFr: (v, a) => `V${v} livrée. ${a ? a + " ajoutés" : "Une révision payante est ajoutée"} à ta facture de la semaine. Pour ne plus compter sur cette vidéo, passe en illimité.`, clientEn: (v, a) => `V${v} delivered. ${a ? a + " added" : "A paid revision is added"} to your invoice this week. To stop counting revisions on this video, switch to unlimited.` },
     chrono: { title: "Temps de montage", pillTip: (n) => `${n} session${n > 1 ? "s" : ""} chronométrée${n > 1 ? "s" : ""} (vue équipe)`, sessions: (n) => `${n} session${n > 1 ? "s" : ""}`, flagged: (n) => `${n} coupée${n > 1 ? "s" : ""} à 6 h, à vérifier`, running: "chrono en cours", cost: "de coût (taux horaire)", tv: "⏱ En montage maintenant" },
+    vw: { orders: "Commandes clients", demos: "Démos prospection", tag: "DÉMO", aria: "Type de commandes" },
     tabs: { prod: "Production", equipe: "Équipe", tarifs: "Tarifs", factures: "Factures", rdv: "Rendez-vous", recrut: "Recrutement", grille: "Grille", rituels: "Rituels", rh: "Espace RH" },
     gh: { notYou: "Ce n'est pas vous ?", sharedFallback: "Vue d'équipe indisponible avec ce compte : connecte-toi avec ton compte nominatif.", morning: "Rituels du matin", prios: "3 priorités du jour", week: "7 derniers jours", tz: "heure de Bali", loading: "Lecture en cours…", retry: "Réessayer",
       rit: { bilan_veille: "Relire le bilan de la veille", agenda_jour: "Vérifier l'agenda et les rendez-vous du jour", relances_jour: "Préparer les relances du jour", nouveaux_contacts: "Repérer les nouveaux contacts à traiter", crm_a_jour: "Vérifier que le CRM est à jour" },
@@ -718,6 +731,7 @@ const T = {
       doneT: (v) => `V${v} delivered`, copyT: "Ready-to-copy text for the client", copy: "Copy", copied: "Copied", copyFail: "Copy failed: select the text by hand.", sent: "✓ Redelivered",
       clientFr: (v, a) => `V${v} livrée. ${a ? a + " ajoutés" : "Une révision payante est ajoutée"} à ta facture de la semaine. Pour ne plus compter sur cette vidéo, passe en illimité.`, clientEn: (v, a) => `V${v} delivered. ${a ? a + " added" : "A paid revision is added"} to your invoice this week. To stop counting revisions on this video, switch to unlimited.` },
     chrono: { title: "Editing time", pillTip: (n) => `${n} timed session${n > 1 ? "s" : ""} (team board)`, sessions: (n) => `${n} session${n > 1 ? "s" : ""}`, flagged: (n) => `${n} auto-stopped at 6 h, to check`, running: "timer running", cost: "cost (hourly rate)", tv: "⏱ Editing right now" },
+    vw: { orders: "Client orders", demos: "Prospecting demos", tag: "DEMO", aria: "Order type" },
     tabs: { prod: "Production", equipe: "Team", tarifs: "Pricing", factures: "Invoices", rdv: "Appointments", recrut: "Recruitment", grille: "Grid", rituels: "Routines", rh: "HR space" },
     gh: { notYou: "Not you?", sharedFallback: "Team view unavailable with this account: sign in with your personal account.", morning: "Morning routines", prios: "Today's 3 priorities", week: "Last 7 days", tz: "Bali time", loading: "Loading…", retry: "Retry",
       rit: { bilan_veille: "Read yesterday's recap", agenda_jour: "Check today's agenda and appointments", relances_jour: "Prepare today's follow-ups", nouveaux_contacts: "Spot the new contacts to handle", crm_a_jour: "Check the CRM is up to date" },
@@ -766,7 +780,7 @@ const params = new URLSearchParams(location.search);
 let lang = params.get("lang") || (() => { try { return localStorage.getItem("ds_lang"); } catch { return null; } })() || "fr"; if (!T[lang]) lang = "fr";
 const t = (k) => T[lang][k];
 let tv = params.get("tv") === "1"; document.body.classList.toggle("tv", tv);
-let me = null, profile = null, myEditor = null, jobs = [], editors = [], filter = params.get("f") || "all", edFilter = params.get("editor") || "", q = "", known = new Set(), sb = null;
+let me = null, profile = null, myEditor = null, jobs = [], editors = [], filter = params.get("f") || "all", edFilter = params.get("editor") || "", view = params.get("v") === "demos" ? "demos" : "orders", q = "", known = new Set(), sb = null;
 let tab = params.get("tab") || "prod", studios = [], grids = [], offerRows = [], invoicesAll = [], extras = [], tarifStudio = "", bookingSettings = null, bookingsAll = [], candidatesAll = [], interviewsAll = [], interviewSettings = null, scoringGrids = [], recruitOk = false, times = [], rates = [], chronoRun = [];
 const money = (x, cur) => x == null ? "—" : (cur === "USD" ? "$" + Number(x).toLocaleString("en-US", { minimumFractionDigits: 2 }) : Number(x).toLocaleString("fr-FR", { minimumFractionDigits: 2 }) + " €");
 
@@ -1039,9 +1053,25 @@ setInterval(tick, 10000); tick();
 
 /* ===== rendu ===== */
 const open = (j) => !isDone(j);
-const byEditor = (list) => edFilter ? list.filter((j) => (j.editor_ids || []).includes(edFilter)) : list;
+/* Démo de prospection (17/11) : jobs.source = 'prospection'. Les RPC « lien » (team_jobs) ne renvoient pas `source` (liste blanche _team_job_keys) :
+   repli sur client_slug, puis sur le nom du client « Prospection » (studio interne, toujours renvoyé). Aucun changement SQL. */
+const isDemo = (j) => j.source === "prospection" || j.client_slug === "prospection" || String(j.client_name || "").trim().toLowerCase() === "prospection";
+const inView = (list) => list.filter((j) => isDemo(j) === (view === "demos"));
+const byEditor = (list) => inView(edFilter ? list.filter((j) => (j.editor_ids || []).includes(edFilter)) : list);
+function renderViewSw() {
+  const el = $("#viewsw"), V = t("vw"), n = jobs.filter((j) => isDemo(j) && open(j)).length;
+  el.hidden = !(view === "demos" || jobs.some(isDemo));   // pas de démo chargée : l'écran reste comme avant
+  el.setAttribute("aria-label", V.aria);
+  el.innerHTML = `<button type="button" data-view="orders" aria-pressed="${view === "orders"}" class="${view === "orders" ? "on" : ""}">${V.orders}</button><button type="button" data-view="demos" aria-pressed="${view === "demos"}" class="${view === "demos" ? "on" : ""}">${V.demos} (<span class="n">${n}</span>)</button>`;
+  el.querySelectorAll("[data-view]").forEach((b) => b.addEventListener("click", () => {
+    if (view === b.dataset.view) return; view = b.dataset.view;
+    const u = new URL(location.href); view === "demos" ? u.searchParams.set("v", "demos") : u.searchParams.delete("v"); history.replaceState(null, "", u);
+    renderViewSw(); renderEditorBar(); renderStats(); renderBoard();
+  }));
+}
 function renderEditorBar() {
-  const openJobs = jobs.filter(open);
+  renderViewSw();
+  const openJobs = inView(jobs).filter(open);
   const chip = (id, label, count, av) => `<div class="ed ${edFilter === id ? "on" : ""} ${id ? "" : "all"}" data-ed="${id}">${av}<div><div class="nm">${esc(label)}</div><div class="ct">${t("tasks")(count)}</div></div></div>`;
   $("#edbar").innerHTML = chip("", t("all"), openJobs.length, `<span class="av" style="background:var(--surface-2);color:var(--cream)">★</span>`) +
     editors.filter((e) => e.active !== false).map((e) => chip(e.id, e.name, openJobs.filter((j) => (j.editor_ids || []).includes(e.id)).length, avatar(e))).join("");
@@ -1192,7 +1222,7 @@ function renderBoard() {
     const teamDate = j.delivery_date && j.delivery_date !== j.requested_deadline ? `<div class="team">${t("team")} : ${fmtD(j.delivery_date)}</div>` : "";
     return head + `<div class="job ${c}${na ? " na" : ""}${isAsm(j) && isAdmin() ? " asm" : ""}${openIds.has(j.id) ? " open" : ""}${(flashUntil.get(j.id) || 0) > now ? " flash" : ""}" data-id="${j.id}">
       <div class="tok">${esc(j.token)}<small>${t("received")} ${fmtDT(j.created_at)}</small></div>
-      <div class="c"><b>${esc(j.client_name)}${isAsm(j) && isAdmin() ? `<span class="asmtag">${t("parts").asmTag}</span>` : ""}</b><em>${esc(j.project)}</em><span>${esc(j.work_to_do || "")}</span></div>
+      <div class="c"><b>${esc(j.client_name)}${isDemo(j) ? `<span class="demotag">${t("vw").tag}</span>` : ""}${isAsm(j) && isAdmin() ? `<span class="asmtag">${t("parts").asmTag}</span>` : ""}</b><em>${esc(j.project)}</em><span>${esc(j.work_to_do || "")}</span></div>
       <div class="edcell"><div class="eds ${isAdmin() && !multi ? "can" : ""}" data-eds="${j.id}">${edCell}</div></div>
       <div class="due ${c}"><div class="k">${t("wanted")}</div><div class="dt">${j.requested_deadline ? fmtD(j.requested_deadline) : (j.delivery_date ? fmtD(j.delivery_date) : fmtD(target(j)) + " *")}</div><div class="cd" data-cd="${j.id}">${countdown(remaining(j), isDone(j))}</div>${teamDate}</div>
       <div class="steps">
@@ -1880,7 +1910,7 @@ function renderTabs() {
   renderAdmin();
 }
 function renderAdmin() {
-  const prod = tab === "prod"; ["#edbar", "#stats", "#toolbar", "#alerts", "#board"].forEach((s) => { $(s).style.display = prod ? "" : "none"; }); $("#admin").hidden = prod;
+  const prod = tab === "prod"; ["#viewsw", "#edbar", "#stats", "#toolbar", "#alerts", "#board"].forEach((s) => { $(s).style.display = prod ? "" : "none"; }); $("#admin").hidden = prod;
   if (tab === "equipe") renderEquipe(); else if (tab === "tarifs") renderTarifs(); else if (tab === "factures") renderFactures(); else if (tab === "rdv") renderRdv(); else if (tab === "recrut") renderRecruit(); else if (tab === "grille") renderGrille(); else if (tab === "rituels") renderRituals();
 }
 /* ===== Onglet Rituels (13/10) =====
