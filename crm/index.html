@@ -184,16 +184,20 @@ td .sub{display:block;color:var(--muted);font-size:12.5px;max-width:340px;overfl
 .gs-item small{grid-column:1/-1;color:var(--muted);font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .gs-item mark{background:var(--accent-soft);color:inherit;border-radius:3px;padding:0 1px}
 .gs-foot{font-size:12.5px;color:var(--muted);padding:8px 14px}
+/* langue (23/11) : bouton FR / EN en haut à droite ; compte « CRM seul » = pas de menu Espaces (nav.js) */
+.who .seg{padding:2px}
+.who .seg button{padding:4px 10px;font-size:12px}
+body.crm-only .dsnav{display:none!important}
 </style>
 </head>
 <body>
 
 <section id="login" hidden>
   <span class="brand"><i></i>DS<em>Editing CRM</em></span>
-  <h1 style="font-size:26px;font-weight:600;letter-spacing:-.03em">Connexion</h1>
+  <h1 id="loginTitle" style="font-size:26px;font-weight:600;letter-spacing:-.03em">Connexion</h1>
   <form id="loginForm">
-    <label>E-mail<input class="field" type="email" id="email" autocomplete="username" required/></label>
-    <label>Mot de passe<input class="field" type="password" id="password" autocomplete="current-password" required/></label>
+    <label><span id="lEmail">E-mail</span><input class="field" type="email" id="email" autocomplete="username" required/></label>
+    <label><span id="lPass">Mot de passe</span><input class="field" type="password" id="password" autocomplete="current-password" required/></label>
     <button class="btn pri" type="submit" id="loginBtn">Se connecter</button>
     <p id="loginMsg" role="alert"></p>
   </form>
@@ -207,7 +211,7 @@ td .sub{display:block;color:var(--muted);font-size:12.5px;max-width:340px;overfl
       <kbd>/</kbd>
       <div class="gs-res" id="gsRes" role="listbox" hidden></div>
     </div>
-    <div class="who"><span id="whoami"></span><button class="btn" type="button" id="logout" hidden>Se déconnecter</button><a class="btn" id="notYou" href="?login=1" hidden>Ce n'est pas vous ?</a></div>
+    <div class="who"><span id="whoami"></span><div class="seg" id="langSeg" role="group" aria-label="Langue / Language"><button type="button" data-lang="fr">FR</button><button type="button" data-lang="en">EN</button></div><button class="btn" type="button" id="logout" hidden>Se déconnecter</button><a class="btn" id="notYou" href="?login=1" hidden>Ce n'est pas vous ?</a></div>
   </div>
   <div class="tabs" id="tabs" role="tablist"></div>
   <main id="view"></main>
@@ -224,16 +228,45 @@ const SUPABASE_URL = "https://xkanmjlpysxpohsuqvwg.supabase.co";
 const SUPABASE_ANON = "sb_publishable_lIZtV_WtN5NcGSb0dnfaiQ_AgKYBIVa";
 const HUBSPOT_COMPANY = "https://app-na2.hubspot.com/contacts/247385305/record/0-2/";
 
-const STAGES = [["a_contacter", "À contacter"], ["contacte", "Contacté"], ["en_conversation", "En conversation"], ["rdv_pris", "RDV pris"], ["visio_faite", "Visio faite"], ["test_en_cours", "Test en cours"], ["test_livre", "Test livré"], ["gagne", "Gagné"], ["perdu", "Perdu"], ["ecarte", "Écarté"]];
-const STAGE_LABEL = Object.fromEntries(STAGES);
-const OPEN = STAGES.slice(0, 7).map((s) => s[0]);
-const MARKET = { france_metropole: "France", usa: "USA", quebec: "Québec", uk: "UK", antilles_guyane: "Antilles-Guyane", suisse: "Suisse", belgique: "Belgique", luxembourg: "Luxembourg", acadie_n_b: "Acadie", pays_bas: "Pays-Bas", autre: "Autre" };
-const TYPE = { studio_podcast: "Studio podcast", infopreneur: "Infopreneur", youtuber: "YouTuber", agence: "Agence", agence_smm_contenu: "Agence contenu", agence_video_production: "Agence vidéo", createur_media: "Créateur / média", formateur_coach: "Formateur / coach", autre: "Autre" };
-const KIND = { call: "Appel", email: "Mail", message: "Message", note: "Note", task: "Tâche", meeting: "Rendez-vous", stage: "Étape", assistant: "Assistant" };
-const TABS = [["jour", "Ma journée"], ["fiches", "Fiches"], ["tunnel", "Tunnel"], ["clients", "Clients"], ["mail", "Mailing"], ["chiffres", "Chiffres"], ["bot", "Bot et alertes"], ["tele", "Mode télé"]];
+/* ---------- langue (23/11/2026) : FR par défaut, EN pour les sales US ----------
+   Tous les textes de l'interface passent par T("français", "english"), lu au moment de l'affichage.
+   Choix de la langue : ?lang=en|fr dans l'adresse → bouton FR / EN (gardé dans ce navigateur, par compte) → EN_MEMBERS → FR.
+   Nouveau sales US : ajouter son user_id (crm_members) dans EN_MEMBERS, et dans CRM_ONLY s'il ne doit voir que le CRM.
+   Les données tapées par l'équipe (notes, prochaines actions, contexte des fiches) restent dans la langue où on les a écrites.
+   CRM_ONLY : comptes qui ne voient que le CRM (pas de menu « Espaces » vers la production, les entretiens…). Ce n'est pas une
+   barrière de sécurité (chaque page garde ses droits), juste pour ne pas montrer des portes inutiles. */
+// Par identifiant de compte (crm_members.user_id), jamais par e-mail : cette page est publique.
+const EN_MEMBERS = ["89ca1105-dc87-4061-a598-e670cbf61762"];   // Arvada (sales US)
+const CRM_ONLY = ["89ca1105-dc87-4061-a598-e670cbf61762"];     // Arvada
+const QS = new URLSearchParams(location.search);
+const QS_LANG = ["fr", "en"].includes((QS.get("lang") || "").toLowerCase()) ? QS.get("lang").toLowerCase() : null;
+function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) { /* navigation privée : la langue n'est pas gardée */ } }
+const savedLang = (uid) => { const v = lsGet("crm_lang:" + uid); return v === "fr" || v === "en" ? v : null; };
+const defaultLang = (uid) => (EN_MEMBERS.includes(uid) ? "en" : "fr");
+let LANG = QS_LANG || (lsGet("crm_lang:last") === "en" ? "en" : "fr");   // avant la connexion : dernière langue utilisée dans ce navigateur
+const T = (fr, en) => (LANG === "en" ? en : fr);
+const sEn = (n) =>   // « s » du pluriel : français n > 1, anglais n ≠ 1 (0 leads, 1 lead, 2 leads)
+   (LANG === "en" ? (n === 1 ? "" : "s") : n > 1 ? "s" : "");
+
+const OPEN = ["a_contacter", "contacte", "en_conversation", "rdv_pris", "visio_faite", "test_en_cours", "test_livre"];
+let STAGES, STAGE_LABEL, MARKET, TYPE, KIND, TABS, CLIENT_STATUS, OUTCOME;
+function buildLabels() {
+  STAGES = [["a_contacter", T("À contacter", "To contact")], ["contacte", T("Contacté", "Contacted")], ["en_conversation", T("En conversation", "In conversation")], ["rdv_pris", T("RDV pris", "Meeting booked")], ["visio_faite", T("Visio faite", "Video call done")], ["test_en_cours", T("Test en cours", "Test in progress")], ["test_livre", T("Test livré", "Test delivered")], ["gagne", T("Gagné", "Won")], ["perdu", T("Perdu", "Lost")], ["ecarte", T("Écarté", "Disqualified")]];
+  STAGE_LABEL = Object.fromEntries(STAGES);
+  MARKET = { france_metropole: "France", usa: "USA", quebec: T("Québec", "Quebec"), uk: "UK", antilles_guyane: T("Antilles-Guyane", "French Caribbean"), suisse: T("Suisse", "Switzerland"), belgique: T("Belgique", "Belgium"), luxembourg: "Luxembourg", acadie_n_b: T("Acadie", "Acadia"), pays_bas: T("Pays-Bas", "Netherlands"), autre: T("Autre", "Other") };
+  TYPE = { studio_podcast: T("Studio podcast", "Podcast studio"), infopreneur: "Infopreneur", youtuber: "YouTuber", agence: T("Agence", "Agency"), agence_smm_contenu: T("Agence contenu", "Content agency"), agence_video_production: T("Agence vidéo", "Video agency"), createur_media: T("Créateur / média", "Creator / media"), formateur_coach: T("Formateur / coach", "Trainer / coach"), autre: T("Autre", "Other") };
+  KIND = { call: T("Appel", "Call"), email: T("Mail", "Email"), message: "Message", note: "Note", task: T("Tâche", "Task"), meeting: T("Rendez-vous", "Meeting"), stage: T("Étape", "Stage"), assistant: "Assistant" };
+  TABS = [["jour", T("Ma journée", "My day")], ["fiches", T("Fiches", "Leads")], ["tunnel", T("Tunnel", "Pipeline")], ["clients", "Clients"], ["mail", "Mailing"], ["chiffres", T("Chiffres", "Numbers")], ["bot", T("Bot et alertes", "Bot & alerts")], ["tele", T("Mode télé", "TV mode")]];
+  CLIENT_STATUS = { client_actif: T("Actif", "Active"), en_pause: T("En pause", "Paused"), perdu: T("Perdu", "Lost"), test_livre: T("Test livré", "Test delivered"), prospect: "Prospect" };
+  // Résultat d'appel : valeur française en base (webhook Onoff, import HubSpot), traduite à l'affichage seulement.
+  OUTCOME = LANG === "en" ? { "Décroché": "Answered", "Occupé": "Busy", "Message laissé": "Left a message", "Messagerie": "Voicemail", "Répondeur": "Answering machine", "Pas de réponse": "No answer", "Appel manqué": "Missed call", "Mauvais numéro": "Wrong number" } : {};
+  VERDICTS = [["icp", "ICP"], ["attente", T("En attente", "On hold")], ["sortir", T("Sortir", "Not a fit")]];
+  CE_FIELDS = [["first_name", T("Prénom", "First name")], ["last_name", T("Nom", "Last name")], ["job_title", T("Fonction", "Job title")], ["phone", T("Téléphone", "Phone")], ["email", T("E-mail", "Email")]];
+}
+const outc = (x) => OUTCOME[x] || x;
 const VIEWER_TABS = ["fiches", "tunnel", "clients", "chiffres", "tele"];
 const PROSPECTING = ["a_contacter", "contacte", "en_conversation"], CLOSING = ["rdv_pris", "visio_faite", "test_en_cours", "test_livre"];
-const CLIENT_STATUS = { client_actif: "Actif", en_pause: "En pause", perdu: "Perdu", test_livre: "Test livré", prospect: "Prospect" };
 
 const $ = (id) => document.getElementById(id);
 function h(tag, a, kids) {
@@ -249,17 +282,20 @@ const p2 = (n) => String(n).padStart(2, "0");
 const cap = (s) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : "");
 function todayIso() { const d = new Date(); return `${d.getFullYear()}-${p2(d.getMonth() + 1)}-${p2(d.getDate())}`; }
 function dayDiff(iso) { const [y, m, d] = iso.split("-").map(Number), [ty, tm, td] = todayIso().split("-").map(Number); return Math.round((Date.UTC(y, m - 1, d) - Date.UTC(ty, tm - 1, td)) / 864e5); }
-function frDate(iso) { if (!iso) return ""; const d = iso.length === 10 ? iso.split("-") : null; if (d) return `${d[2]}/${d[1]}/${d[0]}`; const x = new Date(iso); return `${p2(x.getDate())}/${p2(x.getMonth() + 1)}/${x.getFullYear()}`; }
-function rel(iso) { const n = dayDiff(iso); if (n < 0) return `En retard de ${-n} j`; if (n === 0) return "Aujourd'hui"; if (n === 1) return "Demain"; return `Le ${frDate(iso).slice(0, 5)}`; }
+// Date affichée : JJ/MM/AAAA en français, MM/JJ/AAAA (format US) en anglais.
+function frDate(iso) { if (!iso) return ""; const d = iso.length === 10 ? iso.split("-") : null, x = d ? null : new Date(iso);
+  const [D, M, Y] = d ? [d[2], d[1], d[0]] : [p2(x.getDate()), p2(x.getMonth() + 1), x.getFullYear()];
+  return LANG === "en" ? `${M}/${D}/${Y}` : `${D}/${M}/${Y}`; }
+function rel(iso) { const n = dayDiff(iso); if (n < 0) return T(`En retard de ${-n} j`, `${-n} d overdue`); if (n === 0) return T("Aujourd'hui", "Today"); if (n === 1) return T("Demain", "Tomorrow"); return T("Le ", "On ") + frDate(iso).slice(0, 5); }
 function relClass(iso) { const n = dayDiff(iso); return n < 0 ? "late" : n === 0 ? "today" : ""; }
 let toastTimer = null;
 function toast(x) { const t = $("toast"); t.textContent = x; t.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true; }, 3800); }
 
 let sb = null;
-const S = { me: null, members: [], deals: [], contacts: new Map(), tab: "fiches", q: "", stage: "open", family: "", market: "", setter: "", quick: "", mine: false, open: null, acts: null, more: {}, busy: false, note: "", sel: null, actsFor: null, week: [], jourMore: {}, newOpen: false, nf: null, onoff: [], ce: null };
+const S = { me: null, members: [], deals: [], contacts: new Map(), tab: "fiches", q: "", stage: "open", family: "", market: "", setter: "", quick: "", mine: false, open: null, acts: null, more: {}, busy: false, note: "", sel: null, actsFor: null, week: [], jourMore: {}, newOpen: false, nf: null, onoff: [], ce: null, uid: "", crmOnly: false };
 const canEdit = () => S.me && (S.me.role === "admin" || S.me.role === "sales");
 const isOpen = (d) => OPEN.includes(d.stage);
-const ownerName = (d) => (S.members.find((m) => m.user_id === d.owner_id)?.display_name) || cap(d.setter) || "Non attribué";
+const ownerName = (d) => (S.members.find((m) => m.user_id === d.owner_id)?.display_name) || cap(d.setter) || T("Non attribué", "Unassigned");
 const byId = (id) => S.deals.find((d) => d.id === id);
 
 /* ---------- données ---------- */
@@ -284,15 +320,15 @@ async function loadOnoff() {
   return error ? [] : data;
 }
 async function linkOnoff(call, companyId) {
-  if (!companyId) { toast("Choisis d'abord la société."); return; }
+  if (!companyId) { toast(T("Choisis d'abord la société.", "Pick the company first.")); return; }
   if (S.busy) return; S.busy = true;
   try {
     const { error } = await sb.rpc("crm_onoff_link", { p_call: call.id, p_company: companyId });
     if (error) throw error;
     S.onoff = S.onoff.filter((c) => c.id !== call.id);
     S.week = await loadWeek();
-    toast("Appel rattaché à la fiche.");
-  } catch (e) { toast("Rattachement impossible : " + (e.message || e)); }
+    toast(T("Appel rattaché à la fiche.", "Call linked to the lead."));
+  } catch (e) { toast(T("Rattachement impossible : ", "Could not link: ") + (e.message || e)); }
   S.busy = false; render();
 }
 function onoffPanel() {
@@ -301,21 +337,22 @@ function onoffPanel() {
   const rows = S.onoff.map((c) => {
     let pick = "";
     const who = [c.external_name, c.external_company].filter(Boolean).join(" · ");
-    const bits = [frDate(c.started_at || c.received_at), c.direction === "in" ? "reçu" : "passé", c.outcome, c.duration_s ? `${Math.max(1, Math.round(c.duration_s / 60))} min` : null, c.author_label].filter(Boolean).join(" · ");
+    const bits = [frDate(c.started_at || c.received_at), c.direction === "in" ? T("reçu", "incoming") : T("passé", "outgoing"), outc(c.outcome), c.duration_s ? `${Math.max(1, Math.round(c.duration_s / 60))} min` : null, c.author_label].filter(Boolean).join(" · ");
     const text = c.summary || c.notes;
     return h("div", { class: "qrow", style: "flex-direction:column;align-items:stretch;gap:6px;padding:10px" }, [
-      h("div", null, [h("b", { text: c.external_number || "Numéro masqué" }), who ? h("span", { class: "muted", text: " · " + who }) : null]),
+      h("div", null, [h("b", { text: c.external_number || T("Numéro masqué", "Hidden number") }), who ? h("span", { class: "muted", text: " · " + who }) : null]),
       h("small", { class: "muted", text: bits }),
       text ? h("div", { class: "body clip small", text }) : null,
       h("div", { style: "display:flex;gap:8px;flex-wrap:wrap" }, [
-        h("select", { class: "field", "aria-label": "Société de cet appel", style: "flex:1;min-width:180px", onchange: (ev) => { pick = ev.target.value; } },
-          [h("option", { value: "" }, ["Choisir la société…"]), ...companies.map(([id, name]) => h("option", { value: id }, [name]))]),
-        h("button", { type: "button", class: "btn", onclick: () => linkOnoff(c, pick) }, ["Rattacher"]),
+        h("select", { class: "field", "aria-label": T("Société de cet appel", "Company for this call"), style: "flex:1;min-width:180px", onchange: (ev) => { pick = ev.target.value; } },
+          [h("option", { value: "" }, [T("Choisir la société…", "Pick the company…")]), ...companies.map(([id, name]) => h("option", { value: id }, [name]))]),
+        h("button", { type: "button", class: "btn", onclick: () => linkOnoff(c, pick) }, [T("Rattacher", "Link")]),
       ]),
     ]);
   });
+  const n = S.onoff.length;
   return h("div", { class: "panel" }, [
-    h("div", { class: "ph" }, [h("b", { text: "Appels Onoff à rattacher" }), h("span", { class: "muted small", text: `${S.onoff.length} appel${S.onoff.length > 1 ? "s" : ""} avec un numéro absent du CRM` })]),
+    h("div", { class: "ph" }, [h("b", { text: T("Appels Onoff à rattacher", "Onoff calls to link") }), h("span", { class: "muted small", text: T(`${n} appel${sEn(n)} avec un numéro absent du CRM`, `${n} call${sEn(n)} from a number not in the CRM`) })]),
     h("div", null, rows),
   ]);
 }
@@ -333,7 +370,7 @@ function stats(userId) {
 function ensureActs(id) {
   if (S.actsFor === id) return;
   S.actsFor = id; S.acts = null;
-  loadActs(byId(id)).then((a) => { if (S.actsFor === id) { S.acts = a; render(); } }).catch((e) => toast("Chronologie indisponible : " + (e.message || e)));
+  loadActs(byId(id)).then((a) => { if (S.actsFor === id) { S.acts = a; render(); } }).catch((e) => toast(T("Chronologie indisponible : ", "Timeline unavailable: ") + (e.message || e)));
 }
 async function loadActs(d) {
   const { data, error } = await sb.from("crm_activities").select("*").or(`deal_id.eq.${d.id},company_id.eq.${d.company_id}`).order("occurred_at", { ascending: false }).limit(500);
@@ -349,7 +386,7 @@ async function patchDeal(id, patch, okMsg) {
     if (S.actsFor === id) S.acts = await loadActs(data);
     if (patch.stage) S.week = await loadWeek();
     toast(okMsg);
-  } catch (e) { toast("Enregistrement impossible : " + (e.message || e)); }
+  } catch (e) { toast(T("Enregistrement impossible : ", "Could not save: ") + (e.message || e)); }
   S.busy = false; render();
 }
 async function addNote(d, body) {
@@ -357,8 +394,8 @@ async function addNote(d, body) {
   try {
     const { error } = await sb.from("crm_activities").insert({ deal_id: d.id, company_id: d.company_id, kind: "note", body, author_id: S.me.user_id, author_label: S.me.display_name });
     if (error) throw error;
-    S.note = ""; S.acts = await loadActs(d); toast("Note ajoutée à la chronologie.");
-  } catch (e) { toast("Note non enregistrée : " + (e.message || e)); }
+    S.note = ""; S.acts = await loadActs(d); toast(T("Note ajoutée à la chronologie.", "Note added to the timeline."));
+  } catch (e) { toast(T("Note non enregistrée : ", "Note not saved: ") + (e.message || e)); }
   S.busy = false; render();
 }
 
@@ -393,35 +430,35 @@ function vFiches() {
   const count = (key, n, label) => h("button", { type: "button", class: "count", "aria-pressed": String(S.quick === key), onclick: () => { S.quick = S.quick === key ? "" : key; if (S.quick) S.stage = "open"; render(); } }, [h("b", { text: String(n) }), h("span", { text: label })]);
   /* Familles (27/10) : un bouton par famille de prospect, compté sur les fiches ouvertes. type_structure vide = studio podcast (historique). */
   const famOf = (d) => d.company.type_structure || "studio_podcast";
-  const FAMILIES = [["studio_podcast", "Studios podcast"], ["infopreneur", "Infopreneurs"], ["youtuber", "YouTubers"]];
+  const FAMILIES = [["studio_podcast", T("Studios podcast", "Podcast studios")], ["infopreneur", "Infopreneurs"], ["youtuber", "YouTubers"]];
   const fam = (key, label) => h("button", { type: "button", class: "count", "aria-pressed": String(S.family === key), onclick: () => { S.family = S.family === key ? "" : key; render(); } }, [h("b", { text: String(key ? open.filter((d) => famOf(d) === key).length : open.length) }), h("span", { text: label })]);
-  const search = h("input", { class: "field", type: "search", id: "q", placeholder: "Chercher une société ou un contact", "aria-label": "Chercher", value: S.q, oninput: (ev) => { S.q = ev.target.value; renderTable(); } });
+  const search = h("input", { class: "field", type: "search", id: "q", placeholder: T("Chercher une société ou un contact", "Search a company or a contact"), "aria-label": T("Chercher", "Search"), value: S.q, oninput: (ev) => { S.q = ev.target.value; renderTable(); } });
   const holder = h("div", { id: "tableHolder" });
   function renderTable() {
     const rows = filtered(); holder.textContent = "";
-    holder.appendChild(h("p", { class: "small muted", style: "margin:0 0 8px", text: `${rows.length} fiche${rows.length > 1 ? "s" : ""}` }));
+    holder.appendChild(h("p", { class: "small muted", style: "margin:0 0 8px", text: T(`${rows.length} fiche${sEn(rows.length)}`, `${rows.length} lead${sEn(rows.length)}`) }));
     holder.appendChild(rows.length ? h("div", { class: "tw" }, [h("table", null, [
-      h("thead", null, [h("tr", null, ["Société", "Étape", "Marché", "Prospecté par", "Prochaine action", "Dernier contact"].map((x) => h("th", { text: x })))]),
+      h("thead", null, [h("tr", null, [T("Société", "Company"), T("Étape", "Stage"), T("Marché", "Market"), T("Prospecté par", "Rep"), T("Prochaine action", "Next action"), T("Dernier contact", "Last contact")].map((x) => h("th", { text: x })))]),
       h("tbody", null, rows.map((d) => h("tr", { onclick: () => openFiche(d.id) }, [
         h("td", null, [h("button", { type: "button", class: "link", onclick: (ev) => { ev.stopPropagation(); openFiche(d.id); } }, [d.company.name]), h("span", { class: "sub", text: TYPE[d.company.type_structure] || "" })]),
         h("td", { class: "nw" }, [h("span", { class: "pill" + (d.stage === "gagne" ? " ok" : ""), text: STAGE_LABEL[d.stage] })]),
         h("td", { class: "nw", text: MARKET[d.company.market] || d.company.market || "" }),
         h("td", { class: "nw", text: ownerName(d) }),
-        h("td", null, [d.next_action_at ? h("span", { class: "pill " + relClass(d.next_action_at), text: rel(d.next_action_at) }) : (isOpen(d) ? h("span", { class: "pill", text: "À planifier" }) : null), d.next_action ? h("span", { class: "sub", text: d.next_action }) : null]),
+        h("td", null, [d.next_action_at ? h("span", { class: "pill " + relClass(d.next_action_at), text: rel(d.next_action_at) }) : (isOpen(d) ? h("span", { class: "pill", text: T("À planifier", "To schedule") }) : null), d.next_action ? h("span", { class: "sub", text: d.next_action }) : null]),
         h("td", { class: "nw muted", text: d.last_contact_at ? frDate(d.last_contact_at) : "" }),
       ]))),
-    ])]) : h("div", { class: "empty", text: "Aucune fiche ne correspond à ces filtres." }));
+    ])]) : h("div", { class: "empty", text: T("Aucune fiche ne correspond à ces filtres.", "No lead matches these filters.") }));
   }
   renderTable();
   return h("div", { style: "display:flex;flex-direction:column;gap:14px" }, [
-    h("div", { class: "vh" }, [h("h2", { text: "Fiches" }), h("div", { class: "rowf" }, [h("span", { class: "muted small", text: `${S.deals.length} sociétés · ${open.length} ouvertes` }), canEdit() ? h("button", { type: "button", class: "btn pri", id: "newLead", onclick: openNew }, ["+ Nouvelle fiche"]) : null])]),
-    h("div", { class: "counts" }, [count("late", late, "relances en retard"), count("today", today, "à faire aujourd'hui"), count("nodate", nodate, "ouvertes sans date")]),
-    h("div", { class: "counts" }, [fam("", "Toutes les familles"), ...FAMILIES.map(([k, l]) => fam(k, l))]),
+    h("div", { class: "vh" }, [h("h2", { text: T("Fiches", "Leads") }), h("div", { class: "rowf" }, [h("span", { class: "muted small", text: T(`${S.deals.length} sociétés · ${open.length} ouvertes`, `${S.deals.length} companies · ${open.length} open`) }), canEdit() ? h("button", { type: "button", class: "btn pri", id: "newLead", onclick: openNew }, [T("+ Nouvelle fiche", "+ New lead")]) : null])]),
+    h("div", { class: "counts" }, [count("late", late, T("relances en retard", "overdue follow-ups")), count("today", today, T("à faire aujourd'hui", "due today")), count("nodate", nodate, T("ouvertes sans date", "open, no date"))]),
+    h("div", { class: "counts" }, [fam("", T("Toutes les familles", "All types")), ...FAMILIES.map(([k, l]) => fam(k, l))]),
     h("div", { class: "filters" }, [
       search,
-      select("fStage", "Étape", S.stage, [["open", "Étapes ouvertes"], ["", "Toutes les étapes"], ...STAGES], (v) => { S.stage = v; if (v !== "open") S.quick = ""; render(); }),
-      select("fMarket", "Marché", S.market, [["", "Tous les marchés"], ...options(MARKET, markets)], (v) => { S.market = v; render(); }),
-      select("fSetter", "Prospecté par", S.setter, [["", "Toute l'équipe"], ...setters.map((s) => [s, cap(s)])], (v) => { S.setter = v; render(); }),
+      select("fStage", T("Étape", "Stage"), S.stage, [["open", T("Étapes ouvertes", "Open stages")], ["", T("Toutes les étapes", "All stages")], ...STAGES], (v) => { S.stage = v; if (v !== "open") S.quick = ""; render(); }),
+      select("fMarket", T("Marché", "Market"), S.market, [["", T("Tous les marchés", "All markets")], ...options(MARKET, markets)], (v) => { S.market = v; render(); }),
+      select("fSetter", T("Prospecté par", "Rep"), S.setter, [["", T("Toute l'équipe", "Whole team")], ...setters.map((s) => [s, cap(s)])], (v) => { S.setter = v; render(); }),
     ]),
     holder,
   ]);
@@ -434,90 +471,91 @@ function vTunnel() {
     return h("div", { class: "col" }, [h("h3", null, [l, h("span", { text: String(cards.length) })]),
       ...cards.slice(0, limit).map((d) => h("button", { type: "button", class: "kcard", onclick: () => openFiche(d.id) }, [
         h("b", { text: d.company.name }), h("small", { text: `${ownerName(d)} · ${MARKET[d.company.market] || ""}` }),
-        d.next_action_at ? h("small", { class: dayDiff(d.next_action_at) < 0 ? "late" : null, text: rel(d.next_action_at) }) : (k === "gagne" ? null : h("small", { text: "À planifier" })),
+        d.next_action_at ? h("small", { class: dayDiff(d.next_action_at) < 0 ? "late" : null, text: rel(d.next_action_at) }) : (k === "gagne" ? null : h("small", { text: T("À planifier", "To schedule") })),
       ])),
-      cards.length > limit ? h("button", { type: "button", class: "more", onclick: () => { S.more[k] = true; render(); } }, [`Afficher les ${cards.length - limit} autres`]) : null,
+      cards.length > limit ? h("button", { type: "button", class: "more", onclick: () => { S.more[k] = true; render(); } }, [T(`Afficher les ${cards.length - limit} autres`, `Show ${cards.length - limit} more`)]) : null,
     ]);
   });
   const out = (k) => list.filter((d) => d.stage === k).length;
   return h("div", { style: "display:flex;flex-direction:column;gap:14px" }, [
-    h("div", { class: "vh" }, [h("h2", { text: "Tunnel" }), h("div", { class: "seg", role: "group", "aria-label": "Filtre" }, [
-      h("button", { type: "button", "aria-pressed": String(!S.mine), onclick: () => { S.mine = false; render(); } }, ["Toutes les fiches"]),
-      h("button", { type: "button", "aria-pressed": String(S.mine), onclick: () => { S.mine = true; render(); } }, ["Les miennes"]),
+    h("div", { class: "vh" }, [h("h2", { text: T("Tunnel", "Pipeline") }), h("div", { class: "seg", role: "group", "aria-label": T("Filtre", "Filter") }, [
+      h("button", { type: "button", "aria-pressed": String(!S.mine), onclick: () => { S.mine = false; render(); } }, [T("Toutes les fiches", "All leads")]),
+      h("button", { type: "button", "aria-pressed": String(S.mine), onclick: () => { S.mine = true; render(); } }, [T("Les miennes", "Mine")]),
     ])]),
     h("div", { class: "kan" }, cols),
-    h("p", { class: "small muted" }, ["Sorties : ",
-      h("button", { type: "button", class: "link", onclick: () => { S.tab = "fiches"; S.stage = "perdu"; S.quick = ""; render(); } }, [`Perdu (${out("perdu")})`]), " · ",
-      h("button", { type: "button", class: "link", onclick: () => { S.tab = "fiches"; S.stage = "ecarte"; S.quick = ""; render(); } }, [`Écarté (${out("ecarte")})`])]),
+    h("p", { class: "small muted" }, [T("Sorties : ", "Closed: "),
+      h("button", { type: "button", class: "link", onclick: () => { S.tab = "fiches"; S.stage = "perdu"; S.quick = ""; render(); } }, [`${STAGE_LABEL.perdu} (${out("perdu")})`]), " · ",
+      h("button", { type: "button", class: "link", onclick: () => { S.tab = "fiches"; S.stage = "ecarte"; S.quick = ""; render(); } }, [`${STAGE_LABEL.ecarte} (${out("ecarte")})`])]),
   ]);
 }
 function actLine(a) {
   const bits = [KIND[a.kind] || a.kind];
-  if (a.kind === "call" && a.outcome) bits.push(a.outcome);
+  if (a.kind === "call" && a.outcome) bits.push(outc(a.outcome));
   if (a.kind === "call" && a.duration_s) bits.push(`${Math.max(1, Math.round(a.duration_s / 60))} min`);
-  if (a.kind === "email") bits.push(a.direction === "in" ? "reçu" : "envoyé");
+  if (a.kind === "email") bits.push(a.direction === "in" ? T("reçu", "received") : T("envoyé", "sent"));
   if (a.kind === "message" && a.channel) bits.push(a.channel);
-  if (a.kind === "task") bits.push(a.done ? "faite" : "à faire");
+  if (a.kind === "task") bits.push(a.done ? T("faite", "done") : T("à faire", "to do"));
   if (a.author_label && a.author_label !== "Import HubSpot") bits.push(a.author_label);
   let subject = a.subject;
   if (a.kind === "stage" && subject) subject = subject.split(" > ").map((s) => STAGE_LABEL[s] || s).join(" → ");
   const body = a.body ? h("div", { class: "body" + (a.body.length > 320 ? " clip" : ""), text: a.body }) : null;
   return h("li", null, [h("time", { text: frDate(a.kind === "task" && a.due_at ? a.due_at : a.occurred_at) }), h("div", null, [
     h("b", { text: bits.join(" · ") }), subject ? h("div", { text: subject }) : null, body,
-    body && a.body.length > 320 ? h("button", { type: "button", class: "more", style: "text-align:left;padding:2px 0", onclick: (ev) => { body.classList.toggle("clip"); ev.target.textContent = body.classList.contains("clip") ? "Lire la suite" : "Réduire"; } }, ["Lire la suite"]) : null,
+    body && a.body.length > 320 ? h("button", { type: "button", class: "more", style: "text-align:left;padding:2px 0", onclick: (ev) => { body.classList.toggle("clip"); ev.target.textContent = body.classList.contains("clip") ? T("Lire la suite", "Read more") : T("Réduire", "Show less"); } }, [T("Lire la suite", "Read more")]) : null,
   ])]);
 }
 function fiche(d, inline) {
   const c = d.company, people = S.contacts.get(d.company_id) || [], edit = canEdit(), kids = [], acts = S.actsFor === d.id ? S.acts : null;
   kids.push(h("div", { style: "display:flex;justify-content:space-between;gap:10px;align-items:center" }, [
-    c.hubspot_id ? h("a", { class: "small muted", href: HUBSPOT_COMPANY + c.hubspot_id, target: "_blank", rel: "noopener" }, ["Voir dans HubSpot"]) : h("span"),
-    inline ? null : h("button", { type: "button", class: "btn", id: "closeFiche", onclick: closeFiche }, ["Fermer"])]));
+    c.hubspot_id ? h("a", { class: "small muted", href: HUBSPOT_COMPANY + c.hubspot_id, target: "_blank", rel: "noopener" }, [T("Voir dans HubSpot", "View in HubSpot")]) : h("span"),
+    inline ? null : h("button", { type: "button", class: "btn", id: "closeFiche", onclick: closeFiche }, [T("Fermer", "Close")])]));
   kids.push(h("div", { class: "fh" }, [h("h2", { text: c.name }), edit
-    ? select("stageSel", "Étape", d.stage, STAGES, (v) => patchDeal(d.id, { stage: v }, `Étape : ${STAGE_LABEL[v]}.`))
+    ? select("stageSel", T("Étape", "Stage"), d.stage, STAGES, (v) => patchDeal(d.id, { stage: v }, T(`Étape : ${STAGE_LABEL[v]}.`, `Stage: ${STAGE_LABEL[v]}.`)))
     : h("span", { class: "pill", text: STAGE_LABEL[d.stage] })]));
-  if (!edit) kids.push(h("div", { class: "ro", text: "Lecture seule." }));
+  if (!edit) kids.push(h("div", { class: "ro", text: T("Lecture seule.", "Read-only.") }));
   const site = c.website ? (c.website.startsWith("http") ? c.website : "https://" + c.website) : null;
   const cell = (l, v) => (v ? h("div", null, [h("span", { text: l }), v]) : null);
   kids.push(h("div", { class: "meta" }, [
-    cell("Société", [TYPE[c.type_structure], MARKET[c.market] || c.market].filter(Boolean).join(" · ")),
-    cell("Téléphone", c.phone),
-    site ? h("div", null, [h("span", { text: "Site" }), h("a", { href: site, target: "_blank", rel: "noopener" }, [c.website.replace(/^https?:\/\//, "")])]) : null,
-    cell("Prospecté par", ownerName(d)),
-    cell("Tentatives", String(d.tries)),
-    cell("Premier canal", d.first_channel), cell("Offre proposée", d.offer), cell("Source", c.source), cell("Langue", c.lang),
-    cell("Dernier contact", d.last_contact_at ? frDate(d.last_contact_at) : null),
-    cell("Raison de la perte", d.lost_reason),
+    cell(T("Société", "Company"), [TYPE[c.type_structure], MARKET[c.market] || c.market].filter(Boolean).join(" · ")),
+    cell(T("Téléphone", "Phone"), c.phone),
+    site ? h("div", null, [h("span", { text: T("Site", "Website") }), h("a", { href: site, target: "_blank", rel: "noopener" }, [c.website.replace(/^https?:\/\//, "")])]) : null,
+    cell(T("Prospecté par", "Rep"), ownerName(d)),
+    cell(T("Tentatives", "Attempts"), String(d.tries)),
+    cell(T("Premier canal", "First channel"), d.first_channel), cell(T("Offre proposée", "Offer pitched"), d.offer), cell("Source", c.source), cell(T("Langue", "Language"), c.lang),
+    cell(T("Dernier contact", "Last contact"), d.last_contact_at ? frDate(d.last_contact_at) : null),
+    cell(T("Raison de la perte", "Loss reason"), d.lost_reason),
   ]));
   const ce = edit && S.ce && S.ce.company_id === d.company_id ? S.ce : null;
   if (people.length || edit) kids.push(h("div", null, [h("span", { class: "lbl", text: people.length > 1 ? "Contacts" : "Contact" }), h("div", { class: "people", style: "margin-top:6px" }, [
     ...people.map((p) => (ce && ce.id === p.id ? contactForm(d, ce) : h("div", { class: "person" }, [h("div", { style: "min-width:0" }, [
-      h("b", { text: [p.first_name, p.last_name].filter(Boolean).join(" ") || "Sans nom" }), p.job_title ? ` · ${p.job_title}` : "", h("br"),
-      h("span", { class: "muted", text: [p.email, p.phone].filter(Boolean).join(" · ") || "Pas de coordonnées" }),
+      h("b", { text: [p.first_name, p.last_name].filter(Boolean).join(" ") || T("Sans nom", "No name") }), p.job_title ? ` · ${p.job_title}` : "", h("br"),
+      h("span", { class: "muted", text: [p.email, p.phone].filter(Boolean).join(" · ") || T("Pas de coordonnées", "No contact details") }),
       p.linkedin_url ? h("span", null, [" · ", h("a", { href: p.linkedin_url, target: "_blank", rel: "noopener" }, ["LinkedIn"])]) : null,
-    ]), edit && !ce ? h("button", { type: "button", class: "pedit", "aria-label": `Modifier ${fullName(p) || "ce contact"}`, onclick: () => editContact(p) }, ["Modifier"]) : null]))),
+    ]), edit && !ce ? h("button", { type: "button", class: "pedit", "aria-label": T(`Modifier ${fullName(p) || "ce contact"}`, `Edit ${fullName(p) || "this contact"}`), onclick: () => editContact(p) }, [T("Modifier", "Edit")]) : null]))),
     ce && !ce.id ? contactForm(d, ce) : null,
-    edit && !ce ? h("button", { type: "button", class: "addc", onclick: () => editContact(null, d.company_id) }, ["+ Ajouter un contact"]) : null,
-    !people.length && !ce ? h("p", { class: "muted small", text: "Aucun contact sur cette fiche." }) : null,
+    edit && !ce ? h("button", { type: "button", class: "addc", onclick: () => editContact(null, d.company_id) }, [T("+ Ajouter un contact", "+ Add a contact")]) : null,
+    !people.length && !ce ? h("p", { class: "muted small", text: T("Aucun contact sur cette fiche.", "No contact on this lead.") }) : null,
   ])]));
   if (isOpen(d)) {
+    const NA = T("Prochaine action", "Next action"), TBD = T("À planifier", "To schedule");
     if (edit) {
-      const txt = h("input", { class: "field grow", type: "text", id: "nextText", "aria-label": "Prochaine action", placeholder: "Prochaine action", value: d.next_action || "" });
-      const date = h("input", { class: "field", type: "date", id: "nextDate", "aria-label": "Date de la prochaine action", value: d.next_action_at || "" });
+      const txt = h("input", { class: "field grow", type: "text", id: "nextText", "aria-label": NA, placeholder: NA, value: d.next_action || "" });
+      const date = h("input", { class: "field", type: "date", id: "nextDate", "aria-label": T("Date de la prochaine action", "Next action date"), value: d.next_action_at || "" });
       kids.push(h("div", { class: "box" }, [
-        h("div", { style: "display:flex;justify-content:space-between;gap:8px;align-items:center" }, [h("span", { class: "lbl", text: "Prochaine action" }), d.next_action_at ? h("span", { class: "pill " + relClass(d.next_action_at), text: rel(d.next_action_at) }) : h("span", { class: "pill", text: "À planifier" })]),
-        h("div", { class: "rowf" }, [txt, date, h("button", { type: "button", class: "btn pri", onclick: () => { if (!txt.value.trim() || !date.value) { toast("Il faut une action et une date."); return; } patchDeal(d.id, { next_action: txt.value.trim(), next_action_at: date.value }, `Prochaine action : ${rel(date.value).toLowerCase()}.`); } }, ["Enregistrer"])]),
+        h("div", { style: "display:flex;justify-content:space-between;gap:8px;align-items:center" }, [h("span", { class: "lbl", text: NA }), d.next_action_at ? h("span", { class: "pill " + relClass(d.next_action_at), text: rel(d.next_action_at) }) : h("span", { class: "pill", text: TBD })]),
+        h("div", { class: "rowf" }, [txt, date, h("button", { type: "button", class: "btn pri", onclick: () => { if (!txt.value.trim() || !date.value) { toast(T("Il faut une action et une date.", "Add an action and a date.")); return; } patchDeal(d.id, { next_action: txt.value.trim(), next_action_at: date.value }, T("Prochaine action : ", "Next action: ") + rel(date.value).toLowerCase() + "."); } }, [T("Enregistrer", "Save")])]),
       ]));
-    } else if (d.next_action || d.next_action_at) kids.push(h("div", { class: "box" }, [h("span", { class: "lbl", text: "Prochaine action" }), h("div", null, [d.next_action_at ? h("span", { class: "pill " + relClass(d.next_action_at), text: rel(d.next_action_at) }) : null, " ", d.next_action || ""])]));
+    } else if (d.next_action || d.next_action_at) kids.push(h("div", { class: "box" }, [h("span", { class: "lbl", text: NA }), h("div", null, [d.next_action_at ? h("span", { class: "pill " + relClass(d.next_action_at), text: rel(d.next_action_at) }) : null, " ", d.next_action || ""])]));
   }
-  const ctx = [["Angle", c.angle], ["Montage actuel", c.montage_actuel], ["Volume estimé", c.volume_estime], ["Prix publics", c.prix_publics]].filter((x) => x[1]);
+  const ctx = [["Angle", c.angle], [T("Montage actuel", "Current editing"), c.montage_actuel], [T("Volume estimé", "Estimated volume"), c.volume_estime], [T("Prix publics", "Public prices"), c.prix_publics]].filter((x) => x[1]);
   if (ctx.length) kids.push(h("div", { class: "ctx" }, ctx.map(([l, v]) => h("div", null, [h("span", { class: "lbl", text: l }), h("p", { text: v })]))));
   if (edit) {
-    const note = h("textarea", { class: "field", id: "noteText", "aria-label": "Nouvelle note", placeholder: "Ajouter une note à la chronologie", oninput: (ev) => { S.note = ev.target.value; } });
+    const note = h("textarea", { class: "field", id: "noteText", "aria-label": T("Nouvelle note", "New note"), placeholder: T("Ajouter une note à la chronologie", "Add a note to the timeline"), oninput: (ev) => { S.note = ev.target.value; } });
     note.value = S.note;
-    kids.push(h("div", { class: "box" }, [note, h("div", null, [h("button", { type: "button", class: "btn", onclick: () => { const v = note.value.trim(); if (!v) { toast("La note est vide."); return; } addNote(d, v); } }, ["Ajouter la note"])])]));
+    kids.push(h("div", { class: "box" }, [note, h("div", null, [h("button", { type: "button", class: "btn", onclick: () => { const v = note.value.trim(); if (!v) { toast(T("La note est vide.", "The note is empty.")); return; } addNote(d, v); } }, [T("Ajouter la note", "Add note")])])]));
   }
-  kids.push(h("span", { class: "lbl", text: "Chronologie" }));
-  kids.push(acts == null ? h("p", { class: "muted small", text: "Chargement…" }) : acts.length ? h("ul", { class: "tl" }, acts.map(actLine)) : h("p", { class: "muted small", text: "Aucun échange enregistré." }));
+  kids.push(h("span", { class: "lbl", text: T("Chronologie", "Timeline") }));
+  kids.push(acts == null ? h("p", { class: "muted small", text: T("Chargement…", "Loading…") }) : acts.length ? h("ul", { class: "tl" }, acts.map(actLine)) : h("p", { class: "muted small", text: T("Aucun échange enregistré.", "No activity yet.") }));
   return h("div", { class: "fiche" }, kids);
 }
 function openFiche(id) { S.open = id; S.newOpen = false; S.note = ""; S.ce = null; ensureActs(id); render(); }
@@ -528,7 +566,7 @@ function closeFiche() { S.open = null; S.newOpen = false; S.note = ""; S.ce = nu
    international (+33…) quand on sait le lire : le webhook Onoff compare les 9 derniers chiffres (crm_phone_key),
    donc un numéro bien rangé ici = les prochains appels se rattachent tout seuls à la fiche. */
 const CC = { france_metropole: "33", belgique: "32", suisse: "41", uk: "44", usa: "1", quebec: "1" };
-const CE_FIELDS = [["first_name", "Prénom"], ["last_name", "Nom"], ["job_title", "Fonction"], ["phone", "Téléphone"], ["email", "E-mail"]];
+let CE_FIELDS;   // [champ, libellé] : rempli par buildLabels() (langue)
 /* Le pays vient du marché de la fiche, mais l'indicatif n'est ajouté que si le format local colle à ce pays.
    Sinon : un 06 / 07 à 10 chiffres = mobile français (+33) ; tout le reste est gardé tel quel. */
 const LOCAL = {
@@ -565,20 +603,21 @@ function contactForm(d, ce) {
   const f = ce.f, inp = (k, label, attrs, wide) => h("label", { class: wide ? "w" : null }, [label,
     h("input", Object.assign({ class: "field", type: "text", id: "ce_" + k, value: f[k], oninput: (ev) => { f[k] = ev.target.value; } }, attrs || {}))]);
   const save = () => saveContact(d, ce);
-  const box = h("div", { class: "box", role: "group", "aria-label": ce.id ? "Modifier le contact" : "Nouveau contact",
+  const title = ce.id ? T("Modifier le contact", "Edit contact") : T("Nouveau contact", "New contact");
+  const box = h("div", { class: "box", role: "group", "aria-label": title,
     onkeydown: (ev) => { if (ev.key === "Escape") { ev.stopPropagation(); S.ce = null; render(); } else if (ev.key === "Enter" && ev.target.tagName === "INPUT") save(); } }, [
-    h("span", { class: "lbl", text: ce.id ? "Modifier le contact" : "Nouveau contact" }),
+    h("span", { class: "lbl", text: title }),
     h("div", { class: "nf ce" }, [
-      inp("first_name", "Prénom", { placeholder: "Morgan", autocomplete: "off" }),
-      inp("last_name", "Nom", { placeholder: "Prudhomme", autocomplete: "off" }),
-      inp("job_title", "Fonction", { placeholder: "Fondateur" }, true),
-      inp("phone", "Téléphone", { type: "tel", placeholder: "06 12 34 56 78 ou +33 6…", inputmode: "tel" }),
-      inp("email", "E-mail", { type: "email", placeholder: "morgan@studio.fr", inputmode: "email" }),
+      inp("first_name", T("Prénom", "First name"), { placeholder: T("Morgan", "Jordan"), autocomplete: "off" }),
+      inp("last_name", T("Nom", "Last name"), { placeholder: T("Prudhomme", "Lee"), autocomplete: "off" }),
+      inp("job_title", T("Fonction", "Job title"), { placeholder: T("Fondateur", "Founder") }, true),
+      inp("phone", T("Téléphone", "Phone"), { type: "tel", placeholder: T("06 12 34 56 78 ou +33 6…", "(212) 555-0142 or +1 212…"), inputmode: "tel" }),
+      inp("email", T("E-mail", "Email"), { type: "email", placeholder: T("morgan@studio.fr", "jordan@studio.com"), inputmode: "email" }),
     ]),
-    h("p", { class: "muted small", text: "Le numéro est rangé au format international (+33…) quand il est reconnu, sinon gardé tel quel. Les prochains appels Onoff de ce numéro arrivent ensuite seuls sur la fiche." }),
+    h("p", { class: "muted small", text: T("Le numéro est rangé au format international (+33…) quand il est reconnu, sinon gardé tel quel. Les prochains appels Onoff de ce numéro arrivent ensuite seuls sur la fiche.", "The number is saved in international format (+1…) when it is recognized, otherwise as typed. Future Onoff calls from this number then land on this lead automatically.") }),
     h("div", { class: "rowf" }, [
-      h("button", { type: "button", class: "btn pri", disabled: S.busy, onclick: save }, [S.busy ? "Enregistrement…" : "Enregistrer"]),
-      h("button", { type: "button", class: "btn", onclick: () => { S.ce = null; render(); } }, ["Annuler"]),
+      h("button", { type: "button", class: "btn pri", disabled: S.busy, onclick: save }, [S.busy ? T("Enregistrement…", "Saving…") : T("Enregistrer", "Save")]),
+      h("button", { type: "button", class: "btn", onclick: () => { S.ce = null; render(); } }, [T("Annuler", "Cancel")]),
     ]),
   ]);
   return box;
@@ -588,11 +627,11 @@ async function saveContact(d, ce) {
   const t = (k) => (ce.f[k] || "").trim() || null;
   const row = { first_name: t("first_name"), last_name: t("last_name"), job_title: t("job_title"), email: t("email"), phone: e164(ce.f.phone, d.company.market) };
   if (row.email) row.email = row.email.toLowerCase();
-  if (!row.first_name && !row.last_name && !row.phone && !row.email) { toast("Il faut au moins un nom, un téléphone ou un e-mail."); return; }
-  if (row.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(row.email)) { toast("L'e-mail ne semble pas valide."); return; }
+  if (!row.first_name && !row.last_name && !row.phone && !row.email) { toast(T("Il faut au moins un nom, un téléphone ou un e-mail.", "Add at least a name, a phone or an email.")); return; }
+  if (row.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(row.email)) { toast(T("L'e-mail ne semble pas valide.", "This email doesn't look valid.")); return; }
   const list = S.contacts.get(d.company_id) || [], old = ce.id ? list.find((p) => p.id === ce.id) : null;
   const changed = old ? CE_FIELDS.filter(([k]) => (old[k] || null) !== row[k]) : [];
-  if (old && !changed.length) { S.ce = null; render(); toast("Rien n'a changé."); return; }
+  if (old && !changed.length) { S.ce = null; render(); toast(T("Rien n'a changé.", "Nothing changed.")); return; }
   S.busy = true; render();
   let p = null, linked = 0, failed = 0;
   try {
@@ -600,10 +639,11 @@ async function saveContact(d, ce) {
               : (await must(sb.from("crm_contacts").insert({ company_id: d.company_id, ...row }).select("*").single())).data;
     S.contacts.set(d.company_id, ce.id ? list.map((x) => (x.id === p.id ? p : x)) : [...list, p]);
     S.ce = null;
-    const who = fullName(p) || p.phone || p.email || "sans nom";
+    // Ligne de chronologie écrite dans la langue de la personne qui fait la modification.
+    const who = fullName(p) || p.phone || p.email || T("sans nom", "no name"), empty = T("vide", "empty");
     const body = old
-      ? `Contact modifié : ${who}\n` + changed.map(([k, l]) => `${l} : ${old[k] || "vide"} → ${p[k] || "vide"}`).join("\n")
-      : `Contact ajouté : ${[who, p.job_title, p.phone, p.email].filter(Boolean).join(" · ")}`;
+      ? T("Contact modifié : ", "Contact edited: ") + who + "\n" + changed.map(([k, l]) => `${l}${T(" : ", ": ")}${old[k] || empty} → ${p[k] || empty}`).join("\n")
+      : T("Contact ajouté : ", "Contact added: ") + [who, p.job_title, p.phone, p.email].filter(Boolean).join(" · ");
     const act = await sb.from("crm_activities").insert({ deal_id: d.id, company_id: d.company_id, contact_id: p.id, kind: "note", body, author_id: S.me.user_id, author_label: S.me.display_name });
     // Appels Onoff déjà en attente (« à rattacher ») dont le numéro correspond : rattachés tout de suite à cette fiche.
     const key = phoneKey(p.phone);
@@ -615,16 +655,18 @@ async function saveContact(d, ce) {
       if (linked) S.week = await loadWeek();
     }
     S.acts = await loadActs(d);
-    toast((old ? "Contact modifié." : "Contact ajouté.") + (act.error ? ` Ligne de chronologie non enregistrée : ${act.error.message}.` : "") + (linked ? ` ${linked} appel${linked > 1 ? "s" : ""} Onoff rattaché${linked > 1 ? "s" : ""} à la fiche.` : "") + (failed ? ` ${failed} appel${failed > 1 ? "s" : ""} Onoff non rattaché${failed > 1 ? "s" : ""} : à faire dans « Ma journée ».` : ""));
-  } catch (e) { toast((p ? "Contact enregistré, suite incomplète : " : "Contact non enregistré : ") + (e.message || e)); }
+    toast((old ? T("Contact modifié.", "Contact updated.") : T("Contact ajouté.", "Contact added.")) + (act.error ? T(` Ligne de chronologie non enregistrée : ${act.error.message}.`, ` Timeline line not saved: ${act.error.message}.`) : "")
+      + (linked ? T(` ${linked} appel${sEn(linked)} Onoff rattaché${sEn(linked)} à la fiche.`, ` ${linked} Onoff call${sEn(linked)} linked to the lead.`) : "")
+      + (failed ? T(` ${failed} appel${sEn(failed)} Onoff non rattaché${sEn(failed)} : à faire dans « Ma journée ».`, ` ${failed} Onoff call${sEn(failed)} not linked: do it in "My day".`) : ""));
+  } catch (e) { toast((p ? T("Contact enregistré, suite incomplète : ", "Contact saved, the rest failed: ") : T("Contact non enregistré : ", "Contact not saved: ")) + (e.message || e)); }
   S.busy = false; render();
 }
 
 /* ---------- nouvelle fiche (setters : société + deal + contact en une fois ; policies crm_v1 : insert admin/sales) ---------- */
-const VERDICTS = [["icp", "ICP"], ["attente", "En attente"], ["sortir", "Sortir"]];
+let VERDICTS;   // [clé, libellé] : rempli par buildLabels() (langue)
 const NF_MARKETS = ["france_metropole", "belgique", "suisse", "luxembourg", "quebec", "usa", "uk", "autre"];
 function plusDays(n) { const d = new Date(); d.setDate(d.getDate() + n); return `${d.getFullYear()}-${p2(d.getMonth() + 1)}-${p2(d.getDate())}`; }
-function blankLead() { return { name: "", website: "", city: "", market: "france_metropole", type_structure: "studio_podcast", phone: "", first_name: "", last_name: "", job_title: "", verdict: "icp", note: "", next_action_at: plusDays(1) }; }
+function blankLead() { return { name: "", website: "", city: "", market: LANG === "en" ? "usa" : "france_metropole", type_structure: "studio_podcast", phone: "", first_name: "", last_name: "", job_title: "", verdict: "icp", note: "", next_action_at: plusDays(1) }; }
 function normName(s) { return (s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/\s*\(.*?\)\s*/g, " ").replace(/[^a-z0-9]+/g, " ").trim(); }
 function domainOf(u) { return (u || "").trim().toLowerCase().replace(/^https?:\/\//, "").replace(/^www\./, "").split(/[/?#]/)[0]; }
 function findDuplicate(f) {
@@ -645,17 +687,18 @@ async function createLead(f) {
     };
     const c = (await must(sb.from("crm_companies").insert(company).select("*").single())).data;
     const deal = { company_id: c.id, title: `${c.name} — montage marque blanche`, owner_id: me.user_id, setter, first_channel: "phone", stage_changed_at: new Date().toISOString() };
-    if (f.verdict === "sortir") { deal.stage = "ecarte"; deal.lost_reason = note || "Hors cible (grille setter)"; }
-    else { deal.stage = "a_contacter"; deal.next_action = (f.verdict === "icp" ? "ICP : " : "Nurture : il manque ") + (note || (f.verdict === "icp" ? "appeler le gérant" : "une preuve")); deal.next_action_at = f.next_action_at || plusDays(1); }
+    // Textes par défaut écrits dans la langue de la personne qui crée la fiche (un sales US relit ses propres fiches).
+    if (f.verdict === "sortir") { deal.stage = "ecarte"; deal.lost_reason = note || T("Hors cible (grille setter)", "Not a fit (setter grid)"); }
+    else { deal.stage = "a_contacter"; deal.next_action = (f.verdict === "icp" ? T("ICP : ", "ICP: ") : T("Nurture : il manque ", "Nurture: missing ")) + (note || (f.verdict === "icp" ? T("appeler le gérant", "call the owner") : T("une preuve", "proof"))); deal.next_action_at = f.next_action_at || plusDays(1); }
     const d = (await must(sb.from("crm_deals").insert(deal).select("*, company:crm_companies(*)").single())).data;
     if (f.first_name.trim() || f.last_name.trim()) {
       const p = (await must(sb.from("crm_contacts").insert({ company_id: c.id, first_name: f.first_name.trim() || null, last_name: f.last_name.trim() || null, job_title: f.job_title.trim() || null, phone: f.phone.trim() || null }).select("*").single())).data;
       S.contacts.set(c.id, [p]);
     }
-    await sb.from("crm_activities").insert({ deal_id: d.id, company_id: c.id, kind: "note", body: `Fiche créée par ${me.display_name} · verdict ${VERDICTS.find((v) => v[0] === f.verdict)[1]}${note ? " · " + note : ""}`, author_id: me.user_id, author_label: me.display_name });
+    await sb.from("crm_activities").insert({ deal_id: d.id, company_id: c.id, kind: "note", body: T(`Fiche créée par ${me.display_name}`, `Lead created by ${me.display_name}`) + ` · verdict ${VERDICTS.find((v) => v[0] === f.verdict)[1]}${note ? " · " + note : ""}`, author_id: me.user_id, author_label: me.display_name });
     S.deals.push(d); S.newOpen = false; S.nf = null; S.busy = false;
-    toast(`Fiche ${c.name} créée.`); openFiche(d.id); return;
-  } catch (e) { toast("Création impossible : " + (e.message || e)); }
+    toast(T(`Fiche ${c.name} créée.`, `Lead ${c.name} created.`)); openFiche(d.id); return;
+  } catch (e) { toast(T("Création impossible : ", "Could not create: ") + (e.message || e)); }
   S.busy = false; render();
 }
 function newForm() {
@@ -666,47 +709,48 @@ function newForm() {
     const d = findDuplicate(f); dupBox.textContent = "";
     if (!d) { dupBox.hidden = true; return; }
     dupBox.hidden = false;
-    dupBox.appendChild(h("span", { text: `Déjà au CRM : ${d.company.name} (${STAGE_LABEL[d.stage]}, ${ownerName(d)}).` }));
-    dupBox.appendChild(h("button", { type: "button", class: "btn", onclick: () => openFiche(d.id) }, ["Ouvrir la fiche existante"]));
+    dupBox.appendChild(h("span", { text: T(`Déjà au CRM : ${d.company.name} (${STAGE_LABEL[d.stage]}, ${ownerName(d)}).`, `Already in the CRM: ${d.company.name} (${STAGE_LABEL[d.stage]}, ${ownerName(d)}).`) }));
+    dupBox.appendChild(h("button", { type: "button", class: "btn", onclick: () => openFiche(d.id) }, [T("Ouvrir la fiche existante", "Open the existing lead")]));
   }
   const verdict = h("div", { class: "seg", role: "group", "aria-label": "Verdict" }, VERDICTS.map(([k, l]) => h("button", { type: "button", "aria-pressed": String(f.verdict === k), onclick: () => { f.verdict = k; if (k === "attente") f.next_action_at = plusDays(30); if (k === "icp") f.next_action_at = plusDays(1); render(); } }, [l])));
-  const noteLabel = f.verdict === "icp" ? "Pourquoi ICP (preuves : plateaux, avis, montage vendu)" : f.verdict === "attente" ? "Ce qui manque" : "Motif de sortie";
+  const noteLabel = f.verdict === "icp" ? T("Pourquoi ICP (preuves : plateaux, avis, montage vendu)", "Why ICP (proof: sets, reviews, editing sold)") : f.verdict === "attente" ? T("Ce qui manque", "What's missing") : T("Motif de sortie", "Why it's not a fit");
   const form = h("div", { class: "nf" }, [
-    inp("name", "Studio *", { placeholder: "Nom du studio", required: true }, true),
-    inp("website", "Site web", { placeholder: "mumbo.fr", inputmode: "url" }),
-    inp("city", "Ville", { placeholder: "Paris 2e" }),
-    h("label", null, ["Marché", select("nfMarket", "Marché", f.market, NF_MARKETS.map((k) => [k, MARKET[k] || k]), (v) => { f.market = v; })]),
+    inp("name", "Studio *", { placeholder: T("Nom du studio", "Studio name"), required: true }, true),
+    inp("website", T("Site web", "Website"), { placeholder: T("mumbo.fr", "studio.com"), inputmode: "url" }),
+    inp("city", T("Ville", "City"), { placeholder: T("Paris 2e", "Brooklyn, NY") }),
+    h("label", null, [T("Marché", "Market"), select("nfMarket", T("Marché", "Market"), f.market, NF_MARKETS.map((k) => [k, MARKET[k] || k]), (v) => { f.market = v; })]),
     h("label", null, ["Type", select("nfType", "Type", f.type_structure, Object.entries(TYPE), (v) => { f.type_structure = v; })]),
-    inp("phone", "Téléphone (source : mentions légales, pied de page…)", { placeholder: "06 00 00 00 00", type: "tel" }, true),
-    inp("first_name", "Gérant · prénom", { placeholder: "Amir" }),
-    inp("last_name", "Gérant · nom", { placeholder: "Laieb" }),
-    inp("job_title", "Fonction (ex. président, d'après les mentions légales)", { placeholder: "Président" }, true),
+    inp("phone", T("Téléphone (source : mentions légales, pied de page…)", "Phone (source: website footer, contact page, Google…)"), { placeholder: T("06 00 00 00 00", "(212) 555-0100"), type: "tel" }, true),
+    inp("first_name", T("Gérant · prénom", "Studio owner · first name"), { placeholder: T("Amir", "Jordan") }),
+    inp("last_name", T("Gérant · nom", "Studio owner · last name"), { placeholder: T("Laieb", "Lee") }),
+    inp("job_title", T("Fonction (ex. président, d'après les mentions légales)", "Job title (e.g. founder, CEO)"), { placeholder: T("Président", "Founder") }, true),
     h("label", { class: "w" }, ["Verdict", verdict]),
-    h("label", { class: "w" }, [noteLabel, h("textarea", { class: "field", value: f.note, oninput: upd("note"), placeholder: f.verdict === "icp" ? "6 décors, +50 avis, montage 125-325 €/h, gérant trouvé" : f.verdict === "attente" ? "pas de preuve de montage vendu" : "audio seul" })]),
-    f.verdict === "sortir" ? null : h("label", null, ["Prochaine action le", h("input", { class: "field", type: "date", value: f.next_action_at, oninput: upd("next_action_at") })]),
+    h("label", { class: "w" }, [noteLabel, h("textarea", { class: "field", value: f.note, oninput: upd("note"), placeholder: f.verdict === "icp" ? T("6 décors, +50 avis, montage 125-325 €/h, gérant trouvé", "6 sets, 50+ reviews, sells editing, owner found") : f.verdict === "attente" ? T("pas de preuve de montage vendu", "no proof they sell editing") : T("audio seul", "audio only") })]),
+    f.verdict === "sortir" ? null : h("label", null, [T("Prochaine action le", "Next action on"), h("input", { class: "field", type: "date", value: f.next_action_at, oninput: upd("next_action_at") })]),
   ]);
   const submit = h("button", { type: "button", class: "btn pri", onclick: () => {
-    if (!f.name.trim()) { toast("Le nom du studio est obligatoire."); return; }
-    const d = findDuplicate(f); if (d) { toast(`${d.company.name} est déjà au CRM : ouvre la fiche existante.`); refreshDup(); return; }
-    if (f.verdict !== "sortir" && !f.next_action_at) { toast("Il faut une date de prochaine action."); return; }
+    if (!f.name.trim()) { toast(T("Le nom du studio est obligatoire.", "The studio name is required.")); return; }
+    const d = findDuplicate(f); if (d) { toast(T(`${d.company.name} est déjà au CRM : ouvre la fiche existante.`, `${d.company.name} is already in the CRM: open the existing lead.`)); refreshDup(); return; }
+    if (f.verdict !== "sortir" && !f.next_action_at) { toast(T("Il faut une date de prochaine action.", "Add a next action date.")); return; }
     createLead(f);
-  } }, [S.busy ? "Création…" : "Créer la fiche"]);
+  } }, [S.busy ? T("Création…", "Creating…") : T("Créer la fiche", "Create lead")]);
   return h("div", { class: "fiche" }, [
-    h("div", { style: "display:flex;justify-content:space-between;gap:10px;align-items:center" }, [h("span", { class: "lbl", text: "Nouvelle fiche" }), h("button", { type: "button", class: "btn", onclick: closeFiche }, ["Fermer"])]),
-    h("h2", { text: "Un studio qualifié avec la grille" }),
-    h("p", { class: "hint", text: "Avant de créer : les critères 1 à 3 prouvés sur le site, le gérant et le numéro cherchés dans les mentions légales. La fiche part en « À contacter » avec ton verdict comme prochaine action." }),
+    h("div", { style: "display:flex;justify-content:space-between;gap:10px;align-items:center" }, [h("span", { class: "lbl", text: T("Nouvelle fiche", "New lead") }), h("button", { type: "button", class: "btn", onclick: closeFiche }, [T("Fermer", "Close")])]),
+    h("h2", { text: T("Un studio qualifié avec la grille", "A studio qualified with the grid") }),
+    h("p", { class: "hint", text: T("Avant de créer : les critères 1 à 3 prouvés sur le site, le gérant et le numéro cherchés dans les mentions légales. La fiche part en « À contacter » avec ton verdict comme prochaine action.", "Before you create it: criteria 1 to 3 proven on the website, the owner and the phone number found. The lead goes to \"To contact\" with your verdict as the next action.") }),
     dupBox, form,
-    h("div", { class: "rowf" }, [submit, h("span", { class: "muted small", text: `Prospecté par ${S.me.display_name}` })]),
+    h("div", { class: "rowf" }, [submit, h("span", { class: "muted small", text: T("Prospecté par ", "Rep: ") + S.me.display_name })]),
   ]);
 }
 
 /* ---------- onglets de la maquette ---------- */
-function weekLabel() { const m = monday(), e = new Date(m); e.setDate(m.getDate() + 6); return `Semaine du ${p2(m.getDate())}/${p2(m.getMonth() + 1)} au ${p2(e.getDate())}/${p2(e.getMonth() + 1)}`; }
+function weekLabel() { const m = monday(), e = new Date(m); e.setDate(m.getDate() + 6);
+  return LANG === "en" ? `Week of ${p2(m.getMonth() + 1)}/${p2(m.getDate())} to ${p2(e.getMonth() + 1)}/${p2(e.getDate())}` : `Semaine du ${p2(m.getDate())}/${p2(m.getMonth() + 1)} au ${p2(e.getDate())}/${p2(e.getMonth() + 1)}`; }
 function tiles(k, big) {
   const tile = (l, v, sub) => h("div", { class: "tile" }, [h("span", { class: "l", text: l }), h("span", { class: "v", text: v }), h("span", { class: "s", text: sub || "" })]);
   return h("div", { class: "tiles" + (big ? " big" : "") }, [
-    tile("Appels passés", String(k.a)), tile("Taux de décroché", (k.a ? Math.round(k.d / k.a * 100) : 0) + " %", k.d + " décroché" + (k.d > 1 ? "s" : "")),
-    tile("Rendez-vous pris", String(k.r)), tile("Visios faites", String(k.v)), tile("Tests lancés", String(k.t)), tile("Clients gagnés", String(k.g)),
+    tile(T("Appels passés", "Calls made"), String(k.a)), tile(T("Taux de décroché", "Pick-up rate"), (k.a ? Math.round(k.d / k.a * 100) : 0) + T(" %", "%"), k.d + T(" décroché" + (k.d > 1 ? "s" : ""), " answered")),
+    tile(T("Rendez-vous pris", "Meetings booked"), String(k.r)), tile(T("Visios faites", "Video calls done"), String(k.v)), tile(T("Tests lancés", "Tests started"), String(k.t)), tile(T("Clients gagnés", "Clients won"), String(k.g)),
   ]);
 }
 function queue() {
@@ -714,9 +758,9 @@ function queue() {
   const mine = S.deals.filter((d) => (PROSPECTING.includes(d.stage) && d.owner_id === me.user_id) || (me.role === "admin" && CLOSING.includes(d.stage)));
   const byDate = (a, b) => pin(a, b) || a.next_action_at.localeCompare(b.next_action_at) || a.company.name.localeCompare(b.company.name);
   return [
-    ["late", "En retard", mine.filter((d) => d.next_action_at && dayDiff(d.next_action_at) < 0).sort(byDate)],
-    ["today", "Aujourd'hui", mine.filter((d) => d.next_action_at && dayDiff(d.next_action_at) === 0).sort(byDate)],
-    ["fresh", "Nouveaux, à contacter", mine.filter((d) => d.stage === "a_contacter" && !d.next_action_at).sort((a, b) => pin(a, b) || a.company.name.localeCompare(b.company.name))],
+    ["late", T("En retard", "Overdue"), mine.filter((d) => d.next_action_at && dayDiff(d.next_action_at) < 0).sort(byDate)],
+    ["today", T("Aujourd'hui", "Today"), mine.filter((d) => d.next_action_at && dayDiff(d.next_action_at) === 0).sort(byDate)],
+    ["fresh", T("Nouveaux, à contacter", "New, to contact"), mine.filter((d) => d.stage === "a_contacter" && !d.next_action_at).sort((a, b) => pin(a, b) || a.company.name.localeCompare(b.company.name))],
   ];
 }
 function vJour() {
@@ -730,73 +774,74 @@ function vJour() {
     list.push(h("div", { class: "qgroup", text: `${label} · ${items.length}` }));
     items.slice(0, limit).forEach((d) => list.push(h("div", { class: "qrow" + (d.id === S.sel ? " sel" : "") }, [
       h("button", { type: "button", class: "qmain", onclick: () => { S.sel = d.id; S.note = ""; render(); } }, [
-        h("b", { text: d.company.name }), d.next_action_at ? h("span", { class: "pill " + relClass(d.next_action_at), text: rel(d.next_action_at) }) : h("span", { class: "pill", text: "Nouveau" }),
+        h("b", { text: d.company.name }), d.next_action_at ? h("span", { class: "pill " + relClass(d.next_action_at), text: rel(d.next_action_at) }) : h("span", { class: "pill", text: T("Nouveau", "New") }),
         h("small", { text: STAGE_LABEL[d.stage] + (d.next_action ? " · " + d.next_action : "") })]),
-      canEdit() ? h("button", { type: "button", class: "qpin" + (d.pinned ? " on" : ""), "aria-pressed": String(!!d.pinned), onclick: () => patchDeal(d.id, { pinned: !d.pinned }, d.pinned ? "Fiche désépinglée." : "Fiche épinglée en haut de sa liste.") }, [d.pinned ? "Épinglé" : "Épingler"]) : null,
+      canEdit() ? h("button", { type: "button", class: "qpin" + (d.pinned ? " on" : ""), "aria-pressed": String(!!d.pinned), onclick: () => patchDeal(d.id, { pinned: !d.pinned }, d.pinned ? T("Fiche désépinglée.", "Lead unpinned.") : T("Fiche épinglée en haut de sa liste.", "Lead pinned to the top of its list.")) }, [d.pinned ? T("Épinglé", "Pinned") : T("Épingler", "Pin")]) : null,
     ])));
-    if (items.length > limit) list.push(h("button", { type: "button", class: "more", style: "display:block;width:100%;padding:10px", onclick: () => { S.jourMore[key] = true; render(); } }, [`Afficher les ${items.length - limit} autres`]));
+    if (items.length > limit) list.push(h("button", { type: "button", class: "more", style: "display:block;width:100%;padding:10px", onclick: () => { S.jourMore[key] = true; render(); } }, [T(`Afficher les ${items.length - limit} autres`, `Show ${items.length - limit} more`)]));
   });
   const sel = S.sel ? byId(S.sel) : null, late = groups[0][2].length;
   return h("div", { style: "display:flex;flex-direction:column;gap:14px" }, [
-    h("div", { class: "vh" }, [h("h2", { text: "Ma journée · " + S.me.display_name }), h("span", { class: "muted small", text: weekLabel() })]),
+    h("div", { class: "vh" }, [h("h2", { text: T("Ma journée · ", "My day · ") + S.me.display_name }), h("span", { class: "muted small", text: weekLabel() })]),
     tiles(stats(S.me.user_id)),
-    h("p", { class: "hint", text: "Les six chiffres comptent ce qui est fait dans ce CRM depuis lundi. Les appels Onoff s'ajoutent tout seuls à la fiche dont le numéro correspond." }),
+    h("p", { class: "hint", text: T("Les six chiffres comptent ce qui est fait dans ce CRM depuis lundi. Les appels Onoff s'ajoutent tout seuls à la fiche dont le numéro correspond.", "These six numbers count what was done in this CRM since Monday. Onoff calls are added automatically to the lead whose number matches.") }),
     onoffPanel(),
     h("div", { class: "day" }, [
-      h("div", { class: "panel" }, [h("div", { class: "ph" }, [h("b", { text: "File du jour" }), h("span", { class: "muted small", text: `${all.length} fiche${all.length > 1 ? "s" : ""}${late ? " · " + late + " en retard" : ""}` })]), list.length ? h("div", null, list) : h("div", { class: "empty", text: "La file est vide. Aucune action due aujourd'hui." })]),
-      h("div", { class: "panel" }, [sel ? fiche(sel, true) : h("div", { class: "empty", text: "Choisis une fiche dans la file." })]),
+      h("div", { class: "panel" }, [h("div", { class: "ph" }, [h("b", { text: T("File du jour", "Today's queue") }), h("span", { class: "muted small", text: T(`${all.length} fiche${sEn(all.length)}${late ? " · " + late + " en retard" : ""}`, `${all.length} lead${sEn(all.length)}${late ? " · " + late + " overdue" : ""}`) })]), list.length ? h("div", null, list) : h("div", { class: "empty", text: T("La file est vide. Aucune action due aujourd'hui.", "The queue is empty. Nothing due today.") })]),
+      h("div", { class: "panel" }, [sel ? fiche(sel, true) : h("div", { class: "empty", text: T("Choisis une fiche dans la file.", "Pick a lead in the queue.") })]),
     ]),
   ]);
 }
 function vClients() {
   const cl = S.deals.filter((d) => d.stage === "gagne").sort((a, b) => a.company.name.localeCompare(b.company.name));
   return h("div", { style: "display:flex;flex-direction:column;gap:14px" }, [
-    h("div", { class: "vh" }, [h("h2", { text: "Clients" }), h("span", { class: "muted small", text: `${cl.length} client${cl.length > 1 ? "s" : ""} gagné${cl.length > 1 ? "s" : ""}` })]),
+    h("div", { class: "vh" }, [h("h2", { text: "Clients" }), h("span", { class: "muted small", text: T(`${cl.length} client${sEn(cl.length)} gagné${sEn(cl.length)}`, `${cl.length} client${sEn(cl.length)} won`) })]),
     cl.length ? h("div", { class: "tw" }, [h("table", null, [
-      h("thead", null, [h("tr", null, ["Client", "Marché", "Prospecté par", "Statut", "Gagné le"].map((x) => h("th", { text: x })))]),
+      h("thead", null, [h("tr", null, ["Client", T("Marché", "Market"), T("Prospecté par", "Rep"), T("Statut", "Status"), T("Gagné le", "Won on")].map((x) => h("th", { text: x })))]),
       h("tbody", null, cl.map((d) => h("tr", { onclick: () => openFiche(d.id) }, [
         h("td", null, [h("button", { type: "button", class: "link", onclick: (ev) => { ev.stopPropagation(); openFiche(d.id); } }, [d.company.name])]),
         h("td", { class: "nw", text: MARKET[d.company.market] || d.company.market || "" }), h("td", { class: "nw", text: ownerName(d) }),
-        h("td", { class: "nw" }, [h("span", { class: "pill ok", text: CLIENT_STATUS[d.company.statut_client] || "Actif" })]),
-        h("td", { class: "nw muted", text: d.closed_at ? frDate(d.closed_at) : "avant l'import" }),
+        h("td", { class: "nw" }, [h("span", { class: "pill ok", text: CLIENT_STATUS[d.company.statut_client] || CLIENT_STATUS.client_actif })]),
+        h("td", { class: "nw muted", text: d.closed_at ? frDate(d.closed_at) : T("avant l'import", "before the import") }),
       ]))),
-    ])]) : h("div", { class: "empty", text: "Aucun client gagné pour l'instant." }),
-    h("p", { class: "hint", text: "L'ancienneté et le revenu mensuel seront calculés depuis les factures à la tranche 3. Le revenu ne sera visible que par Cyriaque et Sajid." }),
+    ])]) : h("div", { class: "empty", text: T("Aucun client gagné pour l'instant.", "No client won yet.") }),
+    h("p", { class: "hint", text: T("L'ancienneté et le revenu mensuel seront calculés depuis les factures à la tranche 3. Le revenu ne sera visible que par Cyriaque et Sajid.", "Client age and monthly revenue will come from the invoices in phase 3. Revenue will only be visible to Cyriaque and Sajid.") }),
   ]);
 }
 function vChiffres() {
   const team = S.me.role !== "sales", sellers = S.members.filter((m) => m.active && m.role !== "viewer");
-  const kids = [h("div", { class: "vh" }, [h("h2", { text: team ? "Chiffres de l'équipe" : "Mes chiffres" }), h("span", { class: "muted small", text: weekLabel() })]), tiles(stats(team ? null : S.me.user_id))];
+  const kids = [h("div", { class: "vh" }, [h("h2", { text: team ? T("Chiffres de l'équipe", "Team numbers") : T("Mes chiffres", "My numbers") }), h("span", { class: "muted small", text: weekLabel() })]), tiles(stats(team ? null : S.me.user_id))];
   if (team) kids.push(h("div", { class: "tw" }, [h("table", null, [
-    h("thead", null, [h("tr", null, ["Personne", "Appels", "Décroché", "RDV pris", "Visios", "Tests", "Gagnés"].map((x) => h("th", { text: x })))]),
-    h("tbody", null, sellers.map((m) => { const k = stats(m.user_id); return h("tr", { style: "cursor:default" }, [h("td", { text: m.display_name }), ...[k.a, (k.a ? Math.round(k.d / k.a * 100) : 0) + " %", k.r, k.v, k.t, k.g].map((x) => h("td", { text: String(x) }))]); })),
+    h("thead", null, [h("tr", null, [T("Personne", "Person"), T("Appels", "Calls"), T("Décroché", "Answered"), T("RDV pris", "Meetings"), T("Visios", "Video calls"), "Tests", T("Gagnés", "Won")].map((x) => h("th", { text: x })))]),
+    h("tbody", null, sellers.map((m) => { const k = stats(m.user_id); return h("tr", { style: "cursor:default" }, [h("td", { text: m.display_name }), ...[k.a, (k.a ? Math.round(k.d / k.a * 100) : 0) + T(" %", "%"), k.r, k.v, k.t, k.g].map((x) => h("td", { text: String(x) }))]); })),
   ])]));
-  kids.push(h("p", { class: "hint", text: "Ces chiffres comptent ce qui est fait dans ce CRM depuis lundi : ils démarrent à zéro. Les objectifs de la semaine et le chiffre d'affaires arrivent à la tranche 3." }));
+  kids.push(h("p", { class: "hint", text: T("Ces chiffres comptent ce qui est fait dans ce CRM depuis lundi : ils démarrent à zéro. Les objectifs de la semaine et le chiffre d'affaires arrivent à la tranche 3.", "These numbers count what was done in this CRM since Monday: they start at zero. Weekly goals and revenue come in phase 3.") }));
   return h("div", { style: "display:flex;flex-direction:column;gap:14px" }, kids);
 }
 function vTele() {
   return h("div", { style: "display:flex;flex-direction:column;gap:14px" }, [
-    h("div", { class: "vh" }, [h("h2", { text: "Mode télé · équipe" }), h("span", { class: "muted small", text: weekLabel() + " · sans chiffre d'affaires" })]),
+    h("div", { class: "vh" }, [h("h2", { text: T("Mode télé · équipe", "TV mode · team") }), h("span", { class: "muted small", text: weekLabel() + T(" · sans chiffre d'affaires", " · no revenue") })]),
     tiles(stats(null), true),
-    h("p", { class: "hint", text: "Totaux de l'équipe depuis lundi. L'affichage plein écran pour la télé du bureau et les objectifs arrivent à la tranche 3." }),
+    h("p", { class: "hint", text: T("Totaux de l'équipe depuis lundi. L'affichage plein écran pour la télé du bureau et les objectifs arrivent à la tranche 3.", "Team totals since Monday. Full screen for the office TV and goals come in phase 3.") }),
   ]);
 }
-const SOON = {
-  mail: ["Mailing", "Tranche 4", ["Envoi depuis la boîte @ds-editing.com de chacun.", "Séquence de 3 mails (J0, J+3, J+7), arrêtée dès que le prospect répond.", "Réponses lues dans Outlook et copiées dans la fiche.", "Suivi des clics seulement."], "Il faut d'abord la boîte de Ghali."],
-  bot: ["Bot et alertes", "Tranche 5", ["Un bot Telegram par personne.", "Tout par réponses toutes prêtes : Fait, Reporter, Ouvrir la fiche, Ma file du jour, Mes relances en retard, Mes chiffres, Ajouter une note.", "Les 7 alertes, à toute heure."], "Il faut Telegram installé sur ton téléphone et celui de Ghali."],
-};
+const soon = () => ({
+  mail: ["Mailing", T("Tranche 4", "Phase 4"), [T("Envoi depuis la boîte @ds-editing.com de chacun.", "Sent from each person's @ds-editing.com mailbox."), T("Séquence de 3 mails (J0, J+3, J+7), arrêtée dès que le prospect répond.", "3-email sequence (D0, D+3, D+7), stopped as soon as the prospect replies."), T("Réponses lues dans Outlook et copiées dans la fiche.", "Replies read in Outlook and copied to the lead."), T("Suivi des clics seulement.", "Click tracking only.")], T("Il faut d'abord la boîte de Ghali.", "Ghali's mailbox comes first.")],
+  bot: [T("Bot et alertes", "Bot & alerts"), T("Tranche 5", "Phase 5"), [T("Un bot Telegram par personne.", "One Telegram bot per person."), T("Tout par réponses toutes prêtes : Fait, Reporter, Ouvrir la fiche, Ma file du jour, Mes relances en retard, Mes chiffres, Ajouter une note.", "Everything through ready-made replies: Done, Postpone, Open lead, My queue, My overdue follow-ups, My numbers, Add a note."), T("Les 7 alertes, à toute heure.", "The 7 alerts, at any time.")], T("Il faut Telegram installé sur ton téléphone et celui de Ghali.", "Telegram must be installed on your phone and on Ghali's.")],
+});
 function vSoon(key) {
-  const [title, when, items, need] = SOON[key];
+  const [title, when, items, need] = soon()[key];
   return h("div", { style: "display:flex;flex-direction:column;gap:14px" }, [
-    h("div", { class: "vh" }, [h("h2", { text: title }), h("span", { class: "pill today", text: "Pas encore construit · " + when })]),
-    h("div", { class: "soon" }, [h("b", { text: "Ce que fera cet onglet" }), h("ul", null, items.map((x) => h("li", { text: x }))), h("p", { class: "muted small", text: need })]),
+    h("div", { class: "vh" }, [h("h2", { text: title }), h("span", { class: "pill today", text: T("Pas encore construit · ", "Not built yet · ") + when })]),
+    h("div", { class: "soon" }, [h("b", { text: T("Ce que fera cet onglet", "What this tab will do") }), h("ul", null, items.map((x) => h("li", { text: x }))), h("p", { class: "muted small", text: need })]),
   ]);
 }
 const VIEWS = { jour: vJour, fiches: vFiches, tunnel: vTunnel, clients: vClients, mail: () => vSoon("mail"), chiffres: vChiffres, bot: () => vSoon("bot"), tele: vTele };
+const CRM_ONLY_HIDDEN = ["mail", "bot", "tele"];   // compte « CRM seul » : pas les onglets pas encore construits ni la télé du bureau
 
 function render() {
   const tb = $("tabs"); tb.textContent = "";
-  const tabs = S.me.role === "viewer" ? TABS.filter(([k]) => VIEWER_TABS.includes(k)) : TABS;
+  const tabs = (S.me.role === "viewer" ? TABS.filter(([k]) => VIEWER_TABS.includes(k)) : TABS).filter(([k]) => !(S.crmOnly && CRM_ONLY_HIDDEN.includes(k)));
   if (!tabs.some(([k]) => k === S.tab)) S.tab = tabs[0][0];
   tabs.forEach(([k, l]) => tb.appendChild(h("button", { type: "button", role: "tab", "aria-selected": String(S.tab === k), onclick: () => { S.tab = k; S.note = ""; render(); } }, [l])));
   const v = $("view"); v.textContent = "";
@@ -859,7 +904,7 @@ async function gsNotes() {
   const { data, error } = await sb.from("crm_activities").select("id,deal_id,company_id,kind,subject,body,occurred_at")
     .neq("kind", "stage").or(`body.ilike."*${raw}*",subject.ilike."*${raw}*"`).order("occurred_at", { ascending: false }).limit(30);
   if (seq !== G.seq) return;
-  G.notes = error ? [] : data; G.noteQ = raw; G.noteErr = error ? (error.message || "erreur") : "";
+  G.notes = error ? [] : data; G.noteQ = raw; G.noteErr = error ? (error.message || T("erreur", "error")) : "";
   gsRender();
 }
 function gsItem(dealId, kids) {
@@ -871,25 +916,25 @@ function gsRender() {
   G.items = []; box.textContent = "";
   if (norm(q).length < 2) { box.hidden = true; inp.setAttribute("aria-expanded", "false"); return; }
   if (G.hits.length) {
-    kids.push(h("div", { class: "qgroup", text: `Fiches · ${G.hits.length}` }));
+    kids.push(h("div", { class: "qgroup", text: `${T("Fiches", "Leads")} · ${G.hits.length}` }));
     G.hits.slice(0, 8).forEach(([d, m]) => kids.push(gsItem(d.id, [
       h("b", null, mark(d.company.name, q)), h("span", { class: "pill" + (d.stage === "gagne" ? " ok" : ""), text: STAGE_LABEL[d.stage] }),
       h("small", null, m.why ? mark(m.why, q) : [[TYPE[d.company.type_structure], MARKET[d.company.market], ownerName(d)].filter(Boolean).join(" · ")]),
     ])));
-    if (G.hits.length > 8) kids.push(h("button", { type: "button", class: "more", style: "display:block;width:100%;padding:8px", onclick: gsAll }, [`Voir les ${G.hits.length} fiches dans l'onglet Fiches`]));
+    if (G.hits.length > 8) kids.push(h("button", { type: "button", class: "more", style: "display:block;width:100%;padding:8px", onclick: gsAll }, [T(`Voir les ${G.hits.length} fiches dans l'onglet Fiches`, `See all ${G.hits.length} leads in the Leads tab`)]));
   }
   const notes = G.noteQ === raw ? G.notes.map((a) => [a, (a.deal_id && byId(a.deal_id)) || S.deals.find((d) => d.company_id === a.company_id)]).filter((x) => x[1]).slice(0, 8) : [];
   if (notes.length) {
-    kids.push(h("div", { class: "qgroup", text: "Dans les notes et la chronologie" }));
+    kids.push(h("div", { class: "qgroup", text: T("Dans les notes et la chronologie", "In notes and timeline") }));
     notes.forEach(([a, d]) => { const t = norm(a.body).includes(norm(raw)) ? a.body : a.subject; kids.push(gsItem(d.id, [
       h("b", { text: d.company.name }), h("span", { class: "muted small", text: `${KIND[a.kind] || a.kind} · ${frDate(a.occurred_at)}` }),
       h("small", null, mark(snippet(t, raw), raw)),
     ])); });
   }
   const pending = raw.length >= 3 && G.noteQ !== raw;
-  if (pending) kids.push(h("div", { class: "gs-foot", text: "Recherche dans les notes…" }));
-  else if (G.noteErr && raw.length >= 3) kids.push(h("div", { class: "gs-foot", text: "Notes indisponibles : " + G.noteErr }));
-  if (!kids.length) kids.push(h("div", { class: "gs-foot", text: raw.length < 3 && !G.hits.length ? "Aucune fiche. Tape au moins 3 lettres pour chercher aussi dans les notes." : "Aucun résultat." }));
+  if (pending) kids.push(h("div", { class: "gs-foot", text: T("Recherche dans les notes…", "Searching the notes…") }));
+  else if (G.noteErr && raw.length >= 3) kids.push(h("div", { class: "gs-foot", text: T("Notes indisponibles : ", "Notes unavailable: ") + G.noteErr }));
+  if (!kids.length) kids.push(h("div", { class: "gs-foot", text: raw.length < 3 && !G.hits.length ? T("Aucune fiche. Tape au moins 3 lettres pour chercher aussi dans les notes.", "No lead. Type at least 3 letters to search the notes too.") : T("Aucun résultat.", "No results.") }));
   kids.forEach((k) => box.appendChild(k));
   box.hidden = false; inp.setAttribute("aria-expanded", "true");
   if (G.idx >= 0) inp.setAttribute("aria-activedescendant", "gsItem" + G.idx); else inp.removeAttribute("aria-activedescendant");
@@ -922,34 +967,67 @@ function gsInit() {
   });
 }
 
+/* ---------- langue : textes fixes de la page et bouton FR / EN ---------- */
+function applyStatic() {
+  document.documentElement.lang = LANG;
+  $("loginTitle").textContent = T("Connexion", "Sign in");
+  $("lEmail").textContent = T("E-mail", "Email");
+  $("lPass").textContent = T("Mot de passe", "Password");
+  $("loginBtn").textContent = T("Se connecter", "Sign in");
+  const gi = $("gsInput");
+  gi.placeholder = T("Rechercher : société, contact, téléphone, site, note…", "Search: company, contact, phone, website, note…");
+  gi.setAttribute("aria-label", T("Rechercher dans tout le CRM", "Search the whole CRM"));
+  $("logout").textContent = T("Se déconnecter", "Sign out");
+  $("notYou").textContent = T("Ce n'est pas vous ?", "Not you?");
+  $("drawer").setAttribute("aria-label", T("Fiche", "Lead"));
+  document.querySelectorAll("#langSeg button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.lang === LANG)));
+}
+function setLang(l) { LANG = l === "en" ? "en" : "fr"; lsSet("crm_lang:last", LANG); buildLabels(); applyStatic(); }
+function renderWho() {
+  const who = $("whoami"); who.textContent = "";
+  who.appendChild(h("b", { text: S.me.display_name })); who.appendChild(document.createTextNode(S.me.role === "viewer" ? T(" · lecture seule", " · read-only") : S.me.role === "admin" ? " · admin" : ""));
+}
+
 /* ---------- session ---------- */
 async function boot(user) {
   const { data, error } = await sb.from("crm_members").select("*");
   const me = !error && data ? data.find((m) => m.user_id === user.id && m.active) : null;
   if (!me) {
     await sb.auth.signOut({ scope: "local" }); $("app").hidden = true; $("login").hidden = false;
-    $("loginMsg").textContent = "Ce compte n'a pas accès au CRM. Demande l'accès à Cyriaque."; return;
+    $("loginMsg").textContent = T("Ce compte n'a pas accès au CRM. Demande l'accès à Cyriaque.", "This account has no access to the CRM. Ask Cyriaque for access."); return;
   }
+  // Langue du compte : ?lang= (gardé pour ce compte) → choix déjà fait avec le bouton → anglais d'office pour EN_MEMBERS.
+  S.uid = user.id; S.crmOnly = CRM_ONLY.includes(S.uid);
+  if (QS_LANG) lsSet("crm_lang:" + S.uid, QS_LANG);
+  setLang(QS_LANG || savedLang(S.uid) || defaultLang(S.uid));
+  document.body.classList.toggle("crm-only", S.crmOnly);
   S.me = me; S.tab = me.role === "viewer" ? "fiches" : "jour"; S.sel = null; S.open = null; S.actsFor = null;
   $("login").hidden = true; $("app").hidden = false;
   const shared = !!OPEN_ACCESS && user.email === OPEN_ACCESS.email;
   $("logout").hidden = shared; $("notYou").hidden = !shared;   // session nominative : Déconnexion ; compte partagé : pas de bouton, mais un lien vers la connexion nominative
-  const who = $("whoami"); who.textContent = "";
-  who.appendChild(h("b", { text: me.display_name })); who.appendChild(document.createTextNode(me.role === "viewer" ? " · lecture seule" : me.role === "admin" ? " · admin" : ""));
-  $("view").textContent = ""; $("view").appendChild(h("div", { class: "empty", text: "Chargement des fiches…" }));
-  try { await load(); render(); } catch (e) { $("view").textContent = ""; $("view").appendChild(h("div", { class: "empty", text: "Chargement impossible : " + (e.message || e) })); }
+  renderWho();
+  $("view").textContent = ""; $("view").appendChild(h("div", { class: "empty", text: T("Chargement des fiches…", "Loading leads…") }));
+  try { await load(); render(); } catch (e) { $("view").textContent = ""; $("view").appendChild(h("div", { class: "empty", text: T("Chargement impossible : ", "Could not load: ") + (e.message || e) })); }
 }
 async function init() {
+  buildLabels(); applyStatic();
   sb = createClient(SUPABASE_URL, SUPABASE_ANON);
   gsInit();
+  $("langSeg").addEventListener("click", (ev) => {
+    const b = ev.target.closest("button[data-lang]");
+    if (!b || b.dataset.lang === LANG) return;
+    if (S.uid) lsSet("crm_lang:" + S.uid, b.dataset.lang);   // choix gardé pour ce compte, dans ce navigateur
+    setLang(b.dataset.lang); gsClose();
+    if (S.me) { renderWho(); render(); }
+  });
   $("loginForm").addEventListener("submit", async (ev) => {
     ev.preventDefault(); $("loginMsg").textContent = ""; $("loginBtn").disabled = true;
     const { data, error } = await sb.auth.signInWithPassword({ email: $("email").value.trim(), password: $("password").value });
     $("loginBtn").disabled = false;
-    if (error) { $("loginMsg").textContent = "E-mail ou mot de passe incorrect."; return; }
+    if (error) { $("loginMsg").textContent = T("E-mail ou mot de passe incorrect.", "Wrong email or password."); return; }
     $("password").value = ""; boot(data.user);
   });
-  $("logout").addEventListener("click", async () => { await sb.auth.signOut({ scope: "local" }); S.me = null; S.open = null; $("gsInput").value = ""; G.q = ""; gsRun(); $("app").hidden = true; $("overlay").hidden = true; $("login").hidden = false; });
+  $("logout").addEventListener("click", async () => { await sb.auth.signOut({ scope: "local" }); S.me = null; S.open = null; S.uid = ""; S.crmOnly = false; document.body.classList.remove("crm-only"); $("gsInput").value = ""; G.q = ""; gsRun(); $("app").hidden = true; $("overlay").hidden = true; $("login").hidden = false; });
   $("overlay").addEventListener("click", (ev) => { if (ev.target === $("overlay")) closeFiche(); });
   document.addEventListener("keydown", (ev) => { if (ev.key === "Escape" && (S.open || S.newOpen)) closeFiche(); });
   const qs = new URLSearchParams(location.search);
