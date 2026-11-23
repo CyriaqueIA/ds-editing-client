@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brief</title>
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='7' fill='%231F2937'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="portail.css">
+</head>
+<body>
+<main class="wrap" id="app" aria-busy="true"><p class="muted" id="boot">…</p></main>
+<script type="module">
+import { readBriefParams, rpc, apiBase, createUploads, handleSaved, lostFiles, usableUpload, fieldMax, fmtSize, formatsList, t as tr, esc, loc, fmtDate, applyBrand, studioHeader, logoFallback, cleanAnswers, prepareAnswers, normalizeTime, normalizeLink, TC_RE, isHttpUrl, renderForm, renderField, renderSummary, questionCount, errorMessage, progressText, readBackup, pickSource, lsGet, lsSet, lsDel } from "./portail.js";
+
+const { token, lang: urlLang, fromQuery } = readBriefParams();
+if (fromQuery) {   // ancien format ?s=… : on déplace le jeton après le #, sans recharger
+  try { const q = new URLSearchParams(location.search); q.delete("s"); history.replaceState(null, "", location.pathname + (q.toString() ? "?" + q : "") + "#s=" + token); } catch { /* adresse non modifiable : sans conséquence */ }
+}
+const app = document.getElementById("app");
+let lang = urlLang;
+let data = null;          // réponse de portal_brief_get
+let answers = {};         // réponses brutes (lignes vides comprises)
+let fieldsByKey = {};
+let saveTimer = null, saving = false, again = false, sending = false, saveState = "";
+let rev = 0, syncedRev = 0, lastAt = "", lastTypeMs = 0;   // rev : numéro de la dernière modification ; syncedRev : dernière modification confirmée par la base
+const isDirty = () => rev !== syncedRev;
+const t = (k, v) => tr(lang || "fr", k, v);
+const LS_KEY = "brief:" + token;
+const $ = (s, r = document) => r.querySelector(s);
+// Dépôt de fichiers : envois en cours ou ratés par question, et refus à afficher sous la question (hors réponses : rien ne s'y perd).
+// Toute la mécanique des envois (file, délai d'inactivité, annulation, questions cachées) vit dans portail.js (createUploads, testée sous Node).
+const uploads = createUploads({
+  getUpload: () => (data && data.state === "open" && usableUpload(data.upload) ? data.upload : null),
+  getBase: () => apiBase(),
+  getVisible: () => (data ? cleanAnswers(data.fields || [], answers, false).visible : null),
+  onDone: (key, file) => { if (data && data.state === "open") { answers[key] = [...filesOf(key), file]; touch(); } },
+  onChange: (key, focus, o) => redrawFiles(key, focus, o),
+  onProgress: (p) => {
+    const li = document.querySelector(`[data-pend="${CSS.escape(p.id)}"]`); if (!li) return;
+    const bar = li.querySelector("progress"), pc = li.querySelector(".fpct"); if (bar) bar.value = p.pct; if (pc) pc.textContent = p.pct + " %";
+  },
+  onEvent: (e) => {   // une annonce par événement, jamais relue au redessin
+    if (e.type === "start") announce(t("files.sending", { name: e.p.name }));
+    else if (e.type === "done") announce(t("files.done", { name: e.p.name }));
+    else if (e.type === "error") announce(e.p.name + " : " + t(e.p.err));
+    else if (e.type === "refused") announce(noteTexts(e.notes).join(" "));
+  },
+});
+const fmtSizeLang = (b) => fmtSize(b, lang || "fr"), formatsOf = (ty) => formatsList(ty, lang || "fr");
+const noteTexts = (list) => list.map((n) => tr(lang || "fr", "files.err." + n.why, { ...n, size: fmtSizeLang(n.bytes), formats: formatsOf(n.types) }));
+const uctx = () => ({ upload: data && data.state === "open" ? data.upload || null : null, open: !!data && data.state === "open", pending: uploads.pending, notes: uploads.notes });
+
+logoFallback(app);
+
+/* ---------------- écrans ---------------- */
+function setTitle(name) { document.title = name ? `${t("brief.title")} — ${name}` : t("brief.title"); }
+function screen(html) { app.setAttribute("aria-busy", "false"); app.innerHTML = html; }
+
+function invalidScreen() {
+  document.documentElement.lang = lang || "fr";
+  setTitle("");
+  screen(`<section class="card center"><h1>${esc(t("brief.invalid"))}</h1></section>`);
+}
+function loadErrorScreen(key) {
+  document.documentElement.lang = lang || "fr";
+  screen(`<section class="card center"><p>${esc(t(key))}</p><p style="margin-top:16px"><button type="button" class="btn primary" id="retry">${esc(t("retry"))}</button></p></section>`);
+  $("#retry").addEventListener("click", () => { app.setAttribute("aria-busy", "true"); load(); });
+}
+
+function header() {
+  const st = data.studio || {}, f = data.formula || {};
+  const date = data.session_date ? fmtDate(data.session_date, lang) : "";
+  const summary = loc(f.summary, lang), fname = loc(f.name, lang);
+  return `<div class="topline">${studioHeader(st)}<button type="button" class="langbtn" id="lang" lang="${lang === "fr" ? "en" : "fr"}">${esc(t("lang.other"))}</button></div>
+  <section class="card">
+    <h1>${esc(data.title)}</h1>
+    <p class="hello">${esc(t("brief.hello", { name: data.client_name }))}</p>
+    ${date ? `<p class="meta">${esc(t("brief.shoot", { date }))}</p>` : ""}
+    ${fname ? `<div class="formula"><strong>${esc(t("brief.formula", { name: fname }))}</strong>${summary ? `<span class="muted">${esc(summary)}</span>` : ""}</div>` : ""}
+    ${data.state === "open" ? `<p class="intro">${esc(t("brief.intro"))}</p>` : ""}
+  </section>`;
+}
+
+function renderPage() {
+  if (!data) return;
+  document.documentElement.lang = lang;
+  setTitle((data.studio && data.studio.name) || "");
+  if (data.state === "submitted") return renderThanks();
+  const fields = data.fields || [];
+  screen(`${header()}
+    <div class="progress" aria-live="polite"><div class="progress-t"><span id="ptext"></span><span class="savestate" id="sstate"></span></div><div class="bar" aria-hidden="true"><i id="pbar"></i></div></div>
+    <form class="card" id="form" novalidate>
+      <div id="fields">${questionCount(fields) ? renderForm(fields, answers, lang, uctx()) : `<p class="muted">${esc(t("brief.noQuestions"))}</p>`}</div>
+    </form>
+    <div class="sendbox"><p>${esc(t("brief.sendHint"))}</p><button type="button" class="btn primary big" id="send">${esc(t("brief.send"))}</button><p class="sendwhy" id="sendwhy" role="status" aria-live="polite"></p><div class="msg" id="msg" role="alert"></div></div>
+    <p class="sr" id="live" role="status" aria-live="polite"></p>`);
+  growAll(); updateProgress(); showSaveState(saveState); refreshSend();
+  $("#lang").addEventListener("click", () => { lang = lang === "fr" ? "en" : "fr"; renderPage(); });
+  $("#send").addEventListener("click", submit);
+  $("#form").addEventListener("submit", (e) => e.preventDefault());
+  bindForm();
+}
+
+function renderThanks() {
+  const fields = data.fields || [];
+  screen(`${header()}
+    <section class="card center"><div class="okc" aria-hidden="true">✓</div><h1>${esc(t("brief.thanks"))}</h1><p class="muted" style="margin-top:8px">${esc(t("brief.thanksText"))}</p>${renderSummary(fields, answers, lang)}</section>`);
+  $("#lang").addEventListener("click", () => { lang = lang === "fr" ? "en" : "fr"; renderPage(); });
+}
+
+/* ---------------- état et enregistrement ---------------- */
+function updateProgress() {
+  const r = cleanAnswers(data.fields || [], answers, false);
+  const n = Object.keys(r.answers).length, total = r.visible.length;
+  const pt = $("#ptext"); if (pt) pt.textContent = total ? progressText(lang || "fr", n, total) : "";
+  const bar = $("#pbar"); if (bar) bar.style.width = total ? Math.round((n / total) * 100) + "%" : "0%";
+}
+function showSaveState(s) {
+  saveState = s;
+  const el = $("#sstate"); if (!el) return;
+  const key = { saved: "save.saved", saving: "save.saving", offline: "save.offline", error: "save.error", limit: "save.limit", big: "save.big", refused: "save.refused" }[s];
+  el.textContent = key ? t(key) : "";
+  el.classList.toggle("bad", s === "offline" || s === "error" || s === "limit" || s === "big" || s === "refused");
+}
+// Copie locale : { answers, at, synced }. synced = vrai seulement si la base a confirmé cet état exact.
+function backup() { if (data && data.state === "open") lsSet(LS_KEY, JSON.stringify({ answers, at: lastAt, synced: !isDirty() })); }
+function touch() {
+  rev++; lastAt = new Date().toISOString(); lastTypeMs = Date.now();
+  backup(); updateProgress();
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(save, 1500);
+}
+async function save({ keepalive = false } = {}) {
+  clearTimeout(saveTimer);
+  if (sending || !data || data.state !== "open" || !isDirty()) return;
+  if (saving && !keepalive) { again = true; return; }
+  const myRev = rev;
+  if (!keepalive) { saving = true; again = false; showSaveState("saving"); }
+  const payload = cleanAnswers(data.fields, prepareAnswers(data.fields, answers), false).answers;
+  try {
+    const res = await rpc("portal_brief_save", { p_token: token, p_answers: payload, p_submit: false }, { keepalive });
+    syncedRev = Math.max(syncedRev, myRev);
+    // files_refused : fichiers que la base n'a pas trouvés (écartés en silence côté base). Absent = base pas encore à jour : rien à faire.
+    const gone = keepalive ? { refused: [] } : handleSaved(data.fields, answers, res, uploads.notes);
+    if (gone.refused.length) {
+      answers = gone.answers;
+      backup(); updateProgress();
+      gone.keys.forEach((k) => redrawFiles(k, null));
+      announce(noteTexts(gone.refused).join(" "));
+      showSaveState("refused");
+    } else { backup(); showSaveState(isDirty() ? "saving" : "saved"); }
+  } catch (e) {
+    if (keepalive) return;   // la page se ferme : la copie locale est déjà écrite
+    saving = false;
+    if (e.code === "closed" || e.code === "not_found") return load();
+    if (e.code === "too_big") showSaveState("big");   // pas de boucle d'essais : on réessaie à la prochaine frappe
+    else {
+      showSaveState(e.offline ? "offline" : e.code === "rate_limit" ? "limit" : "error");
+      saveTimer = setTimeout(save, e.code === "rate_limit" ? 60000 : 15000);
+    }
+    return;
+  }
+  if (!keepalive) { saving = false; if (again) { again = false; save(); } }
+}
+// En quittant la page : copie locale tout de suite, et envoi sans attendre le délai s'il reste du non-enregistré.
+function flush() {
+  backup();
+  if (data && data.state === "open" && isDirty() && !sending) save({ keepalive: true });
+}
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "hidden") return flush();
+  // de retour : si rien n'est en attente ni en cours de saisie, on relit la base (autre onglet, autre appareil)
+  if (data && !sending && !saving && !isDirty() && uploads.active() === 0 && Date.now() - lastTypeMs > 5000) load(true);
+});
+window.addEventListener("pagehide", flush);
+window.addEventListener("online", () => { if (isDirty() && data && data.state === "open") save(); });
+
+/* ---------------- saisie ---------------- */
+function bindForm() {
+  const f = $("#fields"); if (!f) return;
+  f.addEventListener("input", onInput);
+  f.addEventListener("change", onChange);
+  f.addEventListener("click", onClick);
+  f.addEventListener("focusout", onBlur);
+  const zone = (e) => (hasFiles(e) && e.target.closest ? e.target.closest("[data-drop]") : null);
+  const over = (e) => { const z = zone(e); if (z) { e.preventDefault(); z.classList.add("over"); } };
+  f.addEventListener("dragenter", over); f.addEventListener("dragover", over);
+  f.addEventListener("dragleave", (e) => { const z = e.target.closest && e.target.closest("[data-drop]"); if (z && !z.contains(e.relatedTarget)) z.classList.remove("over"); });
+  f.addEventListener("drop", (e) => { const z = zone(e); if (!z) return; e.preventDefault(); z.classList.remove("over"); takeFiles(z.dataset.drop, e.dataTransfer.files); });
+}
+function setInvalid(q, on) {
+  q.querySelectorAll("input,textarea,[role=group],[role=radiogroup]").forEach((x) => (on ? x.setAttribute("aria-invalid", "true") : x.removeAttribute("aria-invalid")));
+}
+function clearBad(el) {
+  const q = el.closest(".q"); if (!q) return;
+  q.classList.remove("bad"); const e = q.querySelector(".err"); if (e) e.textContent = "";
+  q.querySelectorAll(".bad").forEach((x) => x.classList.remove("bad"));
+  setInvalid(q, false);
+}
+function grow(ta) { ta.style.height = "auto"; ta.style.height = Math.min(ta.scrollHeight + 2, window.innerHeight * 0.7) + "px"; }
+function growAll() { document.querySelectorAll("textarea.grow").forEach(grow); document.querySelectorAll("[data-count]").forEach(updCount); }
+function updCount(span) {
+  const key = span.getAttribute("data-count"), max = +span.getAttribute("data-max");
+  const v = typeof answers[key] === "string" ? [...answers[key]].length : 0;
+  const near = v >= max * 0.8;
+  span.hidden = !near; span.classList.toggle("near", near);
+  span.textContent = `${v} / ${max}`;
+}
+function rowObj(key, i) {
+  const arr = Array.isArray(answers[key]) ? answers[key] : (answers[key] = []);
+  while (arr.length <= i) arr.push(key && fieldsByKey[key].type === "links" ? "" : {});
+  return arr;
+}
+function onInput(e) {
+  const el = e.target, key = el.dataset.k; if (!key || !fieldsByKey[key]) return;
+  const f = fieldsByKey[key];
+  clearBad(el);
+  if (f.type === "text" || f.type === "longtext") {
+    answers[key] = el.value;
+    if (el.tagName === "TEXTAREA") grow(el);
+    const c = el.parentElement.querySelector("[data-count]"); if (c) updCount(c);
+  } else if (f.type === "ranges" || f.type === "reels") {
+    const arr = rowObj(key, +el.dataset.i);
+    const row = (arr[+el.dataset.i] = { ...(arr[+el.dataset.i] || {}) });
+    row[el.dataset.f] = el.value;
+  } else if (f.type === "links") {
+    rowObj(key, +el.dataset.i)[+el.dataset.i] = el.value;
+  } else return;
+  touch();
+}
+function onChange(e) {
+  if (e.target.matches("input[type=file]")) { const fk = e.target.dataset.fk; takeFiles(fk, e.target.files); e.target.value = ""; return; }
+  const el = e.target, key = el.dataset.k; if (!key || !fieldsByKey[key]) return;
+  const f = fieldsByKey[key];
+  if (f.type !== "choice" && f.type !== "multi") return;
+  clearBad(el);
+  const before = cleanAnswers(data.fields, answers, false).visible.join(",");
+  if (f.type === "choice") answers[key] = el.value;
+  else answers[key] = [...document.querySelectorAll(`input[type=checkbox][data-k="${CSS.escape(key)}"]:checked`)].map((x) => x.value);
+  const after = cleanAnswers(data.fields, answers, false).visible.join(",");
+  if (before !== after) {   // une question apparaît ou disparaît : on redessine en gardant le focus
+    uploads.syncVisible(cleanAnswers(data.fields, answers, false).visible);   // une question files cachée : ses envois sont interrompus
+    $("#fields").innerHTML = renderForm(data.fields, answers, lang, uctx());
+    growAll();
+    const back = [...document.querySelectorAll(`input[data-k="${CSS.escape(key)}"]`)].find((x) => x.value === el.value);
+    if (back) back.focus();
+  }
+  refreshSend();
+  touch();
+}
+function onClick(e) {
+  const pick = e.target.closest("[data-pick]"), rm = e.target.closest("[data-rmfile]"), retry = e.target.closest("[data-retry]"), dismiss = e.target.closest("[data-dismiss]"), cancel = e.target.closest("[data-cancel]");
+  if (pick) { const inp = pick.closest(".drop").querySelector("input[type=file]"); if (inp) inp.click(); return; }
+  if (rm) return removeFile(rm.dataset.rmfile, +rm.dataset.i);
+  if (retry) return uploads.retry(retry.dataset.fk, retry.dataset.retry);
+  if (dismiss) return uploads.dismiss(dismiss.dataset.fk, dismiss.dataset.dismiss);
+  if (cancel) return uploads.cancel(cancel.dataset.fk, cancel.dataset.cancel);
+  const add = e.target.closest("[data-add]"), del = e.target.closest("[data-del]");
+  if (!add && !del) return;
+  const key = (add || del).dataset.add || (add || del).dataset.del, f = fieldsByKey[key]; if (!f) return;
+  const arr = Array.isArray(answers[key]) && answers[key].length ? answers[key] : [f.type === "links" ? "" : {}];
+  if (add) arr.push(f.type === "links" ? "" : {});
+  else { arr.splice(+del.dataset.i, 1); if (!arr.length) arr.push(f.type === "links" ? "" : {}); }
+  answers[key] = arr;
+  const q = document.getElementById("q-" + key), tmp = document.createElement("div");
+  tmp.innerHTML = renderField(f, arr, lang);
+  q.replaceWith(tmp.firstElementChild);
+  const per = f.type === "links" ? 1 : 3, inputs = document.querySelectorAll(`#q-${CSS.escape(key)} input.in`);
+  const target = inputs[(add ? arr.length - 1 : Math.min(+del.dataset.i, arr.length - 1)) * per];
+  if (target) target.focus();
+  touch();
+}
+function onBlur(e) {
+  const el = e.target, key = el.dataset.k; if (!key || !fieldsByKey[key]) return;
+  const f = fieldsByKey[key];
+  if (el.classList.contains("tc")) {
+    const v = normalizeTime(el.value);
+    if (v !== el.value) { el.value = v; const arr = rowObj(key, +el.dataset.i); arr[+el.dataset.i] = { ...(arr[+el.dataset.i] || {}), [el.dataset.f]: v }; touch(); }
+    const q = el.closest(".q");
+    if (v && !TC_RE.test(v)) { el.classList.add("bad"); el.setAttribute("aria-invalid", "true"); q.querySelector(".err").textContent = tr(lang, "err.time"); }
+  } else if (f.type === "links") {
+    const v = normalizeLink(el.value);
+    if (v !== el.value) { el.value = v; rowObj(key, +el.dataset.i)[+el.dataset.i] = v; touch(); }
+    if (v && !isHttpUrl(v)) { el.classList.add("bad"); el.setAttribute("aria-invalid", "true"); el.closest(".q").querySelector(".err").textContent = t("err.link"); }
+  }
+}
+
+/* ---------------- dépôt de fichiers ---------------- */
+// Zone aria-live polie unique, alimentée à la demande : une annonce part une fois, quand l'événement arrive.
+function announce(text) { const l = $("#live"); if (l && text) { l.textContent = ""; setTimeout(() => (l.textContent = text), 30); } }
+// Le bouton d'envoi du brief est grisé seulement tant qu'un envoi est réellement en vol, avec la raison écrite dessous.
+function refreshSend() {
+  const btn = $("#send"), why = $("#sendwhy"); if (!btn || sending) return;
+  const busy = uploads.active() > 0, txt = busy ? t("files.wait") : "";
+  btn.disabled = busy;
+  if (why && why.textContent !== txt) why.textContent = txt;   // pas de réécriture identique : rien n'est relu
+}
+// Redessine UNE question de type files (le reste du formulaire n'est pas touché).
+// focus : sélecteur à retrouver ; null = ne rien focaliser ; absent = garder le focus dans la question seulement s'il y était.
+// o.soft : le focus ne bouge que s'il était déjà dans cette question (ou nulle part).
+function redrawFiles(key, focus, o) {
+  refreshSend();   // d'abord : même si la question n'est plus à l'écran, le bouton reflète les envois réels
+  const q = document.getElementById("q-" + key), f = fieldsByKey[key]; if (!q || !f || !data || data.state !== "open") return;
+  const had = q.contains(document.activeElement), tmp = document.createElement("div");
+  tmp.innerHTML = renderField(f, answers[key], lang, uctx());
+  q.replaceWith(tmp.firstElementChild);
+  let want = focus === undefined ? (had ? "[data-pick],.flist button" : null) : focus;
+  const act = document.activeElement;
+  if (o && o.soft && !(had || !act || act === document.body)) want = null;   // un échec qui arrive pendant une frappe ailleurs ne prend pas le focus
+  if (want) { const nq = document.getElementById("q-" + key), tg = nq && (nq.querySelector(want) || nq.querySelector("[data-pick],.flist button")); if (tg) tg.focus({ preventScroll: true }); }
+}
+const filesOf = (key) => (Array.isArray(answers[key]) ? answers[key] : []);
+function takeFiles(key, list) {
+  const f = fieldsByKey[key]; if (!f || f.type !== "files" || sending) return;
+  uploads.take(key, list, { max: fieldMax(f), known: filesOf(key) });
+}
+function removeFile(key, i) {
+  const arr = [...filesOf(key)], gone = arr.splice(i, 1)[0]; if (!gone) return;
+  answers[key] = arr; uploads.notes[key] = [];
+  touch();
+  announce(t("files.removed", { name: gone.name }));
+  redrawFiles(key, `[data-rmfile][data-i="${Math.min(i, arr.length - 1)}"]`);
+}
+// Un fichier lâché à côté de la zone ne doit pas faire quitter la page (les réponses seraient perdues de vue).
+const hasFiles = (e) => !!(e.dataTransfer && Array.from(e.dataTransfer.types || []).includes("Files"));
+window.addEventListener("dragover", (e) => { if (hasFiles(e)) e.preventDefault(); });
+window.addEventListener("drop", (e) => { if (hasFiles(e)) e.preventDefault(); });
+
+/* ---------------- envoi ---------------- */
+function flagQuestion(key, msg) {
+  const q = document.getElementById("q-" + key); if (!q) return;
+  q.classList.add("bad"); setInvalid(q, true);
+  q.querySelector(".err").textContent = msg;
+  q.scrollIntoView({ behavior: "smooth", block: "center" });
+  const c = q.querySelector("input:not([type=file]),textarea") || q.querySelector("[data-pick],button"); if (c) c.focus({ preventScroll: true });
+}
+function setMsg(s) { const m = $("#msg"); if (m && m.textContent !== (s || "")) m.textContent = s || ""; }
+async function submit() {
+  if (sending) return;
+  // Un fichier part encore, ou n'a pas pu être ajouté : le brief ne part pas sans lui (il se fermerait sans ce fichier).
+  const blk = uploads.block();
+  if (blk === "busy") { setMsg(t("files.wait")); return; }
+  if (blk === "failed") {
+    const fl = uploads.failed(); setMsg(t("files.err.pending"));
+    const li = document.querySelector(`[data-pend="${CSS.escape(fl.p.id)}"]`);
+    if (li) { li.scrollIntoView({ behavior: "smooth", block: "center" }); const b = li.querySelector("[data-retry]"); if (b) b.focus({ preventScroll: true }); }
+    return;
+  }
+  const fields = data.fields || [];
+  const prepared = prepareAnswers(fields, answers);
+  // Les timecodes et liens complétés reviennent dans l'état affiché.
+  answers = prepared; $("#fields").innerHTML = renderForm(fields, answers, lang, uctx()); growAll();
+  const r = cleanAnswers(fields, prepared, true);
+  setMsg("");
+  if (r.error) { const f = fieldsByKey[r.error.key]; flagQuestion(r.error.key, errorMessage(f, r.error.code, lang)); return; }
+  sending = true; clearTimeout(saveTimer);
+  const btn = $("#send"); btn.disabled = true; btn.textContent = t("brief.sending");
+  try {
+    while (saving) await new Promise((ok) => setTimeout(ok, 100));
+    await rpc("portal_brief_save", { p_token: token, p_answers: r.answers, p_submit: true });
+    answers = r.answers; data.state = "submitted"; clearTimeout(saveTimer); lsDel(LS_KEY);
+    sending = false; renderThanks(); window.scrollTo({ top: 0 });
+  } catch (e) {
+    sending = false;
+    if (e.code === "brief_required" || e.code === "brief_invalid") { renderPage(); const f = fieldsByKey[e.key]; return flagQuestion(e.key, errorMessage(f, e.code, lang)); }
+    if (e.code === "closed" || e.code === "not_found") return load();
+    btn.disabled = false; btn.textContent = t("brief.send");
+    setMsg(e.offline ? t("err.send.offline") : e.code === "rate_limit" ? t("err.send.rate") : e.code === "too_big" ? t("err.send.big") : t("err.send.fail"));
+  }
+}
+
+/* ---------------- chargement ---------------- */
+// soft = relecture silencieuse au retour sur l'onglet : on ne redessine que si quelque chose a changé.
+async function load(soft = false) {
+  if (!/^[0-9a-f]{32}$/.test(token)) return invalidScreen();
+  let r;
+  try { r = await rpc("portal_brief_get", { p_token: token }); }
+  catch (e) {
+    if (soft) return;
+    if (e.code === "rate_limit") return loadErrorScreen("brief.rate");
+    if (e.offline || e.code === "offline") return loadErrorScreen("brief.offline");
+    return invalidScreen();
+  }
+  if (!r || r.state === "cancelled") { lsDel(LS_KEY); data = null; return invalidScreen(); }
+  if (r.state === "submitted") lsDel(LS_KEY);
+  const prevState = data && data.state, prevJson = JSON.stringify(answers);
+  data = r;
+  if (!lang) lang = r.lang === "en" ? "en" : "fr";
+  fieldsByKey = Object.fromEntries((r.fields || []).map((f) => [f.key, f]));
+  applyBrand(r.studio && r.studio.brand_color);
+  let startSave = false, lost = [];
+  answers = r.answers && typeof r.answers === "object" ? { ...r.answers } : {};
+  rev = syncedRev = 0;
+  if (r.state === "open") {
+    // copie de cet appareil ou base ? Une copie non synchronisée n'est jamais écrasée.
+    const local = readBackup(lsGet(LS_KEY));
+    if (pickSource(local, { answers: r.answers, saved_at: r.saved_at }) === "local") {
+      answers = { ...local.answers }; lastAt = local.at || new Date().toISOString(); rev = 1; startSave = true;
+    } else if (local) lost = lostFiles(r.fields || [], local.answers, answers);   // la base gagne : un fichier de la copie qu'elle n'a plus est signalé
+  }
+  uploads.syncVisible(cleanAnswers(r.fields || [], answers, false).visible);   // mêmes lignes nettoyées qu'une question qui se cache en direct
+  if (lost.length) {
+    for (const d of lost) (uploads.notes[d.key] = uploads.notes[d.key] || []).push({ why: "refused", name: d.name });
+    backup(); saveState = "refused";
+  }
+  if (soft && prevState === "open" && data.state === "open" && !startSave && !lost.length && JSON.stringify(answers) === prevJson) return;
+  renderPage();
+  if (lost.length) announce(noteTexts(lost.map((d) => ({ why: "refused", name: d.name }))).join(" "));
+  if (startSave) save();   // tout de suite
+}
+load();
+</script>
+</body>
+</html>

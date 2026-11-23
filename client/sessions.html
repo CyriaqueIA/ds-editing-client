@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sessions</title>
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='7' fill='%231F2937'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="portail.css">
+<link rel="stylesheet" href="portail-studio.css">
+</head>
+<body>
+<main class="wrap wide" id="app" aria-busy="true"><p class="muted">…</p></main>
+<dialog id="dlg" aria-labelledby="dlg-title"></dialog>
+<script type="module">
+import { rpc, t as tr, esc, loc, fmtDate, applyBrand, studioHeader, logoFallback, renderSummary, briefText, lsGet, lsSet } from "./portail.js";
+import { renderTiles, renderSessions, deliverablesText, parseLinks, briefUrl, copyText, startsOrder } from "./portail-studio.js";
+
+/* Phrase des conditions : reprise MOT POUR MOT de client/depot.html, clé « s6.terms » (FR ligne ~685, EN ligne ~766).
+   Elle nomme DS Editing : le studio est notre client, il la connaît. C'est la seule mention de la marque sur cette page. */
+const TERMS = {
+  fr: "J'accepte les conditions de collaboration DS Editing : facture hebdomadaire, paiement à réception, pénalité de 20 % par semaine de retard.",
+  en: "I accept the DS Editing terms of collaboration: weekly invoice, payment on receipt, 20% penalty per week late.",
+};
+
+const qs = new URLSearchParams(location.search);
+const slug = (qs.get("client") || "").trim(), key = (qs.get("k") || "").trim();
+const app = document.getElementById("app"), dlg = document.getElementById("dlg");
+let lang = qs.get("lang") === "en" ? "en" : qs.get("lang") === "fr" ? "fr" : "";
+let studio = null, sessions = [], internal = null, filter = "all", listErr = false;
+const t = (k, v) => tr(lang || "fr", k, v);
+const $ = (s, r = document) => r.querySelector(s);
+const byId = (id) => sessions.find((s) => s.id === id);
+const args = (extra) => ({ p_slug: slug, p_key: key, ...extra });
+// Lien vers l'espace client, seulement si la base dit que ce code est celui d'un studio (internal === false).
+const spaceUrl = () => {
+  if (internal !== false) return "";
+  const u = new URL("espace.html", location.href);
+  u.searchParams.set("client", slug); u.searchParams.set("k", key); u.searchParams.set("lang", lang);
+  return u.href;
+};
+
+logoFallback(app);
+
+/* ---------------- écrans ---------------- */
+function invalid() {
+  document.documentElement.lang = lang || "fr";
+  app.setAttribute("aria-busy", "false");
+  app.innerHTML = `<section class="card center"><h1>${esc(t("s.invalid"))}</h1></section>`;
+}
+
+function renderPage() {
+  document.documentElement.lang = lang;
+  document.title = `${t("s.title")} — ${studio.name}`;
+  app.setAttribute("aria-busy", "false");
+  app.innerHTML = `<div class="topline">${studioHeader(studio)}<button type="button" class="langbtn" id="lang" lang="${lang === "fr" ? "en" : "fr"}">${esc(t("lang.other"))}</button></div>
+    <div class="pagehead"><h1>${esc(t("s.title"))}</h1><button type="button" class="btn primary" id="new">+ ${esc(t("s.new"))}</button></div>
+    <p class="help-line">${esc(t("s.help"))}</p>
+    <div class="tiles" id="tiles" role="group" aria-label="${esc(t("s.title"))}"></div>
+    <p class="listmsg" id="listmsg" role="status"></p>
+    <div id="list"></div>`;
+  renderList();
+  $("#lang").addEventListener("click", () => { lang = lang === "fr" ? "en" : "fr"; renderPage(); });
+  $("#new").addEventListener("click", openNew);
+  $("#tiles").addEventListener("click", (e) => { const b = e.target.closest("[data-f]"); if (!b) return; filter = b.dataset.f; renderList(); });
+  $("#list").addEventListener("click", onAction);
+}
+// Redessine tuiles et liste en gardant le bloc « annulées » ouvert et le focus (tuile, ou action d'une session).
+function renderList() {
+  const ae = document.activeElement, ds = ae && ae.dataset ? ae.dataset : {};
+  const tileFocus = ds.f || "", row = ae && ae.closest ? ae.closest("[data-id]") : null;
+  const actFocus = ds.act && row ? { act: ds.act, id: row.dataset.id } : null;
+  const wasOpen = !!($("#list details.cancelled") || {}).open;
+  $("#tiles").innerHTML = renderTiles(sessions, lang, filter);
+  $("#list").innerHTML = renderSessions(sessions, lang, filter, undefined, { spaceUrl: spaceUrl() });
+  const det = $("#list details.cancelled"); if (det && wasOpen) det.open = true;
+  $("#listmsg").textContent = listErr ? t("s.refresh.err") : "";
+  if (tileFocus) { const b = $(`#tiles [data-f="${tileFocus}"]`); if (b) b.focus(); }
+  if (actFocus) {
+    const cands = [...document.querySelectorAll(`#list [data-id="${CSS.escape(actFocus.id)}"] [data-act="${CSS.escape(actFocus.act)}"]`)];
+    const vis = cands.find((x) => x.offsetParent !== null) || cands[0]; if (vis) vis.focus();
+  }
+}
+
+/* ---------------- données ---------------- */
+async function refresh() {
+  try {
+    const r = await rpc("portal_sessions_list", args());
+    sessions = (r && r.sessions) || []; studio = r.studio || studio; internal = r.internal === false ? false : r.internal === true ? true : internal; listErr = false;
+  } catch (e) { if (e.code === "bad_key") return invalid(); listErr = true; }
+  if ($("#list")) renderList();
+}
+async function loadFormulas() {
+  try { return await rpc("portal_formulas_list", args()); } catch (e) { return null; }
+}
+async function boot() {
+  if (!slug || !key) return invalid();
+  let list;
+  try { list = await rpc("portal_sessions_list", args()); }
+  catch (e) {
+    if (e.code === "bad_key") return invalid();
+    app.setAttribute("aria-busy", "false");
+    app.innerHTML = `<section class="card center"><p>${esc(tr(lang || "fr", "s.e.offline"))}</p><p style="margin-top:16px"><button type="button" class="btn primary" id="retry">${esc(tr(lang || "fr", "retry"))}</button></p></section>`;
+    return $("#retry").addEventListener("click", boot);
+  }
+  if (!list || !list.studio) return invalid();
+  studio = list.studio; sessions = list.sessions || []; internal = list.internal === false ? false : list.internal === true ? true : null;
+  if (!lang) lang = studio.lang === "en" ? "en" : "fr";
+  applyBrand(studio.brand_color);
+  renderPage();
+  setInterval(() => { if (!document.hidden) refresh(); }, 60000);
+}
+
+/* ---------------- fenêtre ---------------- */
+function openDlg(html) { dlg.innerHTML = `<div class="dlg">${html}</div>`; if (!dlg.open) dlg.showModal(); }
+function closeDlg() { if (dlg.open) dlg.close(); }
+// Fermeture sur le fond seulement si l'appui ET le relâchement ont eu lieu sur le fond (une sélection de texte qui finit dehors ne ferme pas).
+let downOnBackdrop = false;
+dlg.addEventListener("mousedown", (e) => { downOnBackdrop = e.target === dlg; });
+dlg.addEventListener("click", (e) => {
+  if (e.target.closest("[data-close]")) return closeDlg();
+  if (e.target === dlg && downOnBackdrop) closeDlg();
+  downOnBackdrop = false;
+});
+function dlgHead(title) { return `<div class="dlg-h"><h2 id="dlg-title">${esc(title)}</h2><button type="button" class="icon" data-close aria-label="${esc(t("close"))}"><span aria-hidden="true">×</span></button></div>`; }
+
+// Copie : retour visuel « Copié », ou message clair avec le champ sélectionné si le navigateur refuse.
+async function doCopy(text, btn, field, msgEl) {
+  const ok = await copyText(text);
+  if (ok) { const old = btn.textContent; btn.textContent = t("copied"); if (msgEl) msgEl.textContent = ""; setTimeout(() => { if (btn.isConnected) btn.textContent = old; }, 2000); return; }
+  if (msgEl) msgEl.textContent = t("s.copyFail");
+  if (field) { field.focus(); field.select(); }
+}
+
+/* ---------------- actions par session ---------------- */
+async function onAction(e) {
+  const b = e.target.closest("[data-act]"); if (!b) return;
+  const s = byId(b.closest("[data-id]").dataset.id); if (!s) return;
+  const act = b.dataset.act;
+  if (act === "copy") {
+    const link = briefUrl(s.token);
+    if (await copyText(link)) { const old = b.textContent; b.textContent = t("copied"); setTimeout(() => { if (b.isConnected) b.textContent = old; }, 2000); }
+    else { openDlg(`${dlgHead(t("s.copyLink"))}<div class="q"><input class="in" id="c-link" readonly value="${esc(link)}"><p class="err" id="c-msg" role="alert"></p></div><div class="dlg-actions"><button type="button" class="btn" data-close>${esc(t("close"))}</button></div>`); $("#c-msg").textContent = t("s.copyFail"); $("#c-link").select(); }
+  } else if (act === "rushes") openRushes(s);
+  else if (act === "brief" || act === "view") openBrief(s);
+  else if (act === "cancel") openCancel(s);
+}
+
+function openRushes(s) {
+  const go = startsOrder(s);
+  openDlg(`${dlgHead(t("s.rushes.title"))}<div class="q"><label class="lbl" for="r-links">${esc(t("s.rushes.label"))}</label><p class="help">${esc(t("s.rushes.help"))}</p>
+    <textarea class="in" id="r-links" rows="5" spellcheck="false" autocapitalize="none" placeholder="https://…">${esc((s.rushes_links || []).join("\n"))}</textarea><p class="err" id="r-err" role="alert"></p></div>
+    <p class="notice" id="r-warn" hidden>${esc(t("s.rushes.warnGo"))}</p>
+    <div class="dlg-actions"><button type="button" class="btn" data-close>${esc(t("cancel"))}</button><button type="button" class="btn primary" id="r-save">${esc(t("s.rushes.save"))}</button></div>`);
+  const ta = $("#r-links"), warn = $("#r-warn"), save = $("#r-save");
+  const upd = () => { const on = go && parseLinks(ta.value).links.length > 0; warn.hidden = !on; save.textContent = t(on ? "s.rushes.saveGo" : "s.rushes.save"); };
+  ta.addEventListener("input", upd); upd();
+  save.addEventListener("click", async () => {
+    const { links, bad } = parseLinks(ta.value);
+    if (bad.length) { $("#r-err").textContent = t("s.rushes.bad"); return; }
+    save.disabled = true;
+    try { await rpc("portal_session_update", args({ p_session: s.id, p_patch: { rushes_links: links } })); closeDlg(); await refresh(); }
+    catch (er) { save.disabled = false; $("#r-err").textContent = er.code === "locked" ? t("s.locked") : er.code === "rate_limit" ? t("s.e.rate_limit") : er.offline ? t("s.e.offline") : t("s.e.generic"); if (er.code === "locked") refresh(); }
+  });
+}
+
+function openCancel(s) {
+  openDlg(`${dlgHead(t("s.cancel.title"))}<p><strong>${esc(s.title)}</strong> · ${esc(s.client_name)}</p><p class="muted" style="margin-top:8px">${esc(t("s.cancel.text"))}</p><p class="err" id="c-err" role="alert"></p>
+    <div class="dlg-actions"><button type="button" class="btn" data-close>${esc(t("s.cancel.no"))}</button><button type="button" class="btn primary" id="c-yes">${esc(t("s.cancel.yes"))}</button></div>`);
+  $("#c-yes").addEventListener("click", async () => {
+    const btn = $("#c-yes"); btn.disabled = true;
+    try { await rpc("portal_session_update", args({ p_session: s.id, p_patch: { cancel: true } })); closeDlg(); await refresh(); }
+    catch (er) { btn.disabled = false; $("#c-err").textContent = er.code === "locked" ? t("s.locked") : er.offline ? t("s.e.offline") : t("s.e.generic"); if (er.code === "locked") refresh(); }
+  });
+}
+
+async function openBrief(s) {
+  openDlg(`${dlgHead(t("s.brief.title", { name: s.client_name }))}<p class="muted">${esc(t("loading"))}</p>`);
+  let r;
+  try { r = await rpc("portal_session_get", args({ p_session: s.id })); }
+  catch (er) { openDlg(`${dlgHead(t("s.brief.title", { name: s.client_name }))}<p class="msg">${esc(er.offline ? t("s.e.offline") : t("s.e.generic"))}</p>`); return; }
+  const fields = r.fields || [], answers = r.answers || {};
+  const submitted = !!(r.brief && r.brief.submitted_at);
+  const text = (r.brief_text && (r.brief_text[lang] || r.brief_text.fr || r.brief_text.en)) || briefText(fields, answers, lang);
+  openDlg(`${dlgHead(t("s.brief.title", { name: r.client_name }))}
+    <p class="muted">${esc(!fields.length ? t("s.brief.noBrief") : submitted ? t("s.brief.sent") : t("s.brief.draft"))}</p>
+    ${fields.length ? renderSummary(fields, answers, lang) : ""}
+    <p class="err" id="b-msg" role="alert"></p>
+    <div class="dlg-actions"><button type="button" class="btn" data-close>${esc(t("close"))}</button>${text ? `<button type="button" class="btn primary" id="b-copy">${esc(t("copy"))}</button>` : ""}</div>`);
+  const cb = $("#b-copy");
+  if (cb) cb.addEventListener("click", () => doCopy(text, cb, null, $("#b-msg")));
+}
+
+/* ---------------- nouvelle session ---------------- */
+async function openNew() {
+  openDlg(`${dlgHead(t("s.n.title"))}<p class="muted">${esc(t("loading"))}</p>`);
+  const f = await loadFormulas();   // relu à chaque ouverture : les conditions ont pu être acceptées entre-temps
+  const head = dlgHead(t("s.n.title"));
+  if (!f) { openDlg(`${head}<p class="msg">${esc(t("s.e.offline"))}</p>`); return; }
+  if (!f.formulas || !f.formulas.length) { openDlg(`${head}<div class="notice">${esc(t("s.n.noFormulas"))}</div>`); return; }
+  if (f.terms && f.terms.required && !f.terms.ok) { openDlg(`${head}<div class="notice">${esc(t("s.n.termsFirst"))}</div>`); return; }
+  const email = lsGet("portail:studio_email") || "";
+  const bl = studio.lang === "en" ? "en" : "fr", curLang = lang;
+  const field = (id, label, input, help) => `<div class="q"><label class="lbl" for="${id}">${label}</label>${help ? `<p class="help">${esc(help)}</p>` : ""}${input}<p class="err" id="e-${id}" role="alert"></p></div>`;
+  openDlg(`${head}<form id="nform" novalidate>
+    ${field("n-title", esc(t("s.n.t")), `<input class="in" id="n-title" type="text" maxlength="200" autocomplete="off" required>`, t("s.n.tHelp"))}
+    ${field("n-client", esc(t("s.n.c")), `<input class="in" id="n-client" type="text" maxlength="120" autocomplete="off" required>`)}
+    ${field("n-date", esc(t("s.n.d")), `<input class="in" id="n-date" type="date">`)}
+    ${field("n-formula", esc(t("s.n.f")), `<select class="in" id="n-formula" required><option value="">${esc(t("s.n.fSel"))}</option>${f.formulas.map((x) => `<option value="${esc(x.key)}">${esc(loc(x.name, curLang))}</option>`).join("")}</select><p class="fdeliv" id="n-deliv" aria-live="polite"></p>`)}
+    <div class="q"><div class="lbl" id="l-lang">${esc(t("s.n.lang"))}</div><div class="pills" role="radiogroup" aria-labelledby="l-lang" style="margin-top:10px">${["fr", "en"].map((l) => `<label class="pill"><input type="radio" name="n-lang" value="${l}"${l === bl ? " checked" : ""}><span>${l === "fr" ? "Français" : "English"}</span></label>`).join("")}</div></div>
+    ${field("n-rushes", esc(t("s.n.rushes")), `<input class="in" id="n-rushes" type="text" inputmode="url" autocapitalize="none" spellcheck="false" placeholder="https://…" autocomplete="off">`, t("s.n.rushesHelp"))}
+    <p class="notice" id="n-warn" hidden>${esc(t("s.n.warnGo"))}</p>
+    ${field("n-email", esc(t("s.n.email")), `<input class="in" id="n-email" type="email" autocomplete="email" value="${esc(email)}" required>`, t("s.n.emailHelp"))}
+    <div class="q"><label class="terms" for="n-terms"><input type="checkbox" id="n-terms"><span>${esc(TERMS[lang])} <a href="../conditions.html?lang=${lang}" target="_blank" rel="noopener noreferrer">${esc(t("s.n.termsLink"))}</a></span></label><p class="err" id="e-n-terms" role="alert"></p></div>
+    <p class="msg" id="n-msg" role="alert"></p>
+    <div class="dlg-actions"><button type="button" class="btn" data-close>${esc(t("cancel"))}</button><button type="submit" class="btn primary" id="n-go">${esc(t("s.n.create"))}</button></div>
+  </form>`);
+  const sel = $("#n-formula"), rushes = $("#n-rushes");
+  const upd = () => {
+    const x = f.formulas.find((y) => y.key === sel.value);
+    const d = x ? deliverablesText(x.deliverables, curLang) : "", sm = x ? loc(x.summary, curLang) : "";
+    $("#n-deliv").textContent = [d ? t("s.n.fDeliv", { list: d }) : "", sm].filter(Boolean).join(" — ");
+    $("#n-warn").hidden = !(x && x.questions === 0 && parseLinks(rushes.value).links.length > 0);   // sans brief, des rushes lancent la commande tout de suite
+  };
+  sel.addEventListener("change", upd); rushes.addEventListener("input", upd); upd();
+  $("#n-title").focus();
+  $("#nform").addEventListener("submit", (e) => { e.preventDefault(); createSession(f); });
+}
+
+const ERR_FIELD = { bad_formula: "n-formula", no_title: "n-title", no_client: "n-client", bad_email: "n-email", terms: "n-terms" };
+function setErr(id, msg) {
+  document.querySelectorAll(".dlg .err").forEach((x) => (x.textContent = ""));
+  const el = document.getElementById("e-" + id);
+  if (el) { el.textContent = msg; const c = document.getElementById(id); if (c) c.focus(); }
+}
+
+async function createSession(f) {
+  const v = (id) => $("#" + id).value.trim();
+  const blang = (document.querySelector('input[name="n-lang"]:checked') || {}).value || "fr";
+  $("#n-msg").textContent = "";
+  if (!v("n-title")) return setErr("n-title", t("s.e.no_title"));
+  if (!v("n-client")) return setErr("n-client", t("s.e.no_client"));
+  if (!v("n-formula")) return setErr("n-formula", t("s.e.bad_formula"));
+  const links = parseLinks($("#n-rushes").value);
+  if (links.bad.length) return setErr("n-rushes", t("s.e.bad_rushes"));
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v("n-email"))) return setErr("n-email", t("s.e.bad_email"));
+  if (!$("#n-terms").checked) return setErr("n-terms", t("s.e.terms"));
+  const session = { formula: v("n-formula"), title: v("n-title"), client_name: v("n-client"), lang: blang, studio_email: v("n-email"), rushes_links: links.links, terms_accepted: true, terms_text: TERMS[lang] };
+  if ($("#n-date").value) session.session_date = $("#n-date").value;
+  const go = $("#n-go"); go.disabled = true; go.textContent = t("s.n.creating");
+  try {
+    const r = await rpc("portal_session_create", args({ p_session: session }));
+    lsSet("portail:studio_email", session.studio_email);
+    showCreated(r, session, blang);
+    refresh();
+  } catch (e) {
+    go.disabled = false; go.textContent = t("s.n.create");
+    const target = ERR_FIELD[e.code];
+    if (e.code === "terms_not_accepted") $("#n-msg").textContent = t("s.e.terms_not_accepted");
+    else if (target) setErr(target, t("s.e." + e.code));
+    else $("#n-msg").textContent = e.code === "rate_limit" ? t("s.e.rate_limit") : e.offline ? t("s.e.offline") : t("s.e.generic");
+  }
+}
+
+function showCreated(r, session, blang) {
+  const link = briefUrl(r.token);
+  const msg = tr(blang, "s.ok.msg", { name: session.client_name, link });
+  openDlg(`${dlgHead(t("s.ok.title"))}<p class="muted">${esc(t("s.ok.text"))}</p>
+    <div class="q"><label class="lbl" for="o-link">${esc(t("s.ok.linkLabel"))}</label><div class="copybox"><input class="in" id="o-link" readonly value="${esc(link)}"><button type="button" class="btn" id="o-cl">${esc(t("copy"))}</button></div></div>
+    <div class="q"><label class="lbl" for="o-msg">${esc(t("s.ok.msgLabel"))}</label><div class="copybox"><textarea class="in" id="o-msg" rows="4" readonly>${esc(msg)}</textarea><button type="button" class="btn primary" id="o-cm">${esc(t("copy"))}</button></div></div>
+    <p class="err" id="o-err" role="alert"></p>
+    <div class="dlg-actions"><button type="button" class="btn" id="o-more">${esc(t("s.ok.another"))}</button><button type="button" class="btn" data-close>${esc(t("close"))}</button></div>`);
+  $("#o-cl").addEventListener("click", () => doCopy(link, $("#o-cl"), $("#o-link"), $("#o-err")));
+  $("#o-cm").addEventListener("click", () => doCopy(msg, $("#o-cm"), $("#o-msg"), $("#o-err")));
+  $("#o-more").addEventListener("click", openNew);
+}
+
+boot();
+</script>
+</body>
+</html>
