@@ -265,6 +265,20 @@ function buildLabels() {
   CE_FIELDS = [["first_name", T("Prénom", "First name")], ["last_name", T("Nom", "Last name")], ["job_title", T("Fonction", "Job title")], ["phone", T("Téléphone", "Phone")], ["email", T("E-mail", "Email")]];
 }
 const outc = (x) => OUTCOME[x] || x;
+/* Textes écrits par le robot Onoff (SQL onoff_v1/v2 + fonction Edge onoff-webhook), gardés en français en base,
+   traduits à l'affichage en anglais seulement : sujet « Appel Onoff · <finalité> », corps « Résumé automatique : »,
+   1re ligne du résumé « Finalité : … » (les résumés des fiches US sont écrits en anglais depuis le 23/11). */
+const ONOFF_EN = { "Message vocal": "Voicemail message", "Conversation": "Conversation", "Messagerie": "Voicemail", "Occupé": "Busy", "Mauvais numéro": "Wrong number", "Appel manqué": "Missed call", "Pas de réponse": "No answer", "Répondeur": "Voicemail", "Pas de conversation": "No conversation", "Refus": "Refused", "À rappeler": "Call back", "Intéressé": "Interested", "RDV pris": "Meeting booked", "Hors prospection": "Not prospecting" };
+const ONOFF_FIN = new RegExp("^(" + Object.keys(ONOFF_EN).join("|") + ")(?=$| \\(| ?:)");
+const finEn = (x) => x.replace(ONOFF_FIN, (m) => ONOFF_EN[m]);
+function robotText(s, isSubject) {
+  if (LANG !== "en" || !s) return s;
+  if (isSubject) {
+    const m = s.match(/^(Appel Onoff|Message vocal Onoff)(?: · ([\s\S]*))?$/);
+    return m ? (m[1] === "Appel Onoff" ? "Onoff call" : "Onoff voicemail") + (m[2] ? " · " + finEn(m[2]) : "") : s;
+  }
+  return s.replace(/^Résumé automatique :/m, "Automatic summary:").replace(/^[\s*_]*Finalit[ée][\s*_]*:[\s*_]*(.*)$/m, (m, v) => "Outcome: " + finEn(v));
+}
 const VIEWER_TABS = ["fiches", "tunnel", "clients", "chiffres", "tele"];
 const PROSPECTING = ["a_contacter", "contacte", "en_conversation"], CLOSING = ["rdv_pris", "visio_faite", "test_en_cours", "test_livre"];
 
@@ -338,7 +352,7 @@ function onoffPanel() {
     let pick = "";
     const who = [c.external_name, c.external_company].filter(Boolean).join(" · ");
     const bits = [frDate(c.started_at || c.received_at), c.direction === "in" ? T("reçu", "incoming") : T("passé", "outgoing"), outc(c.outcome), c.duration_s ? `${Math.max(1, Math.round(c.duration_s / 60))} min` : null, c.author_label].filter(Boolean).join(" · ");
-    const text = c.summary || c.notes;
+    const text = robotText(c.summary) || c.notes;
     return h("div", { class: "qrow", style: "flex-direction:column;align-items:stretch;gap:6px;padding:10px" }, [
       h("div", null, [h("b", { text: c.external_number || T("Numéro masqué", "Hidden number") }), who ? h("span", { class: "muted", text: " · " + who }) : null]),
       h("small", { class: "muted", text: bits }),
@@ -496,12 +510,13 @@ function actLine(a) {
   if (a.kind === "message" && a.channel) bits.push(a.channel);
   if (a.kind === "task") bits.push(a.done ? T("faite", "done") : T("à faire", "to do"));
   if (a.author_label && a.author_label !== "Import HubSpot") bits.push(a.author_label);
-  let subject = a.subject;
+  let subject = a.kind === "call" ? robotText(a.subject, true) : a.subject;
   if (a.kind === "stage" && subject) subject = subject.split(" > ").map((s) => STAGE_LABEL[s] || s).join(" → ");
-  const body = a.body ? h("div", { class: "body" + (a.body.length > 320 ? " clip" : ""), text: a.body }) : null;
+  const btxt = a.kind === "call" ? robotText(a.body) : a.body;
+  const body = btxt ? h("div", { class: "body" + (btxt.length > 320 ? " clip" : ""), text: btxt }) : null;
   return h("li", null, [h("time", { text: frDate(a.kind === "task" && a.due_at ? a.due_at : a.occurred_at) }), h("div", null, [
     h("b", { text: bits.join(" · ") }), subject ? h("div", { text: subject }) : null, body,
-    body && a.body.length > 320 ? h("button", { type: "button", class: "more", style: "text-align:left;padding:2px 0", onclick: (ev) => { body.classList.toggle("clip"); ev.target.textContent = body.classList.contains("clip") ? T("Lire la suite", "Read more") : T("Réduire", "Show less"); } }, [T("Lire la suite", "Read more")]) : null,
+    body && btxt.length > 320 ? h("button", { type: "button", class: "more", style: "text-align:left;padding:2px 0", onclick: (ev) => { body.classList.toggle("clip"); ev.target.textContent = body.classList.contains("clip") ? T("Lire la suite", "Read more") : T("Réduire", "Show less"); } }, [T("Lire la suite", "Read more")]) : null,
   ])]);
 }
 function fiche(d, inline) {
