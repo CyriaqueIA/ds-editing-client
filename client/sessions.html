@@ -8,14 +8,14 @@
 <meta name="referrer" content="no-referrer">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='7' fill='%231F2937'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="portail.css">
-<link rel="stylesheet" href="portail-studio.css">
+<link rel="stylesheet" href="portail-studio.css?v=d7d21275">
 </head>
 <body>
 <main class="wrap wide" id="app" aria-busy="true"><p class="muted">…</p></main>
 <dialog id="dlg" aria-labelledby="dlg-title"></dialog>
 <script type="module">
 import { rpc, t as tr, esc, loc, fmtDate, applyBrand, studioHeader, logoFallback, renderSummary, briefText, lsGet, lsSet } from "./portail.js";
-import { renderTiles, renderSessions, deliverablesText, parseLinks, briefUrl, copyText, startsOrder } from "./portail-studio.js";
+import { renderTiles, renderSessions, deliverablesText, parseLinks, briefUrl, copyText, startsOrder, isStudio, filesInfo } from "./portail-studio.js?v=4c04736b";
 
 /* Phrase des conditions : reprise MOT POUR MOT de client/depot.html, clé « s6.terms » (FR ligne ~685, EN ligne ~766).
    Elle nomme DS Editing : le studio est notre client, il la connaît. C'est la seule mention de la marque sur cette page. */
@@ -145,11 +145,19 @@ async function onAction(e) {
   } else if (act === "rushes") openRushes(s);
   else if (act === "brief" || act === "view") openBrief(s);
   else if (act === "cancel") openCancel(s);
+  else if (act === "done") openDone(s);
 }
+// Après une action qui redessine la liste : le focus revient sur un bouton de la même ligne (celui qui est visible : carte ou tableau).
+function focusAct(id, act) {
+  const c = [...document.querySelectorAll(`#list [data-id="${CSS.escape(id)}"] [data-act="${CSS.escape(act)}"]`)];
+  const b = c.find((x) => x.offsetParent !== null) || c[0]; if (b) b.focus();
+}
+// Message d'une session verrouillée : propre au mode autonome (classée ou annulée), sinon celui de la commande partie.
+const lockedMsg = (s) => t(isStudio(s) ? "s.locked.studio" : "s.locked");
 
 function openRushes(s) {
-  const go = startsOrder(s);
-  openDlg(`${dlgHead(t("s.rushes.title"))}<div class="q"><label class="lbl" for="r-links">${esc(t("s.rushes.label"))}</label><p class="help">${esc(t("s.rushes.help"))}</p>
+  const studioMode = isStudio(s), go = !studioMode && startsOrder(s);   // en mode autonome, des liens ne lancent rien
+  openDlg(`${dlgHead(t(studioMode ? "s.note.title" : "s.rushes.title"))}<div class="q"><label class="lbl" for="r-links">${esc(t("s.rushes.label"))}</label><p class="help">${esc(t(studioMode ? "s.note.help" : "s.rushes.help"))}</p>
     <textarea class="in" id="r-links" rows="5" spellcheck="false" autocapitalize="none" placeholder="https://…">${esc((s.rushes_links || []).join("\n"))}</textarea><p class="err" id="r-err" role="alert"></p></div>
     <p class="notice" id="r-warn" hidden>${esc(t("s.rushes.warnGo"))}</p>
     <div class="dlg-actions"><button type="button" class="btn" data-close>${esc(t("cancel"))}</button><button type="button" class="btn primary" id="r-save">${esc(t("s.rushes.save"))}</button></div>`);
@@ -161,17 +169,34 @@ function openRushes(s) {
     if (bad.length) { $("#r-err").textContent = t("s.rushes.bad"); return; }
     save.disabled = true;
     try { await rpc("portal_session_update", args({ p_session: s.id, p_patch: { rushes_links: links } })); closeDlg(); await refresh(); }
-    catch (er) { save.disabled = false; $("#r-err").textContent = er.code === "locked" ? t("s.locked") : er.code === "rate_limit" ? t("s.e.rate_limit") : er.offline ? t("s.e.offline") : t("s.e.generic"); if (er.code === "locked") refresh(); }
+    catch (er) { save.disabled = false; $("#r-err").textContent = er.code === "locked" ? lockedMsg(s) : er.code === "rate_limit" ? t("s.e.rate_limit") : er.offline ? t("s.e.offline") : t("s.e.generic"); if (er.code === "locked") refresh(); }
   });
 }
 
 function openCancel(s) {
-  openDlg(`${dlgHead(t("s.cancel.title"))}<p><strong>${esc(s.title)}</strong> · ${esc(s.client_name)}</p><p class="muted" style="margin-top:8px">${esc(t("s.cancel.text"))}</p><p class="err" id="c-err" role="alert"></p>
+  openDlg(`${dlgHead(t("s.cancel.title"))}<p><strong>${esc(s.title)}</strong> · ${esc(s.client_name)}</p><p class="muted" style="margin-top:8px">${esc(t("s.cancel.text"))}${isStudio(s) && filesInfo(s) && filesInfo(s).copying ? " " + esc(t("s.cancel.files")) : ""}</p><p class="err" id="c-err" role="alert"></p>
     <div class="dlg-actions"><button type="button" class="btn" data-close>${esc(t("s.cancel.no"))}</button><button type="button" class="btn primary" id="c-yes">${esc(t("s.cancel.yes"))}</button></div>`);
   $("#c-yes").addEventListener("click", async () => {
     const btn = $("#c-yes"); btn.disabled = true;
     try { await rpc("portal_session_update", args({ p_session: s.id, p_patch: { cancel: true } })); closeDlg(); await refresh(); }
-    catch (er) { btn.disabled = false; $("#c-err").textContent = er.code === "locked" ? t("s.locked") : er.offline ? t("s.e.offline") : t("s.e.generic"); if (er.code === "locked") refresh(); }
+    catch (er) { btn.disabled = false; $("#c-err").textContent = er.code === "locked" ? lockedMsg(s) : er.offline ? t("s.e.offline") : t("s.e.generic"); if (er.code === "locked") refresh(); }
+  });
+}
+
+// « Classer » (mode autonome) : confirmation dans la page, comme l'annulation.
+function openDone(s) {
+  const fi = filesInfo(s);
+  openDlg(`${dlgHead(t("s.done.title"))}<p><strong>${esc(s.title)}</strong> · ${esc(s.client_name)}</p><p class="muted" style="margin-top:8px">${esc(t("s.done.text"))}${fi && fi.copying ? " " + esc(t("s.done.copying")) : ""}</p><p class="err" id="d-err" role="alert"></p>
+    <div class="dlg-actions"><button type="button" class="btn" data-close>${esc(t("s.done.no"))}</button><button type="button" class="btn primary" id="d-yes">${esc(t("s.done.yes"))}</button></div>`);
+  $("#d-yes").addEventListener("click", async () => {
+    const btn = $("#d-yes"); btn.disabled = true;
+    try { await rpc("portal_session_update", args({ p_session: s.id, p_patch: { done: true } })); closeDlg(); await refresh(); focusAct(s.id, "view"); }
+    catch (er) {
+      btn.disabled = false;
+      const m = { locked: lockedMsg(s), done_not_studio: t("s.e.done_not_studio"), done_no_brief: t("s.e.done_no_brief"), patch_invalid: t("s.e.patch_invalid"), rate_limit: t("s.e.rate_limit") };
+      $("#d-err").textContent = m[er.code] || (er.offline ? t("s.e.offline") : t("s.e.action"));
+      if (["locked", "done_not_studio", "done_no_brief"].includes(er.code)) refresh();
+    }
   });
 }
 
@@ -187,7 +212,7 @@ async function openBrief(s) {
     <p class="muted">${esc(!fields.length ? t("s.brief.noBrief") : submitted ? t("s.brief.sent") : t("s.brief.draft"))}</p>
     ${fields.length ? renderSummary(fields, answers, lang) : ""}
     <p class="err" id="b-msg" role="alert"></p>
-    <div class="dlg-actions"><button type="button" class="btn" data-close>${esc(t("close"))}</button>${text ? `<button type="button" class="btn primary" id="b-copy">${esc(t("copy"))}</button>` : ""}</div>`);
+    <div class="dlg-actions"><button type="button" class="btn" data-close>${esc(t("close"))}</button>${text ? `<button type="button" class="btn primary" id="b-copy">${esc(t(isStudio(s) || r.mode === "studio" ? "s.brief.copy" : "copy"))}</button>` : ""}</div>`);
   const cb = $("#b-copy");
   if (cb) cb.addEventListener("click", () => doCopy(text, cb, null, $("#b-msg")));
 }
@@ -199,35 +224,48 @@ async function openNew() {
   const head = dlgHead(t("s.n.title"));
   if (!f) { openDlg(`${head}<p class="msg">${esc(t("s.e.offline"))}</p>`); return; }
   if (!f.formulas || !f.formulas.length) { openDlg(`${head}<div class="notice">${esc(t("s.n.noFormulas"))}</div>`); return; }
-  if (f.terms && f.terms.required && !f.terms.ok) { openDlg(`${head}<div class="notice">${esc(t("s.n.termsFirst"))}</div>`); return; }
+  // Conditions de commande : elles ne concernent que les formules « ds ». Les formules autonomes (mode studio) n'en demandent jamais.
+  termsForced = false;
+  const isSt = (x) => x.mode === "studio";
+  let formulas = f.formulas, partial = false;
+  if (f.terms && f.terms.required && !f.terms.ok) {   // conditions pas encore acceptées : seules les formules autonomes restent ouvertes
+    formulas = f.formulas.filter(isSt);
+    if (!formulas.length) { openDlg(`${head}<div class="notice">${esc(t("s.n.termsFirst"))}</div>`); return; }
+    partial = formulas.length < f.formulas.length;
+  }
+  const hasDs = formulas.some((x) => !isSt(x));
   const email = lsGet("portail:studio_email") || "";
   const bl = studio.lang === "en" ? "en" : "fr", curLang = lang;
-  const field = (id, label, input, help) => `<div class="q"><label class="lbl" for="${id}">${label}</label>${help ? `<p class="help">${esc(help)}</p>` : ""}${input}<p class="err" id="e-${id}" role="alert"></p></div>`;
-  openDlg(`${head}<form id="nform" novalidate>
+  const field = (id, label, input, help) => `<div class="q"><label class="lbl" id="lbl-${id}" for="${id}">${label}</label>${help ? `<p class="help" id="help-${id}">${esc(help)}</p>` : ""}${input}<p class="err" id="e-${id}" role="alert"></p></div>`;
+  openDlg(`${head}${partial ? `<p class="notice">${esc(t("s.n.termsSome"))}${spaceUrl() ? ` <a href="${esc(spaceUrl())}" target="_blank" rel="noopener noreferrer">${esc(t("s.hint.space"))}</a>` : ""}</p>` : ""}<form id="nform" novalidate>
     ${field("n-title", esc(t("s.n.t")), `<input class="in" id="n-title" type="text" maxlength="200" autocomplete="off" required>`, t("s.n.tHelp"))}
     ${field("n-client", esc(t("s.n.c")), `<input class="in" id="n-client" type="text" maxlength="120" autocomplete="off" required>`)}
     ${field("n-date", esc(t("s.n.d")), `<input class="in" id="n-date" type="date">`)}
-    ${field("n-formula", esc(t("s.n.f")), `<select class="in" id="n-formula" required><option value="">${esc(t("s.n.fSel"))}</option>${f.formulas.map((x) => `<option value="${esc(x.key)}">${esc(loc(x.name, curLang))}</option>`).join("")}</select><p class="fdeliv" id="n-deliv" aria-live="polite"></p>`)}
+    ${field("n-formula", esc(t("s.n.f")), `<select class="in" id="n-formula" required><option value="">${esc(t("s.n.fSel"))}</option>${formulas.map((x) => `<option value="${esc(x.key)}">${esc(loc(x.name, curLang))}</option>`).join("")}</select><p class="fdeliv" id="n-deliv" aria-live="polite"></p>`)}
     <div class="q"><div class="lbl" id="l-lang">${esc(t("s.n.lang"))}</div><div class="pills" role="radiogroup" aria-labelledby="l-lang" style="margin-top:10px">${["fr", "en"].map((l) => `<label class="pill"><input type="radio" name="n-lang" value="${l}"${l === bl ? " checked" : ""}><span>${l === "fr" ? "Français" : "English"}</span></label>`).join("")}</div></div>
     ${field("n-rushes", esc(t("s.n.rushes")), `<input class="in" id="n-rushes" type="text" inputmode="url" autocapitalize="none" spellcheck="false" placeholder="https://…" autocomplete="off">`, t("s.n.rushesHelp"))}
     <p class="notice" id="n-warn" hidden>${esc(t("s.n.warnGo"))}</p>
     ${field("n-email", esc(t("s.n.email")), `<input class="in" id="n-email" type="email" autocomplete="email" value="${esc(email)}" required>`, t("s.n.emailHelp"))}
-    <div class="q"><label class="terms" for="n-terms"><input type="checkbox" id="n-terms"><span>${esc(TERMS[lang])} <a href="../conditions.html?lang=${lang}" target="_blank" rel="noopener noreferrer">${esc(t("s.n.termsLink"))}</a></span></label><p class="err" id="e-n-terms" role="alert"></p></div>
+    <div class="q" id="n-termsq"${hasDs ? "" : " hidden"}><label class="terms" for="n-terms"><input type="checkbox" id="n-terms"><span>${esc(TERMS[lang])} <a href="../conditions.html?lang=${lang}" target="_blank" rel="noopener noreferrer">${esc(t("s.n.termsLink"))}</a></span></label><p class="err" id="e-n-terms" role="alert"></p></div>
     <p class="msg" id="n-msg" role="alert"></p>
     <div class="dlg-actions"><button type="button" class="btn" data-close>${esc(t("cancel"))}</button><button type="submit" class="btn primary" id="n-go">${esc(t("s.n.create"))}</button></div>
   </form>`);
   const sel = $("#n-formula"), rushes = $("#n-rushes");
   const upd = () => {
-    const x = f.formulas.find((y) => y.key === sel.value);
+    const x = formulas.find((y) => y.key === sel.value), st = !!x && isSt(x);
     const d = x ? deliverablesText(x.deliverables, curLang) : "", sm = x ? loc(x.summary, curLang) : "";
     $("#n-deliv").textContent = [d ? t("s.n.fDeliv", { list: d }) : "", sm].filter(Boolean).join(" — ");
-    $("#n-warn").hidden = !(x && x.questions === 0 && parseLinks(rushes.value).links.length > 0);   // sans brief, des rushes lancent la commande tout de suite
+    $("#n-warn").hidden = st || !(x && x.questions === 0 && parseLinks(rushes.value).links.length > 0);   // sans brief, des rushes lancent la commande tout de suite (formule « ds » seulement)
+    $("#n-termsq").hidden = termsForced ? false : x ? st : !hasDs;   // conditions : seulement pour une formule « ds »
+    $("#lbl-n-rushes").textContent = t(st ? "s.n.rushesStudio" : "s.n.rushes"); $("#help-n-rushes").textContent = t(st ? "s.n.rushesHelpStudio" : "s.n.rushesHelp");
+    $("#help-n-email").textContent = t(st ? "s.n.emailHelpStudio" : "s.n.emailHelp");
   };
   sel.addEventListener("change", upd); rushes.addEventListener("input", upd); upd();
   $("#n-title").focus();
-  $("#nform").addEventListener("submit", (e) => { e.preventDefault(); createSession(f); });
+  $("#nform").addEventListener("submit", (e) => { e.preventDefault(); createSession(formulas); });
 }
 
+let termsForced = false;   // la base a répondu « terms » : la formule n'est plus autonome, les conditions sont envoyées à partir de maintenant
 const ERR_FIELD = { bad_formula: "n-formula", no_title: "n-title", no_client: "n-client", bad_email: "n-email", terms: "n-terms" };
 function setErr(id, msg) {
   document.querySelectorAll(".dlg .err").forEach((x) => (x.textContent = ""));
@@ -235,7 +273,7 @@ function setErr(id, msg) {
   if (el) { el.textContent = msg; const c = document.getElementById(id); if (c) c.focus(); }
 }
 
-async function createSession(f) {
+async function createSession(formulas) {
   const v = (id) => $("#" + id).value.trim();
   const blang = (document.querySelector('input[name="n-lang"]:checked') || {}).value || "fr";
   $("#n-msg").textContent = "";
@@ -245,8 +283,10 @@ async function createSession(f) {
   const links = parseLinks($("#n-rushes").value);
   if (links.bad.length) return setErr("n-rushes", t("s.e.bad_rushes"));
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v("n-email"))) return setErr("n-email", t("s.e.bad_email"));
-  if (!$("#n-terms").checked) return setErr("n-terms", t("s.e.terms"));
-  const session = { formula: v("n-formula"), title: v("n-title"), client_name: v("n-client"), lang: blang, studio_email: v("n-email"), rushes_links: links.links, terms_accepted: true, terms_text: TERMS[lang] };
+  const picked = formulas.find((x) => x.key === v("n-formula")), autonomous = !!picked && picked.mode === "studio" && !termsForced;
+  if (!autonomous && !$("#n-terms").checked) return setErr("n-terms", t("s.e.terms"));
+  const session = { formula: v("n-formula"), title: v("n-title"), client_name: v("n-client"), lang: blang, studio_email: v("n-email"), rushes_links: links.links };
+  if (!autonomous) { session.terms_accepted = true; session.terms_text = TERMS[lang]; }   // formule autonome : rien à accepter, rien envoyé
   if ($("#n-date").value) session.session_date = $("#n-date").value;
   const go = $("#n-go"); go.disabled = true; go.textContent = t("s.n.creating");
   try {
@@ -257,6 +297,7 @@ async function createSession(f) {
   } catch (e) {
     go.disabled = false; go.textContent = t("s.n.create");
     const target = ERR_FIELD[e.code];
+    if (e.code === "terms" || e.code === "terms_not_accepted") { const q = $("#n-termsq"); if (q) q.hidden = false; termsForced = true; }   // la formule a changé de mode entre-temps : la case doit être visible avant d'y poser l'erreur
     if (e.code === "terms_not_accepted") $("#n-msg").textContent = t("s.e.terms_not_accepted");
     else if (target) setErr(target, t("s.e." + e.code));
     else $("#n-msg").textContent = e.code === "rate_limit" ? t("s.e.rate_limit") : e.offline ? t("s.e.offline") : t("s.e.generic");

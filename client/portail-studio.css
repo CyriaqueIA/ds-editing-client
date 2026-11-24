@@ -86,3 +86,15 @@ dialog::backdrop { background: rgba(17, 24, 39, .5); }
 
 .hint { margin-top: 6px; max-width: 34ch; font-size: 13px; line-height: 1.4; color: var(--wait); font-weight: 600; }
 .scard .hint { max-width: none; }
+
+/* mode « studio autonome » : 4 étapes, ligne des fichiers */
+.seg-bar.n4 { grid-template-columns: repeat(4, 1fr); }
+.files { margin-top: 6px; font-size: 14px; }
+.files.wait { color: var(--wait); font-weight: 600; }
+.files .link { color: var(--brand-ink); }
+/* studio sans aucune session « ds » : 4 tuiles (« En montage » retirée) */
+.tiles:has(.tile:nth-child(4):last-child) .tile:last-child { grid-column: 1 / -1; }
+@media (min-width: 700px) {
+  .tiles:has(.tile:nth-child(4):last-child) { grid-template-columns: repeat(4, 1fr); }
+  .tiles:has(.tile:nth-child(4):last-child) .tile:last-child { grid-column: auto; }
+}

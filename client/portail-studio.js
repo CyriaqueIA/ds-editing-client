@@ -225,6 +225,72 @@ Object.assign(T.en, {
     "s.ok.another": "Create another session",
 });
 
+/* Mode « studio autonome » (contrat §10) : le studio garde ses monteurs, aucune commande. */
+Object.assign(T.fr, {
+    "st.brief_recu": "Brief reçu",
+    "st.terminee": "Classée",
+    "s.t.done.studio": "Classées",
+    "s.t.done.mixed": "Livrées ou classées",
+    "step.files": "Fichiers",
+    "step.filed": "Classée",
+    "s.files.open": "Ouvrir les fichiers",
+    "s.files.copying": "Copie des fichiers en cours…",
+    "s.files.slow": "La copie des fichiers prend plus de temps que prévu. Elle reprend toute seule ; si cela dure, prévenez votre contact habituel.",
+    "s.done": "Classer",
+    "s.done.title": "Classer cette session ?",
+    "s.done.text": "Elle passe dans les sessions classées et ne pourra plus être modifiée ni annulée.",
+    "s.done.copying": "La copie des fichiers continue.",
+    "s.done.yes": "Oui, classer la session",
+    "s.done.no": "Non, pas maintenant",
+    "s.cancel.files": "Les fichiers qui ne sont pas encore copiés ne le seront plus.",
+    "s.locked.studio": "Cette session est déjà classée ou annulée, elle ne peut plus être modifiée.",
+    "s.e.done_not_studio": "Cette session ne peut pas être classée.",
+    "s.e.done_no_brief": "Le client n'a pas encore envoyé son brief. Classez la session une fois le brief reçu.",
+    "s.e.patch_invalid": "Cette action n'a pas pu être enregistrée. Rechargez la page et réessayez.",
+    "s.e.action": "L'action n'a pas abouti. Réessayez dans un instant.",
+    "s.addNote": "Ajouter des liens pour vos monteurs",
+    "s.editNote": "Modifier les liens pour vos monteurs",
+    "s.note.title": "Liens pour vos monteurs",
+    "s.note.help": "Facultatif. Un lien par ligne (Drive, Dropbox, WeTransfer…). Ils restent dans cette session, pour vos monteurs.",
+    "s.brief.copy": "Copier le brief",
+    "s.n.rushesStudio": "Liens pour vos monteurs (facultatif)",
+    "s.n.rushesHelpStudio": "Ils restent dans cette session. Vous pourrez les ajouter plus tard.",
+    "s.n.emailHelpStudio": "L'adresse de votre studio.",
+    "s.n.termsSome": "Les autres formules s'ouvriront quand vous aurez accepté les conditions dans votre espace client.",
+});
+Object.assign(T.en, {
+    "st.brief_recu": "Brief received",
+    "st.terminee": "Done",
+    "s.t.done.studio": "Done",
+    "s.t.done.mixed": "Delivered or done",
+    "step.files": "Files",
+    "step.filed": "Done",
+    "s.files.open": "Open the files",
+    "s.files.copying": "Copying the files…",
+    "s.files.slow": "Copying the files is taking longer than expected. It retries on its own; if it lasts, tell your usual contact.",
+    "s.done": "Mark as done",
+    "s.done.title": "Mark this session as done?",
+    "s.done.text": "It moves to Done and can no longer be changed or cancelled.",
+    "s.done.copying": "Copying the files continues.",
+    "s.done.yes": "Yes, mark it as done",
+    "s.done.no": "Not now",
+    "s.cancel.files": "Files that are not copied yet will no longer be copied.",
+    "s.locked.studio": "This session is already done or cancelled and can no longer be changed.",
+    "s.e.done_not_studio": "This session cannot be marked as done.",
+    "s.e.done_no_brief": "The client has not sent the brief yet. Mark the session as done once the brief is in.",
+    "s.e.patch_invalid": "This action could not be saved. Reload the page and try again.",
+    "s.e.action": "The action did not go through. Please try again in a moment.",
+    "s.addNote": "Add links for your editors",
+    "s.editNote": "Edit the links for your editors",
+    "s.note.title": "Links for your editors",
+    "s.note.help": "Optional. One link per line (Drive, Dropbox, WeTransfer…). They stay in this session, for your editors.",
+    "s.brief.copy": "Copy the brief",
+    "s.n.rushesStudio": "Links for your editors (optional)",
+    "s.n.rushesHelpStudio": "They stay in this session. You can add them later.",
+    "s.n.emailHelpStudio": "Your studio's address.",
+    "s.n.termsSome": "The other packages open once you have accepted the terms in your client space.",
+});
+
 // Site neutre du brief : il ne porte pas notre nom et ne sert que la page de brief, à sa racine (publié par tools/publish_brief.py).
 export const BRIEF_SITE = "https://mybrief.studio/";
 
@@ -239,21 +305,49 @@ export function briefUrl(token, loc = globalThis.location) {
 }
 
 /* ---------------- sessions (page du studio) ---------------- */
-export const STATUSES = ["rush_attendu", "brief_attendu", "commande_en_attente", "a_traiter", "en_montage", "controle", "livre", "annulee"];
+export const STATUSES = ["rush_attendu", "brief_attendu", "commande_en_attente", "a_traiter", "en_montage", "controle", "livre", "annulee", "brief_recu", "terminee"];
 export const statusLabel = (s, lang) => (STATUSES.includes(s) ? t(lang, "st." + s) : String(s || ""));
 
 export function deliverablesText(list, lang) {
   return (Array.isArray(list) ? list : []).map((d) => `${Number(d.qty) || 0} × ${lang === "en" ? d.label_en || d.label_fr || d.key : d.label_fr || d.label_en || d.key}`).join(" · ");
 }
 
-// Une session se modifie (rushes, annulation) tant que la commande n'existe pas et qu'elle n'est pas annulée.
-export const canEdit = (s) => !s.order && !s.cancelled_at && s.status !== "annulee";
+/* Mode « studio autonome » (§10) : session sans commande. Une base pas encore migrée n'envoie ni `mode` ni les nouveaux états :
+   la session est alors une session « ds », comme avant. Les deux états propres au mode autonome le désignent aussi. */
+export const isStudio = (s) => !!s && (s.mode ? s.mode === "studio" : s.status === "brief_recu" || s.status === "terminee");   // `mode` prime quand la base le donne
+const studioStatus = (s) => {
+  if (["annulee", "terminee", "brief_recu", "brief_attendu"].includes(s.status)) return s.status;
+  return s.cancelled_at ? "annulee" : s.done_at ? "terminee" : s.brief && s.brief.submitted_at ? "brief_recu" : "brief_attendu";
+};
+// Adresse du dossier de fichiers : https seulement, hôte drive.google.com (le moteur ne produit que des liens https://drive.google.com/drive/folders/<id>),
+// sans espace, 12 à 1000 caractères ; sinon "" (aucun lien).
+export function safeFilesUrl(u) {
+  if (typeof u !== "string") return "";
+  const v = u.trim();
+  if (v.length < 12 || v.length > 1000 || /\s/.test(v) || !/^https:\/\//i.test(v)) return "";
+  try { const u = new URL(v); return u.protocol === "https:" && u.hostname === "drive.google.com" && !u.username && !u.password ? v : ""; } catch { return ""; }
+}
+// Fichiers du brief : { url } si le lien est posé (même sur une session annulée : le dossier existe toujours) ; { copying: true } si la copie est en cours,
+// avec slow: true pour `erreur` (jamais d'erreur brute : « ça prend plus de temps que prévu ») ; sinon null. Rien ne se déduit de files_count.
+export function filesInfo(s) {
+  if (!isStudio(s)) return null;
+  const url = safeFilesUrl(s.files_folder_url);
+  if (url) return { url };
+  if (s.cancelled_at || s.status === "annulee") return null;
+  if (s.files_state === "erreur") return { copying: true, slow: true };
+  if (s.files_state === "copie_en_cours") return { copying: true };
+  return null;
+}
+
+// Une session se modifie (rushes, annulation) tant que la commande n'existe pas et qu'elle n'est pas annulée ; en mode autonome, tant qu'elle n'est pas classée.
+export const canEdit = (s) => !s.order && !s.cancelled_at && s.status !== "annulee" && !(isStudio(s) && (s.done_at || s.status === "terminee"));
 
 /* sessionView : tout ce que la liste affiche d'une session se calcule ici, à partir de l'objet session du contrat (§7.4).
    La PREMIÈRE règle vraie gagne. */
 export const BUCKETS = ["all", "a_vous", "client", "montage", "livrees"];
 const STEP_KEYS = ["created", "rushes", "brief", "edit", "done"];
 export function sessionView(s, lang) {
+  if (isStudio(s)) return studioView(s, lang);
   const st = s.status, hasRushes = !!s.has_rushes, briefDone = !!(s.brief && s.brief.submitted_at) || s.questions === 0;
   let bucket, pill, next, hint = null;
   const P = (key, tone) => ({ label: t(lang, key), tone });
@@ -276,6 +370,22 @@ export function sessionView(s, lang) {
   return { bucket, pill, next, steps, done: steps.filter((x) => x.state === "done").length, total: steps.length, missing, hint };
 }
 
+/* Session autonome : 4 états (§10.5), jamais de commande ni de rushes obligatoires. */
+function studioView(s, lang) {
+  const st = studioStatus(s), briefDone = !!(s.brief && s.brief.submitted_at) || s.questions === 0 || st === "brief_recu" || st === "terminee";
+  const P = (key, tone) => ({ label: t(lang, key), tone });
+  const N = (action, key) => ({ action, label: t(lang, key) });
+  let bucket, pill, next;
+  if (st === "annulee") { bucket = "annulees"; pill = P("st.annulee", "off"); next = null; }
+  else if (st === "terminee") { bucket = "livrees"; pill = P("st.terminee", "ok"); next = N("view", "s.viewBrief"); }
+  else if (st === "brief_recu") { bucket = "a_vous"; pill = P("st.brief_recu", "todo"); next = N("view", "s.viewBrief"); }
+  else { bucket = "client"; pill = P("st.brief_attendu", "wait"); next = N("copy", "s.copyLink"); }
+  const cancelled = bucket === "annulees", filed = st === "terminee", fi = filesInfo(s);
+  const flags = { created: "done", brief: briefDone ? "done" : "wait", files: !briefDone ? "todo" : fi && fi.copying ? "wait" : "done", filed: filed ? "done" : "todo" };
+  const steps = cancelled ? [] : ["created", "brief", "files", "filed"].map((key) => ({ key, label: t(lang, "step." + key), state: flags[key] }));
+  return { bucket, pill, next, steps, done: steps.filter((x) => x.state === "done").length, total: steps.length, missing: cancelled || briefDone ? null : "brief", hint: null, studio: true, files: fi };
+}
+
 export function tileCounts(sessions) {
   const c = { all: 0, a_vous: 0, client: 0, montage: 0, livrees: 0, annulees: 0 };
   for (const s of Array.isArray(sessions) ? sessions : []) {
@@ -293,7 +403,11 @@ export function filterSessions(sessions, filter) {
 const TILE_KEY = { all: "s.t.all", a_vous: "s.t.you", client: "s.t.client", montage: "s.t.montage", livrees: "s.t.done" };
 export function renderTiles(sessions, lang, filter) {
   const c = tileCounts(sessions);
-  return BUCKETS.map((b) => `<button type="button" class="tile${b === "a_vous" && c.a_vous > 0 ? " hot" : ""}" data-f="${b}" aria-pressed="${filter === b}"><span class="tile-n">${c[b]}</span><span class="tile-l">${esc(t(lang, TILE_KEY[b]))}</span></button>`).join("");
+  const live = (Array.isArray(sessions) ? sessions : []).filter((s) => sessionView(s, "fr").bucket !== "annulees");
+  const nStudio = live.filter(isStudio).length;
+  const key = (b) => (b === "livrees" && nStudio ? (nStudio === live.length ? "s.t.done.studio" : "s.t.done.mixed") : TILE_KEY[b]);   // « Livrées » devient « Classées » quand il n'y a que des sessions autonomes
+  const onlyStudio = live.length > 0 && nStudio === live.length;   // « En montage » resterait à 0 pour toujours : on la retire
+  return BUCKETS.filter((b) => !(onlyStudio && b === "montage")).map((b) => `<button type="button" class="tile${b === "a_vous" && c.a_vous > 0 ? " hot" : ""}" data-f="${b}" aria-pressed="${filter === b}"><span class="tile-n">${c[b]}</span><span class="tile-l">${esc(t(lang, key(b)))}</span></button>`).join("");
 }
 
 function stepsHtml(v, lang) {
@@ -301,7 +415,14 @@ function stepsHtml(v, lang) {
   const stateTxt = (x) => t(lang, "step.s." + x);
   const aria = t(lang, "s.stepsAria", { list: v.steps.map((x) => `${x.label} (${stateTxt(x.state)})`).join(", ") });
   const miss = v.missing ? `<p class="miss">${esc(t(lang, "s.miss." + v.missing))}</p>` : "";
-  return `<div class="steps"><div class="seg-bar" role="img" aria-label="${esc(aria)}">${v.steps.map((x) => `<i class="seg ${x.state}"></i>`).join("")}</div><p class="steps-t">${esc(t(lang, v.done === 1 ? "s.stepsOne" : "s.steps", { n: v.done, total: v.total }))}</p>${miss}</div>`;
+  return `<div class="steps"><div class="seg-bar${v.steps.length === 4 ? " n4" : ""}" role="img" aria-label="${esc(aria)}">${v.steps.map((x) => `<i class="seg ${x.state}"></i>`).join("")}</div><p class="steps-t">${esc(t(lang, v.done === 1 ? "s.stepsOne" : "s.steps", { n: v.done, total: v.total }))}</p>${miss}</div>`;
+}
+
+// Ligne des fichiers (mode autonome) : lien « Ouvrir les fichiers » (nouvel onglet) ou « Copie des fichiers en cours… ». Rien sinon.
+function filesHtml(v, lang) {
+  const f = v.files; if (!f) return "";
+  if (f.url) return `<p class="files"><a class="link" href="${esc(f.url)}" target="_blank" rel="noopener noreferrer">${esc(t(lang, "s.files.open"))}</a></p>`;
+  return `<p class="files wait">${esc(t(lang, f.slow ? "s.files.slow" : "s.files.copying"))}</p>`;
 }
 
 const defaultUrl = (token) => { try { return briefUrl(token); } catch { return ""; } };
@@ -310,11 +431,13 @@ function actionsHtml(s, v, lang, urlFor) {
   const btn = (act, label, cls) => `<button type="button" class="${cls}" data-act="${act}" data-id="${id}">${esc(label)}</button>`;
   const out = [];
   if (v.next) out.push(btn(v.next.action, v.next.label, "btn primary small"));
+  const studio = !!v.studio;
+  if (studio && s.status === "brief_recu" && !s.cancelled_at && !s.done_at) out.push(btn("done", t(lang, "s.done"), "btn small"));
   const sec = [];
   const skip = v.next && v.next.action;
   const cancelled = v.bucket === "annulees";
-  if (!cancelled && skip !== "copy") sec.push(btn("copy", t(lang, "s.copyLink"), "link"));
-  if (canEdit(s) && skip !== "rushes") sec.push(btn("rushes", t(lang, s.has_rushes ? "s.editRushes" : "s.addRushes"), "link"));
+  if (!cancelled && skip !== "copy" && !(studio && s.status === "terminee")) sec.push(btn("copy", t(lang, "s.copyLink"), "link"));
+  if (canEdit(s) && skip !== "rushes") sec.push(btn("rushes", t(lang, studio ? (s.has_rushes ? "s.editNote" : "s.addNote") : s.has_rushes ? "s.editRushes" : "s.addRushes"), "link"));
   if (skip !== "view") sec.push(btn("view", t(lang, "s.viewBrief"), "link"));
   if (!cancelled && !(s.brief && s.brief.submitted_at)) { const u = urlFor(s.token); if (u && /^https?:\/\//i.test(u)) sec.push(`<a class="link" href="${esc(u)}" target="_blank" rel="noopener">${esc(t(lang, "s.fillFor"))}</a>`); }
   if (canEdit(s)) sec.push(btn("cancel", t(lang, "s.cancelSession"), "link danger"));
@@ -328,9 +451,9 @@ function listBlock(list, lang, urlFor, ctx = {}) {
   };
   const who = (s) => `<strong>${esc(s.title)}</strong><span class="sub">${esc(s.client_name)}${s.session_date ? " · " + esc(t(lang, "s.shoot", { date: fmtDate(s.session_date, lang) })) : ""}</span>` + (s.order && s.order.token ? `<span class="sub">${esc(t(lang, "s.order", { n: s.order.token }))}</span>` : "");
   const hintHtml = (v) => (v.hint ? `<p class="hint">${esc(v.hint)}${v.bucket === "a_vous" && ctx.spaceUrl ? ` <a href="${esc(ctx.spaceUrl)}" target="_blank" rel="noopener">${esc(t(lang, "s.hint.space"))}</a>` : ""}</p>` : "");
-  const prog = (v) => `<span class="pill-st st-${v.pill.tone}">${esc(v.pill.label)}</span>${hintHtml(v)}${stepsHtml(v, lang)}`;
+  const prog = (v) => `<span class="pill-st st-${v.pill.tone}">${esc(v.pill.label)}</span>${hintHtml(v)}${filesHtml(v, lang)}${stepsHtml(v, lang)}`;
   const rows = list.map((s) => { const v = sessionView(s, lang); return `<tr data-id="${esc(s.id)}"><td class="c-main">${who(s)}</td><td>${formula(s)}</td><td class="c-prog">${prog(v)}</td><td>${actionsHtml(s, v, lang, urlFor)}</td></tr>`; }).join("");
-  const cards = list.map((s) => { const v = sessionView(s, lang); return `<article class="scard" data-id="${esc(s.id)}"><div class="scard-h"><div>${who(s)}</div><span class="pill-st st-${v.pill.tone}">${esc(v.pill.label)}</span></div>${hintHtml(v)}<p class="scard-f">${formula(s)}</p>${stepsHtml(v, lang)}${actionsHtml(s, v, lang, urlFor)}</article>`; }).join("");
+  const cards = list.map((s) => { const v = sessionView(s, lang); return `<article class="scard" data-id="${esc(s.id)}"><div class="scard-h"><div>${who(s)}</div><span class="pill-st st-${v.pill.tone}">${esc(v.pill.label)}</span></div>${hintHtml(v)}<p class="scard-f">${formula(s)}</p>${filesHtml(v, lang)}${stepsHtml(v, lang)}${actionsHtml(s, v, lang, urlFor)}</article>`; }).join("");
   return `<div class="tablewrap"><table class="stable"><thead><tr><th scope="col">${esc(t(lang, "s.col.session"))}</th><th scope="col">${esc(t(lang, "s.col.formula"))}</th><th scope="col">${esc(t(lang, "s.col.marks"))}</th><th scope="col"><span class="sr">${esc(t(lang, "s.col.actions"))}</span></th></tr></thead><tbody>${rows}</tbody></table></div><div class="cards">${cards}</div>`;
 }
 
