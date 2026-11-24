@@ -315,7 +315,7 @@
       trust: "Ils nous confient leurs montages · cliquez pour voir", spKicker: "Nos projets pour", projects1: "1 projet", projectsN: "{n} projets",
       upKicker: "Pour aller plus loin", upTitle: "Un épisode, <em>cinq</em> contenus.", upText: "On monte l'épisode, puis on en tire 2 reels, la miniature et le trailer. De quoi publier partout à partir d'un seul tournage.", upBtn: "Réserver un appel",
       upEp: "Épisode", upReel: "Reel", upThumb: "Miniature", upTrailer: "Trailer" },
-    en: { sub: "Production examples", private: "Private link", contact: "Get in touch", types: "Content type", soon: "Coming soon", quote: "On quote", unique: "Single package", uniqueDesc: "One package for this format.", perVideo: "per delivered video, excl. VAT", perVideoDirect: "per delivered video", bundle: "Episode + 3 reels bundle:", noneTier: "No example in this package yet", noneTierSub: "The price still applies: {p} per delivered video.", count1: "{n} example in {f}", countN: "{n} examples in {f}", footPrice: "prices excl. VAT, per delivered video", soonPrice: "Planned price for this format: {p}.", gate: "This space is reserved for studios we're talking with. Ask for your link at contact@ds-editing.com.",
+    en: { sub: "Production examples", private: "Private link", contact: "Get in touch", types: "Content type", soon: "Coming soon", quote: "Custom quote", unique: "Single package", uniqueDesc: "One package for this format.", perVideo: "per delivered video, excl. VAT", perVideoDirect: "per delivered video", bundle: "Episode + 3 reels bundle:", noneTier: "No example in this package yet", noneTierSub: "The price still applies: {p} per delivered video.", count1: "{n} example in {f}", countN: "{n} examples in {f}", footPrice: "prices excl. VAT, per delivered video", soonPrice: "Planned price for this format: {p}.", gate: "This space is reserved for studios we're talking with. Ask for your link at contact@ds-editing.com.",
       soonKicker: "Coming soon to the portfolio", soonTitle: "We already do it.", soonText: "Our {type} examples are on their way. No need to wait: send us a project, the first edit is on us.", soonBtn: "First edit on us",
       soonSubject: "First edit on us — {type}", soonBody: "Hi Cyriaque,\n\nI'd like to try DS Editing on a {type} project.\n\n",
       g1Kicker: "Client testimonial", g1Title: "{studio} trusts us with their edits.", g1Text: "One minute, on video, about how we work.", g1Btn: "See pricing", skip: "Skip",
@@ -362,7 +362,7 @@
   if (params.get("gift") === "reset") store.set(null);
   // ?prices=1 (24/11/2026) : prix directs, sans numéro à laisser. Témoignage, puis « Voir les tarifs » ferme la pop-up sur les prix (non barrés).
   // Sans effet sur les portfolios recommandés (?r=) et personnalisés (?p=), qui ne montrent jamais de prix.
-  const DIRECT = params.get("prices") === "1" && !RF && !PR;
+  const DIRECT = params.get("prices") === "1" && !params.has("r") && !params.has("p");
   let unlocked = !DIRECT && !!G && store.get() === "1";
   // Envoi du contact : Supabase site_lead_add (kind « gift », alerte Telegram + CRM) et copie e-mail FormSubmit.
   // Jamais depuis un serveur local (localhost / 127.0.0.1 / fichier) : on journalise seulement, pour tester sans écrire en base.
