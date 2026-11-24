@@ -278,7 +278,7 @@
 <div class="gift" id="gift" role="dialog" aria-modal="true" aria-labelledby="giftTitle"><div class="box" id="giftBox"></div></div>
 <div class="sp" id="sp" role="dialog" aria-modal="true" aria-labelledby="spTitle"><div class="box"><div class="sp-head" id="spHead"></div><div id="spGrid"></div></div></div>
 
-<script src="portfolio.js?v=18"></script>
+<script src="portfolio.js?v=19"></script>
 <script src="previews.js?v=13"></script>
 <script src="prospects.js?v=1"></script>
 <script>
@@ -306,7 +306,7 @@
   let lang = params.get("lang") || (RF && RF.lang) || (() => { try { return localStorage.getItem("ds_lang"); } catch { return null; } })() || ((navigator.language || "en").slice(0, 2) === "fr" ? "fr" : "en");
   if (!["fr", "en"].includes(lang)) lang = "en";
   const T = {
-    fr: { sub: "Exemples de production", private: "Lien privé", contact: "Prendre contact", types: "Type de contenu", soon: "Bientôt", quote: "Sur devis", unique: "Formule unique", uniqueDesc: "Une seule formule pour ce format.", perVideo: "par vidéo livrée, hors taxes", noneTier: "Aucun exemple dans cette formule", noneTierSub: "Le tarif reste affiché : {p} par vidéo livrée.", count1: "{n} exemple en {f}", countN: "{n} exemples en {f}", footPrice: "prix hors taxes, par vidéo livrée", soonPrice: "Tarif prévu pour ce format : {p}.", gate: "Cet espace est réservé aux studios avec qui nous échangeons. Demandez votre lien à contact@ds-editing.com.",
+    fr: { sub: "Exemples de production", private: "Lien privé", contact: "Prendre contact", types: "Type de contenu", soon: "Bientôt", quote: "Sur devis", unique: "Formule unique", uniqueDesc: "Une seule formule pour ce format.", perVideo: "par vidéo livrée, hors taxes", perVideoDirect: "par vidéo livrée", bundle: "Pack épisode + 3 reels :", noneTier: "Aucun exemple dans cette formule", noneTierSub: "Le tarif reste affiché : {p} par vidéo livrée.", count1: "{n} exemple en {f}", countN: "{n} exemples en {f}", footPrice: "prix hors taxes, par vidéo livrée", soonPrice: "Tarif prévu pour ce format : {p}.", gate: "Cet espace est réservé aux studios avec qui nous échangeons. Demandez votre lien à contact@ds-editing.com.",
       soonKicker: "Bientôt dans le portfolio", soonTitle: "On le fait déjà.", soonText: "Nos exemples {type} arrivent. Pas besoin d'attendre : envoyez-nous un projet, le premier montage est offert.", soonBtn: "Premier montage offert",
       soonSubject: "Premier montage offert — {type}", soonBody: "Bonjour Cyriaque,\n\nJe souhaite tester DS Editing sur un projet {type}.\n\n",
       g1Kicker: "Témoignage client", g1Title: "{studio} nous confie ses montages.", g1Text: "Une minute, en vidéo, sur notre façon de travailler.", g1Btn: "Voir les tarifs", skip: "Passer",
@@ -315,7 +315,7 @@
       trust: "Ils nous confient leurs montages · cliquez pour voir", spKicker: "Nos projets pour", projects1: "1 projet", projectsN: "{n} projets",
       upKicker: "Pour aller plus loin", upTitle: "Un épisode, <em>cinq</em> contenus.", upText: "On monte l'épisode, puis on en tire 2 reels, la miniature et le trailer. De quoi publier partout à partir d'un seul tournage.", upBtn: "Réserver un appel",
       upEp: "Épisode", upReel: "Reel", upThumb: "Miniature", upTrailer: "Trailer" },
-    en: { sub: "Production examples", private: "Private link", contact: "Get in touch", types: "Content type", soon: "Coming soon", quote: "On quote", unique: "Single package", uniqueDesc: "One package for this format.", perVideo: "per delivered video, excl. VAT", noneTier: "No example in this package yet", noneTierSub: "The price still applies: {p} per delivered video.", count1: "{n} example in {f}", countN: "{n} examples in {f}", footPrice: "prices excl. VAT, per delivered video", soonPrice: "Planned price for this format: {p}.", gate: "This space is reserved for studios we're talking with. Ask for your link at contact@ds-editing.com.",
+    en: { sub: "Production examples", private: "Private link", contact: "Get in touch", types: "Content type", soon: "Coming soon", quote: "Custom quote", unique: "Single package", uniqueDesc: "One package for this format.", perVideo: "per delivered video, excl. VAT", perVideoDirect: "per delivered video", bundle: "Episode + 3 reels bundle:", noneTier: "No example in this package yet", noneTierSub: "The price still applies: {p} per delivered video.", count1: "{n} example in {f}", countN: "{n} examples in {f}", footPrice: "prices excl. VAT, per delivered video", soonPrice: "Planned price for this format: {p}.", gate: "This space is reserved for studios we're talking with. Ask for your link at contact@ds-editing.com.",
       soonKicker: "Coming soon to the portfolio", soonTitle: "We already do it.", soonText: "Our {type} examples are on their way. No need to wait: send us a project, the first edit is on us.", soonBtn: "First edit on us",
       soonSubject: "First edit on us — {type}", soonBody: "Hi Cyriaque,\n\nI'd like to try DS Editing on a {type} project.\n\n",
       g1Kicker: "Client testimonial", g1Title: "{studio} trusts us with their edits.", g1Text: "One minute, on video, about how we work.", g1Btn: "See pricing", skip: "Skip",
@@ -360,7 +360,10 @@
   const G = P.gift || null;
   const store = { get: () => { try { return localStorage.getItem("ds_gift"); } catch { return null; } }, set: (v) => { try { v == null ? localStorage.removeItem("ds_gift") : localStorage.setItem("ds_gift", v); } catch {} } };
   if (params.get("gift") === "reset") store.set(null);
-  let unlocked = !!G && store.get() === "1";
+  // ?prices=1 (24/11/2026) : prix directs, sans numéro à laisser. Témoignage, puis « Voir les tarifs » ferme la pop-up sur les prix (non barrés).
+  // Sans effet sur les portfolios recommandés (?r=) et personnalisés (?p=), qui ne montrent jamais de prix.
+  const DIRECT = params.get("prices") === "1" && !params.has("r") && !params.has("p");
+  let unlocked = !DIRECT && !!G && store.get() === "1";
   // Envoi du contact : Supabase site_lead_add (kind « gift », alerte Telegram + CRM) et copie e-mail FormSubmit.
   // Jamais depuis un serveur local (localhost / 127.0.0.1 / fichier) : on journalise seulement, pour tester sans écrire en base.
   const LOCAL = !location.hostname || /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
@@ -403,7 +406,7 @@
       <div class="gift-ic" aria-hidden="true">🎁</div><div class="mono">${t.g3Kicker}</div><h2 class="display" id="giftTitle">${t.g3Title}</h2><p>${fill(t.g3Text)}</p>
       <button class="btn" type="button" data-close>${t.g3Btn}</button>`;
     box.querySelectorAll("[data-close]").forEach((b) => b.addEventListener("click", giftClose));
-    const next = box.querySelector("[data-next]"); if (next) next.addEventListener("click", () => giftOpen(2));
+    const next = box.querySelector("[data-next]"); if (next) next.addEventListener("click", () => (DIRECT ? giftClose() : giftOpen(2)));
     const form = box.querySelector("form");
     if (form) {
       form.addEventListener("submit", (e) => {
@@ -430,16 +433,16 @@
     document.documentElement.lang = lang;
     document.querySelectorAll("[data-t]").forEach((el) => { el.textContent = t[el.dataset.t] || ""; });
     $("#langBtn").textContent = lang === "fr" ? "EN" : "FR";
-    $("#giftBtn").hidden = !G || unlocked;
+    $("#giftBtn").hidden = !G || unlocked || DIRECT;
     $("#contact").href = P.contactPhone ? `https://wa.me/${P.contactPhone.replace(/\D/g, "")}` : `mailto:${P.contactEmail}`;
     $("#types").innerHTML = P.types.map((ty) => `<div class="type-item ${ty.slug === type ? "active" : ""}" data-type="${ty.slug}"><b>${ty[lang][0]}</b><span>${ty[lang][1]}</span></div>`).join("");
     $("#types").querySelectorAll("[data-type]").forEach((el) => el.addEventListener("click", () => { type = el.dataset.type; render(); }));
     const ty = P.types.find((x) => x.slug === type);
     $("#typeTitle").textContent = ty[lang][0]; $("#typeSub").textContent = ty[lang][1];
-    const prices = P.prices[type] || {};
+    const prices = ((lang === "en" && P.pricesEn) || P.prices)[type] || {};
     // portfolio.js → hidePrices : aucun prix nulle part (onglets, description, pied, scène « bientôt »)
     // … sauf une fois le cadeau débloqué (parcours gift) : les prix s'affichent, barrés, avec « 1er montage offert »
-    const hide = !!PR || !!RF || (P.hidePrices && !unlocked); // portfolio perso et recommandés : jamais de prix (prix en visio)
+    const hide = !!PR || !!RF || (P.hidePrices && !unlocked && !DIRECT); // portfolio perso et recommandés : jamais de prix (prix en visio)
     renderProspect(); renderTrust(); renderUpsell();
     const show = (p) => (hide ? "" : p);
     const fmt = (p) => (unlocked ? `<s>${esc(p)}</s>` : esc(p));
@@ -455,12 +458,14 @@
     // Type sans aucun exemple et listé dans portfolio.js → soon : scène animée à la place de la grille (disparaît dès qu'une vidéo arrive du Drive)
     const soon = (P.soon || []).includes(type) && ofType.length === 0;
     const price = show(unique || prices[tier] || "");
+    // Prix directs : sans « hors taxes » (prix clients TTC, décision du 11/11) et avec le pack épisode + 3 reels
+    const bundle = DIRECT && type === "podcast-interview" ? ((P.bundles || {})[lang] || {})[tier] || "" : "";
     $("#tiers").hidden = $("#tierDesc").hidden = !unique && !tiered && !soon && ofType.length > 0;
     $("#tiers").innerHTML = unique
       ? `<div class="tier active unique"><b>${t.unique}</b>${hide ? "" : `<span>${fmt(unique)}${unlocked ? `<i class="free">${t.free}</i>` : ""}</span>`}</div>`
       : tiers.map((ti) => `<div class="tier ${ti.slug === tier ? "active" : ""}" data-tier="${ti.slug}"><b>${ti[lang][0]}</b>${hide ? "" : `<span>${prices[ti.slug] ? fmt(prices[ti.slug]) : t.quote}${unlocked && prices[ti.slug] ? `<i class="free">${t.free}</i>` : ""}</span>`}</div>`).join("");
     $("#tiers").querySelectorAll("[data-tier]").forEach((el) => el.addEventListener("click", () => { tier = el.dataset.tier; render(); }));
-    $("#tierDesc").innerHTML = `${unique ? t.uniqueDesc : esc(tiers.find((x) => x.slug === tier)[lang][1])}${price ? ` <em>${fmt(price)}</em> ${t.perVideo}.${unlocked ? ` <span class="free">${t.free}.</span>` : ""}` : RF && unlocked ? ` <span class="free">${t.free}.</span>` : ""}`;
+    $("#tierDesc").innerHTML = `${unique ? t.uniqueDesc : esc(tiers.find((x) => x.slug === tier)[lang][1])}${price ? ` <em>${fmt(price)}</em> ${DIRECT ? t.perVideoDirect : t.perVideo}.${bundle ? ` ${t.bundle} <em>${esc(bundle)}</em>.` : ""}${unlocked ? ` <span class="free">${t.free}.</span>` : ""}` : RF && unlocked ? ` <span class="free">${t.free}.</span>` : ""}`;
     const items = ofType.filter((it) => !tiered || it.tier === tier)
       .sort((a, b) => (a.lang && a.lang !== lang ? 1 : 0) - (b.lang && b.lang !== lang ? 1 : 0) || (a.vertical ? 1 : 0) - (b.vertical ? 1 : 0)); // langue de l'interface d'abord, puis 16:9 avant 9:16
     const grid = $("#grid");
@@ -472,7 +477,7 @@
       // type sans formule (ex. YouTube & Docu) : « 2 exemples », sans « en standard »
       const f = unique ? t.unique.toLowerCase() : tiered ? tiers.find((x) => x.slug === tier)[lang][0].toLowerCase() : "";
       const c = (items.length === 1 ? t.count1 : t.countN).replace("{n}", items.length);
-      $("#foot").textContent = `${f ? c.replace("{f}", f) : c.replace(/ (en|in) \{f\}/, "")}${price ? ` · ${t.footPrice}` : ""}`;
+      $("#foot").textContent = `${f ? c.replace("{f}", f) : c.replace(/ (en|in) \{f\}/, "")}${price && !DIRECT ? ` · ${t.footPrice}` : ""}`;
     }
   }
   // Grille de vidéos (portfolio et panneau studio) : images chargées au défilement ; 16:9 et 9:16 dans deux grilles quand le lot mélange les deux

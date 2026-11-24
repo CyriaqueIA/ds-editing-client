@@ -112,6 +112,23 @@ window.DS_PORTFOLIO = {
     "ia": { standard: "", premium: "", signature: "" },
   },
 
+  // Prix affichés quand la page est en anglais (24/11/2026, demande de Cyriaque) : même grille que `prices`, en dollars
+  // (Vault « Offre et tarifs », 1 € = 1,163 $). Absent = la page anglaise affiche `prices`.
+  pricesEn: {
+    "podcast-interview": { standard: "$150", premium: "$243", signature: "" },
+    "vsl": { unique: "From $69" }, // il existe aussi un VSL Premium ($208) : « From », choix de Cyriaque le 24/11
+    "reels-shorts": { standard: "$17.50", premium: "$29", signature: "" },
+    "trailers": { unique: "$39.50" },
+    "miniatures": { unique: "$14" },
+    "youtube-docu": { standard: "", premium: "", signature: "" },
+    "ia": { standard: "", premium: "", signature: "" },
+  },
+  // Pack épisode + 3 reels, rappelé sous la formule Podcast avec un lien « prix directs » (?prices=1, voir portfolio.html).
+  bundles: {
+    fr: { standard: "149 €", premium: "229 €" },
+    en: { standard: "$173", premium: "$266" },
+  },
+
   // Studios et créateurs qui nous confient leurs montages (section « Ils nous font confiance »).
   // `ok: true` = affiché. Logo dans assets/clients/. Cliquer sur un studio ouvre ses vidéos (items dont studio = name).
   // Aussi la bande défilante en haut du portfolio privé (logo, sinon initiales).
