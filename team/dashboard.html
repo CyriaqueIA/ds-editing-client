@@ -2557,8 +2557,19 @@ async function teamLoad() {
   if (lkKind === "too" || lkKind === "off") { lkKind = ""; $("#lkGate").hidden = true; $("#app").hidden = false; $("#live").hidden = false; }
   return r.data;
 }
+/* Trafic (23/11/2026) : un onglet CACHÉ ne lit plus rien, et se met à jour dès qu'on y revient. Les changements reçus en direct sont regroupés (une rafale = une relecture).
+   Rien d'autre ne change : ni ce qui est lu, ni le rythme d'un écran visible. La télé (?tv=1) n'est jamais mise en pause : un navigateur de télé peut se dire « caché » alors qu'il affiche. */
+let lastLoadAt = 0, reloadDue = false, rtTimer = 0;
+const RETURN_AFTER = 30000, RT_DELAY = 5000;
+function tabHidden() { return document.hidden && !tv; }
+function reloadOnReturn(due, now, last) { return !!due || now - last > RETURN_AFTER; }   // retour sur l'onglet : tout de suite si une relecture était due, sinon seulement si la dernière a plus de 30 s
+function typing() { const a = document.activeElement; return !!(a && /^(INPUT|SELECT|TEXTAREA)$/.test(a.tagName) && a.closest("#board")); }   // on ne repeint pas pendant une saisie
+function autoTick() { if (tabHidden()) { reloadDue = true; return; } if (typing()) return; load(false); }
+function onJobsChange() { if (rtTimer) return; rtTimer = setTimeout(() => { rtTimer = 0; if (tabHidden()) { reloadDue = true; return; } load(false); }, RT_DELAY); }   // 5 s après le premier changement, une seule relecture
+document.addEventListener("visibilitychange", () => { if (document.hidden || !lastLoadAt || typing()) return; if (reloadOnReturn(reloadDue, Date.now(), lastLoadAt)) load(false); });
 async function load(first, keepPop, pre) {
   let rows, eds;
+  lastLoadAt = Date.now(); reloadDue = false;
   if (LINKED) {
     const r = pre || await teamLoad(); if (!r) return;
     rows = r.jobs; eds = r.editors; myEditor = r.editor || null; agentOk = "agent" in r; agent = r.agent || null; agentSettings = r.agent_settings || null;
@@ -2645,7 +2656,7 @@ async function bootLink() {
   renderWho(); adminInit(); $("#logout").hidden = false; $("#gate").hidden = true; $("#app").hidden = false; $("#live").hidden = false;
   renderToolbar(); await load(true, false, r);
   // pas de temps réel avec un code : relecture toutes les 20 s (bip conservé) ; on ne repeint pas pendant une saisie
-  setInterval(() => { const a = document.activeElement; if (a && /^(INPUT|SELECT|TEXTAREA)$/.test(a.tagName) && a.closest("#board")) return; load(false); }, 20000);
+  setInterval(autoTick, 20000);   // rien si l'onglet est caché (relecture au retour)
   setInterval(() => { renderPc(); renderAlerts(); paintDl(); }, 15000);
 }
 // Repli sur l'annuaire du CRM : utilisé UNIQUEMENT quand `profiles` n'a pas de ligne. Un membre actif en `sales` devient le rôle « sales » du dashboard (jamais « editor » : il verrait les commandes).
@@ -2697,11 +2708,11 @@ async function boot() {
   if (isSales()) { $("#logout").hidden = false; await bootSales(); return; }   // commercial sans ligne `profiles` : sa vue seulement, aucune requête de production
   $("#logout").hidden = !!OPEN_ACCESS && me.email === OPEN_ACCESS.email; $("#gate").hidden = true; $("#app").hidden = false; $("#live").hidden = false;
   renderToolbar(); await load(true); renderTabs();
-  sb.channel("jobs-live").on("postgres_changes", { event: "*", schema: "public", table: "jobs" }, () => load(false)).subscribe();
+  sb.channel("jobs-live").on("postgres_changes", { event: "*", schema: "public", table: "jobs" }, onJobsChange).subscribe();
   // état du PC du bureau : temps réel si la table est publiée, sinon le rafraîchissement de 60 s ci-dessous ; l'âge du dernier signal est réévalué toutes les 15 s
   sb.channel("agent-live").on("postgres_changes", { event: "*", schema: "public", table: "agent_status" }, () => refreshAgent()).subscribe();
   // monteurs : plus de temps réel sur `jobs` (lecture par jobs_visible) -> relecture toutes les 20 s ; on ne repeint pas pendant une saisie
-  setInterval(() => { const a = document.activeElement; if (a && /^(INPUT|SELECT|TEXTAREA)$/.test(a.tagName) && a.closest("#board")) return; load(false); }, isEditor() ? 20000 : 60000);
+  setInterval(autoTick, isEditor() ? 20000 : 60000);   // rien si l'onglet est caché (relecture au retour)
   setInterval(() => { renderPc(); renderAlerts(); paintDl(); }, 15000);
 }
 $("#loginBtn").addEventListener("click", async () => {
