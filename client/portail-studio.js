@@ -225,10 +225,15 @@ Object.assign(T.en, {
     "s.ok.another": "Create another session",
 });
 
-// Adresse absolue du brief d'une session (même dossier que la page courante).
+// Site neutre du brief : il ne porte pas notre nom et ne sert que la page de brief, à sa racine (publié par tools/publish_brief.py).
+export const BRIEF_SITE = "https://mybrief.studio/";
+
+// Adresse absolue du brief d'une session. En production : le site neutre (le client final ne voit jamais notre domaine).
+// En test local (api=local sur localhost) : le fichier voisin, servi par le faux serveur.
 export function briefUrl(token, loc = globalThis.location) {
-  const u = new URL("brief.html", loc.href);
-  if (apiBase(loc) !== SUPABASE_URL) u.searchParams.set("api", "local");   // propage le test local, inerte en production
+  const local = apiBase(loc) !== SUPABASE_URL;
+  const u = local ? new URL("brief.html", loc.href) : new URL(BRIEF_SITE);
+  if (local) u.searchParams.set("api", "local");   // propage le test local, inerte en production
   u.hash = "s=" + token;   // le jeton passe après le # : il ne part vers aucun serveur
   return u.href;
 }
