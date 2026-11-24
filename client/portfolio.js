@@ -116,7 +116,7 @@ window.DS_PORTFOLIO = {
   // (Vault « Offre et tarifs », 1 € = 1,163 $). Absent = la page anglaise affiche `prices`.
   pricesEn: {
     "podcast-interview": { standard: "$150", premium: "$243", signature: "" },
-    "vsl": { unique: "$69" },
+    "vsl": { unique: "From $69" }, // il existe aussi un VSL Premium ($208) : « From », choix de Cyriaque le 24/11
     "reels-shorts": { standard: "$17.50", premium: "$29", signature: "" },
     "trailers": { unique: "$39.50" },
     "miniatures": { unique: "$14" },
