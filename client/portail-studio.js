@@ -340,13 +340,13 @@ export function filesInfo(s) {
 }
 
 // Une session se modifie (rushes, annulation) tant que la commande n'existe pas et qu'elle n'est pas annulée ; en mode autonome, tant qu'elle n'est pas classée.
-export const canEdit = (s) => !s.order && !s.cancelled_at && s.status !== "annulee" && !(isStudio(s) && (s.done_at || s.status === "terminee"));
+export const canEdit = (s) => !s.purged_at && !s.order && !s.cancelled_at && s.status !== "annulee" && !(isStudio(s) && (s.done_at || s.status === "terminee"));
 
 /* sessionView : tout ce que la liste affiche d'une session se calcule ici, à partir de l'objet session du contrat (§7.4).
    La PREMIÈRE règle vraie gagne. */
 export const BUCKETS = ["all", "a_vous", "client", "montage", "livrees"];
 const STEP_KEYS = ["created", "rushes", "brief", "edit", "done"];
-export function sessionView(s, lang) {
+function baseView(s, lang) {
   if (isStudio(s)) return studioView(s, lang);
   const st = s.status, hasRushes = !!s.has_rushes, briefDone = !!(s.brief && s.brief.submitted_at) || s.questions === 0;
   let bucket, pill, next, hint = null;
@@ -427,6 +427,7 @@ function filesHtml(v, lang) {
 
 const defaultUrl = (token) => { try { return briefUrl(token); } catch { return ""; } };
 function actionsHtml(s, v, lang, urlFor) {
+  if (v.purged) return "";   // session vidée : ni lien de brief, ni fichiers, ni relance
   const id = esc(s.id);
   const btn = (act, label, cls) => `<button type="button" class="${cls}" data-act="${act}" data-id="${id}">${esc(label)}</button>`;
   const out = [];
@@ -439,6 +440,7 @@ function actionsHtml(s, v, lang, urlFor) {
   if (!cancelled && skip !== "copy" && !(studio && s.status === "terminee")) sec.push(btn("copy", t(lang, "s.copyLink"), "link"));
   if (canEdit(s) && skip !== "rushes") sec.push(btn("rushes", t(lang, studio ? (s.has_rushes ? "s.editNote" : "s.addNote") : s.has_rushes ? "s.editRushes" : "s.addRushes"), "link"));
   if (skip !== "view") sec.push(btn("view", t(lang, "s.viewBrief"), "link"));
+  if (v.canRemind && skip !== "remind") sec.push(btn("remind", t(lang, "rem.btn"), "link"));
   if (!cancelled && !(s.brief && s.brief.submitted_at)) { const u = urlFor(s.token); if (u && /^https?:\/\//i.test(u)) sec.push(`<a class="link" href="${esc(u)}" target="_blank" rel="noopener">${esc(t(lang, "s.fillFor"))}</a>`); }
   if (canEdit(s)) sec.push(btn("cancel", t(lang, "s.cancelSession"), "link danger"));
   return `<div class="acts">${out.join("")}${sec.length ? `<div class="sec">${sec.join("")}</div>` : ""}</div>`;
@@ -449,11 +451,11 @@ function listBlock(list, lang, urlFor, ctx = {}) {
     const name = loc(s.formula && s.formula.name, lang), d = deliverablesText(s.deliverables, lang);
     return `<strong>${esc(name)}</strong>` + (d ? `<span class="sub">${esc(d)}</span>` : "");
   };
-  const who = (s) => `<strong>${esc(s.title)}</strong><span class="sub">${esc(s.client_name)}${s.session_date ? " · " + esc(t(lang, "s.shoot", { date: fmtDate(s.session_date, lang) })) : ""}</span>` + (s.order && s.order.token ? `<span class="sub">${esc(t(lang, "s.order", { n: s.order.token }))}</span>` : "");
+  const who = (s) => `<strong>${esc(s.title)}</strong><span class="sub">${esc(s.client_name)}${s.session_date ? " · " + esc(t(lang, "s.shoot", { date: fmtDate(s.session_date, lang) })) : ""}</span>` + (s.order && s.order.token && !s.purged_at ? `<span class="sub">${esc(t(lang, "s.order", { n: s.order.token }))}</span>` : "");
   const hintHtml = (v) => (v.hint ? `<p class="hint">${esc(v.hint)}${v.bucket === "a_vous" && ctx.spaceUrl ? ` <a href="${esc(ctx.spaceUrl)}" target="_blank" rel="noopener">${esc(t(lang, "s.hint.space"))}</a>` : ""}</p>` : "");
-  const prog = (v) => `<span class="pill-st st-${v.pill.tone}">${esc(v.pill.label)}</span>${hintHtml(v)}${filesHtml(v, lang)}${stepsHtml(v, lang)}`;
-  const rows = list.map((s) => { const v = sessionView(s, lang); return `<tr data-id="${esc(s.id)}"><td class="c-main">${who(s)}</td><td>${formula(s)}</td><td class="c-prog">${prog(v)}</td><td>${actionsHtml(s, v, lang, urlFor)}</td></tr>`; }).join("");
-  const cards = list.map((s) => { const v = sessionView(s, lang); return `<article class="scard" data-id="${esc(s.id)}"><div class="scard-h"><div>${who(s)}</div><span class="pill-st st-${v.pill.tone}">${esc(v.pill.label)}</span></div>${hintHtml(v)}<p class="scard-f">${formula(s)}</p>${filesHtml(v, lang)}${stepsHtml(v, lang)}${actionsHtml(s, v, lang, urlFor)}</article>`; }).join("");
+  const prog = (v) => `<span class="pill-st st-${v.pill.tone}">${esc(v.pill.label)}</span>${hintHtml(v)}${filesHtml(v, lang)}${extrasHtml(v)}${stepsHtml(v, lang)}`;
+  const rows = list.map((s) => { const v = sessionView(s, lang); return `<tr data-id="${esc(s.id)}"${v.purged ? ' class="purged"' : ""}><td class="c-main">${who(s)}</td><td>${formula(s)}</td><td class="c-prog">${prog(v)}</td><td>${actionsHtml(s, v, lang, urlFor)}</td></tr>`; }).join("");
+  const cards = list.map((s) => { const v = sessionView(s, lang); return `<article class="scard${v.purged ? " purged" : ""}" data-id="${esc(s.id)}"><div class="scard-h"><div>${who(s)}</div><span class="pill-st st-${v.pill.tone}">${esc(v.pill.label)}</span></div>${hintHtml(v)}<p class="scard-f">${formula(s)}</p>${filesHtml(v, lang)}${extrasHtml(v)}${stepsHtml(v, lang)}${actionsHtml(s, v, lang, urlFor)}</article>`; }).join("");
   return `<div class="tablewrap"><table class="stable"><thead><tr><th scope="col">${esc(t(lang, "s.col.session"))}</th><th scope="col">${esc(t(lang, "s.col.formula"))}</th><th scope="col">${esc(t(lang, "s.col.marks"))}</th><th scope="col"><span class="sr">${esc(t(lang, "s.col.actions"))}</span></th></tr></thead><tbody>${rows}</tbody></table></div><div class="cards">${cards}</div>`;
 }
 
@@ -489,3 +491,391 @@ export async function copyText(text) {
 
 // Enregistrer des rushes lance-t-il la commande ? Oui si le brief est déjà envoyé (ou n'a aucune question).
 export const startsOrder = (s) => !!(s.brief && s.brief.submitted_at) || s.questions === 0;
+
+/* =====================================================================================================================
+   Brique 4 et 5 : abonnement, bilan du mois, relances, durée de garde (contrats portail_abonnement_v1 et portail_brief_v1 §11).
+   Règle d'or : si la base n'est pas à jour (fonction absente, clé absente), RIEN de nouveau n'apparaît.
+   Tout ce que la page lit du contrat passe par CONTRACT et les trois fonctions norm* : un changement de nom ou de format
+   se corrige ICI, à un seul endroit. Le reste du code ne lit que la forme normalisée.
+   ===================================================================================================================== */
+// Arguments de l'acceptation : version ET prix AFFICHÉS (la base refuse si l'un des deux a changé : version_obsolete, price_changed).
+// Ce que le bloc dessiné montre (version et prix) : c'est la seule chose envoyée à l'acceptation.
+export const shownAsk = (sub) => ({ terms: { version: sub.terms.version }, price: sub.price });
+export const acceptArgs = (sub) => ({ p_version: sub.terms.version, p_price: sub.price });
+export const CONTRACT = {
+  fn: { subGet: "portal_subscription_get", subAccept: "portal_subscription_accept", report: "portal_month_report", remind: "portal_session_remind" },
+  err: { notWaiting: "not_waiting", badKey: "bad_key", obsolete: "version_obsolete", noSub: "no_subscription", stopped: "subscription_stopped", noTerms: "no_terms", noPrice: "no_price", priceInvalid: "price_invalide", priceChanged: "price_changed", monthBad: ["month_invalide", "month_futur"] },
+  states: ["essai", "actif", "arrete"],
+  report: ["sessions_created", "briefs_received", "briefs_waiting", "median_brief_hours", "files_received", "orders_created", "orders_delivered", "sessions_done"],
+};
+const isObj = (x) => !!x && typeof x === "object" && !Array.isArray(x);
+const numOrNull = (x) => (typeof x === "number" && Number.isFinite(x) ? x : null);
+const strOrNull = (x) => (typeof x === "string" && x.trim() ? x : null);
+
+// Réponse de portal_subscription_get → forme interne, ou null (rien à afficher).
+// ask_reason rendu par la base → cause interne (une seule table à corriger si un nom change)
+const ASK_REASONS = { first: "first", terms: "version", price_up: "price", resume: "resume", after_free: "afterFree" };
+export function normSub(raw) {
+  if (!isObj(raw) || !isObj(raw.subscription) || !CONTRACT.states.includes(raw.subscription.state)) return null;
+  const s = raw.subscription, ter = isObj(raw.terms) && strOrNull(raw.terms.version) && isObj(raw.terms.text) ? { version: raw.terms.version, text: raw.terms.text } : null;
+  const acc = isObj(raw.accepted) ? { version: raw.accepted.version, at: strOrNull(raw.accepted.accepted_at), price: numOrNull(raw.accepted.price), current: raw.accepted.current === true } : null;   // price : dernier prix ACCEPTÉ (null avec la clé interne)
+  return {
+    state: s.state, trialStart: strOrNull(s.trial_start), trialEnd: strOrNull(s.trial_end), trialActive: s.trial_active !== false,
+    billedKnown: "billed_price" in s, billed: numOrNull(typeof s.billed_price === "string" ? parseFloat(s.billed_price) : s.billed_price),   // prix réellement facturé ce mois-ci ; null = rien ne sera facturé (ou clé interne)
+    askReason: ASK_REASONS[s.ask_reason] || null, askPriceFrom: strOrNull(s.ask_price_from),   // pourquoi la base demande d'accepter, et la date à partir de laquelle le prix à accepter s'appliquerait (null avec la clé interne)
+    nextPrice: numOrNull(typeof s.next_price === "string" ? parseFloat(s.next_price) : s.next_price), nextPriceFrom: strOrNull(s.next_price_from),   // hausse acceptée en cours de mois : vaut à partir de la période suivante (null sinon, et avec la clé interne)
+    free: s.free === true || s.monthly_price === 0,                                                                    // studio gratuit : « Portail offert », rien à accepter
+    price: numOrNull(typeof s.monthly_price === "string" ? parseFloat(s.monthly_price) : s.monthly_price),   // null = pas fixé, ou clé interne : jamais affiché
+    nextEnd: strOrNull(s.next_billing), stoppedAt: strOrNull(s.stopped_at),   // next_billing = lendemain de la fin de la période en cours (contrat 4.2) : la période finit la veille
+    terms: ter, accepted: acc, needsAcceptance: raw.needs_acceptance === true, internal: raw.internal === true,
+    currency: isObj(raw.studio) ? raw.studio.currency : "",
+  };
+}
+// Réponse de portal_month_report → forme interne, ou null (la section n'existe pas).
+export function normReport(raw) {
+  if (!isObj(raw) || !isObj(raw.current) || !strOrNull(raw.month)) return null;
+  const per = (o) => (isObj(o) ? Object.fromEntries(CONTRACT.report.map((k) => [k, numOrNull(o[k])])) : null);
+  return { month: raw.month, prevMonth: strOrNull(raw.previous_month), cur: per(raw.current), prev: per(raw.previous) };
+}
+// Clés nouvelles d'une session. `has` faux = base pas à jour : aucune nouveauté à l'écran.
+export function sessionExtra(s) {
+  const has = typeof s.to_remind === "boolean", n = Number(s.nudge_count);
+  const waiting = has && !(s.brief && s.brief.submitted_at) && !s.cancelled_at && !s.done_at && !s.purged_at && !s.order && s.status !== "annulee";
+  return { has, waiting, toRemind: waiting && s.to_remind === true, days: numOrNull(s.waiting_days), nudgedAt: strOrNull(s.nudged_at), nudges: Number.isFinite(n) && n > 0 ? Math.floor(n) : 0, keepUntil: strOrNull(s.keep_until), purgedAt: strOrNull(s.purged_at), purgedFiles: numOrNull(s.files_count) };
+}
+
+/* ---------- dates et nombres ---------- */
+const pad = (n) => String(n).padStart(2, "0");
+function ymd(v) {   // « AAAA-MM-JJ » tel quel (jour sans fuseau) ; un horodatage → jour local du navigateur
+  if (typeof v !== "string") return null;
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(v); if (m) return [m[3], m[2], m[1]];
+  const d = new Date(v); return isNaN(d) ? null : [pad(d.getDate()), pad(d.getMonth() + 1), String(d.getFullYear())];
+}
+export function dateText(v, lang) {   // date lisible dans les deux langues (« 5 December 2026 »), jamais « 05/12 » ambigu
+  const x = ymd(v); if (!x) return "";
+  const out = fmtDate(`${x[2]}-${x[1]}-${x[0]}`, lang);
+  return lang === "en" ? out : out.replace(/^1 /, "1er ");   // « 1er décembre » en français
+}
+const nf = (n, lang, max = 1) => new Intl.NumberFormat(lang === "en" ? "en-GB" : "fr-FR", { maximumFractionDigits: max }).format(n);
+export function fmtPrice(n, currency, lang) {
+  if (typeof n !== "number" || !Number.isFinite(n)) return "";
+  const cur = /^[A-Z]{3}$/.test(currency || "") ? currency : "";
+  if (cur) { try { return new Intl.NumberFormat(lang === "en" ? "en-GB" : "fr-FR", { style: "currency", currency: cur }).format(n); } catch { /* repli */ } }
+  return nf(n, lang, 2) + (cur ? " " + cur : "");
+}
+export function fmtDelay(hours, lang) {   // heures sous 48 h, jours au-delà
+  if (typeof hours !== "number" || !Number.isFinite(hours) || hours < 0) return "";
+  if (hours < 1) return t(lang, "bil.lessHour");
+  return hours >= 48 ? t(lang, "bil.days", { n: nf(hours / 24, lang) }) : t(lang, "bil.hours", { n: nf(hours, lang) });
+}
+export function monthLabel(m, lang) {
+  const x = /^(\d{4})-(\d{2})$/.exec(String(m || "")); if (!x) return "";
+  try { return new Intl.DateTimeFormat(lang === "en" ? "en-GB" : "fr-FR", { month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(Date.UTC(+x[1], +x[2] - 1, 1))); } catch { return String(m); }
+}
+
+/* ---------- abonnement ---------- */
+// Prix écrit sur la ligne d'état : le prix réellement FACTURÉ (billed_price), jamais un prix réglé que le studio n'a pas encore accepté.
+// Mois offert sans acceptation : le prix qu'il va devoir accepter. Clé interne : aucun prix.
+export function linePrice(sub) {
+  if (!sub || sub.free) return null;
+  if (sub.billedKnown) return sub.billed !== null ? sub.billed : sub.state === "essai" && !sub.accepted ? sub.price : null;
+  return sub.accepted ? sub.accepted.price : sub.state === "essai" ? sub.price : null;
+}
+export function aboParts(sub, lang, opts = {}) {
+  if (!sub) return [];
+  const price = fmtPrice(linePrice(sub), sub.currency, lang), out = [];
+  if (sub.free) return [t(lang, "ab.free")];
+  if (sub.state === "arrete") {
+    out.push(sub.stoppedAt && dateText(sub.stoppedAt, lang) ? t(lang, "ab.stoppedOn", { date: dateText(sub.stoppedAt, lang) }) : t(lang, "ab.stopped"));
+    return out;
+  }
+  if (sub.state === "essai") {   // mois offert, à venir, ou fini en attendant le passage du moteur (l'état reste « essai » au plus un jour)
+    const d = dateText(sub.trialEnd, lang), from = dateText(sub.trialStart, lang);
+    // trial_active vient de la base (jour de Bali) : sans lui on ne devine pas si le mois offert est à venir ou fini : on écrit ses dates, sans « terminé » ni « à venir »
+    out.push(!d ? t(lang, "ab.trialOn") : sub.trialActive ? t(lang, "ab.trial", { date: d }) : from ? t(lang, "ab.trialRange", { from, date: d }) : t(lang, "ab.trial", { date: d }));
+    if (price) out.push(t(lang, "ab.then", { price }));
+  } else {
+    out.push(t(lang, "ab.active"));
+    const np = fmtPrice(sub.nextPrice, sub.currency, lang), npFrom = dateText(sub.nextPriceFrom, lang);
+    if (price && np && npFrom) { out.push(t(lang, "ab.thisMonth", { price }), t(lang, "ab.nextPrice", { price: np, date: npFrom })); }   // hausse acceptée : ce mois-ci l'ancien prix, puis le nouveau
+    else {
+      if (price) out.push(t(lang, "ab.price", { price }));
+      const owed = sub.needsAcceptance && ["resume", "afterFree"].includes(askKind(sub)), endYmd = owed ? null : dayBefore(sub.nextEnd), end = endYmd ? dateText(endYmd, lang) : "";   // next_billing = lendemain de la fin de période ; pendant une reprise il peut désigner l'ancienne période encore due : ce n'est pas « le mois en cours »
+      if (end) out.push(t(lang, "ab.cur", { date: end }));
+      const billed = linePrice(sub); if (canAccept(sub) && billed !== null && sub.price > billed) out.push(t(lang, "ab.newPrice"));   // seulement une HAUSSE en attente (pas une reprise ni un changement de texte)
+    }
+  }
+  if (sub.accepted && sub.accepted.current && !sub.needsAcceptance && !opts.done && dateText(sub.accepted.at, lang)) out.push(t(lang, "ab.accepted", { date: dateText(sub.accepted.at, lang) }));
+  return out;
+}
+export function dayBefore(v) {   // « AAAA-MM-JJ » → la veille (jour sans fuseau)
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(v || "")); if (!m) return null;
+  return new Date(Date.UTC(+m[1], +m[2] - 1, +m[3] - 1)).toISOString().slice(0, 10);
+}
+// Pourquoi la base demande d'accepter (elle ne le dit pas, on le déduit de ce qu'elle rend) :
+// "first" jamais accepté · "version" le texte a changé · "price" hausse du prix seule · "resume" reprise après un arrêt (rien d'autre n'a changé).
+export function askKind(sub) {
+  if (sub && sub.askReason) return sub.askReason;   // la base le DIT (ask_reason) : on s'y fie
+  const a = sub && sub.accepted;   // repli seulement si le champ manque (base plus ancienne) : déduction
+  if (!a || !a.at) return "first";
+  if (sub.terms && a.version !== sub.terms.version) return "version";
+  if (a.price !== null && sub.price !== null && sub.price > a.price) return "price";
+  return sub.internal ? "first" : "resume";   // la clé interne ne voit aucun prix : on ne peut pas distinguer, titre neutre
+}
+// La date du prix à accepter est-elle À VENIR ? Sans l'heure du navigateur, d'après les champs de la base :
+// mois offert en cours ou état « essai » : le 1er jour payant est à venir ; sinon la base ne rend une date à venir que pour la période SUIVANTE, qui commence à next_billing ;
+// sans next_billing (rien n'est facturé encore : première acceptation après le mois offert, après une période gratuite) : le début du mois en cours, déjà passé.
+export function askFuture(sub) {
+  if (!sub || !sub.askPriceFrom) return false;
+  if (sub.trialActive || sub.state === "essai") return true;
+  if (sub.nextEnd) return sub.askPriceFrom >= sub.nextEnd;
+  return false;
+}
+export const termsText = (sub, lang) => (sub && sub.terms ? loc(sub.terms.text, lang) : "");
+// L'acceptation est proposée seulement si : à accepter, version courante posée, prix fixé, abonnement pas arrêté.
+export const canAccept = (sub) => !!sub && sub.needsAcceptance && !!sub.terms && sub.price !== null && sub.state !== "arrete" && !sub.internal && !sub.free;
+// Prix pas encore fixé (la base rend alors needs_acceptance faux) : rien à accepter, on le dit une fois, tant que rien n'a jamais été accepté.
+export const needsPrep = (sub) => !!sub && !sub.internal && !sub.free && !!sub.terms && sub.price === null && sub.state !== "arrete" && !sub.accepted;
+/* ligne d'état + bloc des conditions. opts.done = date d'une acceptation faite dans cette page. */
+export function aboHtml(sub, lang, opts = {}) {
+  if (!sub) return "";
+  const parts = aboParts(sub, lang, opts);
+  let h = `<p class="abo-line">${esc(parts.join(" · "))}</p>`;
+  if (opts.done && !sub.needsAcceptance) h += `<p class="abo-ok" role="status">${esc(t(lang, "ab.terms.done", { date: dateText(opts.done, lang) || opts.done }))}</p>`;
+  if (sub.free) return h;
+  if (needsPrep(sub)) return h + `<section class="card abo-card" aria-labelledby="ab-h"><h2 id="ab-h">${esc(t(lang, "ab.terms.title"))}</h2><p class="notice" role="status">${esc(t(lang, "ab.prep"))}</p></section>`;
+  if (!sub.needsAcceptance || !sub.terms || sub.state === "arrete") return h;
+  const price = fmtPrice(sub.price, sub.currency, lang), was = sub.billed !== null ? sub.billed : sub.accepted ? sub.accepted.price : null, before = was !== null && sub.price !== null && was !== sub.price ? fmtPrice(was, sub.currency, lang) : "";   // « avant » = le prix réellement facturé (billed_price), à défaut le dernier accepté
+  const kind = askKind(sub), TITLE = { first: "ab.terms.title", version: "ab.terms.titleNew", price: "ab.terms.titlePrice", resume: "ab.terms.titleResume", afterFree: "ab.terms.titleAfterFree" }, INTRO = { first: "ab.terms.intro", version: "ab.terms.intro", price: "ab.terms.introPrice", resume: "ab.terms.introResume", afterFree: "ab.terms.introAfterFree" };
+  h += `<section class="card abo-card" aria-labelledby="ab-h"><h2 id="ab-h">${esc(t(lang, TITLE[kind]))}</h2>`;
+  if (sub.internal) {   // accès équipe : la base ne rend aucun prix ; on montre le texte, sans montant, sans case ni bouton
+    h += `<div class="terms-text" tabindex="0" role="region" aria-label="${esc(t(lang, "ab.terms.box"))}">${esc(termsText(sub, lang))}</div>`;
+    return h + `<p class="notice" role="status">${esc(t(lang, "ab.terms.internal"))}</p></section>`;
+  }
+  if (sub.price === null) return h + `<p class="notice" role="status">${esc(t(lang, "ab.prep"))}</p></section>`;
+  h += `<p class="muted">${esc(t(lang, INTRO[kind]))}</p>`;
+  h += `<p class="abo-price"><span class="abo-price-l">${esc(t(lang, "ab.terms.priceL"))}</span> <strong>${esc(t(lang, "ab.price", { price }))}</strong>${before ? ` <span class="abo-price-l">(${esc(t(lang, "ab.terms.was", { price: before }))})</span>` : ""}</p>`;
+  // La base donne la date (ask_price_from). Aucune phrase de date quand seul le TEXTE change (le prix ne change pas, ou baisse : la baisse vaut déjà ce mois-ci).
+  if (kind !== "version" && sub.askPriceFrom && dateText(sub.askPriceFrom, lang)) h += `<p class="muted abo-from">${esc(t(lang, askFuture(sub) ? "ab.terms.from" : "ab.terms.fromNow", { date: dateText(sub.askPriceFrom, lang) }))}</p>`;
+  h += `<div class="terms-text" tabindex="0" role="region" aria-label="${esc(t(lang, "ab.terms.box"))}">${esc(termsText(sub, lang))}</div>`;
+  return h + `<label class="terms" for="ab-check"><input type="checkbox" id="ab-check"><span>${esc(t(lang, "ab.terms.check", { price }))}</span></label><p class="err" id="ab-err" role="alert"></p><button type="button" class="btn primary" id="ab-accept">${esc(t(lang, "ab.terms.accept"))}</button></section>`;
+}
+
+/* ---------- bilan du mois ---------- */
+// rep : forme interne ; state : { which: "cur" | "prev", err: bool }
+export function reportBody(rep, lang, state = {}) {
+  if (!rep) return "";
+  const hasPrev = !!rep.prev;
+  const radios = rep.prevMonth ? `<div class="pills" role="radiogroup" aria-label="${esc(t(lang, "bil.pick"))}">${["cur", "prev"].map((w) => `<label class="pill"><input type="radio" name="bm" value="${w}"${(state.which || "cur") === w ? " checked" : ""}><span>${esc(t(lang, "bil." + w))}</span></label>`).join("")}</div>` : "";
+  const fig = (k) => {
+    const v = rep.cur[k], p = rep.prev ? rep.prev[k] : null, show = (x) => (x === null ? "—" : k === "median_brief_hours" ? fmtDelay(x, lang) || "—" : nf(x, lang, 0));
+    return `<div class="fig"><dt>${esc(t(lang, "bil." + k))}</dt><dd class="fig-n">${esc(show(v))}</dd>${hasPrev ? `<dd class="fig-p">${esc(t(lang, "bil.before", { value: show(p) }))}</dd>` : ""}</div>`;
+  };
+  const cmp = hasPrev && rep.prevMonth ? ` · ${t(lang, "bil.vs", { month: monthLabel(rep.prevMonth, lang) })}` : "";
+  return `${radios}<p class="bil-month">${esc(monthLabel(rep.month, lang) + cmp)}</p>${state.err ? `<p class="err" role="alert">${esc(t(lang, "bil.err"))}</p>` : ""}<dl class="figs">${CONTRACT.report.map(fig).join("")}</dl><p class="help">${esc(t(lang, "bil.help"))}</p>`;
+}
+
+/* ---------- relances ---------- */
+export function remindMessage(s, link) {
+  const l = s.lang === "en" ? "en" : "fr";
+  return t(l, "rem.msg", { name: s.client_name || "", link });
+}
+export const remindSubject = (s) => t(s.lang === "en" ? "en" : "fr", "rem.subject");
+export const waUrl = (text) => "https://wa.me/?text=" + encodeURIComponent(text);
+export function mailtoUrl(email, subject, body) {
+  const to = typeof email === "string" && /^[^\s@,;<>?&=]+@[^\s@,;<>?&=]+\.[^\s@,;<>?&=]+$/.test(email) ? email : "";
+  return `mailto:${to.split("@").map(encodeURIComponent).join("@")}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(String(body).replace(/\r?\n/g, "\r\n"))}`;
+}
+export function remindedText(s, lang) {
+  const x = sessionExtra(s); if (!x.nudges || !dateText(x.nudgedAt, lang)) return "";
+  return t(lang, x.nudges === 1 ? "rem.sentOne" : "rem.sent", { date: dateText(x.nudgedAt, lang), n: x.nudges });
+}
+
+/* ---------- vue d'une session : base + relance, garde, vidée ---------- */
+export function sessionView(s, lang) {
+  const v = baseView(s, lang), x = sessionExtra(s);
+  if (x.purgedAt) {   // vidée : même bucket que son état d'origine, mais aucune donnée, aucune action
+    const d = dateText(x.purgedAt, lang), lines = [d ? t(lang, "purged.on", { date: d }) : t(lang, "purged.pill")];
+    if (x.purgedFiles) lines.push(t(lang, x.purgedFiles === 1 ? "purged.filesOne" : "purged.files", { n: x.purgedFiles }));
+    return { ...v, pill: { label: t(lang, "purged.pill"), tone: "off" }, next: null, steps: [], done: 0, total: 0, missing: null, hint: null, files: null, purged: true, canRemind: false, extras: [{ cls: "purged-l", text: lines.join(" · ") }] };
+  }
+  const extras = [];
+  if (x.toRemind) extras.push({ cls: "rem-l", pill: t(lang, "rem.pill"), text: x.days === null ? "" : x.days === 0 ? t(lang, "rem.days0") : x.days === 1 ? t(lang, "rem.days1") : t(lang, "rem.days", { n: x.days }) });
+  const nd = remindedText(s, lang); if (nd) extras.push({ cls: "nudged-l", text: nd });
+  if (x.keepUntil && dateText(x.keepUntil, lang)) extras.push({ cls: "keep-l", text: t(lang, "keep.until", { date: dateText(x.keepUntil, lang) }) });
+  let next = v.next;
+  if (x.toRemind && next && next.action === "copy") next = { action: "remind", label: t(lang, "rem.btn") };   // le lien se copie toujours, en second
+  return { ...v, next, extras, canRemind: x.waiting };
+}
+function extrasHtml(v) {
+  return (v.extras || []).map((e) => `<p class="${e.cls}">${e.pill ? `<span class="pill-st st-wait">${esc(e.pill)}</span> ` : ""}${esc(e.text)}</p>`).join("");
+}
+
+Object.assign(T.fr, {
+    "ab.trial": "Mois offert jusqu'au {date}",
+    "ab.trialOn": "Mois offert en cours",
+    "ab.trialRange": "Mois offert du {from} au {date}",
+    "ab.then": "ensuite {price} TTC par mois, facturé à la fin de chaque mois",
+    "ab.free": "Portail offert",
+    "ab.newPrice": "nouveau prix à accepter ci-dessous",
+    "ab.e.price_changed": "Le prix vient de changer. Relisez, puis acceptez.",
+    "ab.cur": "mois en cours : jusqu'au {date}",
+    "ab.thisMonth": "{price} TTC ce mois-ci",
+    "ab.nextPrice": "{price} TTC à partir du {date}",
+    "ab.terms.from": "Ce prix s'appliquera à partir du {date}.",
+    "ab.terms.fromNow": "Ce prix s'applique dès le mois en cours, commencé le {date}. Ce mois est dû en entier.",
+    "ab.terms.titleAfterFree": "Votre abonnement redevient payant",
+    "ab.terms.introAfterFree": "Votre abonnement redevient payant. Relisez les conditions et le prix, puis acceptez. Sans engagement, facturé à la fin de chaque mois.",
+    "ab.terms.was": "avant : {price} TTC",
+    "ab.price": "{price} TTC par mois",
+    "ab.active": "Abonnement actif",
+    "ab.stopped": "Abonnement arrêté",
+    "ab.stoppedOn": "Abonnement arrêté le {date}",
+    "ab.accepted": "Conditions acceptées le {date}",
+    "ab.prep": "Votre abonnement est en cours de préparation. Vous pourrez accepter les conditions ici dès qu'il sera prêt.",
+    "ab.terms.title": "Conditions de l'abonnement",
+    "ab.terms.titleNew": "Les conditions de l'abonnement ont changé",
+    "ab.terms.titlePrice": "Le prix de votre abonnement a changé",
+    "ab.terms.titleResume": "Votre abonnement reprend",
+    "ab.terms.introPrice": "Une baisse de prix s'applique tout de suite. Une hausse s'applique après votre accord, à la date indiquée. Sans engagement, facturé à la fin de chaque mois. Relisez, puis acceptez.",
+    "ab.terms.introResume": "Votre abonnement reprend. Relisez les conditions, puis acceptez. Sans engagement, facturé à la fin de chaque mois.",
+    "ab.terms.intro": "Sans engagement. L'abonnement est facturé à la fin de chaque mois. Une baisse de prix s'applique tout de suite. Une hausse s'applique après votre accord, à la date indiquée. Lisez les conditions, puis acceptez-les.",
+    "ab.terms.priceL": "Prix que vous acceptez :",
+    "ab.terms.box": "Texte des conditions de l'abonnement",
+    "ab.terms.check": "J'ai lu et j'accepte les conditions de l'abonnement, au prix de {price} TTC par mois.",
+    "ab.terms.accept": "J'accepte",
+    "ab.terms.accepting": "Enregistrement…",
+    "ab.terms.done": "Merci, conditions acceptées le {date}.",
+    "ab.terms.internal": "Vous voyez cette page avec l'accès de l'équipe : seul le studio peut accepter les conditions.",
+    "ab.e.check": "Cochez la case pour accepter.",
+    "ab.e.version_obsolete": "Les conditions viennent de changer. Relisez-les, puis acceptez.",
+    "ab.e.gone": "Impossible d'accepter pour le moment. La page vient d'être actualisée.",
+    "ab.e.generic": "L'acceptation n'a pas abouti. Réessayez dans un instant.",
+    "bil.title": "Bilan du mois",
+    "bil.pick": "Mois affiché",
+    "bil.cur": "Mois en cours",
+    "bil.prev": "Mois précédent",
+    "bil.vs": "comparé à {month}",
+    "bil.before": "Mois d'avant : {value}",
+    "bil.help": "Les chiffres portent sur les sessions créées pendant le mois choisi, comptées au moment où vous ouvrez cette page.",
+    "bil.err": "Impossible d'afficher ce mois pour le moment.",
+    "bil.hours": "{n} h",
+    "bil.days": "{n} jours",
+    "bil.lessHour": "moins d'1 h",
+    "bil.sessions_created": "Sessions créées",
+    "bil.briefs_received": "Briefs reçus",
+    "bil.briefs_waiting": "Briefs en attente",
+    "bil.median_brief_hours": "Délai médian pour recevoir un brief",
+    "bil.files_received": "Fichiers reçus",
+    "bil.orders_created": "Commandes passées",
+    "bil.orders_delivered": "Commandes livrées",
+    "bil.sessions_done": "Sessions classées",
+    "rem.pill": "À relancer",
+    "rem.days0": "En attente depuis aujourd'hui",
+    "rem.days1": "En attente depuis 1 jour",
+    "rem.days": "En attente depuis {n} jours",
+    "rem.btn": "Relancer",
+    "rem.title": "Relancer le client",
+    "rem.intro": "Voici un message prêt à envoyer à votre client, avec le lien de son brief. Vous pouvez le modifier avant de l'envoyer.",
+    "rem.label": "Message ({lang})",
+    "rem.lang.fr": "français",
+    "rem.lang.en": "anglais",
+    "rem.copy": "Copier le message",
+    "rem.wa": "Ouvrir dans WhatsApp",
+    "rem.mail": "Ouvrir dans un e-mail",
+    "rem.sentOne": "Relancé le {date} (1 fois)",
+    "rem.sent": "Relancé le {date} ({n} fois)",
+    "rem.track": "Le message est prêt, mais la relance n'a pas pu être notée sur cette page.",
+    "rem.notWaiting": "Votre client a déjà envoyé son brief : inutile de le relancer.",
+    "rem.subject": "Rappel : votre brief",
+    "rem.msg": "Bonjour {name},\nPetit rappel : nous attendons encore votre brief pour lancer le montage. Il se remplit en quelques minutes, sans compte :\n{link}\nMerci beaucoup.",
+    "keep.until": "Brief et fichiers du client gardés jusqu'au {date}",
+    "purged.pill": "Vidée",
+    "purged.on": "Vidée le {date}",
+    "purged.filesOne": "1 fichier supprimé",
+    "purged.files": "{n} fichiers supprimés",
+});
+Object.assign(T.en, {
+    "ab.trial": "Free month until {date}",
+    "ab.trialOn": "Free month in progress",
+    "ab.trialRange": "Free month from {from} to {date}",
+    "ab.then": "then {price} per month (tax included), billed at the end of each month",
+    "ab.free": "Portal included at no charge",
+    "ab.newPrice": "new price to accept below",
+    "ab.e.price_changed": "The price has just changed. Read it again, then accept.",
+    "ab.cur": "current month: until {date}",
+    "ab.thisMonth": "{price} this month (tax included)",
+    "ab.nextPrice": "{price} from {date} (tax included)",
+    "ab.terms.from": "This price applies from {date}.",
+    "ab.terms.fromNow": "This price applies to the current month, which started on {date}. This month is due in full.",
+    "ab.terms.titleAfterFree": "Your subscription is paid again",
+    "ab.terms.introAfterFree": "Your subscription is paid again. Read the terms and the price again, then accept. No commitment, billed at the end of each month.",
+    "ab.terms.was": "was {price}",
+    "ab.price": "{price} per month (tax included)",
+    "ab.active": "Subscription active",
+    "ab.stopped": "Subscription stopped",
+    "ab.stoppedOn": "Subscription stopped on {date}",
+    "ab.accepted": "Terms accepted on {date}",
+    "ab.prep": "Your subscription is being prepared. You will be able to accept the terms here as soon as it is ready.",
+    "ab.terms.title": "Subscription terms",
+    "ab.terms.titleNew": "The subscription terms have changed",
+    "ab.terms.titlePrice": "The price of your subscription has changed",
+    "ab.terms.titleResume": "Your subscription is resuming",
+    "ab.terms.introPrice": "A price decrease applies immediately. An increase applies after you accept, from the date shown. No commitment, billed at the end of each month. Read it again, then accept.",
+    "ab.terms.introResume": "Your subscription is resuming. Read the terms again, then accept. No commitment, billed at the end of each month.",
+    "ab.terms.intro": "No commitment. The subscription is billed at the end of each month. A price decrease applies immediately. An increase applies after you accept, from the date shown. Read the terms, then accept them.",
+    "ab.terms.priceL": "Price you are accepting:",
+    "ab.terms.box": "Text of the subscription terms",
+    "ab.terms.check": "I have read and accept the subscription terms, at {price} per month (tax included).",
+    "ab.terms.accept": "I accept",
+    "ab.terms.accepting": "Saving…",
+    "ab.terms.done": "Thank you, terms accepted on {date}.",
+    "ab.terms.internal": "You are viewing this page with the team's access: only the studio can accept the terms.",
+    "ab.e.check": "Tick the box to accept.",
+    "ab.e.version_obsolete": "The terms have just changed. Read them again, then accept.",
+    "ab.e.gone": "Cannot accept right now. The page has just been refreshed.",
+    "ab.e.generic": "The acceptance did not go through. Please try again in a moment.",
+    "bil.title": "Monthly report",
+    "bil.pick": "Month shown",
+    "bil.cur": "Current month",
+    "bil.prev": "Previous month",
+    "bil.vs": "compared with {month}",
+    "bil.before": "Month before: {value}",
+    "bil.help": "The figures cover the sessions created during the chosen month, counted when you open this page.",
+    "bil.err": "Cannot show this month right now.",
+    "bil.hours": "{n} h",
+    "bil.days": "{n} days",
+    "bil.lessHour": "under 1 h",
+    "bil.sessions_created": "Sessions created",
+    "bil.briefs_received": "Briefs received",
+    "bil.briefs_waiting": "Briefs waiting",
+    "bil.median_brief_hours": "Median time to receive a brief",
+    "bil.files_received": "Files received",
+    "bil.orders_created": "Orders placed",
+    "bil.orders_delivered": "Orders delivered",
+    "bil.sessions_done": "Sessions marked as done",
+    "rem.pill": "To remind",
+    "rem.days0": "Waiting since today",
+    "rem.days1": "Waiting for 1 day",
+    "rem.days": "Waiting for {n} days",
+    "rem.btn": "Send a reminder",
+    "rem.title": "Remind the client",
+    "rem.intro": "Here is a message ready to send to your client, with the link to their brief. You can edit it before sending.",
+    "rem.label": "Message ({lang})",
+    "rem.lang.fr": "French",
+    "rem.lang.en": "English",
+    "rem.copy": "Copy the message",
+    "rem.wa": "Open in WhatsApp",
+    "rem.mail": "Open in an e-mail",
+    "rem.sentOne": "Reminded on {date} (1 time)",
+    "rem.sent": "Reminded on {date} ({n} times)",
+    "rem.track": "The message is ready, but the reminder could not be noted on this page.",
+    "rem.notWaiting": "Your client has already sent their brief: no need to remind them.",
+    "rem.subject": "Reminder: your brief",
+    "rem.msg": "Hi {name},\nA quick reminder: we are still waiting for your brief to get started on the edit. It takes a few minutes and needs no account:\n{link}\nThank you.",
+    "keep.until": "Client's brief and files kept until {date}",
+    "purged.pill": "Cleared",
+    "purged.on": "Cleared on {date}",
+    "purged.filesOne": "1 file deleted",
+    "purged.files": "{n} files deleted",
+});

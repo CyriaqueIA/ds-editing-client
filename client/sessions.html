@@ -8,14 +8,14 @@
 <meta name="referrer" content="no-referrer">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='7' fill='%231F2937'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="portail.css">
-<link rel="stylesheet" href="portail-studio.css?v=d7d21275">
+<link rel="stylesheet" href="portail-studio.css?v=c1d119b3">
 </head>
 <body>
 <main class="wrap wide" id="app" aria-busy="true"><p class="muted">…</p></main>
 <dialog id="dlg" aria-labelledby="dlg-title"></dialog>
 <script type="module">
 import { rpc, t as tr, esc, loc, fmtDate, applyBrand, studioHeader, logoFallback, renderSummary, briefText, lsGet, lsSet } from "./portail.js";
-import { renderTiles, renderSessions, deliverablesText, parseLinks, briefUrl, copyText, startsOrder, isStudio, filesInfo } from "./portail-studio.js?v=4c04736b";
+import { renderTiles, renderSessions, deliverablesText, parseLinks, briefUrl, copyText, startsOrder, isStudio, filesInfo, CONTRACT, shownAsk, normSub, normReport, aboHtml, reportBody, remindMessage, remindSubject, remindedText, waUrl, mailtoUrl, dateText, acceptArgs, sessionExtra } from "./portail-studio.js?v=1ce4df94";
 
 /* Phrase des conditions : reprise MOT POUR MOT de client/depot.html, clé « s6.terms » (FR ligne ~685, EN ligne ~766).
    Elle nomme DS Editing : le studio est notre client, il la connaît. C'est la seule mention de la marque sur cette page. */
@@ -26,9 +26,12 @@ const TERMS = {
 
 const qs = new URLSearchParams(location.search);
 const slug = (qs.get("client") || "").trim(), key = (qs.get("k") || "").trim();
+// Rafraîchissement : 60 s. Seul un essai local (localhost avec api=local et tick=<ms>) peut l'accélérer ; en ligne, le paramètre ne fait rien.
+const TICK = (location.hostname === "localhost" || location.hostname === "127.0.0.1") && qs.get("api") === "local" && +qs.get("tick") >= 500 ? +qs.get("tick") : 60000;
 const app = document.getElementById("app"), dlg = document.getElementById("dlg");
 let lang = qs.get("lang") === "en" ? "en" : qs.get("lang") === "fr" ? "fr" : "";
 let studio = null, sessions = [], internal = null, filter = "all", listErr = false;
+let sub = null, aboDone = "", rep = null, repPrev = null, repWhich = "cur", repErr = false, bilanOpen = false;   // abonnement et bilan (briques 4 et 5) : null = rien à montrer
 const t = (k, v) => tr(lang || "fr", k, v);
 const $ = (s, r = document) => r.querySelector(s);
 const byId = (id) => sessions.find((s) => s.id === id);
@@ -59,12 +62,16 @@ function renderPage() {
     <p class="help-line">${esc(t("s.help"))}</p>
     <div class="tiles" id="tiles" role="group" aria-label="${esc(t("s.title"))}"></div>
     <p class="listmsg" id="listmsg" role="status"></p>
-    <div id="list"></div>`;
-  renderList();
+    <div id="abo"></div>
+    <div id="list"></div>
+    <div id="bilan"></div>`;
+  renderList(); renderAbo(); renderBilan();
   $("#lang").addEventListener("click", () => { lang = lang === "fr" ? "en" : "fr"; renderPage(); });
   $("#new").addEventListener("click", openNew);
   $("#tiles").addEventListener("click", (e) => { const b = e.target.closest("[data-f]"); if (!b) return; filter = b.dataset.f; renderList(); });
   $("#list").addEventListener("click", onAction);
+  $("#abo").addEventListener("click", (e) => { if (e.target.closest("#ab-accept")) acceptTerms(); });
+  $("#bilan").addEventListener("change", onBilanPick);
 }
 // Redessine tuiles et liste en gardant le bloc « annulées » ouvert et le focus (tuile, ou action d'une session).
 function renderList() {
@@ -91,6 +98,74 @@ async function refresh() {
   } catch (e) { if (e.code === "bad_key") return invalid(); listErr = true; }
   if ($("#list")) renderList();
 }
+
+/* ---------------- abonnement et bilan du mois ----------------
+   Fonction absente, erreur ou réponse vide : on ne montre rien (la page reste telle qu'avant la base). */
+const reportArgs = (which) => args(which === "prev" && rep && rep.prevMonth ? { p_month: rep.prevMonth } : {});
+async function loadAbo(withReport = true) {   // withReport faux : le bilan replié n'est pas relu (la limite de débit est partagée par adresse IP)
+  let r;
+  try { r = await rpc(CONTRACT.fn.subGet, args()); } catch (e) { return; }   // on garde ce qui est déjà affiché
+  sub = normSub(r);
+  if (sub && sub.needsAcceptance) aboDone = "";   // une nouvelle demande efface le « Merci » d'avant
+  if ($("#abo")) renderAbo();   // le bloc est redessiné TOUT DE SUITE (même tick que la réponse) : jamais en attendant le bilan
+  if (!sub) { rep = repPrev = null; if ($("#abo")) renderBilan(); return; }
+  if (withReport || !rep) {
+    try { rep = normReport(await rpc(CONTRACT.fn.report, args())); } catch (e) { /* garde le bilan précédent */ }
+    if (repWhich === "prev" && rep && rep.prevMonth) { try { repPrev = normReport(await rpc(CONTRACT.fn.report, reportArgs("prev"))); repErr = false; } catch (e) { repErr = true; } }
+  }
+  if ($("#abo") && withReport) renderBilan();
+}
+let aboKey = "", askKey = "", askShown = null;   // askShown : la version et le montant DESSINÉS dans le bloc ; ce sont les seuls envoyés à l'acceptation
+   // ce qui a été dessiné : on ne redessine que si la version, le montant, l'état, la langue ou un message change
+function renderAbo(force = false) {
+  const el = $("#abo"); if (!el) return;
+  const key = JSON.stringify([sub, lang, aboDone]);
+  if (!force && key === aboKey) return;
+  const hadFocus = document.activeElement && document.activeElement.id, ck = $("#ab-check"), box = $("#abo .terms-text");
+  const same = (x) => x ? JSON.stringify([x.terms && x.terms.version, x.price]) : "";
+  const keep = ck && !force && same(sub) === askKey ? { checked: ck.checked, top: box ? box.scrollTop : 0 } : null;   // même version et même montant : on garde la case et la lecture
+  el.innerHTML = aboHtml(sub, lang, { done: aboDone }); aboKey = key; askKey = same(sub);
+  askShown = sub && sub.terms && $("#ab-accept") ? shownAsk(sub) : null;
+  if (keep) { const c2 = $("#ab-check"), b2 = $("#abo .terms-text"); if (c2) c2.checked = keep.checked; if (b2) b2.scrollTop = keep.top; }
+  if (hadFocus && /^ab-/.test(hadFocus)) { const f = document.getElementById(hadFocus); if (f) f.focus(); }
+}
+function renderBilan() {
+  const el = $("#bilan"); if (!el) return;
+  if (!rep) { el.innerHTML = ""; return; }
+  const ae = document.activeElement, focusVal = ae && ae.name === "bm" ? ae.value : "";
+  const shown = repWhich === "prev" && repPrev ? repPrev : rep;
+  el.innerHTML = `<details class="bilan"${bilanOpen ? " open" : ""}><summary>${esc(t("bil.title"))}</summary><div class="bilan-body">${reportBody(shown, lang, { which: repWhich, err: repErr })}</div></details>`;
+  const d = $("#bilan details");
+  d.addEventListener("toggle", () => { if (d.open === bilanOpen) return; bilanOpen = d.open; if (bilanOpen) loadAbo(true); });   // les chiffres se relisent à l'ouverture
+  if (focusVal) { const f = $(`#bilan input[name="bm"][value="${focusVal}"]`); if (f) f.focus(); }
+}
+async function onBilanPick(e) {
+  if (!e.target || e.target.name !== "bm") return;
+  const which = e.target.value === "prev" ? "prev" : "cur";
+  if (which === "prev" && rep && rep.prevMonth) {
+    try { repPrev = normReport(await rpc(CONTRACT.fn.report, reportArgs("prev"))); repErr = !repPrev; } catch (er) { repErr = true; }
+    if (repErr || !repPrev) { repWhich = "cur"; renderBilan(); return; }
+  } else repErr = false;
+  repWhich = which; renderBilan();
+}
+async function acceptTerms() {
+  const ck = $("#ab-check"), er = $("#ab-err"), btn = $("#ab-accept"); if (!ck || !askShown) return;
+  if (!ck.checked) { er.textContent = t("ab.e.check"); ck.focus(); return; }
+  er.textContent = ""; btn.disabled = true; btn.textContent = t("ab.terms.accepting");
+  try {
+    const r = await rpc(CONTRACT.fn.subAccept, args(acceptArgs(askShown)));   // la version ET le montant DESSINÉS à l'écran, quoi qu'il soit arrivé aux données entre-temps
+    aboDone = (r && r.accepted_at) || new Date().toISOString();   // date brute : formatée à l'affichage, dans la langue courante
+    await loadAbo(false);
+  } catch (e) {
+    btn.disabled = false; btn.textContent = t("ab.terms.accept");
+    if (e.code === CONTRACT.err.badKey) { sub = { ...sub, internal: true }; renderAbo(true); return; }   // clé interne : seul le studio accepte
+    const changed = [CONTRACT.err.obsolete, CONTRACT.err.priceChanged].includes(e.code), gone = [CONTRACT.err.noSub, CONTRACT.err.stopped, CONTRACT.err.noTerms, CONTRACT.err.noPrice].includes(e.code);
+    const msg = e.code === CONTRACT.err.priceChanged ? t("ab.e.price_changed") : e.code === CONTRACT.err.obsolete ? t("ab.e.version_obsolete") : gone ? t("ab.e.gone") : e.code === "rate_limit" ? t("s.e.rate_limit") : e.offline ? t("s.e.offline") : t("ab.e.generic");
+    if (changed || gone) { await loadAbo(false); renderAbo(true); const e2 = $("#ab-err"); if (e2) e2.textContent = msg; }   // bloc rechargé : case décochée, nouveau texte et nouveau montant
+    else er.textContent = msg;
+  }
+}
+
 async function loadFormulas() {
   try { return await rpc("portal_formulas_list", args()); } catch (e) { return null; }
 }
@@ -109,7 +184,8 @@ async function boot() {
   if (!lang) lang = studio.lang === "en" ? "en" : "fr";
   applyBrand(studio.brand_color);
   renderPage();
-  setInterval(() => { if (!document.hidden) refresh(); }, 60000);
+  loadAbo();
+  setInterval(() => { if (!document.hidden) { refresh(); loadAbo(bilanOpen); } }, TICK);
 }
 
 /* ---------------- fenêtre ---------------- */
@@ -146,6 +222,38 @@ async function onAction(e) {
   else if (act === "brief" || act === "view") openBrief(s);
   else if (act === "cancel") openCancel(s);
   else if (act === "done") openDone(s);
+  else if (act === "remind") openRemind(s);
+}
+// « Relancer » : message prêt pour le client final (langue de la session, lien de brief, sans montant ni nom du prestataire).
+// Copier, WhatsApp et e-mail comptent comme une relance : la base la note par portal_session_remind. Les liens WhatsApp et e-mail sont de vrais liens
+// (pas d'ouverture de fenêtre après un appel réseau : aucun blocage par le navigateur).
+function openRemind(s) {
+  const ml = s.lang === "en" ? "en" : "fr", link = briefUrl(s.token), text0 = remindMessage(s, link);
+  openDlg(`${dlgHead(t("rem.title"))}<p class="muted">${esc(t("rem.intro"))}</p>
+    <div class="q"><label class="lbl" for="rm-text">${esc(t("rem.label", { lang: t("rem.lang." + ml) }))}</label><textarea class="in" id="rm-text" rows="7" spellcheck="true">${esc(text0)}</textarea></div>
+    <p class="rm-sent" id="rm-sent" role="status">${esc(remindedText(s, lang))}</p><p class="err" id="rm-err" role="alert"></p>
+    <div class="rm-acts"><button type="button" class="btn primary" id="rm-copy">${esc(t("rem.copy"))}</button><a class="btn" id="rm-wa" href="${esc(waUrl(text0))}" target="_blank" rel="noopener noreferrer">${esc(t("rem.wa"))}</a><a class="btn" id="rm-mail" href="${esc(mailtoUrl(s.client_email, remindSubject(s), text0))}">${esc(t("rem.mail"))}</a></div>
+    <div class="dlg-actions"><button type="button" class="btn" data-close>${esc(t("close"))}</button></div>`);
+  const ta = $("#rm-text");
+  const sync = () => { $("#rm-wa").setAttribute("href", waUrl(ta.value)); $("#rm-mail").setAttribute("href", mailtoUrl(s.client_email, remindSubject(s), ta.value)); };
+  ta.addEventListener("input", sync);
+  let noted = false, busy = false;   // UNE relance par ouverture du panneau, quel que soit le nombre de boutons utilisés
+  const note = async () => {
+    if (noted || busy || internal === true) return;   // accès équipe : le panneau marche, mais la relance du studio n'est pas comptée
+    busy = true;
+    try {
+      const r = await rpc(CONTRACT.fn.remind, args({ p_session: s.id })); noted = true;
+      const i = sessions.findIndex((x) => x.id === s.id); if (i >= 0 && r && r.id === s.id) sessions[i] = r;
+      const cur = byId(s.id); $("#rm-sent").textContent = cur ? remindedText(cur, lang) : ""; $("#rm-err").textContent = "";
+      renderList();
+    } catch (e) {
+      if (e.code === CONTRACT.err.notWaiting) { noted = true; $("#rm-err").textContent = t("rem.notWaiting"); refresh(); }
+      else $("#rm-err").textContent = t("rem.track");
+    } finally { busy = false; }
+  };
+  $("#rm-copy").addEventListener("click", async () => { if (await copyText(ta.value)) { $("#rm-copy").textContent = t("copied"); setTimeout(() => { const b = $("#rm-copy"); if (b) b.textContent = t("rem.copy"); }, 2000); note(); } else { $("#rm-err").textContent = t("s.copyFail"); ta.focus(); ta.select(); } });
+  $("#rm-wa").addEventListener("click", note);
+  $("#rm-mail").addEventListener("click", note);
 }
 // Après une action qui redessine la liste : le focus revient sur un bouton de la même ligne (celui qui est visible : carte ou tableau).
 function focusAct(id, act) {
