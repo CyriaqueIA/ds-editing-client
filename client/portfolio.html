@@ -329,10 +329,10 @@
     // Recommandés : aucun mot sur les tarifs, le formulaire demande téléphone + e-mail
     // Studio appelé (16/11/2026) : `label` remplace « Recommandé par … » (ex. « Préparé pour Pauline · Panache Stories »), `g3Title` / `g3Text` = son cadeau.
     const rfFr = RF.label?.fr || `Recommandé par ${RF.by}`, rfEn = RF.label?.en || `Recommended by ${RF.by}`;
-    Object.assign(T.fr, { private: rfFr, g1Btn: "🎁 Un cadeau pour vous", g2Kicker: rfFr, g2Text: "Laissez votre numéro et votre e-mail pour le découvrir.",
+    Object.assign(T.fr, { private: rfFr, g1Btn: RF.prices ? T.fr.g1Btn : "🎁 Un cadeau pour vous", g2Kicker: rfFr, g2Text: "Laissez votre numéro et votre e-mail pour le découvrir.",
       email: "Votre e-mail", emailPh: "vous@studio.com", errEmail: "Cet e-mail ne semble pas valide.", g2Note: "On ne vous contacte que pour votre cadeau.",
       g3Text: "On vous appelle au {phone} pour lancer votre premier montage.", g3Btn: "Voir nos réalisations" }, RF.gift?.fr || {});
-    Object.assign(T.en, { private: rfEn, g1Btn: "🎁 A gift for you", g2Kicker: rfEn, g2Text: "Leave your number and email to unlock it.",
+    Object.assign(T.en, { private: rfEn, g1Btn: RF.prices ? T.en.g1Btn : "🎁 A gift for you", g2Kicker: rfEn, g2Text: "Leave your number and email to unlock it.",
       email: "Your email", emailPh: "you@studio.com", errEmail: "That email doesn't look valid.", g2Note: "We'll only contact you about your gift.",
       g3Text: "We'll call you at {phone} to get your first edit started.", g3Btn: "See our work" }, RF.gift?.en || {});
   }
@@ -361,8 +361,10 @@
   const store = { get: () => { try { return localStorage.getItem("ds_gift"); } catch { return null; } }, set: (v) => { try { v == null ? localStorage.removeItem("ds_gift") : localStorage.setItem("ds_gift", v); } catch {} } };
   if (params.get("gift") === "reset") store.set(null);
   // ?prices=1 (24/11/2026) : prix directs, sans numéro à laisser. Témoignage, puis « Voir les tarifs » ferme la pop-up sur les prix (non barrés).
-  // Sans effet sur les portfolios recommandés (?r=) et personnalisés (?p=), qui ne montrent jamais de prix.
-  const DIRECT = params.get("prices") === "1" && !params.has("r") && !params.has("p");
+  // Sans effet sur les portfolios recommandés (?r=) et personnalisés (?p=), qui ne montrent jamais de prix…
+  // … sauf un recommandé marqué `prices: true` dans portfolio.js (27/11/2026, Mumbo Studio) : prix directs + « 1er montage offert ».
+  const RFP = !!(RF && RF.prices);
+  const DIRECT = (params.get("prices") === "1" && !params.has("r") && !params.has("p")) || RFP;
   let unlocked = !DIRECT && !!G && store.get() === "1";
   // Envoi du contact : Supabase site_lead_add (kind « gift », alerte Telegram + CRM) et copie e-mail FormSubmit.
   // Jamais depuis un serveur local (localhost / 127.0.0.1 / fichier) : on journalise seulement, pour tester sans écrire en base.
@@ -442,7 +444,7 @@
     const prices = ((lang === "en" && P.pricesEn) || P.prices)[type] || {};
     // portfolio.js → hidePrices : aucun prix nulle part (onglets, description, pied, scène « bientôt »)
     // … sauf une fois le cadeau débloqué (parcours gift) : les prix s'affichent, barrés, avec « 1er montage offert »
-    const hide = !!PR || !!RF || (P.hidePrices && !unlocked && !DIRECT); // portfolio perso et recommandés : jamais de prix (prix en visio)
+    const hide = !!PR || (!!RF && !RFP) || (P.hidePrices && !unlocked && !DIRECT); // portfolio perso et recommandés : jamais de prix (prix en visio), sauf `prices: true`
     renderProspect(); renderTrust(); renderUpsell();
     const show = (p) => (hide ? "" : p);
     const fmt = (p) => (unlocked ? `<s>${esc(p)}</s>` : esc(p));
@@ -465,7 +467,7 @@
       ? `<div class="tier active unique"><b>${t.unique}</b>${hide ? "" : `<span>${fmt(unique)}${unlocked ? `<i class="free">${t.free}</i>` : ""}</span>`}</div>`
       : tiers.map((ti) => `<div class="tier ${ti.slug === tier ? "active" : ""}" data-tier="${ti.slug}"><b>${ti[lang][0]}</b>${hide ? "" : `<span>${prices[ti.slug] ? fmt(prices[ti.slug]) : t.quote}${unlocked && prices[ti.slug] ? `<i class="free">${t.free}</i>` : ""}</span>`}</div>`).join("");
     $("#tiers").querySelectorAll("[data-tier]").forEach((el) => el.addEventListener("click", () => { tier = el.dataset.tier; render(); }));
-    $("#tierDesc").innerHTML = `${unique ? t.uniqueDesc : esc(tiers.find((x) => x.slug === tier)[lang][1])}${price ? ` <em>${fmt(price)}</em> ${DIRECT ? t.perVideoDirect : t.perVideo}.${bundle ? ` ${t.bundle} <em>${esc(bundle)}</em>.` : ""}${unlocked ? ` <span class="free">${t.free}.</span>` : ""}` : RF && unlocked ? ` <span class="free">${t.free}.</span>` : ""}`;
+    $("#tierDesc").innerHTML = `${unique ? t.uniqueDesc : esc(tiers.find((x) => x.slug === tier)[lang][1])}${price ? ` <em>${fmt(price)}</em> ${DIRECT ? t.perVideoDirect : t.perVideo}.${bundle ? ` ${t.bundle} <em>${esc(bundle)}</em>.` : ""}${unlocked || RFP ? ` <span class="free">${t.free}.</span>` : ""}` : RF && unlocked ? ` <span class="free">${t.free}.</span>` : ""}`;
     const items = ofType.filter((it) => !tiered || it.tier === tier)
       .sort((a, b) => (a.lang && a.lang !== lang ? 1 : 0) - (b.lang && b.lang !== lang ? 1 : 0) || (a.vertical ? 1 : 0) - (b.vertical ? 1 : 0)); // langue de l'interface d'abord, puis 16:9 avant 9:16
     const grid = $("#grid");

@@ -63,7 +63,7 @@ window.DS_PORTFOLIO = {
   },
 
   // Portfolios « recommandés » (14/11/2026) : lien ?k=CLÉ&r=<slug>. Pour les contacts qu'un client nous amène.
-  // Aucun prix, jamais (même après le cadeau). Cadeau = téléphone + e-mail, puis « 1er montage offert ».
+  // Aucun prix (même après le cadeau), sauf `prices: true` sur l'entrée. Cadeau = téléphone + e-mail, puis « 1er montage offert ».
   // `by` : nom affiché (« Recommandé par … ») · `lang` : langue d'ouverture (le bouton FR/EN reste là).
   // Studio appelé (16/11/2026), même mode : `label` { fr, en } remplace « Recommandé par … », `gift` { fr, en } = son cadeau (g3Title, g3Text).
   //   Lien : ?k=CLÉ&r=<slug>&ref=<slug> (`ref` = source de la visite dans l'alerte Telegram).
@@ -82,6 +82,10 @@ window.DS_PORTFOLIO = {
         fr: { g3Title: "Votre semaine de montage est offerte.", g3Text: "Sans engagement. On vous écrit pour lancer votre semaine de montage.", free: "Semaine de montage offerte" },
         en: { g3Title: "Your week of editing is on us.", g3Text: "No commitment. We'll email you to start your week of editing.", free: "Week of editing on us" },
       } },
+    // 27/11/2026 : Amir (Mumbo Studio, Paris), mail après l'appel avec Victoria. Demande de Cyriaque : les prix tout de suite, sans formulaire.
+    // `prices: true` = mode « prix directs » (comme ?prices=1) sur ce lien : témoignage, puis tarifs et pack épisode + 3 reels, avec « 1er montage offert ».
+    "mumbo-studio": { by: "Mumbo Studio", lang: "fr", prices: true,
+      label: { fr: "Préparé pour Amir · Mumbo Studio", en: "Prepared for Amir · Mumbo Studio" } },
   },
 
   // Upsell sous la grille de tous les portfolios (14/11/2026) : « Un épisode, cinq contenus » (épisode + 2 reels + miniature + trailer).
